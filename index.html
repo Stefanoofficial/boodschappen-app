@@ -93,12 +93,7 @@ overflow-x: hidden;
   border-bottom: none;
 }
 
-.item.selected {
-  text-decoration: line-through;
-}
-.item.selected span {
-    text-decoration: line-through;
-}
+
 .buttons {
   display: flex;
   gap: 8px;
@@ -208,13 +203,8 @@ function showList() {
 
     const div = document.createElement("div");
 
-    div.className = "item" +
-      (index === selectedIndex ? " selected" : "");
-
-    div.innerHTML = item.startsWith("✅") ? '✅ <span style="text-decoration: line-through;">' + item.substring(1) + '</span>' : item;
-
-
-    div.onclick = () => toggleItem(index);
+    div.className = "item";
+    div.innerHTML = item.startsWith("✅") ? "✅ <span style=\"text-decoration: line-through;\">" + item.substring(1) + "</span>" : item;
 
     list.appendChild(div);
   });
