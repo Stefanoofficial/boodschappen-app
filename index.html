@@ -208,8 +208,8 @@ function showList() {
     div.className = "item" +
       (index === selectedIndex ? " selected" : "");
 
-    div.innerText = item;
-if (item.startsWith("✅")) div.style.textDecoration = "line-through";
+    div.innerHTML = item.startsWith("✅") ? '✅ <span style="text-decoration: line-through;">' + item.substring(1) + '</span>' : item;
+
 
     div.onclick = () => toggleItem(index);
 
