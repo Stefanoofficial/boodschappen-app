@@ -209,6 +209,7 @@ function showList() {
       (index === selectedIndex ? " selected" : "");
 
     div.innerText = item;
+if (index === selectedIndex) div.style.textDecoration = "line-through";
 
     div.onclick = () => toggleItem(index);
 
