@@ -338,7 +338,17 @@ document.addEventListener("touchend", async function(e) {
 
 
 loadList();
+document.getElementById("list").addEventListener("click", function(e) {
+  const item = e.target.closest(".item");
+  if (!item) return;
 
+  const items = Array.from(this.children);
+  const index = items.indexOf(item);
+
+  if (index >= 0) {
+    toggleItem(index);
+  }
+});
 </script>
 
 </body>
