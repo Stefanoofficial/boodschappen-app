@@ -178,16 +178,15 @@ overflow-x: hidden;
 
 <script>
 
-const firebaseURL =
-"https://boodschappenthuis1-default-rtdb.firebaseio.com/boodschappen.json";
+
 
 let boodschappen = [];
 let selectedIndex = -1;
 
 async function loadList() {
   try {
-    const response = await fetch(firebaseURL);
-    const data = await response.json();
+const snapshot = await database.ref("boodschappen").once("value");
+const data = snapshot.val();
 
     boodschappen = data || [];
     selectedIndex = -1;
@@ -217,13 +216,7 @@ function showList() {
 }
 
 async function saveList() {
-  await fetch(firebaseURL, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(boodschappen)
-  });
+await database.ref("boodschappen").set(boodschappen);  
 
   updateStatus();
 }
@@ -355,8 +348,9 @@ document.getElementById("list").addEventListener("click", function(e) {
   }
 });
 </script>
- <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
 <script>
   // Import the functions you need from the SDKs you need
   
@@ -377,6 +371,7 @@ document.getElementById("list").addEventListener("click", function(e) {
   // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const database = firebase.database();
   alert("Firebase geladen");
 async function login() {  
 const email = document.getElementById("email").value;
