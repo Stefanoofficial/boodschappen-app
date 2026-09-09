@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boodschappen lijst</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #234d20, #8fbf72);
+  min-height: 100vh;
+  color: white;
+  overscroll-behavior-y: contain;
+}
+
+.app {
+  max-width: 600px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin: 5px 0 25px;
+  font-size: 30px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add {
+  background: #2e7d32;
+  color: white;
+}
+
+.list {
+  margin-top: 20px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 12px;
+  padding: 8px;
+  min-height: 200px;
+}
+
+.item {
+  padding: 14px 10px;
+  font-size: 19px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item.selected {
+  background: rgba(255,255,255,0.15);
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.buttons button {
+  flex: 1;
+}
+
+.clear {
+  background: #dff5df;
+  color: #1b5e20;
+}
+
+.delete {
+  background: #c62828;
+  color: white;
+}
+
+.status {
+  margin-top: 15px;
+  text-align: center;
+  background: #dff5df;
+  color: #1b5e20;
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#refresh {
+  text-align: center;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.2s;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>Boodschappen lijst</h1>
+
+  <h2>Voeg iets toe aan je lijst</h2>
+
+  <div class="input-row">
+    <input id="product" placeholder="Bijv. melk, brood, eieren...">
+    <button class="add" onclick="addProduct()">+ Toevoegen</button>
+  </div>
+
+  <div id="refresh">↻ Loslaten om te vernieuwen</div>
+
+  <div class="list" id="list"></div>
+
+  <div class="buttons">
+    <button class="clear" onclick="clearList()">Lijst wissen</button>
+    <button class="delete" onclick="deleteProduct()">Verwijder product</button>
+  </div>
+
+  <div class="status" id="status">
+    ☁️ Lijst automatisch opgeslagen
+  </div>
+
+</div>
+
+<script>
+
+const firebaseURL =
+"https://boodschappenthuis1-default-rtdb.firebaseio.com/boodschappen.json";
+
+let boodschappen = [];
+let selectedIndex = -1;
+
+async function loadList() {
+  try {
+    const response = await fetch(firebaseURL);
+    const data = await response.json();
+
+    boodschappen = data || [];
+    selectedIndex = -1;
+
+    showList();
+    updateStatus();
+
+  } catch (error) {
+    document.getElementById("status").innerText =
+      "⚠️ Kon de lijst niet laden";
+  }
+}
+
+function showList() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  boodschappen.forEach((item, index) => {
+
+    const div = document.createElement("div");
+
+    div.className = "item" +
+      (index === selectedIndex ? " selected" : "");
+
+    div.innerText = item;
+
+    div.onclick = () => toggleItem(index);
+
+    list.appendChild(div);
+  });
+}
+
+async function saveList() {
+  await fetch(firebaseURL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(boodschappen)
+  });
+
+  updateStatus();
+}
+
+function toggleItem(index) {
+
+  selectedIndex = index;
+
+  if (boodschappen[index].startsWith("☐")) {
+    boodschappen[index] =
+      "☑" + boodschappen[index].substring(1);
+  } else {
+    boodschappen[index] =
+      "☐" + boodschappen[index].substring(1);
+  }
+
+  showList();
+  saveList();
+}
+
+async function addProduct() {
+
+  const input = document.getElementById("product");
+  const text = input.value.trim();
+
+  if (text === "") return;
+
+  boodschappen.push("☐ " + text);
+
+  input.value = "";
+
+  showList();
+  await saveList();
+}
+
+async function deleteProduct() {
+
+  if (selectedIndex < 0) return;
+
+  boodschappen.splice(selectedIndex, 1);
+
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
+}
+
+async function clearList() {
+
+  boodschappen = [];
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
+}
+
+function updateStatus() {
+
+  const now = new Date();
+
+  const hour =
+    String(now.getHours()).padStart(2, "0");
+
+  const minute =
+    String(now.getMinutes()).padStart(2, "0");
+
+  document.getElementById("status").innerText =
+    "☁️ Lijst automatisch opgeslagen - Laatste update: "
+    + hour + ":" + minute;
+}
+
+
+/* Pull-to-refresh */
+
+let startY = 0;
+let pulling = false;
+
+document.addEventListener("touchstart", function(e) {
+
+  if (window.scrollY === 0) {
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }
+
+});
+
+document.addEventListener("touchmove", function(e) {
+
+  if (!pulling) return;
+
+  const distance =
+    e.touches[0].clientY - startY;
+
+  if (distance > 0 && distance < 100) {
+    document.getElementById("refresh").style.height =
+      distance + "px";
+  }
+
+});
+
+document.addEventListener("touchend", async function(e) {
+
+  if (!pulling) return;
+
+  const distance =
+    e.changedTouches[0].clientY - startY;
+
+  pulling = false;
+
+  document.getElementById("refresh").style.height = "0";
+
+  if (distance > 70) {
+    await loadList();
+  }
+
+});
+
+
+loadList();
+
+</script>
+
+</body>
+</html>
