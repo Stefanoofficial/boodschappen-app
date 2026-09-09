@@ -223,10 +223,10 @@ function toggleItem(index) {
 
   if (boodschappen[index].startsWith("☐")) {
     boodschappen[index] =
-      "☑" + boodschappen[index].substring(1);
+      "✅" + boodschappen[index].substring(1);
   } else {
     boodschappen[index] =
-      "✅" + boodschappen[index].substring(1);
+      "☐" + boodschappen[index].substring(1);
   }
 
   showList();
