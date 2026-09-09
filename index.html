@@ -146,6 +146,11 @@ overflow-x: hidden;
 <div class="app">
 
   <h1>Boodschappen lijst</h1>
+<div id="login">
+  <input id="email" type="email" placeholder="E-mailadres">
+  <input id="password" type="password" placeholder="Wachtwoord">
+  <button onclick="login()">Inloggen</button>
+</div>
 
   <h2>Voeg iets toe aan je lijst</h2>
 
@@ -369,6 +374,18 @@ document.getElementById("list").addEventListener("click", function(e) {
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+  async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("Inloggen gelukt!");
+  } catch (error) {
+    alert("Inloggen mislukt: " + error.message);
+  }
+}
 </script>
 </body>
 </html>
