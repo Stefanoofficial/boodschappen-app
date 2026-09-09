@@ -209,7 +209,7 @@ function showList() {
       (index === selectedIndex ? " selected" : "");
 
     div.innerText = item;
-if (index === selectedIndex) div.style.textDecoration = "line-through";
+if (item.startsWith("✅")) div.style.textDecoration = "line-through";
 
     div.onclick = () => toggleItem(index);
 
