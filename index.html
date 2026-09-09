@@ -375,13 +375,14 @@ document.getElementById("list").addEventListener("click", function(e) {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-  async function login() {
+async function login() {  
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
     alert("Inloggen gelukt!");
+    document.getElementById("login").style.display = "none";
   } catch (error) {
     alert("Inloggen mislukt: " + error.message);
   }
