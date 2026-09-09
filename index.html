@@ -205,7 +205,7 @@ function showList() {
     const div = document.createElement("div");
 
     div.className = "item";
-    div.innerHTML = item.startsWith("☐") ? "✅ <span style=\"text-decoration: line-through;\">" + item.substring(1) + "</span>" : item;
+    div.innerHTML = item.startsWith("✅") ? "✅ <span style=\"text-decoration: line-through;\">" + item.substring(1) + "</span>" : item;
 
     list.appendChild(div);
   });
