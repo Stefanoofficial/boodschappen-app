@@ -223,6 +223,15 @@ overflow-x: hidden;
   color: #666666;
   font-size: 22px;
 }
+  .forgotPassword {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  color: #3F5B45;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: right;
+}
 .version {
   margin-top: 12px;
   font-size: 14px;
@@ -268,6 +277,7 @@ overflow-x: hidden;
   <i class="fa-regular fa-eye"></i>
 </button>
 </div>
+    <div class="forgotPassword" onclick="resetPassword()">Wachtwoord vergeten?</div>
     <button onclick="login()">Inloggen</button>
     <div class="version">Versie 1.0</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
@@ -508,6 +518,21 @@ function togglePassword() {
   } else {
     password.type = "password";
     eye.className = "fa-regular fa-eye";
+  }
+}
+  async function resetPassword() {
+  const email = document.getElementById("loginEmail").value;
+
+  if (!email) {
+    alert("Vul eerst je e-mailadres in.");
+    return;
+  }
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    alert("Er is een e-mail gestuurd om je wachtwoord opnieuw in te stellen.");
+  } catch (error) {
+    alert("Wachtwoord resetten mislukt: " + error.message);
   }
 }
 async function login() {
