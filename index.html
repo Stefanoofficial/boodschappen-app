@@ -325,7 +325,7 @@ let selectedIndex = -1;
 
 async function loadList() {
   try {
-const snapshot = await database.ref("boodschappen").once("value");
+const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
 const data = snapshot.val();
 
     boodschappen = data || [];
@@ -356,7 +356,7 @@ function showList() {
 }
 
 async function saveList() {
-await database.ref("boodschappen").set(boodschappen);  
+await database.ref("households/" + currentHouseholdId + "/boodschappen").set(boodschappen);
 
   updateStatus();
 }
