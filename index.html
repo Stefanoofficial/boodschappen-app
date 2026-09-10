@@ -125,6 +125,22 @@ overflow-x: hidden;
   padding: 7px;
   font-size: 12px;
   font-weight: bold;
+  }
+  .householdButton {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: #3F5B45;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.householdButton i {
+  margin-right: 6px;
 }
 .status span {
     display: block;
@@ -312,6 +328,9 @@ overflow-x: hidden;
     ☁︎ Lijst automatisch opgeslagen
     <span>Laatste update: vandaag</span>
 </div>
+  <button class="householdButton" onclick="showHousehold()">
+  <i class="fa-solid fa-house"></i> Mijn huishouden
+</button>
   </div>
 
 </div>
