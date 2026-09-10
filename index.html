@@ -392,9 +392,9 @@ function updateStatus() {
   const minute =
     String(now.getMinutes()).padStart(2, "0");
 
-  document.getElementById("status").innerText =
-    "☁︎ Lijst automatisch opgeslagen\nLaatste update: vandaag "
-    + hour + ":" + minute;
+document.getElementById("status").innerHTML =
+  "☁︎ Lijst automatisch opgeslagen<span>Laatste update: vandaag "
+  + hour + ":" + minute + "</span>";
 }
 
 
