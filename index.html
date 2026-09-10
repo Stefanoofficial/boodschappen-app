@@ -512,6 +512,49 @@ document.getElementById("list").addEventListener("click", function(e) {
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
+  let currentHouseholdId = null;
+
+async function getOrCreateHousehold() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("Je bent niet ingelogd.");
+  }
+
+  const userRef = database.ref("users/" + user.uid + "/householdId");
+  const userSnapshot = await userRef.once("value");
+
+  if (userSnapshot.exists()) {
+    currentHouseholdId = userSnapshot.val();
+    return currentHouseholdId;
+  }
+
+  let code;
+  let householdExists = true;
+
+  while (householdExists) {
+    code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const check = await database.ref("households/" + code).once("value");
+    householdExists = check.exists();
+  }
+
+  currentHouseholdId = code;
+
+  await database.ref("households/" + code).set({
+    owner: user.uid,
+    name: "Mijn huishouden",
+    members: {
+      [user.uid]: true
+    }
+  });
+
+  await userRef.set(code);
+
+  alert("Je huishouden is aangemaakt!\n\nDeelcode: " + code);
+
+  return code;
+}
 function togglePassword() {
   const password = document.getElementById("loginPassword");
   const eye = document.querySelector(".togglePassword i");
@@ -547,6 +590,7 @@ const password = document.getElementById("loginPassword").value;
     await auth.signInWithEmailAndPassword(email, password);
     alert("Inloggen gelukt!");
 document.getElementById("loginScreen").style.display = "none";
+await getOrCreateHousehold();
 await loadList();
     } catch (error) {
     alert("Inloggen mislukt: " + error.message);
