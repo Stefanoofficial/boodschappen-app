@@ -415,14 +415,14 @@ const auth = firebase.auth();
 const database = firebase.database();
 
 async function login() {  
-const email = document.getElementById(""loginEmail"").value;
-const password = document.getElementById("const password = document.getElementById("loginPassword").value;").value;
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
 
   try {
     await auth.signInWithEmailAndPassword(email, password);
     alert("Inloggen gelukt!");
     await loadList();
-    document.getElementById("login").style.display = "none";
+    document.getElementById("loginScreen").style.display = "none";
     } catch (error) {
     alert("Inloggen mislukt: " + error.message);
   }
