@@ -380,6 +380,7 @@ const password = document.getElementById("password").value;
   try {
     await auth.signInWithEmailAndPassword(email, password);
     alert("Inloggen gelukt!");
+    await loadList();
     document.getElementById("login").style.display = "none";
     } catch (error) {
     alert("Inloggen mislukt: " + error.message);
