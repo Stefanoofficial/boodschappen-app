@@ -427,7 +427,6 @@ const password = document.getElementById("loginPassword").value;
   try {
     await auth.signInWithEmailAndPassword(email, password);
     alert("Inloggen gelukt!");
-    alert("Inloggen gelukt!");
 document.getElementById("loginScreen").style.display = "none";
 await loadList();
     } catch (error) {
