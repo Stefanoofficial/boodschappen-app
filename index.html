@@ -392,7 +392,15 @@ overflow-x: hidden;
 
 let boodschappen = [];
 let selectedIndex = -1;
+function toggleFamilyMenu() {
+  const menu = document.getElementById("familyMenu");
 
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "block";
+  }
+}
 async function loadList() {
   try {
 const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
