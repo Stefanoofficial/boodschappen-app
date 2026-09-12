@@ -1008,18 +1008,15 @@ async function showFamilyCode() {
 
   alert("Familieleden:\n\n" + names.join("\n"));
 }
-  async function enterFamilyCode() {
+ async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
 
   if (!code) {
     return;
   }
 
-  const householdRef = database.ref("households/" + code);
-  const snapshot = await householdRef.once("value");
-
-  if (!snapshot.exists()) {
-    alert("Deze familiecode bestaat niet.");
+  if (!/^\d{6}$/.test(code)) {
+    alert("Voer een geldige 6-cijferige familiecode in.");
     return;
   }
 
@@ -1030,15 +1027,45 @@ async function showFamilyCode() {
     return;
   }
 
-  await database.ref("users/" + user.uid + "/householdId").set(code);
-  await database.ref("households/" + code + "/members/" + user.uid).set(true);
+  try {
+    // Controleren of je al een familie hebt
+    const userSnapshot = await database
+      .ref("users/" + user.uid + "/householdId")
+      .once("value");
 
-  currentHouseholdId = code;
+    if (userSnapshot.exists() && userSnapshot.val()) {
+      alert(
+        "Je bent al aangesloten bij een familie.\n\n" +
+        "Verlaat eerst je huidige familie voordat je een andere familiecode invoert."
+      );
+      return;
+    }
 
-  await loadList();
-  await updateMemberCount();
-  alert("Je bent toegevoegd aan de familie!");
+    // Jezelf toevoegen aan de familie
+    await database
+      .ref("households/" + code + "/members/" + user.uid)
+      .set(true);
+
+    // Familie koppelen aan je account
+    await database
+      .ref("users/" + user.uid + "/householdId")
+      .set(code);
+
+    currentHouseholdId = code;
+
+    await loadList();
+    await updateMemberCount();
+
+    alert("Je bent toegevoegd aan de familie!");
+
+  } catch (error) {
+    console.error("Fout bij toetreden tot familie:", error);
+
+    alert(
+      "Deze familiecode bestaat niet of je kunt geen lid worden van deze familie."
+    );
   }
+}
   async function leaveFamily() {
   const user = auth.currentUser;
 
