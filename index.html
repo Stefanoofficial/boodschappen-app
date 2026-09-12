@@ -348,13 +348,45 @@ overflow-x: hidden;
   font-size: 55px;
   margin-bottom: 15px;
 }
+ .searchBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 14px;
+  padding: 0 15px;
+  margin-top: 12px;
+  height: 58px;
+  box-sizing: border-box;
+}
+
+.searchBox > i {
+  color: #333;
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.searchBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 18px;
+}
+
+.searchBox button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 28px;
+  padding: 0 5px;
+  cursor: pointer;
+} 
 #refresh {
   text-align: center;
   height: 0;
   overflow: hidden;
   transition: height 0.2s;
   font-size: 14px;
-  color: #007AFF;
 }
   .nameModal {
   position: fixed;
@@ -504,7 +536,11 @@ overflow-x: hidden;
     <input id="product" placeholder="Bijv. melk, brood, eieren...">
     <button class="add" onclick="addProduct()">+ Toevoegen</button>
   </div>
-
+<div class="searchBox">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
+  <button type="button" onclick="clearSearch()">✕</button>
+</div>
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
 
   <div class="list" id="list"></div>
@@ -549,6 +585,26 @@ function toggleFamilyMenu() {
   const count = Object.keys(members).length;
 
   document.getElementById("memberCount").innerText = count;
+}
+  function searchList() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const items = document.querySelectorAll(".item");
+
+  items.forEach(item => {
+    const text = item.innerText.toLowerCase();
+
+    if (text.includes(search)) {
+      item.style.display = "";
+    } else {
+      item.style.display = "none";
+    }
+  });
+}
+
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  searchList();
 }
 async function loadList() {
   try {
