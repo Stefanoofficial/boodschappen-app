@@ -454,6 +454,7 @@ overflow-x: hidden;
   <div class="nameBox">
     <h2>Welkom! 👋</h2>
     <p>Hoe heet je?</p>
+    <p>Vul je naam in, zodat je familie weet wie je bent.</p>
     <div class="nameInputBox">
       <i class="fa-solid fa-user"></i>
       <input id="userName" type="text" placeholder="Jouw naam">
@@ -479,7 +480,7 @@ overflow-x: hidden;
   <span>Code invoeren</span>
 </div>
 
-<div class="familyMenuItem" onclick="enterFamilyCode()">
+<div class="familyMenuItem" onclick="showFamilyMembers()">
   <i class="fa-solid fa-user-group"></i>
   <span>Familielid (<span id="memberCount">1</span>)</span>
 </div>
@@ -802,6 +803,26 @@ async function showFamilyCode() {
 
   document.getElementById("nameModal").style.display = "none";
   await loadList();
+}
+  async function showFamilyMembers() {
+  if (!currentHouseholdId) return;
+
+  const snapshot = await database
+    .ref("households/" + currentHouseholdId + "/members")
+    .once("value");
+
+  const members = snapshot.val() || {};
+  let names = [];
+
+  for (const uid of Object.keys(members)) {
+    const nameSnapshot = await database
+      .ref("users/" + uid + "/name")
+      .once("value");
+
+    names.push(nameSnapshot.val() || "Onbekend");
+  }
+
+  alert("Familieleden:\n\n" + names.join("\n"));
 }
   async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
