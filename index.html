@@ -522,7 +522,10 @@ overflow-x: hidden;
   <i class="fa-solid fa-key"></i>
   <span>Familiecode</span>
 </div>
-
+<div class="familyMenuItem" onclick="createNewFamily()">
+  <i class="fa-solid fa-house-circle-plus"></i>
+  <span>Nieuwe familie</span>
+</div>
 <div class="familyMenuItem" style="border-top: 1px solid #ddd; margin-top: 8px; padding-top: 12px;">
   <i class="fa-solid fa-right-from-bracket"></i>
   <span style="color: #e53935;">Familie verlaten</span>
@@ -820,6 +823,44 @@ async function showFamilyCode() {
 
   alert("Jouw familiecode is:\n\n                               " + code);
 }
+ async function createNewFamily() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Je bent niet ingelogd.");
+    return;
+  }
+
+  // Nieuwe 6-cijferige familiecode maken
+  let code;
+  let familyExists = true;
+
+  while (familyExists) {
+    code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const check = await database.ref("households/" + code).once("value");
+    familyExists = check.exists();
+  }
+
+  // Nieuwe familie opslaan
+  await database.ref("households/" + code).set({
+    owner: user.uid,
+    name: "Mijn familie",
+    members: {
+      [user.uid]: true
+    }
+  });
+
+  // Gebruiker koppelen aan de nieuwe familie
+  await database.ref("users/" + user.uid + "/householdId").set(code);
+
+  currentHouseholdId = code;
+
+  await loadList();
+  await updateMemberCount();
+
+  alert("Nieuwe familie aangemaakt!\n\nJouw familiecode is: " + code);
+} 
   async function saveUserName() {
   const user = auth.currentUser;
   const name = document.getElementById("userName").value.trim();
