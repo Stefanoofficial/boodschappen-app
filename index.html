@@ -404,7 +404,7 @@ overflow-x: hidden;
 
 <div class="familyMenuItem" onclick="enterFamilyCode()">
   <i class="fa-solid fa-user-group"></i>
-  <span>Familielid</span>
+  <span>Familielid (<span id="memberCount">1</span>)</span>
 </div>
 <div class="familyMenuItem" onclick="showFamilyCode()">
   <i class="fa-solid fa-key"></i>
@@ -458,6 +458,18 @@ function toggleFamilyMenu() {
     menu.style.display = "block";
   }
 }
+  async function updateMemberCount() {
+  if (!currentHouseholdId) return;
+
+  const snapshot = await database
+    .ref("households/" + currentHouseholdId + "/members")
+    .once("value");
+
+  const members = snapshot.val() || {};
+  const count = Object.keys(members).length;
+
+  document.getElementById("memberCount").innerText = count;
+}
 async function loadList() {
   try {
 const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
@@ -468,6 +480,7 @@ const data = snapshot.val();
 
     showList();
     updateStatus();
+    updateMemberCount();
 
   } catch (error) {
     document.getElementById("status").innerText =
@@ -723,7 +736,7 @@ async function showFamilyCode() {
   currentHouseholdId = code;
 
   await loadList();
-
+await updateMemberCount();
   alert("Je bent toegevoegd aan de familie!");
 }
 function togglePassword() {
