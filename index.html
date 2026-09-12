@@ -355,6 +355,72 @@ overflow-x: hidden;
   transition: height 0.2s;
   font-size: 14px;
 }
+  .nameModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.nameBox {
+  width: 85%;
+  max-width: 400px;
+  background: #f7efe3;
+  border-radius: 25px;
+  padding: 35px 25px;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.nameBox h2 {
+  color: #3F5B45;
+  font-size: 32px;
+  margin: 0 0 15px;
+}
+
+.nameBox p {
+  color: #666;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.nameInputBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 14px;
+  padding: 0 15px;
+  margin-bottom: 15px;
+}
+
+.nameInputBox i {
+  color: #3F5B45;
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.nameInputBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 5px;
+  font-size: 20px;
+}
+
+.nameBox button {
+  width: 100%;
+  background: #3F5B45;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
 </style>
 </head>
 
@@ -382,6 +448,17 @@ overflow-x: hidden;
     <button onclick="login()">Inloggen</button>
     <div class="version">Versie 1.0</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
+  </div>
+</div>
+  <div id="nameModal" class="nameModal">
+  <div class="nameBox">
+    <h2>Welkom! 👋</h2>
+    <p>Hoe heet je?</p>
+    <div class="nameInputBox">
+      <i class="fa-solid fa-user"></i>
+      <input id="userName" type="text" placeholder="Jouw naam">
+    </div>
+    <button onclick="saveUserName()">Opslaan</button>
   </div>
 </div>
 <div class="app">
@@ -708,6 +785,24 @@ async function showFamilyCode() {
 
   alert("Jouw familiecode is:\n\n                               " + code);
 }
+  async function saveUserName() {
+  const user = auth.currentUser;
+  const name = document.getElementById("userName").value.trim();
+
+  if (!user) {
+    return;
+  }
+
+  if (!name) {
+    alert("Vul eerst je naam in.");
+    return;
+  }
+
+  await database.ref("users/" + user.uid + "/name").set(name);
+
+  document.getElementById("nameModal").style.display = "none";
+  await loadList();
+}
   async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
 
@@ -775,6 +870,12 @@ const password = document.getElementById("loginPassword").value;
     alert("Inloggen gelukt!");
 document.getElementById("loginScreen").style.display = "none";
 await getOrCreateHousehold();
+    const nameSnapshot = await database.ref("users/" + auth.currentUser.uid + "/name").once("value");
+
+if (!nameSnapshot.exists()) {
+  document.getElementById("nameModal").style.display = "flex";
+  return;
+}
 await loadList();
     } catch (error) {
     alert("Inloggen mislukt: " + error.message);
