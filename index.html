@@ -689,6 +689,11 @@ async function getOrCreateHousehold() {
   alert("Je huishouden is aangemaakt!\n\nDeelcode: " + code);
 
   return code;
+  async function showFamilyCode() {
+  const code = currentHouseholdId;
+
+  alert("Jouw familiecode is:\n\n" + code);
+}
 }
 function togglePassword() {
   const password = document.getElementById("loginPassword");
