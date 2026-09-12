@@ -831,36 +831,145 @@ async function showFamilyCode() {
     return;
   }
 
-  // Nieuwe 6-cijferige familiecode maken
+  // Controleren of de gebruiker al een familie heeft
+  const userSnapshot = await database
+    .ref("users/" + user.uid + "/householdId")
+    .once("value");
+
+  const existingHouseholdId = userSnapshot.val();
+
+  // Als de gebruiker al een familie heeft
+  if (existingHouseholdId) {
+
+    const leaveFamily = confirm(
+      "Je hebt al een familie.\n\n" +
+      "Je moet je huidige familie eerst verlaten voordat je een nieuwe familie kunt beginnen.\n\n" +
+      "Wil je je huidige familie verlaten?"
+    );
+
+    if (!leaveFamily) {
+      return;
+    }
+
+    // Familiegegevens ophalen
+    const householdSnapshot = await database
+      .ref("households/" + existingHouseholdId)
+      .once("value");
+
+    const household = householdSnapshot.val();
+
+    if (household) {
+
+      // Controleren of deze gebruiker de eigenaar is
+      const isOwner = household.owner === user.uid;
+
+      if (isOwner) {
+
+        // Extra bevestiging voor de eigenaar
+        const confirmOwner = confirm(
+          "Weet je het zeker?\n\n" +
+          "Je bent de eigenaar van deze familie. " +
+          "Als je een nieuwe familie begint, wordt je huidige familie beëindigd " +
+          "en worden alle andere leden uit deze familie gehaald.\n\n" +
+          "Daarna kunnen zij zelf een nieuwe familie beginnen."
+        );
+
+        if (!confirmOwner) {
+          return;
+        }
+
+        // Alle leden uit de oude familie halen
+        const members = household.members || {};
+
+        for (const memberId of Object.keys(members)) {
+          await database
+            .ref("users/" + memberId + "/householdId")
+            .remove();
+        }
+
+        // Oude familie volledig verwijderen
+        await database
+          .ref("households/" + existingHouseholdId)
+          .remove();
+
+      } else {
+
+        // Gewoon lid: tweede bevestiging
+        const confirmLeave = confirm(
+          "Weet je het zeker?\n\n" +
+          "Je verlaat je huidige familie. " +
+          "Daarna kun je je eigen nieuwe familie beginnen."
+        );
+
+        if (!confirmLeave) {
+          return;
+        }
+
+        // Alleen deze gebruiker uit de familie verwijderen
+        await database
+          .ref(
+            "households/" +
+            existingHouseholdId +
+            "/members/" +
+            user.uid
+          )
+          .remove();
+
+        // Familie-ID bij gebruiker verwijderen
+        await database
+          .ref("users/" + user.uid + "/householdId")
+          .remove();
+      }
+
+      currentHouseholdId = null;
+    }
+  }
+
+  // ==========================================
+  // NIEUWE FAMILIE MAKEN
+  // ==========================================
+
   let code;
   let familyExists = true;
 
   while (familyExists) {
-    code = Math.floor(100000 + Math.random() * 900000).toString();
+    code = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
 
-    const check = await database.ref("households/" + code).once("value");
+    const check = await database
+      .ref("households/" + code)
+      .once("value");
+
     familyExists = check.exists();
   }
 
   // Nieuwe familie opslaan
-  await database.ref("households/" + code).set({
-    owner: user.uid,
-    name: "Mijn familie",
-    members: {
-      [user.uid]: true
-    }
-  });
+  await database
+    .ref("households/" + code)
+    .set({
+      owner: user.uid,
+      name: "Mijn familie",
+      members: {
+        [user.uid]: true
+      }
+    });
 
   // Gebruiker koppelen aan de nieuwe familie
-  await database.ref("users/" + user.uid + "/householdId").set(code);
+  await database
+    .ref("users/" + user.uid + "/householdId")
+    .set(code);
 
   currentHouseholdId = code;
 
   await loadList();
   await updateMemberCount();
 
-  alert("Nieuwe familie aangemaakt!\n\nJouw familiecode is: " + code);
-} 
+  alert(
+    "Nieuwe familie aangemaakt!\n\n" +
+    "Jouw familiecode is: " + code
+  );
+}
   async function saveUserName() {
   const user = auth.currentUser;
   const name = document.getElementById("userName").value.trim();
@@ -927,7 +1036,7 @@ async function showFamilyCode() {
   currentHouseholdId = code;
 
   await loadList();
-await updateMemberCount();
+  await updateMemberCount();
   alert("Je bent toegevoegd aan de familie!");
   }
   async function leaveFamily() {
