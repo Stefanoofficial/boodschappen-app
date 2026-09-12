@@ -402,7 +402,7 @@ overflow-x: hidden;
   <span>Code invoeren</span>
 </div>
 
-<div class="familyMenuItem">
+<div class="familyMenuItem" onclick="enterFamilyCode()">
   <i class="fa-solid fa-user-group"></i>
   <span>Familie leden</span>
 </div>
@@ -694,6 +694,37 @@ async function showFamilyCode() {
   const code = currentHouseholdId;
 
   alert("Jouw familiecode is:\n\n                             " + code);
+}
+  async function enterFamilyCode() {
+  const code = prompt("Voer de 6-cijferige familiecode in:");
+
+  if (!code) {
+    return;
+  }
+
+  const householdRef = database.ref("households/" + code);
+  const snapshot = await householdRef.once("value");
+
+  if (!snapshot.exists()) {
+    alert("Deze familiecode bestaat niet.");
+    return;
+  }
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Je bent niet ingelogd.");
+    return;
+  }
+
+  await database.ref("users/" + user.uid + "/householdId").set(code);
+  await database.ref("households/" + code + "/members/" + user.uid).set(true);
+
+  currentHouseholdId = code;
+
+  await loadList();
+
+  alert("Je bent toegevoegd aan de familie!");
 }
 function togglePassword() {
   const password = document.getElementById("loginPassword");
