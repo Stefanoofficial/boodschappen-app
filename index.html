@@ -813,32 +813,7 @@ async function getOrCreateHousehold() {
     currentHouseholdId = userSnapshot.val();
     return currentHouseholdId;
   }
-
-  let code;
-  let householdExists = true;
-
-  while (householdExists) {
-    code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const check = await database.ref("households/" + code).once("value");
-    householdExists = check.exists();
-  }
-
-  currentHouseholdId = code;
-
-  await database.ref("households/" + code).set({
-    owner: user.uid,
-    name: "Mijn huishouden",
-    members: {
-      [user.uid]: true
-    }
-  });
-
-  await userRef.set(code);
-
-  alert("Je huishouden is aangemaakt!\n\nDeelcode: " + code);
-
-  return code;
+return null;
 }
 async function showFamilyCode() {
   const code = currentHouseholdId;
