@@ -1292,7 +1292,7 @@ async function showFamilyMembers() {
   if (!currentHouseholdId) {
     const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
     const name = nameSnapshot.val() || user.email || "Gebruiker";
-    alert("Account:\n\n" + name);
+    alert("Account:\n\n👑 " + name);
     return;
   }
 
@@ -1340,9 +1340,14 @@ async function showFamilyMembers() {
       return;
     }
 
-    // Lees de familie niet vooraf. Een gebruiker die nog geen lid is,
-    // mag de familie niet uitlezen. Firebase Rules controleren bij deze
-    // schrijfactie of de familie bestaat en of zelf-lid worden is toegestaan.
+    const householdSnapshot = await database
+      .ref("households/" + code)
+      .once("value");
+    if (!householdSnapshot.exists()) {
+      alert("Deze familiecode bestaat niet.");
+      return;
+    }
+
     await database
       .ref("households/" + code + "/members/" + user.uid)
       .set(true);
