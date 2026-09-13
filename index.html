@@ -21,6 +21,20 @@ body {
   overscroll-behavior-y: contain;
 }
 
+/* Blokkeer scrollen van de pagina zolang een keuzevenster open staat. */
+html.modal-locked,
+body.modal-locked {
+  overflow: hidden !important;
+  height: 100%;
+}
+body.modal-locked {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  touch-action: none;
+}
+
 .app {
   max-width: 600px;
   margin: auto;
@@ -729,7 +743,7 @@ overflow-x: hidden;
 
 <div class="familyMenuItem" onclick="showFamilyMembers()">
   <i class="fa-solid fa-user-group"></i>
-  <span>Familielid (<span id="memberCount">1</span>)</span>
+  <span id="memberLabel">Familielid (<span id="memberCount">1</span>)</span>
 </div>
 <div class="familyMenuItem" onclick="showFamilyCode()">
   <i class="fa-solid fa-key"></i>
@@ -792,16 +806,33 @@ function toggleFamilyMenu() {
   }
 }
   async function updateMemberCount() {
-  if (!currentHouseholdId) return;
+  const countEl = document.getElementById("memberCount");
+  if (!countEl) return;
+
+  if (!currentHouseholdId) {
+    countEl.innerText = "1";
+    const labelEl = document.getElementById("memberLabel");
+    if (labelEl && auth.currentUser) {
+      try {
+        const nameSnapshot = await database
+          .ref("users/" + auth.currentUser.uid + "/name")
+          .once("value");
+        const name = nameSnapshot.val() || "Mijn account";
+        labelEl.innerText = name + " (1)";
+      } catch (error) {
+        labelEl.innerText = "Mijn account (1)";
+      }
+    }
+    return;
+  }
 
   const snapshot = await database
     .ref("households/" + currentHouseholdId + "/members")
     .once("value");
-
   const members = snapshot.val() || {};
   const count = Object.keys(members).length;
-
-  document.getElementById("memberCount").innerText = count;
+  const labelEl = document.getElementById("memberLabel");
+  if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
 }
   function searchList() {
   const search = document.getElementById("searchInput").value.toLowerCase();
@@ -1149,172 +1180,124 @@ async function getOrCreateHousehold() {
 }
 
 async function showFamilyCode() {
-  const code = currentHouseholdId;
+  if (!currentHouseholdId) {
+    alert("Nog geen familiecode beschikbaar.");
+    return;
+  }
 
-  alert("Jouw familiecode is:\n\n                               " + code);
+  alert("Jouw familiecode is:\n\n" + currentHouseholdId);
 }
  async function createNewFamily() {
   const user = auth.currentUser;
-
   if (!user) {
     alert("Je bent niet ingelogd.");
     return;
   }
 
-  // Controleren of de gebruiker al een familie heeft
-  const userSnapshot = await database
-    .ref("users/" + user.uid + "/householdId")
-    .once("value");
-
-  const existingHouseholdId = userSnapshot.val();
-
-  // Als de gebruiker al een familie heeft
-  if (existingHouseholdId) {
-
-    const leaveFamily = confirm(
-      "Je hebt al een familie.\n\n" +
-      "Je moet je huidige familie eerst verlaten voordat je een nieuwe familie kunt beginnen.\n\n" +
-      "Wil je je huidige familie verlaten?"
-    );
-
-    if (!leaveFamily) {
-      return;
-    }
-
-    // Familiegegevens ophalen
-    const householdSnapshot = await database
-      .ref("households/" + existingHouseholdId)
+  try {
+    const userSnapshot = await database
+      .ref("users/" + user.uid + "/householdId")
       .once("value");
+    const existingHouseholdId = userSnapshot.val();
 
-    const household = householdSnapshot.val();
+    if (existingHouseholdId) {
+      const leaveFamily = confirm(
+        "Je hebt al een familie.\n\n" +
+        "Je moet je huidige familie eerst verlaten voordat je een nieuwe familie kunt beginnen.\n\n" +
+        "Wil je je huidige familie verlaten?"
+      );
+      if (!leaveFamily) return;
 
-    if (household) {
+      const householdSnapshot = await database
+        .ref("households/" + existingHouseholdId)
+        .once("value");
+      const household = householdSnapshot.val();
 
-      // Controleren of deze gebruiker de eigenaar is
-      const isOwner = household.owner === user.uid;
+      if (household) {
+        const isOwner = household.owner === user.uid;
+        if (isOwner) {
+          const confirmOwner = confirm(
+            "Weet je het zeker?\n\n" +
+            "Je bent de eigenaar van deze familie. Als je een nieuwe familie begint, " +
+            "wordt je huidige familie beëindigd en worden alle andere leden uit deze familie gehaald."
+          );
+          if (!confirmOwner) return;
 
-      if (isOwner) {
+          const members = household.members || {};
+          for (const memberId of Object.keys(members)) {
+            await database.ref("users/" + memberId + "/householdId").remove();
+          }
+          await database.ref("households/" + existingHouseholdId).remove();
+        } else {
+          const confirmLeave = confirm(
+            "Weet je het zeker?\n\n" +
+            "Je verlaat je huidige familie. Daarna kun je je eigen nieuwe familie beginnen."
+          );
+          if (!confirmLeave) return;
 
-        // Extra bevestiging voor de eigenaar
-        const confirmOwner = confirm(
-          "Weet je het zeker?\n\n" +
-          "Je bent de eigenaar van deze familie. " +
-          "Als je een nieuwe familie begint, wordt je huidige familie beëindigd " +
-          "en worden alle andere leden uit deze familie gehaald.\n\n" +
-          "Daarna kunnen zij zelf een nieuwe familie beginnen."
-        );
-
-        if (!confirmOwner) {
-          return;
-        }
-
-        // Alle leden uit de oude familie halen
-        const members = household.members || {};
-
-        for (const memberId of Object.keys(members)) {
           await database
-            .ref("users/" + memberId + "/householdId")
+            .ref("households/" + existingHouseholdId + "/members/" + user.uid)
             .remove();
+          await database.ref("users/" + user.uid + "/householdId").remove();
         }
-
-        // Oude familie volledig verwijderen
-        await database
-          .ref("households/" + existingHouseholdId)
-          .remove();
-
-      } else {
-
-        // Gewoon lid: tweede bevestiging
-        const confirmLeave = confirm(
-          "Weet je het zeker?\n\n" +
-          "Je verlaat je huidige familie. " +
-          "Daarna kun je je eigen nieuwe familie beginnen."
-        );
-
-        if (!confirmLeave) {
-          return;
-        }
-
-        // Alleen deze gebruiker uit de familie verwijderen
-        await database
-          .ref(
-            "households/" +
-            existingHouseholdId +
-            "/members/" +
-            user.uid
-          )
-          .remove();
-
-        // Familie-ID bij gebruiker verwijderen
-        await database
-          .ref("users/" + user.uid + "/householdId")
-          .remove();
       }
-
       currentHouseholdId = null;
     }
-  }
 
-  // ==========================================
-  // NIEUWE FAMILIE MAKEN
-  // ==========================================
+    let code;
+    let familyExists = true;
+    while (familyExists) {
+      code = Math.floor(100000 + Math.random() * 900000).toString();
+      const check = await database.ref("households/" + code).once("value");
+      familyExists = check.exists();
+    }
 
-  let code;
-  let familyExists = true;
-
-  while (familyExists) {
-    code = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-
-    const check = await database
-      .ref("households/" + code)
-      .once("value");
-
-    familyExists = check.exists();
-  }
-
-  // Nieuwe familie opslaan
-  await database
-    .ref("households/" + code)
-    .set({
+    await database.ref("households/" + code).set({
       owner: user.uid,
       name: "Mijn familie",
-      members: {
-        [user.uid]: true
-      }
+      members: { [user.uid]: true }
     });
 
-  // Gebruiker koppelen aan de nieuwe familie
-  await database
-    .ref("users/" + user.uid + "/householdId")
-    .set(code);
+    await database.ref("users/" + user.uid + "/householdId").set(code);
 
-  currentHouseholdId = code;
+    localStorage.removeItem("boodschappenUseMode_" + user.uid);
+    currentHouseholdId = code;
+    closeUseModeModal();
+    await loadList();
+    await updateMemberCount();
 
-  await loadList();
-  await updateMemberCount();
+    const menu = document.getElementById("familyMenu");
+    if (menu) menu.style.display = "none";
 
-  alert(
-    "Nieuwe familie aangemaakt!\n\n" +
-    "Jouw familiecode is: " + code
-  );
+    alert("Nieuwe familie aangemaakt!\n\nJouw familiecode is: " + code);
+  } catch (error) {
+    console.error("Nieuwe familie aanmaken mislukt:", error);
+    const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
+    alert("De nieuwe familie kon niet worden aangemaakt." + detail);
+  }
 }
 async function showFamilyMembers() {
-  if (!currentHouseholdId) return;
+  const user = auth.currentUser;
+  if (!user) return;
+
+  if (!currentHouseholdId) {
+    const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
+    const name = nameSnapshot.val() || user.email || "Gebruiker";
+    alert("Account:\n\n" + name);
+    return;
+  }
 
   const snapshot = await database
     .ref("households/" + currentHouseholdId + "/members")
     .once("value");
 
   const members = snapshot.val() || {};
-  let names = [];
+  const names = [];
 
   for (const uid of Object.keys(members)) {
     const nameSnapshot = await database
       .ref("users/" + uid + "/name")
       .once("value");
-
     names.push(nameSnapshot.val() || "Onbekend");
   }
 
@@ -1322,60 +1305,55 @@ async function showFamilyMembers() {
 }
  async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
-
-  if (!code) {
-    return;
-  }
-
+  if (!code) return;
   if (!/^\d{6}$/.test(code)) {
     alert("Voer een geldige 6-cijferige familiecode in.");
     return;
   }
 
   const user = auth.currentUser;
-
   if (!user) {
     alert("Je bent niet ingelogd.");
     return;
   }
 
   try {
-    // Controleren of je al een familie hebt
     const userSnapshot = await database
       .ref("users/" + user.uid + "/householdId")
       .once("value");
-
     if (userSnapshot.exists() && userSnapshot.val()) {
-      alert(
-        "Je bent al aangesloten bij een familie.\n\n" +
-        "Verlaat eerst je huidige familie voordat je een andere familiecode invoert."
-      );
+      alert("Je bent al aangesloten bij een familie.\n\nVerlaat eerst je huidige familie voordat je een andere familiecode invoert.");
       return;
     }
 
-    // Jezelf toevoegen aan de familie
+    const householdSnapshot = await database
+      .ref("households/" + code)
+      .once("value");
+    if (!householdSnapshot.exists()) {
+      alert("Deze familiecode bestaat niet.");
+      return;
+    }
+
     await database
       .ref("households/" + code + "/members/" + user.uid)
       .set(true);
-
-    // Familie koppelen aan je account
     await database
       .ref("users/" + user.uid + "/householdId")
       .set(code);
 
+    localStorage.removeItem("boodschappenUseMode_" + user.uid);
     currentHouseholdId = code;
-
+    closeUseModeModal();
     await loadList();
     await updateMemberCount();
 
+    const menu = document.getElementById("familyMenu");
+    if (menu) menu.style.display = "none";
     alert("Je bent toegevoegd aan de familie!");
-
   } catch (error) {
     console.error("Fout bij toetreden tot familie:", error);
-
-    alert(
-      "Deze familiecode bestaat niet of je kunt geen lid worden van deze familie."
-    );
+    const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
+    alert("Je kon niet aan deze familie worden toegevoegd." + detail);
   }
 }
   async function leaveFamily() {
@@ -1463,9 +1441,26 @@ window.login = login;
 
 
 
+function lockPageScroll() {
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+  document.documentElement.dataset.modalScrollY = String(scrollY);
+  document.documentElement.classList.add("modal-locked");
+  document.body.classList.add("modal-locked");
+  document.body.style.top = `-${scrollY}px`;
+}
+
+function unlockPageScroll() {
+  const scrollY = parseInt(document.documentElement.dataset.modalScrollY || "0", 10) || 0;
+  document.documentElement.classList.remove("modal-locked");
+  document.body.classList.remove("modal-locked");
+  document.body.style.top = "";
+  window.scrollTo(0, scrollY);
+}
+
 function openUseModeModal() {
   const modal = document.getElementById("useModeModal");
   if (!modal) return;
+  lockPageScroll();
   modal.style.display = "flex";
   modal.setAttribute("aria-hidden", "false");
 }
@@ -1475,6 +1470,7 @@ function closeUseModeModal() {
   if (!modal) return;
   modal.style.display = "none";
   modal.setAttribute("aria-hidden", "true");
+  unlockPageScroll();
 }
 
 function openAppWithoutList() {
@@ -1492,13 +1488,11 @@ async function chooseUseMode(mode) {
   if (!user) return;
 
   if (mode === "family") {
-    closeUseModeModal();
     await createNewFamily();
     return;
   }
 
   if (mode === "code") {
-    closeUseModeModal();
     await enterFamilyCode();
     return;
   }
@@ -1507,11 +1501,7 @@ async function chooseUseMode(mode) {
     localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
     closeUseModeModal();
     await loadPrivateList();
-    return;
   }
-
-  localStorage.setItem("boodschappenUseMode_" + user.uid, "skip");
-  openAppWithoutList();
 }
 
 async function loadPrivateList() {
