@@ -407,7 +407,7 @@ overflow-x: hidden;
   overflow: hidden;
   transition: height 0.2s;
   font-size: 14px;
-  color: white;
+  color: #555555;
 }
 
 
@@ -1516,11 +1516,8 @@ async function loadPrivateList() {
     if (!Array.isArray(boodschappen)) boodschappen = [];
     selectedIndex = -1;
     showList();
-    updateStatus();
+    updatePrivateStatus();
     updateMemberCount();
-
-    const status = document.getElementById("status");
-    if (status) status.innerText = "Alleen gebruiken: deze lijst staat privé op dit apparaat.";
   } catch (error) {
     console.error("Privélijst laden mislukt:", error);
     boodschappen = [];
@@ -1543,10 +1540,29 @@ async function savePrivateList() {
     "boodschappenPrivate_" + user.uid,
     JSON.stringify(boodschappen)
   );
-  updateStatus();
+  localStorage.setItem(
+    "boodschappenPrivateLastUpdate_" + user.uid,
+    new Date().toISOString()
+  );
+  updatePrivateStatus();
+}
 
+function updatePrivateStatus() {
+  const user = auth.currentUser;
   const status = document.getElementById("status");
-  if (status) status.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.';
+  if (!status) return;
+
+  const savedAt = user ? localStorage.getItem("boodschappenPrivateLastUpdate_" + user.uid) : null;
+  let timeText = "";
+
+  if (savedAt) {
+    const date = new Date(savedAt);
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
+    timeText = `<span>Laatste update: vandaag ${hour}:${minute}</span>`;
+  }
+
+  status.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.' + timeText;
 }
 
 function openRegister() {
