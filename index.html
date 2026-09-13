@@ -1292,7 +1292,9 @@ async function showFamilyMembers() {
   if (!currentHouseholdId) {
     const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
     const name = nameSnapshot.val() || user.email || "Gebruiker";
-    alert("Account:\n\n" + name);
+    const useMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+    const icon = useMode === "private" ? "👑" : "👤";
+    alert("Familieleden:\n\n" + icon + " " + name);
     return;
   }
 
