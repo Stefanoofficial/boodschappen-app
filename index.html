@@ -244,8 +244,8 @@ overflow-x: hidden;
   max-width: 400px;
   text-align: center;
   background: #f7efe3;
-  padding: 35px 25px;
-  border-radius: 25px;
+  padding: 28px 22px;
+  border-radius: 24px;
   box-sizing: border-box;
   box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
@@ -254,10 +254,10 @@ overflow-x: hidden;
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 10px;
-  padding: 18px;
+  padding: 15px;
   border: none;
   border-radius: 14px;
-  font-size: 20px;
+  font-size: 18px;
 }
 .inputBox {
   width: 100%;
@@ -308,13 +308,13 @@ overflow-x: hidden;
 }
 .welcome {
   text-align: center;
-  margin-bottom: 45px;
+  margin-bottom: 30px;
 }
 
 .welcome h2 {
   margin: 0;
   color: #1f5d43;
-  font-size: 34px;
+  font-size: 30px;
   font-weight: bold;
   line-height: 1.15;
 }
@@ -389,72 +389,116 @@ overflow-x: hidden;
   font-size: 14px;
   color: #555555;
 }
-  .nameModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+
+
+/* Stap 2: account aanmaken */
+.loginOr{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:16px 0 10px;
+  color:#666;
+  font-size:18px;
+}
+.loginOr span{
+  flex:1;
+  height:1px;
+  background:#aaa;
+}
+.loginOr b{font-weight:400;}
+.registerButton{
+  width:100%;
+  min-height:58px;
+  padding:12px 18px;
+  border:2px solid #3F6B58;
+  border-radius:16px;
+  background:transparent;
+  color:#2F6650;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  font-family:inherit;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+.registerButton i{font-size:20px;}
+.registerModal{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  box-sizing:border-box;
+  background:rgba(0,0,0,.40);
+}
+.registerBox{
+  width:88%;
+  max-width:390px;
+  background:#f7efe3;
+  border-radius:24px;
+  padding:26px 22px;
+  box-sizing:border-box;
+  text-align:center;
+  box-shadow:0 10px 35px rgba(0,0,0,.20);
+}
+.registerBox h2{
+  margin:0 0 20px;
+  color:#1f5d43;
+  font-size:28px;
+}
+.registerInputBox{
+  width:100%;
+  display:flex;
+  align-items:center;
+  box-sizing:border-box;
+  background:#fff;
+  border-radius:14px;
+  margin-bottom:10px;
+  padding:0 14px;
+}
+.registerInputBox i{
+  width:24px;
+  color:#666;
+  font-size:19px;
+  text-align:center;
+  margin-right:10px;
+}
+.registerInputBox input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  padding:15px 4px;
+  font-family:inherit;
+  font-size:17px;
+}
+.registerSubmit,.registerBack{
+  width:100%;
+  border-radius:14px;
+  padding:14px;
+  font-family:inherit;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+.registerSubmit{
+  margin-top:5px;
+  background:#3F5B45;
+  color:#fff;
+  border:0;
+}
+.registerBack{
+  margin-top:10px;
+  background:transparent;
+  color:#3F5B45;
+  border:1px solid #3F5B45;
 }
 
-.nameBox {
-  width: 85%;
-  max-width: 400px;
-  background: #f7efe3;
-  border-radius: 25px;
-  padding: 35px 25px;
-  text-align: center;
-  box-sizing: border-box;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-}
-
-.nameBox h2 {
-  color: #3F5B45;
-  font-size: 32px;
-  margin: 0 0 15px;
-}
-
-.nameBox p {
-  color: #666;
-  font-size: 22px;
-  margin-bottom: 20px;
-}
-
-.nameInputBox {
-  display: flex;
-  align-items: center;
-  background: white;
-  border-radius: 14px;
-  padding: 0 15px;
-  margin-bottom: 15px;
-}
-
-.nameInputBox i {
-  color: #3F5B45;
-  font-size: 22px;
-  margin-right: 12px;
-}
-
-.nameInputBox input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 16px 5px;
-  font-size: 20px;
-}
-
-.nameBox button {
-  width: 100%;
-  background: #3F5B45;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  padding: 16px;
-  font-size: 20px;
-  font-weight: bold;
-}
 </style>
 </head>
 
@@ -480,22 +524,46 @@ overflow-x: hidden;
 </div>
     <div class="forgotPassword" onclick="resetPassword()">Wachtwoord vergeten?</div>
     <button onclick="login()">Inloggen</button>
+    <div class="loginOr"><span></span><b>Of</b><span></span></div>
+    <button type="button" class="registerButton" onclick="openRegister()">
+      <i class="fa-solid fa-user-plus"></i>
+      <span>Account aanmaken</span>
+    </button>
     <div class="version">Versie 1.0</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
   </div>
 </div>
-  <div id="nameModal" class="nameModal">
-  <div class="nameBox">
-    <h2>Welkom! 👋</h2>
-    <p>Hoe heet je?</p>
-    <p>Vul je naam in, zodat je familie weet wie je bent.</p>
-    <div class="nameInputBox">
+
+
+<div id="registerModal" class="registerModal" aria-hidden="true">
+  <div class="registerBox" role="dialog" aria-modal="true" aria-labelledby="registerTitle">
+    <h2 id="registerTitle">Account aanmaken</h2>
+
+    <div class="registerInputBox">
       <i class="fa-solid fa-user"></i>
-      <input id="userName" type="text" placeholder="Jouw naam">
+      <input id="registerName" type="text" placeholder="Naam" autocomplete="name">
     </div>
-    <button onclick="saveUserName()">Opslaan</button>
+
+    <div class="registerInputBox">
+      <i class="fa-solid fa-envelope"></i>
+      <input id="registerEmail" type="email" placeholder="E-mailadres" autocomplete="email">
+    </div>
+
+    <div class="registerInputBox">
+      <i class="fa-solid fa-lock"></i>
+      <input id="registerPassword" type="password" placeholder="Wachtwoord" autocomplete="new-password">
+    </div>
+
+    <div class="registerInputBox">
+      <i class="fa-solid fa-lock"></i>
+      <input id="registerPasswordConfirm" type="password" placeholder="Wachtwoord opnieuw" autocomplete="new-password">
+    </div>
+
+    <button type="button" class="registerSubmit" onclick="register()">Account aanmaken</button>
+    <button type="button" class="registerBack" onclick="closeRegister()">Terug naar inloggen</button>
   </div>
 </div>
+
 <div class="app">
 
   <div class="headerBar">
@@ -970,25 +1038,7 @@ async function showFamilyCode() {
     "Jouw familiecode is: " + code
   );
 }
-  async function saveUserName() {
-  const user = auth.currentUser;
-  const name = document.getElementById("userName").value.trim();
-
-  if (!user) {
-    return;
-  }
-
-  if (!name) {
-    alert("Vul eerst je naam in.");
-    return;
-  }
-
-  await database.ref("users/" + user.uid + "/name").set(name);
-
-  document.getElementById("nameModal").style.display = "none";
-  await loadList();
-}
-  async function showFamilyMembers() {
+async function showFamilyMembers() {
   if (!currentHouseholdId) return;
 
   const snapshot = await database
@@ -1123,13 +1173,7 @@ const password = document.getElementById("loginPassword").value;
     alert("Inloggen gelukt!");
 document.getElementById("loginScreen").style.display = "none";
 await getOrCreateHousehold();
-    const nameSnapshot = await database.ref("users/" + auth.currentUser.uid + "/name").once("value");
-
-if (!nameSnapshot.exists()) {
-  document.getElementById("nameModal").style.display = "flex";
-  return;
-}
-await loadList();
+    await loadList();
     } catch (error) {
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
@@ -1137,6 +1181,75 @@ await loadList();
 
 window.login = login;
  
+
+
+function openRegister() {
+  const modal = document.getElementById("registerModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+  setTimeout(() => document.getElementById("registerName")?.focus(), 50);
+}
+
+function closeRegister() {
+  const modal = document.getElementById("registerModal");
+  if (!modal) return;
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function register() {
+  const name = (document.getElementById("registerName").value || "").trim();
+  const email = (document.getElementById("registerEmail").value || "").trim();
+  const password = document.getElementById("registerPassword").value || "";
+  const confirmPassword = document.getElementById("registerPasswordConfirm").value || "";
+
+  if (!name || !email || !password || !confirmPassword) {
+    alert("Vul alle velden in.");
+    return;
+  }
+  if (password !== confirmPassword) {
+    alert("De wachtwoorden komen niet overeen.");
+    return;
+  }
+  if (password.length < 6) {
+    alert("Het wachtwoord moet minimaal 6 tekens bevatten.");
+    return;
+  }
+
+  try {
+    const credential = await auth.createUserWithEmailAndPassword(email, password);
+
+    await database.ref("users/" + credential.user.uid).update({
+      name: name,
+      email: email
+    });
+
+    // Een nieuw Firebase-account wordt automatisch ingelogd.
+    // Direct uitloggen voorkomt dat de gebruiker onverwacht meteen binnenkomt.
+    await auth.signOut();
+
+    document.getElementById("registerName").value = "";
+    document.getElementById("registerEmail").value = "";
+    document.getElementById("registerPassword").value = "";
+    document.getElementById("registerPasswordConfirm").value = "";
+
+    closeRegister();
+    document.getElementById("loginScreen").style.display = "flex";
+    alert("Account aangemaakt. Je kunt nu inloggen.");
+  } catch (error) {
+    let message = "Account aanmaken mislukt.";
+    if (error?.code === "auth/email-already-in-use") message = "Dit e-mailadres is al in gebruik.";
+    else if (error?.code === "auth/invalid-email") message = "Vul een geldig e-mailadres in.";
+    else if (error?.code === "auth/weak-password") message = "Het wachtwoord is te zwak. Gebruik minimaal 6 tekens.";
+    alert(message);
+  }
+}
+
+window.openRegister = openRegister;
+window.closeRegister = closeRegister;
+window.register = register;
+
 </script>
 </body>
 </html>
