@@ -456,11 +456,69 @@ overflow-x: hidden;
   font-weight: bold;
 }
 
-/* Nieuwe account- en gebruiksflow */
-.registerLink{margin-top:14px;color:#3F5B45;font-size:16px;cursor:pointer;font-weight:600;text-align:center}.registerLink span{text-decoration:underline}
-.registerModal,.useModeModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:4000;padding:20px;box-sizing:border-box}
-.registerBox,.useModeBox{width:100%;max-width:420px;background:#f7efe3;border-radius:26px;padding:28px 22px 20px;box-sizing:border-box;box-shadow:0 12px 35px rgba(0,0,0,.22)}
-.registerBox h2,.useModeBox h2{margin:0 0 20px;color:#3F5B45;font-size:27px;text-align:center}.registerBox p{text-align:center;color:#666;margin:-8px 0 18px;font-size:14px}.registerBox .inputBox{margin-bottom:10px}.registerBox>button:first-of-type{width:100%;background:#3F5B45;color:#fff;padding:16px;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer}.registerBack,.useModeSkip{margin-top:12px;width:100%;border:0;background:transparent;color:#666;font-size:14px;cursor:pointer;text-decoration:underline}.useModeOption{width:100%;display:flex;align-items:center;gap:15px;text-align:left;border:1px solid rgba(63,91,69,.18);background:rgba(255,255,255,.45);border-radius:17px;padding:15px;margin-bottom:11px;cursor:pointer;box-sizing:border-box}.useModeIcon{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#3F5B45;color:#fff;font-size:19px}.useModeOption strong{display:block;color:#3F5B45;font-size:17px;margin-bottom:3px}.useModeOption span{display:block;color:#666;font-size:13px;line-height:1.35}
+/* Definitieve loginpagina – account aanmaken als grote knop */
+.registerButton{
+  width:100%;
+  min-height:72px;
+  margin:18px 0 0;
+  padding:14px 20px;
+  border:2px solid #2f6650;
+  border-radius:20px;
+  background:transparent;
+  color:#2f6650;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  font-size:20px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  box-sizing:border-box;
+}
+.registerButton i{
+  font-size:24px;
+}
+.registerButton:active{
+  transform:scale(.99);
+}
+
+
+/* Definitieve registratie-modal */
+.registerModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.35);
+  box-sizing:border-box;
+}
+.registerModalContent{
+  width:min(520px,100%);
+  background:#f8f0e4;
+  border-radius:28px;
+  padding:28px;
+  box-sizing:border-box;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+.registerModalContent h2{
+  margin:0 0 20px;
+  color:#2f6650;
+  text-align:center;
+}
+.registerModalContent input{
+  width:100%;
+  box-sizing:border-box;
+  margin:7px 0;
+  padding:16px 18px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  font-size:17px;
+}
+
 </style>
 </head>
 
@@ -485,14 +543,23 @@ overflow-x: hidden;
 </button>
 </div>
     <div class="forgotPassword" onclick="resetPassword()">Wachtwoord vergeten?</div>
-    <button onclick="login()">Inloggen</button><div class="registerLink" onclick="openRegister()">Nog geen account? <span>Aanmelden</span></div>
+    <button onclick="login()">Inloggen</button>
     <div class="version">Versie 1.0</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
   </div>
 </div>
-
-<div id="registerModal" class="registerModal"><div class="registerBox"><h2>Account aanmaken</h2><p>Vul je gegevens in om een account te maken.</p><div class="inputBox"><span><i class="fa-solid fa-user"></i></span><input id="registerName" type="text" placeholder="Naam" autocomplete="name"></div><div class="inputBox"><span><i class="fa-solid fa-envelope"></i></span><input id="registerEmail" type="email" placeholder="E-mailadres" autocomplete="email"></div><div class="inputBox"><span><i class="fa-solid fa-lock"></i></span><input id="registerPassword" type="password" placeholder="Wachtwoord" autocomplete="new-password"></div><div class="inputBox"><span><i class="fa-solid fa-lock"></i></span><input id="registerPasswordConfirm" type="password" placeholder="Wachtwoord opnieuw" autocomplete="new-password"></div><button onclick="register()">Account aanmaken</button><button class="registerBack" onclick="closeRegister()">Terug naar inloggen</button></div></div>
-<div id="useModeModal" class="useModeModal"><div class="useModeBox"><h2>Hoe wil je Boodschappenlijst gebruiken?</h2><button class="useModeOption" onclick="createNewFamily();closeUseModeModal()"><div class="useModeIcon"><i class="fa-solid fa-house"></i></div><div><strong>Nieuwe familie</strong><span>Maak een nieuwe familie aan en ontvang een 6-cijferige familiecode.</span></div></button><button class="useModeOption" onclick="closeUseModeModal();enterFamilyCode()"><div class="useModeIcon"><i class="fa-solid fa-keyboard"></i></div><div><strong>Familiecode invoeren</strong><span>Sluit je aan bij een bestaande familie met een familiecode.</span></div></button><button class="useModeOption" onclick="closeUseModeModal()"><div class="useModeIcon"><i class="fa-solid fa-user"></i></div><div><strong>Alleen gebruiken</strong><span>Gebruik Boodschappenlijst alleen voor jezelf.</span></div></button><button class="useModeSkip" onclick="closeUseModeModal()">Overslaan</button></div></div>
+  <div id="nameModal" class="nameModal">
+  <div class="nameBox">
+    <h2>Welkom! 👋</h2>
+    <p>Hoe heet je?</p>
+    <p>Vul je naam in, zodat je familie weet wie je bent.</p>
+    <div class="nameInputBox">
+      <i class="fa-solid fa-user"></i>
+      <input id="userName" type="text" placeholder="Jouw naam">
+    </div>
+    <button onclick="saveUserName()">Opslaan</button>
+  </div>
+</div>
 <div class="app">
 
   <div class="headerBar">
@@ -641,10 +708,7 @@ function showList() {
 }
 
 async function saveList() {
-const user = auth.currentUser;
-if (!user) return;
-const path = currentHouseholdId ? ("households/" + currentHouseholdId + "/boodschappen") : ("privateBoodschappen/" + user.uid);
-return database.ref(path).set(boodschappen);
+await database.ref("households/" + currentHouseholdId + "/boodschappen").set(boodschappen);
 
   updateStatus();
 }
@@ -775,6 +839,25 @@ document.getElementById("list").addEventListener("click", function(e) {
     toggleItem(index);
   }
 });
+
+// Registratie
+function openRegister() {
+  const modal = document.getElementById("registerModal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+function closeRegister() {
+  const modal = document.getElementById("registerModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+window.openRegister = openRegister;
+window.closeRegister = closeRegister;
+
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
@@ -805,10 +888,19 @@ const database = firebase.database();
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
   if (!user) throw new Error("Je bent niet ingelogd.");
-  const snap = await database.ref("users/" + user.uid + "/householdId").once("value");
-  currentHouseholdId = snap.val() || null;
-  return currentHouseholdId;
+
+  const userRef = database.ref("users/" + user.uid + "/householdId");
+  const snapshot = await userRef.once("value");
+
+  if (snapshot.exists() && snapshot.val()) {
+    currentHouseholdId = snapshot.val();
+    return currentHouseholdId;
+  }
+
+  currentHouseholdId = null;
+  return null;
 }
+
 async function showFamilyCode() {
   const code = currentHouseholdId;
 
@@ -961,6 +1053,24 @@ async function showFamilyCode() {
     "Jouw familiecode is: " + code
   );
 }
+  async function saveUserName() {
+  const user = auth.currentUser;
+  const name = document.getElementById("userName").value.trim();
+
+  if (!user) {
+    return;
+  }
+
+  if (!name) {
+    alert("Vul eerst je naam in.");
+    return;
+  }
+
+  await database.ref("users/" + user.uid + "/name").set(name);
+
+  document.getElementById("nameModal").style.display = "none";
+  await loadList();
+}
   async function showFamilyMembers() {
   if (!currentHouseholdId) return;
 
@@ -1087,41 +1197,87 @@ function togglePassword() {
     alert("Wachtwoord resetten mislukt: " + error.message);
   }
 }
-
-function openRegister(){document.getElementById("registerModal").style.display="flex";document.getElementById("loginScreen").style.display="none";}
-function closeRegister(){document.getElementById("registerModal").style.display="none";document.getElementById("loginScreen").style.display="flex";}
-function openUseModeModal(){document.getElementById("useModeModal").style.display="flex";}
-function closeUseModeModal(){document.getElementById("useModeModal").style.display="none";}
-async function register(){
- const name=document.getElementById("registerName").value.trim(), email=document.getElementById("registerEmail").value.trim(), password=document.getElementById("registerPassword").value, confirm=document.getElementById("registerPasswordConfirm").value;
- if(!name||!email||!password||!confirm){alert("Vul alle velden in.");return;} if(password.length<6){alert("Je wachtwoord moet minimaal 6 tekens bevatten.");return;} if(password!==confirm){alert("De wachtwoorden komen niet overeen.");return;}
- try{const cred=await auth.createUserWithEmailAndPassword(email,password); await database.ref("users/"+cred.user.uid).update({name:name,email:email}); closeRegister(); currentHouseholdId=null; boodschappen=[]; showList(); openUseModeModal();}catch(error){if(error.code==="auth/email-already-in-use") alert("Dit e-mailadres heeft al een account. Log in."); else if(error.code==="auth/invalid-email") alert("Vul een geldig e-mailadres in."); else if(error.code==="auth/weak-password") alert("Het wachtwoord is te zwak. Gebruik minimaal 6 tekens."); else alert("Account aanmaken mislukt.");}}
-
 async function login() {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  if (!email || !password) { alert("Vul je e-mailadres en wachtwoord in."); return; }
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
+
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    document.getElementById("loginScreen").style.display = "none";
-    await getOrCreateHousehold();
-    if (currentHouseholdId) {
-      await loadList();
-    } else {
-      boodschappen = []; showList(); openUseModeModal();
-    }
-  } catch (error) {
+    alert("Inloggen gelukt!");
+document.getElementById("loginScreen").style.display = "none";
+await getOrCreateHousehold();
+    const nameSnapshot = await database.ref("users/" + auth.currentUser.uid + "/name").once("value");
+
+if (!nameSnapshot.exists()) {
+  document.getElementById("nameModal").style.display = "flex";
+  return;
+}
+await loadList();
+    } catch (error) {
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
 }
+
 window.login = login;
-window.openRegister = openRegister;
-window.closeRegister = closeRegister;
-window.register = register;
-window.openUseModeModal = openUseModeModal;
-window.closeUseModeModal = closeUseModeModal;
-window.createHousehold = createHousehold;
  
+
+async function register() {
+  const name = (document.getElementById("registerName")?.value || "").trim();
+  const email = (document.getElementById("registerEmail")?.value || "").trim();
+  const password = document.getElementById("registerPassword")?.value || "";
+  const confirm = document.getElementById("registerPasswordConfirm")?.value || "";
+
+  if (!name || !email || !password || !confirm) {
+    alert("Vul alle velden in.");
+    return;
+  }
+  if (password !== confirm) {
+    alert("De wachtwoorden komen niet overeen.");
+    return;
+  }
+  if (password.length < 6) {
+    alert("Het wachtwoord moet minimaal 6 tekens bevatten.");
+    return;
+  }
+
+  try {
+    const credential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = credential.user;
+
+    await database.ref("users/" + user.uid).update({
+      name: name,
+      email: email
+    });
+
+    closeRegister();
+    document.getElementById("loginScreen").style.display = "none";
+
+    currentHouseholdId = null;
+    if (typeof showUseModeModal === "function") {
+      showUseModeModal();
+    } else {
+      alert("Account aangemaakt. Kies in de app hoe je Boodschappenlijst wilt gebruiken.");
+    }
+  } catch (error) {
+    alert("Account aanmaken mislukt: " + (error.message || error));
+  }
+}
+
+window.register = register;
+
 </script>
+
+<div id="registerModal" class="registerModal" style="display:none;">
+  <div class="registerModalContent">
+    <h2>Account aanmaken</h2>
+    <input id="registerName" type="text" placeholder="Naam" autocomplete="name">
+    <input id="registerEmail" type="email" placeholder="E-mailadres" autocomplete="email">
+    <input id="registerPassword" type="password" placeholder="Wachtwoord" autocomplete="new-password">
+    <input id="registerPasswordConfirm" type="password" placeholder="Wachtwoord opnieuw" autocomplete="new-password">
+    <button type="button" onclick="register()">Account aanmaken</button>
+    <button type="button" class="registerBack" onclick="closeRegister()">Terug naar inloggen</button>
+  </div>
+</div>
+
 </body>
 </html>
