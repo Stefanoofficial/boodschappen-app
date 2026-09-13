@@ -433,7 +433,7 @@ overflow-x: hidden;
   justify-content:center;
   padding:20px;
   box-sizing:border-box;
-  background:#f7efe3;
+  background:rgba(0,0,0,.28);
 }
 .registerBox{
   width:88%;
@@ -514,6 +514,34 @@ overflow-x: hidden;
   }
 }
 
+
+.registerInputBox{
+  position:relative;
+}
+.registerInputBox input{
+  padding-right:48px;
+}
+.registerPasswordToggle{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:34px;
+  height:34px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#666;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:19px;
+}
+.registerPasswordToggle:active{
+  transform:translateY(-50%) scale(.96);
+}
+
 </style>
 </head>
 
@@ -567,11 +595,17 @@ overflow-x: hidden;
     <div class="registerInputBox">
       <i class="fa-solid fa-lock"></i>
       <input id="registerPassword" type="password" placeholder="Wachtwoord" autocomplete="new-password">
+      <button type="button" class="registerPasswordToggle" onclick="toggleRegisterPassword('registerPassword', this)" aria-label="Wachtwoord tonen">
+        <i class="fa-regular fa-eye"></i>
+      </button>
     </div>
 
     <div class="registerInputBox">
       <i class="fa-solid fa-lock"></i>
       <input id="registerPasswordConfirm" type="password" placeholder="Wachtwoord opnieuw" autocomplete="new-password">
+      <button type="button" class="registerPasswordToggle" onclick="toggleRegisterPassword('registerPasswordConfirm', this)" aria-label="Wachtwoord tonen">
+        <i class="fa-regular fa-eye"></i>
+      </button>
     </div>
 
     <button type="button" class="registerSubmit" onclick="register()">Account aanmaken</button>
@@ -1276,6 +1310,25 @@ async function register() {
 window.openRegister = openRegister;
 window.closeRegister = closeRegister;
 window.register = register;
+
+
+function toggleRegisterPassword(fieldId, button) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  const isHidden = input.type === "password";
+  input.type = isHidden ? "text" : "password";
+
+  const icon = button.querySelector("i");
+  if (icon) {
+    icon.className = isHidden ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+  }
+
+  button.setAttribute(
+    "aria-label",
+    isHidden ? "Wachtwoord verbergen" : "Wachtwoord tonen"
+  );
+}
 
 </script>
 </body>
