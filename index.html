@@ -1193,6 +1193,9 @@ async function showFamilyCode() {
   }
 
   try {
+    const userNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
+    const userName = userNameSnapshot.val() || user.email || "Gebruiker";
+
     const userSnapshot = await database
       .ref("users/" + user.uid + "/householdId")
       .once("value");
@@ -1242,6 +1245,9 @@ async function showFamilyCode() {
       currentHouseholdId = null;
     }
 
+    const userNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
+    const userName = userNameSnapshot.val() || user.email || "Gebruiker";
+
     let code = null;
     let created = false;
     let lastCreateError = null;
@@ -1255,7 +1261,7 @@ async function showFamilyCode() {
         await database.ref("households/" + code).set({
           owner: user.uid,
           name: "Mijn familie",
-          members: { [user.uid]: true }
+          members: { [user.uid]: { name: userName } }
         });
         created = true;
       } catch (createError) {
@@ -1296,26 +1302,31 @@ async function showFamilyMembers() {
     return;
   }
 
-  const snapshot = await database
-    .ref("households/" + currentHouseholdId + "/members")
-    .once("value");
-
-  const members = snapshot.val() || {};
-  const householdSnapshot = await database
-    .ref("households/" + currentHouseholdId + "/owner")
-    .once("value");
-  const ownerUid = householdSnapshot.val();
-  const names = [];
-
-  for (const uid of Object.keys(members)) {
-    const nameSnapshot = await database
-      .ref("users/" + uid + "/name")
+  try {
+    const snapshot = await database
+      .ref("households/" + currentHouseholdId + "/members")
       .once("value");
-    const name = nameSnapshot.val() || "Onbekend";
-    names.push(uid === ownerUid ? "👑 " + name : "👤 " + name);
-  }
 
-  alert("Familieleden:\n\n" + names.join("\n"));
+    const members = snapshot.val() || {};
+    const householdSnapshot = await database
+      .ref("households/" + currentHouseholdId + "/owner")
+      .once("value");
+    const ownerUid = householdSnapshot.val();
+    const names = [];
+
+    for (const uid of Object.keys(members)) {
+      const member = members[uid];
+      const name = (member && typeof member === "object" && member.name)
+        ? member.name
+        : (uid === user.uid ? (await database.ref("users/" + uid + "/name").once("value")).val() : "Onbekend");
+      names.push(uid === ownerUid ? "👑 " + (name || "Onbekend") : "👤 " + (name || "Onbekend"));
+    }
+
+    alert("Familieleden:\n\n" + names.join("\n"));
+  } catch (error) {
+    console.error("Fout bij ophalen familieleden:", error);
+    alert("De familieleden konden niet worden geladen." + (error && error.code ? "\n\nFoutcode: " + error.code : ""));
+  }
 }
  async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
@@ -1345,7 +1356,7 @@ async function showFamilyMembers() {
     // daarom via deze schrijfactie of de familiecode geldig is.
     await database
       .ref("households/" + code + "/members/" + user.uid)
-      .set(true);
+      .set({ name: userName });
     await database
       .ref("users/" + user.uid + "/householdId")
       .set(code);
