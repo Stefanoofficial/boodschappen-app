@@ -1312,10 +1312,26 @@ async function register() {
     document.getElementById("loginScreen").style.display = "flex";
     alert("Account aangemaakt. Je kunt nu inloggen.");
   } catch (error) {
+    console.error("Registratie fout:", error);
+
     let message = "Account aanmaken mislukt.";
-    if (error?.code === "auth/email-already-in-use") message = "Dit e-mailadres is al in gebruik.";
-    else if (error?.code === "auth/invalid-email") message = "Vul een geldig e-mailadres in.";
-    else if (error?.code === "auth/weak-password") message = "Het wachtwoord is te zwak. Gebruik minimaal 6 tekens.";
+
+    if (error?.code === "auth/email-already-in-use") {
+      message = "Dit e-mailadres is al in gebruik.";
+    } else if (error?.code === "auth/invalid-email") {
+      message = "Vul een geldig e-mailadres in.";
+    } else if (error?.code === "auth/weak-password") {
+      message = "Het wachtwoord is te zwak. Gebruik minimaal 6 tekens.";
+    } else if (error?.code === "auth/operation-not-allowed") {
+      message = "E-mail/wachtwoord aanmelden staat niet aan in Firebase.";
+    } else if (error?.code === "auth/network-request-failed") {
+      message = "Geen verbinding met Firebase. Controleer je internetverbinding.";
+    } else if (error?.code === "auth/invalid-api-key" || error?.code === "auth/api-key-not-valid.-please-pass-a-valid-api-key.") {
+      message = "De Firebase-configuratie/API-sleutel is ongeldig.";
+    } else if (error?.message) {
+      message = "Account aanmaken mislukt: " + error.message;
+    }
+
     alert(message);
   }
 }
