@@ -27,6 +27,10 @@ body.modal-locked {
   overflow: hidden !important;
   height: 100%;
 }
+body.logged-in {
+  overflow: hidden !important;
+  height: 100vh;
+}
 body.modal-locked {
   position: fixed;
   left: 0;
@@ -37,6 +41,8 @@ body.modal-locked {
 
 .app {
   max-width: 600px;
+  height: 100vh;
+  overflow: hidden;
   margin: auto;
   min-height: 100vh;
   padding: 20px;
@@ -812,16 +818,8 @@ function toggleFamilyMenu() {
   if (!currentHouseholdId) {
     countEl.innerText = "1";
     const labelEl = document.getElementById("memberLabel");
-    if (labelEl && auth.currentUser) {
-      try {
-        const nameSnapshot = await database
-          .ref("users/" + auth.currentUser.uid + "/name")
-          .once("value");
-        const name = nameSnapshot.val() || "Mijn account";
-        labelEl.innerText = name + " (1)";
-      } catch (error) {
-        labelEl.innerText = "Mijn account (1)";
-      }
+    if (labelEl) {
+      labelEl.innerHTML = 'Familielid (<span id="memberCount">1</span>)';
     }
     return;
   }
@@ -1411,6 +1409,7 @@ async function login() {
   try {
     await auth.signInWithEmailAndPassword(email, password);
     document.getElementById("loginScreen").style.display = "none";
+    document.body.classList.add("logged-in");
 
     const user = auth.currentUser;
     const householdId = await getOrCreateHousehold();
@@ -1431,6 +1430,7 @@ async function login() {
     }
   } catch (error) {
     console.error("Inloggen fout:", error);
+    document.body.classList.remove("logged-in");
     document.getElementById("loginScreen").style.display = "flex";
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
@@ -1474,6 +1474,7 @@ function closeUseModeModal() {
 }
 
 function openAppWithoutList() {
+  document.body.classList.add("logged-in");
   closeUseModeModal();
   boodschappen = [];
   selectedIndex = -1;
@@ -1498,6 +1499,7 @@ async function chooseUseMode(mode) {
   }
 
   if (mode === "private") {
+    document.body.classList.add("logged-in");
     localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
     closeUseModeModal();
     await loadPrivateList();
@@ -1544,7 +1546,7 @@ async function savePrivateList() {
   updateStatus();
 
   const status = document.getElementById("status");
-  if (status) status.innerText = "Privé opgeslagen op dit apparaat.";
+  if (status) status.innerText = "<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.";
 }
 
 function openRegister() {
