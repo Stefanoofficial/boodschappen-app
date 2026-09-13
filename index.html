@@ -1,557 +1,1142 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icoon.png">
-<title>Boodschappenlijst</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Boodschappen lijst</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{
-  background:url('IMG_3639.jpeg') center/cover fixed no-repeat;
-  color:white;
-  overscroll-behavior-y:contain;
+* {
+  box-sizing: border-box;
 }
-button,input{font:inherit}
-button{cursor:pointer}
 
-.app{
-  max-width:600px;margin:auto;min-height:100vh;padding:20px;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: url('IMG_3639.jpeg') center/cover no-repeat;
+  min-height: 100vh - 80px;
+  color: white;
+  overscroll-behavior-y: contain;
 }
-.headerBar{
-  position:relative;display:flex;align-items:center;justify-content:space-between;
-  background:#3F5B45;padding:10px 15px;border-radius:12px;
-}
-.headerBar h1{flex:1;min-width:0;margin:0;padding:5px;font-size:21px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.familyButton{
-  flex-shrink:0;white-space:nowrap;background:rgba(255,255,255,.1);color:#fff;
-  border:0;border-radius:30px;padding:8px 10px;font-size:15px;font-weight:700;
-}
-.familyButton i:first-child{margin-right:7px}.familyButton i:last-child{margin-left:7px}
-.familyMenu{
-  position:absolute;right:0;top:95%;background:#f7efe3;border-radius:14px;padding:8px;
-  width:190px;box-shadow:0 8px 25px rgba(0,0,0,.2);display:none;z-index:1000;
-}
-.familyMenuItem{
-  color:#333;padding:10px 6px;font-size:15px;white-space:nowrap;display:flex;align-items:center;gap:10px;
-}
-.familyMenuItem i{width:22px;text-align:center}
-.familyMenuItem:first-child i{background:#dff5df;color:#3F5B45;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-h2{text-align:center;font-size:21px;font-weight:700;margin-bottom:12px}
-.input-row{display:flex;gap:8px}
-.input-row input{flex:1;min-width:0;padding:14px;border:0;border-radius:10px;font-size:16px}
-.add{flex:0 0 40%;background:#3F5B45;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700}
-.searchBox{display:flex;align-items:center;background:#fff;border-radius:14px;padding:0 15px;margin-top:12px;height:48px}
-.searchBox>i{color:#333;font-size:20px;margin-right:12px}.searchBox input{flex:1;border:0;outline:0;background:transparent;font-size:18px}.searchBox button{background:none;border:0;color:#333;font-size:22px;padding:0 5px}
-.list{margin-top:20px;background:rgba(0,0,0,.45);border-radius:12px;padding:8px;height:300px;max-height:300px;overflow-y:auto;overflow-x:hidden}
-.item{padding:14px 10px;font-size:20px;font-weight:500;border-bottom:1px solid rgba(255,255,255,.15);cursor:pointer}.item:last-child{border-bottom:0}
-.buttons{display:flex;gap:8px;margin-top:15px}.buttons button{flex:1;border:0;border-radius:10px;padding:12px 16px;font-weight:700}.clear{background:#3F5B45;color:#fff}.delete{background:#c62828;color:#fff}
-.status{margin-top:15px;text-align:center;background:#dff5df;color:#1b5e20;border-radius:8px;padding:7px;font-size:12px;font-weight:700}.status span{display:block;font-size:10px;font-weight:400;margin-top:2px}
-.householdButton{width:100%;margin-top:10px;padding:12px;background:#3F5B45;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700}
-#refresh{text-align:center;height:0;overflow:hidden;transition:height .2s;font-size:14px;color:#555}
 
-#loginScreen{
-  position:fixed;inset:0;display:flex;justify-content:center;align-items:center;
-  background:url('IMG_3639.jpeg') center/cover no-repeat;z-index:1000;padding:18px;
+.app {
+  max-width: 600px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 20px;
 }
-.loginBox{
-  width:min(600px,88vw);max-width:600px;text-align:center;background:#f7efe3;
-  padding:46px 42px 36px;border-radius:30px;box-shadow:0 8px 25px rgba(0,0,0,.15);
-}
-.welcome{margin-bottom:42px}.welcome h2{margin:0;color:#1f5d43;font-size:40px;font-weight:800;line-height:1.08}.welcome p{margin:42px 0 0;color:#666;font-size:25px}
-.inputBox{width:100%;height:90px;display:flex;align-items:center;background:#fff;border-radius:22px;margin-bottom:14px;padding:0 24px}
-.inputBox span{width:45px;flex:0 0 45px;color:#666;font-size:28px;text-align:left}.inputBox input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:25px;color:#333}.inputBox input::placeholder{color:#aaa}
-.togglePassword{background:none!important;color:#666!important;border:0!important;padding:5px!important;margin:0!important;font-size:25px!important}
-.forgotPassword{margin-top:10px;margin-bottom:30px;color:#3F5B45;font-size:21px;text-decoration:underline;cursor:pointer;text-align:right}
-.loginButton{width:100%;height:92px;background:#3F5B45;color:#fff;padding:16px;border:0;border-radius:22px;font-size:28px;font-weight:800}
-.loginDivider{display:flex;align-items:center;gap:18px;margin:18px 0 8px;color:#666;font-size:20px}.loginDivider:before,.loginDivider:after{content:"";height:1px;background:#aaa;flex:1}
-.registerButton{
-  width:100%;height:90px;margin-top:0;padding:14px 20px;border:2px solid #2f6650;border-radius:22px;
-  background:transparent;color:#2f6650;display:flex;align-items:center;justify-content:center;gap:16px;
-  font-size:24px;font-weight:800;
-}
-.registerButton i{font-size:27px}
-.version{margin-top:32px;font-size:20px;color:#000}.copyright{color:#000;font-size:19px;margin-top:10px}
 
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;
-  z-index:3000;padding:20px;
+h1 {
+  text-align: left;
+  margin: 0;
+  background: none;
+  font-size: 26px;
+  padding: 5px;
 }
-.modalCard{
-  width:min(500px,92vw);background:#f7efe3;color:#333;border-radius:26px;padding:28px 24px;
-  box-shadow:0 15px 45px rgba(0,0,0,.25);text-align:center;
+.headerBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #3F5B45;
+  padding: 10px 15px;
+  border-radius: 12px;
 }
-.modalCard h2{color:#2f6650;font-size:28px;margin:0 0 20px}.modalCard p{color:#666;font-size:17px;line-height:1.4}
-.formInput{
-  width:100%;height:58px;border:0;background:#fff;border-radius:14px;padding:0 16px;margin:6px 0;
-  font-size:17px;outline:0;
-}
-.primaryModalButton{width:100%;background:#3F5B45;color:#fff;border:0;border-radius:14px;padding:15px;font-size:18px;font-weight:700;margin-top:10px}
-.secondaryModalButton{width:100%;background:transparent;color:#3F5B45;border:0;padding:12px;font-size:16px;text-decoration:underline}
-.modeOptions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.modeButton{
-  width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:16px 18px;
-  background:#fff;color:#2f6650;border:2px solid #d9d0c4;border-radius:15px;font-size:18px;font-weight:700;
-}
-.modeButton i{width:25px;text-align:center;font-size:20px}
-.modeButton:hover{border-color:#2f6650}
-.closeX{position:absolute;right:22px;top:16px;background:none;border:0;font-size:25px;color:#555}
-.registerCard{position:relative}
-.codeInput{letter-spacing:5px;text-align:center;font-size:25px}
-.hidden{display:none!important}
 
-@media(max-width:600px){
-  #loginScreen{padding:0 14px}
-  .loginBox{width:calc(100vw - 28px);padding:48px 28px 34px;border-radius:30px}
-  .welcome{margin-bottom:40px}.welcome h2{font-size:38px}.welcome p{font-size:23px;margin-top:42px}
-  .inputBox{height:88px;border-radius:21px;padding:0 24px}.inputBox input{font-size:24px}.forgotPassword{font-size:20px;margin-bottom:28px}
-  .loginButton{height:92px;font-size:27px}.registerButton{height:90px;font-size:22px}
+.headerBar h1 {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  margin: 0;
+  padding: 5px;
+  font-size: 21px;
+  overflow: hidden;
+text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.familyButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.10);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+.familyMenu {
+  position: absolute;
+  right: 0;
+  top: 95%;
+  margin-top: 0;
+  background: #f7efe3;
+  border-radius: 14px;
+  padding: 8px;
+  width: 155px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 1000;
+}
+  .familyMenuItem {
+  color: #333;
+  padding: 10px 6px;
+  font-size: 15px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+  .familyMenuItem:first-child i {
+  background: #dff5df;
+  color: #3F5B45;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.familyButton i:first-child {
+  margin-right: 6px;
+}
+
+.familyButton i:last-child {
+  margin-left: 6px;
+}
+
+.familyButton i:first-child {
+  margin-right: 8px;
+}
+
+.familyButton i:last-child {
+  margin-left: 8px;
+}
+h2 {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add {
+  flex: 0 0 40%;
+  background: #3F5B45;
+  color: white;
+  
+}
+
+.list {
+  margin-top: 20px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 12px;
+  padding: 8px;
+  height: 300px !important;
+max-height: 300px !important;
+overflow-y: auto !important;
+overflow-x: hidden;
+}
+
+.item {
+  padding: 14px 10px;
+  font-size: 20px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.buttons button {
+  flex: 1;
+}
+
+.clear {
+  background: #3F5B45;
+  color: white;
+}
+
+.delete {
+  background: #c62828;
+  color: white;
+}
+
+.status {
+  margin-top: 15px;
+  text-align: center;
+  background: #dff5df;
+  color: #1b5e20;
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 12px;
+  font-weight: bold;
+  }
+  .householdButton {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: #3F5B45;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.householdButton i {
+  margin-right: 6px;
+}
+.status span {
+    display: block;
+    font-size: 10px;
+    font-weight: normal;
+    margin-top: 2px;
+}
+  #loginScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('IMG_3639.jpeg') center/cover no-repeat;
+  z-index: 1000;
+}
+
+.loginBox {
+  width: 85%;
+  max-width: 400px;
+  text-align: center;
+  background: #f7efe3;
+  padding: 35px 25px;
+  border-radius: 25px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.loginBox input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  padding: 18px;
+  border: none;
+  border-radius: 14px;
+  font-size: 20px;
+}
+.inputBox {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  padding: 0 15px;
+}
+
+.inputBox span {
+  font-size: 22px;
+  margin-right: 12px;
+}
+.inputBox span i {
+  color: #666666;
+  font-size: 22px;
+  width: 24px;
+  text-align: center;
+}
+.inputBox input {
+  flex: 1;
+  margin: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+  .togglePassword {
+  background: none !important;
+  color: #666666 !important;
+  border: none !important;
+  padding: 5px !important;
+  margin: 0 !important;
+  font-size: 18px !important;
+  cursor: pointer;
+}
+.loginBox > button {
+  width: 100%;
+  background: #3F5B45;
+  color: #ffffff;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: bold;
+}
+}
+.welcome {
+  text-align: center;
+  margin-bottom: 45px;
+}
+
+.welcome h2 {
+  margin: 0;
+  color: #1f5d43;
+  font-size: 34px;
+  font-weight: bold;
+  line-height: 1.15;
+}
+
+.welcome p {
+  margin: 10p 0 0;
+  color: #666666;
+  font-size: 22px;
+}
+  .forgotPassword {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  color: #3F5B45;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: right;
+}
+.version {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #000000;
+}
+  .copyright {
+  color: #000000;
+  font-size: 14px;
+  margin-top: 5px;
+}
+.login-icon {
+  text-align: center;
+  font-size: 55px;
+  margin-bottom: 15px;
+}
+ .searchBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 14px;
+  padding: 0 15px;
+  margin-top: 12px;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.searchBox > i {
+  color: #333;
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.searchBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 18px;
+}
+
+.searchBox button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 28px;
+  padding: 0 5px;
+  cursor: pointer;
+} 
+#refresh {
+  text-align: center;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.2s;
+  font-size: 14px;
+  color: #555555;
+}
+  .nameModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.nameBox {
+  width: 85%;
+  max-width: 400px;
+  background: #f7efe3;
+  border-radius: 25px;
+  padding: 35px 25px;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.nameBox h2 {
+  color: #3F5B45;
+  font-size: 32px;
+  margin: 0 0 15px;
+}
+
+.nameBox p {
+  color: #666;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.nameInputBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 14px;
+  padding: 0 15px;
+  margin-bottom: 15px;
+}
+
+.nameInputBox i {
+  color: #3F5B45;
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.nameInputBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 5px;
+  font-size: 20px;
+}
+
+.nameBox button {
+  width: 100%;
+  background: #3F5B45;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
 }
 </style>
 </head>
 
 <body>
-
 <div id="loginScreen">
   <div class="loginBox">
     <div class="welcome">
-      <h2>Welkom bij</h2>
-      <h2>Boodschappenlijst</h2>
-      <p>Jouw lijst, altijd bij de hand</p>
-    </div>
+  <h2>Welkom bij</h2>
+  <h2>Boodschappenlijst</h2>
+  <p>Jouw lijst, altijd bij de hand</p>
+</div>
+<div class="inputBox">
+  <span><i class="fa-solid fa-envelope"></i></span>
+  <input id="loginEmail" type="email" placeholder="E-mailadres">
+</div>
 
-    <div class="inputBox">
-      <span><i class="fa-solid fa-envelope"></i></span>
-      <input id="loginEmail" type="email" placeholder="E-mailadres" autocomplete="email">
-    </div>
-
-    <div class="inputBox">
-      <span><i class="fa-solid fa-lock"></i></span>
-      <input id="loginPassword" type="password" placeholder="Wachtwoord" autocomplete="current-password">
-      <button type="button" class="togglePassword" onclick="togglePassword()" aria-label="Wachtwoord tonen">
-        <i class="fa-regular fa-eye"></i>
-      </button>
-    </div>
-
+<div class="inputBox">
+  <span><i class="fa-solid fa-lock"></i></span>
+  <input id="loginPassword" type="password" placeholder="Wachtwoord">
+<button type="button" class="togglePassword" onclick="togglePassword()">
+  <i class="fa-regular fa-eye"></i>
+</button>
+</div>
     <div class="forgotPassword" onclick="resetPassword()">Wachtwoord vergeten?</div>
-    <button class="loginButton" type="button" onclick="login()">Inloggen</button>
-
-    <div class="loginDivider"><span>Of</span></div>
-
-    <button class="registerButton" type="button" onclick="openRegister()">
-      <i class="fa-solid fa-user-plus"></i>
-      <span>Account aanmaken</span>
-    </button>
-
+    <button onclick="login()">Inloggen</button>
     <div class="version">Versie 1.0</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
   </div>
 </div>
-
-<!-- Registreren -->
-<div id="registerModal" class="modal">
-  <div class="modalCard registerCard">
-    <button class="closeX" type="button" onclick="closeRegister()" aria-label="Sluiten">&times;</button>
-    <h2>Account aanmaken</h2>
-    <p>Maak je account aan met je naam, e-mailadres en wachtwoord.</p>
-    <input id="registerName" class="formInput" type="text" placeholder="Naam" autocomplete="name">
-    <input id="registerEmail" class="formInput" type="email" placeholder="E-mailadres" autocomplete="email">
-    <input id="registerPassword" class="formInput" type="password" placeholder="Wachtwoord" autocomplete="new-password">
-    <input id="registerPasswordConfirm" class="formInput" type="password" placeholder="Wachtwoord opnieuw" autocomplete="new-password">
-    <button class="primaryModalButton" type="button" onclick="register()">Account aanmaken</button>
-    <button class="secondaryModalButton" type="button" onclick="closeRegister()">Terug naar inloggen</button>
-  </div>
-</div>
-
-<!-- Gebruiksmethode na nieuwe account / account zonder familie -->
-<div id="useModeModal" class="modal">
-  <div class="modalCard">
-    <h2>Hoe wil je Boodschappenlijst gebruiken?</h2>
-    <div class="modeOptions">
-      <button class="modeButton" type="button" onclick="createNewFamilyFromMode()"><i class="fa-solid fa-house"></i><span>Nieuwe familie</span></button>
-      <button class="modeButton" type="button" onclick="enterFamilyCodeFromMode()"><i class="fa-solid fa-keyboard"></i><span>Familiecode invoeren</span></button>
-      <button class="modeButton" type="button" onclick="usePrivateMode()"><i class="fa-solid fa-user"></i><span>Alleen gebruiken</span></button>
-      <button class="modeButton" type="button" onclick="skipUseMode()"><i class="fa-solid fa-arrow-right"></i><span>Overslaan</span></button>
+  <div id="nameModal" class="nameModal">
+  <div class="nameBox">
+    <h2>Welkom! 👋</h2>
+    <p>Hoe heet je?</p>
+    <p>Vul je naam in, zodat je familie weet wie je bent.</p>
+    <div class="nameInputBox">
+      <i class="fa-solid fa-user"></i>
+      <input id="userName" type="text" placeholder="Jouw naam">
     </div>
+    <button onclick="saveUserName()">Opslaan</button>
   </div>
 </div>
+<div class="app">
 
-<div class="app" id="mainApp">
   <div class="headerBar">
-    <h1>Boodschappenlijst</h1>
-    <button class="familyButton" onclick="toggleFamilyMenu()">
-      <i class="fa-solid fa-users"></i> Familie <i class="fa-solid fa-chevron-down"></i>
-    </button>
+  <h1>Boodschappenlijst</h1>
+  <button class="familyButton" onclick="toggleFamilyMenu()">
+    <i class="fa-solid fa-users"></i> Familie
+    <i class="fa-solid fa-chevron-down"></i>
+  </button>
     <div id="familyMenu" class="familyMenu">
-      <div class="familyMenuItem"><i class="fa-solid fa-users"></i><span>Mijn familie</span></div>
-      <div class="familyMenuItem" onclick="enterFamilyCode()"><i class="fa-solid fa-keyboard"></i><span>Code invoeren</span></div>
-      <div class="familyMenuItem" onclick="showFamilyMembers()"><i class="fa-solid fa-user-group"></i><span>Familielid (<span id="memberCount">1</span>)</span></div>
-      <div class="familyMenuItem" onclick="showFamilyCode()"><i class="fa-solid fa-key"></i><span>Familiecode</span></div>
-      <div class="familyMenuItem" onclick="createNewFamily()"><i class="fa-solid fa-house"></i><span>Nieuwe familie</span></div>
-      <div class="familyMenuItem" onclick="leaveFamily()" style="border-top:1px solid #ddd;margin-top:8px;padding-top:12px">
-        <i class="fa-solid fa-right-from-bracket" style="color:#e53935"></i><span style="color:#e53935">Familie verlaten</span>
-      </div>
-    </div>
+  <div class="familyMenuItem">
+  <i class="fa-solid fa-users"></i>
+  <span>Mijn familie</span>
   </div>
+<div class="familyMenuItem" onclick="enterFamilyCode()">
+  <i class="fa-solid fa-keyboard"></i>
+  <span>Code invoeren</span>
+</div>
+
+<div class="familyMenuItem" onclick="showFamilyMembers()">
+  <i class="fa-solid fa-user-group"></i>
+  <span>Familielid (<span id="memberCount">1</span>)</span>
+</div>
+<div class="familyMenuItem" onclick="showFamilyCode()">
+  <i class="fa-solid fa-key"></i>
+  <span>Familiecode</span>
+</div>
+<div class="familyMenuItem" onclick="createNewFamily()">
+  <i class="fa-solid fa-house"></i>
+  <span>Nieuwe familie</span>
+</div>
+<div class="familyMenuItem" onclick="leaveFamily()"style="border-top: 1px solid #ddd; margin-top: 8px; padding-top: 12px;">
+  <i class="fa-solid fa-right-from-bracket" style="color: #e53935;"></i>
+  <span style="color: #e53935;">Familie verlaten</span>
+</div>
+</div>
+  </div>
+
 
   <h2>Voeg iets toe aan je lijst</h2>
+
   <div class="input-row">
-    <input id="product" placeholder="Bijv. melk, brood, eieren..." autocomplete="off">
-    <button class="add" onclick="addProduct()">Toevoegen</button>
+    <input id="product" placeholder="Bijv. melk, brood, eieren...">
+    <button class="add" onclick="addProduct()">+ Toevoegen</button>
   </div>
-  <div class="searchBox">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
-    <button type="button" onclick="clearSearch" aria-label="Zoekopdracht wissen">×</button>
-  </div>
-  <div id="refresh">Loslaten om te vernieuwen</div>
+<div class="searchBox">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
+  <button type="button" onclick="clearSearch()">✕</button>
+</div>
+  <div id="refresh">↻ Loslaten om te vernieuwen</div>
+
   <div class="list" id="list"></div>
+
   <div class="buttons">
     <button class="clear" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
-  <div class="status" id="status"><i class="fa-solid fa-cloud"></i> Lijst automatisch opgeslagen<span>Laatste update: vandaag</span></div>
+
+  <div class="status" id="status">
+   <i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen
+    <span>Laatste update: vandaag</span>
+</div>
+  
+  </div>
+
 </div>
 
+<script>
+
+
+
+let boodschappen = [];
+let selectedIndex = -1;
+function toggleFamilyMenu() {
+  const menu = document.getElementById("familyMenu");
+
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "block";
+  }
+}
+  async function updateMemberCount() {
+  if (!currentHouseholdId) return;
+
+  const snapshot = await database
+    .ref("households/" + currentHouseholdId + "/members")
+    .once("value");
+
+  const members = snapshot.val() || {};
+  const count = Object.keys(members).length;
+
+  document.getElementById("memberCount").innerText = count;
+}
+  function searchList() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const items = document.querySelectorAll(".item");
+
+  items.forEach(item => {
+    const text = item.innerText.toLowerCase();
+
+    if (text.includes(search)) {
+      item.style.display = "";
+    } else {
+      item.style.display = "none";
+    }
+  });
+}
+
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  searchList();
+}
+async function loadList() {
+  try {
+const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
+const data = snapshot.val();
+
+    boodschappen = data || [];
+    selectedIndex = -1;
+
+    showList();
+    updateStatus();
+    updateMemberCount();
+
+  } catch (error) {
+    document.getElementById("status").innerText =
+      "⚠️ Kon de lijst niet laden";
+  }
+}
+
+function showList() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  boodschappen.forEach((item, index) => {
+
+    const div = document.createElement("div");
+
+    div.className = "item";
+    div.innerHTML = item.startsWith("✅") ? "✅ <span style=\"text-decoration: line-through;\">" + item.substring(1) + "</span>" : item;
+
+    list.appendChild(div);
+  });
+}
+
+async function saveList() {
+await database.ref("households/" + currentHouseholdId + "/boodschappen").set(boodschappen);
+
+  updateStatus();
+}
+
+function toggleItem(index) {
+
+  selectedIndex = index;
+
+  if (boodschappen[index].startsWith("☐")) {
+    boodschappen[index] =
+      "✅" + boodschappen[index].substring(1);
+  } else {
+    boodschappen[index] =
+      "☐" + boodschappen[index].substring(1);
+  }
+
+  showList();
+  saveList();
+}
+
+async function addProduct() {
+
+  const input = document.getElementById("product");
+  const text = input.value.trim();
+
+  if (text === "") return;
+
+  boodschappen.push("☐ " + text);
+
+  input.value = "";
+
+  showList();
+  await saveList();
+}
+
+async function deleteProduct() {
+
+  if (selectedIndex < 0) return;
+
+  boodschappen.splice(selectedIndex, 1);
+
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
+}
+
+async function clearList() {
+
+  boodschappen = [];
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
+}
+
+function updateStatus() {
+
+  const now = new Date();
+
+  const hour =
+    String(now.getHours()).padStart(2, "0");
+
+  const minute =
+    String(now.getMinutes()).padStart(2, "0");
+
+document.getElementById("status").innerHTML =
+  "<i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen<span>Laatste update: vandaag "
+  + hour + ":" + minute + "</span>";
+}
+
+
+/* Pull-to-refresh */
+
+let startY = 0;
+let pulling = false;
+
+document.addEventListener("touchstart", function(e) {
+
+  if (window.scrollY === 0) {
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }
+
+});
+
+document.addEventListener("touchmove", function(e) {
+
+  if (!pulling) return;
+
+  const distance =
+    e.touches[0].clientY - startY;
+
+  if (distance > 0 && distance < 100) {
+    document.getElementById("refresh").style.height =
+      distance + "px";
+  }
+
+});
+
+document.addEventListener("touchend", async function(e) {
+
+  if (!pulling) return;
+
+  const distance =
+    e.changedTouches[0].clientY - startY;
+
+  pulling = false;
+
+  document.getElementById("refresh").style.height = "0";
+
+  if (distance > 70) {
+    await loadList();
+  }
+
+});
+
+
+
+document.getElementById("list").addEventListener("click", function(e) {
+  const item = e.target.closest(".item");
+  if (!item) return;
+
+  const items = Array.from(this.children);
+  const index = items.indexOf(item);
+
+  if (index >= 0) {
+    toggleItem(index);
+  }
+});
+</script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
-
 <script>
-const firebaseConfig={
-  apiKey:"AIzaSyCtuUMTbByy39KxAbLdw5GUkO_cHmfZHHc",
-  authDomain:"boodschappenthuis1.firebaseapp.com",
-  databaseURL:"https://boodschappenthuis1-default-rtdb.firebaseio.com",
-  projectId:"boodschappenthuis1",
-  storageBucket:"boodschappenthuis1.firebasestorage.app",
-  messagingSenderId:"845995010779",
-  appId:"1:845995010779:web:5896c89bde8b3ace507afe"
-};
+  // Import the functions you need from the SDKs you need
+  
+ // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const database=firebase.database();
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCtuUMTbByy39KxAbLdw5GUkO_cHmfZHHc",
+    authDomain: "boodschappenthuis1.firebaseapp.com",
+    databaseURL: "https://boodschappenthuis1-default-rtdb.firebaseio.com",
+    projectId: "boodschappenthuis1",
+    storageBucket: "boodschappenthuis1.firebasestorage.app",
+    messagingSenderId: "845995010779",
+    appId: "1:845995010779:web:5896c89bde8b3ace507afe"
+  };
 
-let currentHouseholdId=null;
-let usePrivateList=false;
-let boodschappen=[];
-let selectedIndex=-1;
+  // Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
+  let currentHouseholdId = null;
 
-function el(id){return document.getElementById(id)}
-function show(id){el(id).style.display="flex"}
-function hide(id){el(id).style.display="none"}
+async function getOrCreateHousehold() {
+  const user = auth.currentUser;
 
-function toggleFamilyMenu(){
-  const menu=el("familyMenu");
-  menu.style.display=menu.style.display==="block"?"none":"block";
-}
-
-document.addEventListener("click",function(e){
-  const bar=document.querySelector(".headerBar");
-  if(bar && !bar.contains(e.target)) el("familyMenu").style.display="none";
-});
-
-function openRegister(){show("registerModal");setTimeout(()=>el("registerName").focus(),50)}
-function closeRegister(){hide("registerModal")}
-window.openRegister=openRegister;
-window.closeRegister=closeRegister;
-
-function togglePassword(){
-  const password=el("loginPassword");
-  const eye=document.querySelector(".togglePassword i");
-  const visible=password.type==="password";
-  password.type=visible?"text":"password";
-  eye.className=visible?"fa-regular fa-eye-slash":"fa-regular fa-eye";
-}
-
-async function resetPassword(){
-  const email=el("loginEmail").value.trim();
-  if(!email){alert("Vul eerst je e-mailadres in.");return}
-  try{
-    await auth.sendPasswordResetEmail(email);
-    alert("Er is een e-mail gestuurd om je wachtwoord opnieuw in te stellen.");
-  }catch(error){alert("Wachtwoord resetten mislukt: "+error.message)}
-}
-
-async function register(){
-  const name=el("registerName").value.trim();
-  const email=el("registerEmail").value.trim();
-  const password=el("registerPassword").value;
-  const confirmPassword=el("registerPasswordConfirm").value;
-
-  if(!name||!email||!password||!confirmPassword){alert("Vul alle velden in.");return}
-  if(password!==confirmPassword){alert("De wachtwoorden komen niet overeen.");return}
-  if(password.length<6){alert("Het wachtwoord moet minimaal 6 tekens bevatten.");return}
-
-  try{
-    const credential=await auth.createUserWithEmailAndPassword(email,password);
-    const user=credential.user;
-    await database.ref("users/"+user.uid).set({name:name,email:email});
-    closeRegister();
-    el("loginScreen").style.display="none";
-    currentHouseholdId=null;
-    usePrivateList=false;
-    boodschappen=[];
-    show("useModeModal");
-  }catch(error){
-    let message=error.message||"Onbekende fout";
-    if(error.code==="auth/email-already-in-use") message="Dit e-mailadres bestaat al.";
-    if(error.code==="auth/invalid-email") message="Dit e-mailadres is niet geldig.";
-    alert("Account aanmaken mislukt: "+message);
+  if (!user) {
+    throw new Error("Je bent niet ingelogd.");
   }
+
+  const userRef = database.ref("users/" + user.uid + "/householdId");
+  const userSnapshot = await userRef.once("value");
+
+  if (userSnapshot.exists()) {
+    currentHouseholdId = userSnapshot.val();
+    return currentHouseholdId;
+  }
+return null;
 }
-window.register=register;
+async function showFamilyCode() {
+  const code = currentHouseholdId;
 
-async function getExistingHousehold(){
-  const user=auth.currentUser;
-  if(!user) throw new Error("Je bent niet ingelogd.");
-  const snap=await database.ref("users/"+user.uid+"/householdId").once("value");
-  currentHouseholdId=snap.exists()?snap.val():null;
-  return currentHouseholdId;
+  alert("Jouw familiecode is:\n\n                               " + code);
 }
+ async function createNewFamily() {
+  const user = auth.currentUser;
 
-function showUseModeModal(){show("useModeModal")}
-function hideUseModeModal(){hide("useModeModal")}
-window.showUseModeModal=showUseModeModal;
+  if (!user) {
+    alert("Je bent niet ingelogd.");
+    return;
+  }
 
-async function finishWithPrivateList(){
-  currentHouseholdId=null;
-  usePrivateList=true;
-  hideUseModeModal();
+  // Controleren of de gebruiker al een familie heeft
+  const userSnapshot = await database
+    .ref("users/" + user.uid + "/householdId")
+    .once("value");
+
+  const existingHouseholdId = userSnapshot.val();
+
+  // Als de gebruiker al een familie heeft
+  if (existingHouseholdId) {
+
+    const leaveFamily = confirm(
+      "Je hebt al een familie.\n\n" +
+      "Je moet je huidige familie eerst verlaten voordat je een nieuwe familie kunt beginnen.\n\n" +
+      "Wil je je huidige familie verlaten?"
+    );
+
+    if (!leaveFamily) {
+      return;
+    }
+
+    // Familiegegevens ophalen
+    const householdSnapshot = await database
+      .ref("households/" + existingHouseholdId)
+      .once("value");
+
+    const household = householdSnapshot.val();
+
+    if (household) {
+
+      // Controleren of deze gebruiker de eigenaar is
+      const isOwner = household.owner === user.uid;
+
+      if (isOwner) {
+
+        // Extra bevestiging voor de eigenaar
+        const confirmOwner = confirm(
+          "Weet je het zeker?\n\n" +
+          "Je bent de eigenaar van deze familie. " +
+          "Als je een nieuwe familie begint, wordt je huidige familie beëindigd " +
+          "en worden alle andere leden uit deze familie gehaald.\n\n" +
+          "Daarna kunnen zij zelf een nieuwe familie beginnen."
+        );
+
+        if (!confirmOwner) {
+          return;
+        }
+
+        // Alle leden uit de oude familie halen
+        const members = household.members || {};
+
+        for (const memberId of Object.keys(members)) {
+          await database
+            .ref("users/" + memberId + "/householdId")
+            .remove();
+        }
+
+        // Oude familie volledig verwijderen
+        await database
+          .ref("households/" + existingHouseholdId)
+          .remove();
+
+      } else {
+
+        // Gewoon lid: tweede bevestiging
+        const confirmLeave = confirm(
+          "Weet je het zeker?\n\n" +
+          "Je verlaat je huidige familie. " +
+          "Daarna kun je je eigen nieuwe familie beginnen."
+        );
+
+        if (!confirmLeave) {
+          return;
+        }
+
+        // Alleen deze gebruiker uit de familie verwijderen
+        await database
+          .ref(
+            "households/" +
+            existingHouseholdId +
+            "/members/" +
+            user.uid
+          )
+          .remove();
+
+        // Familie-ID bij gebruiker verwijderen
+        await database
+          .ref("users/" + user.uid + "/householdId")
+          .remove();
+      }
+
+      currentHouseholdId = null;
+    }
+  }
+
+  // ==========================================
+  // NIEUWE FAMILIE MAKEN
+  // ==========================================
+
+  let code;
+  let familyExists = true;
+
+  while (familyExists) {
+    code = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    const check = await database
+      .ref("households/" + code)
+      .once("value");
+
+    familyExists = check.exists();
+  }
+
+  // Nieuwe familie opslaan
+  await database
+    .ref("households/" + code)
+    .set({
+      owner: user.uid,
+      name: "Mijn familie",
+      members: {
+        [user.uid]: true
+      }
+    });
+
+  // Gebruiker koppelen aan de nieuwe familie
+  await database
+    .ref("users/" + user.uid + "/householdId")
+    .set(code);
+
+  currentHouseholdId = code;
+
+  await loadList();
+  await updateMemberCount();
+
+  alert(
+    "Nieuwe familie aangemaakt!\n\n" +
+    "Jouw familiecode is: " + code
+  );
+}
+  async function saveUserName() {
+  const user = auth.currentUser;
+  const name = document.getElementById("userName").value.trim();
+
+  if (!user) {
+    return;
+  }
+
+  if (!name) {
+    alert("Vul eerst je naam in.");
+    return;
+  }
+
+  await database.ref("users/" + user.uid + "/name").set(name);
+
+  document.getElementById("nameModal").style.display = "none";
   await loadList();
 }
+  async function showFamilyMembers() {
+  if (!currentHouseholdId) return;
 
-async function usePrivateMode(){
-  await finishWithPrivateList();
-}
-function skipUseMode(){
-  usePrivateList=true;
-  hideUseModeModal();
-  loadList();
-}
+  const snapshot = await database
+    .ref("households/" + currentHouseholdId + "/members")
+    .once("value");
 
-async function createNewFamilyFromMode(){
-  hideUseModeModal();
-  await createNewFamily(true);
-}
-async function enterFamilyCodeFromMode(){
-  hideUseModeModal();
-  await enterFamilyCode(true);
-}
+  const members = snapshot.val() || {};
+  let names = [];
 
-async function loadList(){
-  try{
-    if(usePrivateList){
-      const saved=localStorage.getItem("privateBoodschappen_"+auth.currentUser.uid);
-      boodschappen=saved?JSON.parse(saved):[];
-    }else if(currentHouseholdId){
-      const snapshot=await database.ref("households/"+currentHouseholdId+"/boodschappen").once("value");
-      boodschappen=snapshot.val()||[];
-    }else{
-      boodschappen=[];
+  for (const uid of Object.keys(members)) {
+    const nameSnapshot = await database
+      .ref("users/" + uid + "/name")
+      .once("value");
+
+    names.push(nameSnapshot.val() || "Onbekend");
+  }
+
+  alert("Familieleden:\n\n" + names.join("\n"));
+}
+ async function enterFamilyCode() {
+  const code = prompt("Voer de 6-cijferige familiecode in:");
+
+  if (!code) {
+    return;
+  }
+
+  if (!/^\d{6}$/.test(code)) {
+    alert("Voer een geldige 6-cijferige familiecode in.");
+    return;
+  }
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Je bent niet ingelogd.");
+    return;
+  }
+
+  try {
+    // Controleren of je al een familie hebt
+    const userSnapshot = await database
+      .ref("users/" + user.uid + "/householdId")
+      .once("value");
+
+    if (userSnapshot.exists() && userSnapshot.val()) {
+      alert(
+        "Je bent al aangesloten bij een familie.\n\n" +
+        "Verlaat eerst je huidige familie voordat je een andere familiecode invoert."
+      );
+      return;
     }
-    selectedIndex=-1;showList();updateStatus();
-    if(currentHouseholdId) updateMemberCount();
-  }catch(error){
-    el("status").innerHTML="Lijst kon niet worden geladen";
-  }
-}
 
-async function saveList(){
-  try{
-    if(usePrivateList){
-      localStorage.setItem("privateBoodschappen_"+auth.currentUser.uid,JSON.stringify(boodschappen));
-    }else if(currentHouseholdId){
-      await database.ref("households/"+currentHouseholdId+"/boodschappen").set(boodschappen);
-    }
-    updateStatus();
-  }catch(error){alert("De lijst kon niet worden opgeslagen.")}
-}
+    // Jezelf toevoegen aan de familie
+    await database
+      .ref("households/" + code + "/members/" + user.uid)
+      .set(true);
 
-function showList(){
-  const list=el("list");list.innerHTML="";
-  boodschappen.forEach((item,index)=>{
-    const div=document.createElement("div");div.className="item";
-    if(item.startsWith("✅")) div.innerHTML='✅ <span style="text-decoration:line-through">'+escapeHtml(item.substring(1))+"</span>";
-    else div.textContent=item;
-    div.dataset.index=index;list.appendChild(div);
-  });
-}
-function escapeHtml(text){
-  const d=document.createElement("div");d.textContent=text;return d.innerHTML;
-}
-function toggleItem(index){
-  selectedIndex=index;
-  if(boodschappen[index].startsWith("☐")) boodschappen[index]="✅"+boodschappen[index].substring(1);
-  else boodschappen[index]="☐"+boodschappen[index].substring(1);
-  showList();saveList();
-}
-async function addProduct(){
-  const input=el("product");const text=input.value.trim();if(!text)return;
-  boodschappen.push("☐ "+text);input.value="";showList();await saveList();
-}
-async function deleteProduct(){
-  if(selectedIndex<0)return;
-  boodschappen.splice(selectedIndex,1);selectedIndex=-1;showList();await saveList();
-}
-async function clearList(){
-  if(!boodschappen.length)return;
-  if(!confirm("Wil je de hele lijst wissen?"))return;
-  boodschappen=[];selectedIndex=-1;showList();await saveList();
-}
-function updateStatus(){
-  const now=new Date();
-  el("status").innerHTML='<i class="fa-solid fa-cloud"></i> Lijst automatisch opgeslagen<span>Laatste update: vandaag '+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0")+"</span>";
-}
-function searchList(){
-  const q=el("searchInput").value.toLowerCase();
-  document.querySelectorAll(".item").forEach(item=>item.style.display=item.innerText.toLowerCase().includes(q)?"":"none");
-}
-function clearSearch(){el("searchInput").value="";searchList()}
+    // Familie koppelen aan je account
+    await database
+      .ref("users/" + user.uid + "/householdId")
+      .set(code);
 
-el("list").addEventListener("click",function(e){
-  const item=e.target.closest(".item");if(!item)return;
-  toggleItem(Number(item.dataset.index));
-});
+    currentHouseholdId = code;
 
-el("searchInput").addEventListener("input",searchList);
-document.querySelector(".searchBox button").addEventListener("click",clearSearch);
+    await loadList();
+    await updateMemberCount();
 
-let startY=0,pulling=false;
-document.addEventListener("touchstart",e=>{if(window.scrollY===0){startY=e.touches[0].clientY;pulling=true}});
-document.addEventListener("touchmove",e=>{
-  if(!pulling)return;const distance=e.touches[0].clientY-startY;
-  if(distance>0&&distance<100)el("refresh").style.height=distance+"px";
-});
-document.addEventListener("touchend",async e=>{
-  if(!pulling)return;const distance=e.changedTouches[0].clientY-startY;pulling=false;el("refresh").style.height="0";
-  if(distance>70)await loadList();
-});
-
-async function updateMemberCount(){
-  if(!currentHouseholdId)return;
-  const snapshot=await database.ref("households/"+currentHouseholdId+"/members").once("value");
-  const members=snapshot.val()||{};
-  el("memberCount").innerText=Object.keys(members).length;
-}
-
-async function showFamilyCode(){
-  if(!currentHouseholdId){alert("Je bent nog niet aangesloten bij een familie.");return}
-  alert("Jouw familiecode is:\n\n"+currentHouseholdId);
-}
-
-async function createNewFamily(fromMode=false){
-  const user=auth.currentUser;if(!user){alert("Je bent niet ingelogd.");return}
-
-  const existing=await getExistingHousehold();
-  if(existing){
-    const ok=confirm("Je bent al aangesloten bij een familie.\n\nVerlaat eerst je huidige familie voordat je een nieuwe familie begint?");
-    if(!ok)return;
-    await leaveFamily(true);
-  }
-
-  let code="",exists=true;
-  while(exists){
-    code=String(Math.floor(100000+Math.random()*900000));
-    const check=await database.ref("households/"+code).once("value");exists=check.exists();
-  }
-
-  await database.ref("households/"+code).set({
-    owner:user.uid,name:"Mijn familie",members:{[user.uid]:true}
-  });
-  await database.ref("users/"+user.uid+"/householdId").set(code);
-  currentHouseholdId=code;usePrivateList=false;
-  await loadList();await updateMemberCount();
-  alert("Nieuwe familie aangemaakt!\n\nJouw familiecode is: "+code);
-}
-async function enterFamilyCode(fromMode=false){
-  const code=prompt("Voer de 6-cijferige familiecode in:");
-  if(!code)return;
-  if(!/^\d{6}$/.test(code)){alert("Voer een geldige 6-cijferige familiecode in.");return}
-  const user=auth.currentUser;if(!user){alert("Je bent niet ingelogd.");return}
-  try{
-    const familySnap=await database.ref("households/"+code).once("value");
-    if(!familySnap.exists()){alert("Deze familiecode bestaat niet.");return}
-    const existing=await getExistingHousehold();
-    if(existing){alert("Je bent al aangesloten bij een familie.");return}
-    await database.ref("households/"+code+"/members/"+user.uid).set(true);
-    await database.ref("users/"+user.uid+"/householdId").set(code);
-    currentHouseholdId=code;usePrivateList=false;
-    await loadList();await updateMemberCount();
     alert("Je bent toegevoegd aan de familie!");
-  }catch(error){alert("Je kunt niet aan deze familie deelnemen.")}
-}
 
-async function showFamilyMembers(){
-  if(!currentHouseholdId){alert("Je bent nog niet aangesloten bij een familie.");return}
-  const snapshot=await database.ref("households/"+currentHouseholdId+"/members").once("value");
-  const members=snapshot.val()||{};let names=[];
-  for(const uid of Object.keys(members)){
-    const nameSnap=await database.ref("users/"+uid+"/name").once("value");
-    names.push(nameSnap.val()||"Onbekend");
+  } catch (error) {
+    console.error("Fout bij toetreden tot familie:", error);
+
+    alert(
+      "Deze familiecode bestaat niet of je kunt geen lid worden van deze familie."
+    );
   }
-  alert("Familieleden:\n\n"+names.join("\n"));
 }
+  async function leaveFamily() {
+  const user = auth.currentUser;
 
-async function leaveFamily(silent=false){
-  const user=auth.currentUser;if(!user||!currentHouseholdId)return;
-  if(!silent&&!confirm("Weet je zeker dat je de familie wilt verlaten?"))return;
-  const familyId=currentHouseholdId;
-  await database.ref("households/"+familyId+"/members/"+user.uid).remove();
-  await database.ref("users/"+user.uid+"/householdId").remove();
-  currentHouseholdId=null;usePrivateList=true;await loadList();
-  if(!silent)alert("Je hebt de familie verlaten.");
+  if (!user || !currentHouseholdId) {
+    alert("Je bent niet aangesloten bij een familie.");
+    return;
+  }
+
+  const confirmLeave = confirm("Weet je zeker dat je de familie wilt verlaten?");
+
+  if (!confirmLeave) {
+    return;
+  }
+
+  await database.ref("households/" + currentHouseholdId + "/members/" + user.uid).remove();
+  await database.ref("users/" + user.uid + "/householdId").remove();
+
+  currentHouseholdId = null;
+
+  alert("Je hebt de familie verlaten.");
 }
+function togglePassword() {
+  const password = document.getElementById("loginPassword");
+  const eye = document.querySelector(".togglePassword i");
 
-async function login(){
-  const email=el("loginEmail").value.trim();
-  const password=el("loginPassword").value;
-  if(!email||!password){alert("Vul je e-mailadres en wachtwoord in.");return}
-  try{
-    await auth.signInWithEmailAndPassword(email,password);
-    const user=auth.currentUser;
-    const userSnap=await database.ref("users/"+user.uid).once("value");
-    const userData=userSnap.val()||{};
-    currentHouseholdId=userData.householdId||null;
-    usePrivateList=!currentHouseholdId;
+  if (password.type === "password") {
+    password.type = "text";
+    eye.className = "fa-regular fa-eye-slash";
+  } else {
+    password.type = "password";
+    eye.className = "fa-regular fa-eye";
+  }
+}
+  async function resetPassword() {
+  const email = document.getElementById("loginEmail").value;
 
-    el("loginScreen").style.display="none";
+  if (!email) {
+    alert("Vul eerst je e-mailadres in.");
+    return;
+  }
 
-    if(currentHouseholdId){
-      await loadList();
-    }else{
-      showUseModeModal();
-      await loadList();
-    }
-  }catch(error){
+  try {
+    await auth.sendPasswordResetEmail(email);
+    alert("Er is een e-mail gestuurd om je wachtwoord opnieuw in te stellen.");
+  } catch (error) {
+    alert("Wachtwoord resetten mislukt: " + error.message);
+  }
+}
+async function login() {
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    alert("Inloggen gelukt!");
+document.getElementById("loginScreen").style.display = "none";
+await getOrCreateHousehold();
+    const nameSnapshot = await database.ref("users/" + auth.currentUser.uid + "/name").once("value");
+
+if (!nameSnapshot.exists()) {
+  document.getElementById("nameModal").style.display = "flex";
+  return;
+}
+await loadList();
+    } catch (error) {
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
 }
-window.login=login;
 
-auth.onAuthStateChanged(async user=>{
-  if(!user)return;
-  // Bij een al actieve sessie bepalen we de bestaande familie, zonder er automatisch een aan te maken.
-  try{
-    const snap=await database.ref("users/"+user.uid).once("value");
-    const data=snap.val()||{};
-    currentHouseholdId=data.householdId||null;
-    if(document.getElementById("loginScreen").style.display!=="none" && currentHouseholdId){
-      el("loginScreen").style.display="none";usePrivateList=false;await loadList();
-    }
-  }catch(e){}
-});
-
-// Enter = inloggen / registreren
-el("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
-["registerName","registerEmail","registerPassword","registerPasswordConfirm"].forEach(id=>{
-  el(id).addEventListener("keydown",e=>{if(e.key==="Enter")register()});
-});
+window.login = login;
+ 
 </script>
 </body>
 </html>
