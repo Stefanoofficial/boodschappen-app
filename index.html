@@ -433,7 +433,7 @@ overflow-x: hidden;
   justify-content:center;
   padding:20px;
   box-sizing:border-box;
-  background:rgba(0,0,0,.40);
+  background:#f7efe3;
 }
 .registerBox{
   width:88%;
@@ -497,6 +497,21 @@ overflow-x: hidden;
   background:transparent;
   color:#3F5B45;
   border:1px solid #3F5B45;
+}
+
+
+/* Schermwissel registratie */
+.registerModal{
+  overflow-y:auto;
+}
+.registerBox{
+  flex:0 1 390px;
+}
+@media (max-height:700px){
+  .registerBox{
+    padding-top:22px;
+    padding-bottom:22px;
+  }
 }
 
 </style>
@@ -1185,17 +1200,29 @@ window.login = login;
 
 function openRegister() {
   const modal = document.getElementById("registerModal");
+  const loginScreen = document.getElementById("loginScreen");
   if (!modal) return;
+
+  // Verberg het volledige inlogscherm terwijl registratie open is.
+  if (loginScreen) loginScreen.style.display = "none";
+
   modal.style.display = "flex";
   modal.setAttribute("aria-hidden", "false");
-  setTimeout(() => document.getElementById("registerName")?.focus(), 50);
+
+  setTimeout(() => {
+    document.getElementById("registerName")?.focus();
+  }, 50);
 }
 
 function closeRegister() {
   const modal = document.getElementById("registerModal");
+  const loginScreen = document.getElementById("loginScreen");
   if (!modal) return;
+
+  // Sluit registratie volledig en toon daarna weer het inlogscherm.
   modal.style.display = "none";
   modal.setAttribute("aria-hidden", "true");
+  if (loginScreen) loginScreen.style.display = "flex";
 }
 
 async function register() {
