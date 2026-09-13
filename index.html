@@ -693,7 +693,6 @@ overflow-x: hidden;
 <div id="useModeModal" class="useModeModal" aria-hidden="true">
   <div class="useModeBox" role="dialog" aria-modal="true" aria-labelledby="useModeTitle">
     <h2 id="useModeTitle">Hoe wil je Boodschappenlijst gebruiken?</h2>
-    <p>Kies hoe je jouw boodschappenlijst wilt gebruiken.</p>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('family')">
       <i class="fa-solid fa-house"></i><span>Nieuwe familie</span>
@@ -830,6 +829,19 @@ function clearSearch() {
 
 async function loadList() {
   try {
+    // Een privé-lijst wordt lokaal opgeslagen en hoeft dus niet via Firebase geladen te worden.
+    if (isPrivateMode()) {
+      await loadPrivateList();
+      return true;
+    }
+
+    // Ook de keuze "Overslaan" moet bij vernieuwen behouden blijven.
+    const user = auth.currentUser;
+    if (!currentHouseholdId && user && localStorage.getItem("boodschappenUseMode_" + user.uid) === "skip") {
+      openAppWithoutList();
+      return true;
+    }
+
     if (!currentHouseholdId) {
       const householdId = await getOrCreateHousehold();
       if (!householdId) {
