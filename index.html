@@ -1320,10 +1320,7 @@ async function showFamilyMembers() {
  async function enterFamilyCode() {
   const code = prompt("Voer de 6-cijferige familiecode in:");
   if (!code) return;
-
-  const cleanCode = String(code).trim();
-
-  if (!/^\\d{6}$/.test(cleanCode)) {
+  if (!/^\d{6}$/.test(code)) {
     alert("Voer een geldige 6-cijferige familiecode in.");
     return;
   }
@@ -1338,56 +1335,34 @@ async function showFamilyMembers() {
     const userSnapshot = await database
       .ref("users/" + user.uid + "/householdId")
       .once("value");
-
     if (userSnapshot.exists() && userSnapshot.val()) {
-      alert(
-        "Je bent al aangesloten bij een familie.\\n\\n" +
-        "Verlaat eerst je huidige familie voordat je een andere familiecode invoert."
-      );
+      alert("Je bent al aangesloten bij een familie.\n\nVerlaat eerst je huidige familie voordat je een andere familiecode invoert.");
       return;
     }
 
-    // We lezen de familie hier bewust NIET eerst uit.
-    // Een gebruiker die nog geen lid is mag de familie niet vooraf lezen.
-    // De Firebase Rules bepalen of deze bestaande familiecode geldig is.
+    // Probeer de gebruiker rechtstreeks als lid toe te voegen.
+    // Een niet-lid mag de familie nog niet lezen; Firebase Rules bepalen
+    // daarom via deze schrijfactie of de familiecode geldig is.
     await database
-      .ref("households/" + cleanCode + "/members/" + user.uid)
+      .ref("households/" + code + "/members/" + user.uid)
       .set(true);
-
     await database
       .ref("users/" + user.uid + "/householdId")
-      .set(cleanCode);
+      .set(code);
 
     localStorage.removeItem("boodschappenUseMode_" + user.uid);
-    currentHouseholdId = cleanCode;
+    currentHouseholdId = code;
     closeUseModeModal();
-
     await loadList();
     await updateMemberCount();
 
     const menu = document.getElementById("familyMenu");
     if (menu) menu.style.display = "none";
-
     alert("Je bent toegevoegd aan de familie!");
   } catch (error) {
     console.error("Fout bij toetreden tot familie:", error);
-
-    const detail = error && error.code ? "\\n\\nFoutcode: " + error.code : "";
-
-    if (error && (
-      error.code === "PERMISSION_DENIED" ||
-      error.code === "permission-denied"
-    )) {
-      alert(
-        "Deze familiecode bestaat niet of kon niet worden gebruikt." +
-        detail
-      );
-    } else {
-      alert(
-        "Je kon niet aan deze familie worden toegevoegd." +
-        detail
-      );
-    }
+    const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
+    alert("Je kon niet aan deze familie worden toegevoegd." + detail);
   }
 }
   async function leaveFamily() {
