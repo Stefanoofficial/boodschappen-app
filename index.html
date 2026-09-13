@@ -1546,7 +1546,7 @@ async function savePrivateList() {
   updateStatus();
 
   const status = document.getElementById("status");
-  if (status) status.innerText = "<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.";
+  if (status) status.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.';
 }
 
 function openRegister() {
