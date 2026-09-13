@@ -555,6 +555,69 @@ overflow-x: hidden;
   overflow:hidden !important;
 }
 
+
+/* Stap 3: eerste keuze voor gebruikers zonder familie */
+.useModeModal{
+  position:fixed;
+  inset:0;
+  z-index:2500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  box-sizing:border-box;
+  background:rgba(0,0,0,.40);
+}
+.useModeBox{
+  width:85%;
+  max-width:400px;
+  box-sizing:border-box;
+  padding:28px 22px;
+  border-radius:24px;
+  background:#f7efe3;
+  text-align:center;
+  box-shadow:0 10px 35px rgba(0,0,0,.22);
+}
+.useModeBox h2{
+  margin:0 0 10px;
+  color:#1f5d43;
+  font-size:27px;
+  line-height:1.15;
+}
+.useModeBox p{
+  margin:0 0 18px;
+  color:#666;
+  font-size:16px;
+}
+.useModeButton,.useModeSkip{
+  width:100%;
+  min-height:54px;
+  margin-top:10px;
+  border-radius:14px;
+  padding:12px 16px;
+  font-family:inherit;
+  font-size:17px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:11px;
+  cursor:pointer;
+}
+.useModeButton{
+  border:0;
+  background:#3F5B45;
+  color:#fff;
+}
+.useModeButton i,.useModeSkip i{
+  width:22px;
+}
+.useModeSkip{
+  border:1px solid #3F5B45;
+  background:transparent;
+  color:#3F5B45;
+}
+
 </style>
 </head>
 
@@ -623,6 +686,30 @@ overflow-x: hidden;
 
     <button type="button" class="registerSubmit" onclick="register()">Account aanmaken</button>
     <button type="button" class="registerBack" onclick="closeRegister()">Terug naar inloggen</button>
+  </div>
+</div>
+
+
+<div id="useModeModal" class="useModeModal" aria-hidden="true">
+  <div class="useModeBox" role="dialog" aria-modal="true" aria-labelledby="useModeTitle">
+    <h2 id="useModeTitle">Hoe wil je Boodschappenlijst gebruiken?</h2>
+    <p>Kies hoe je jouw boodschappenlijst wilt gebruiken.</p>
+
+    <button type="button" class="useModeButton" onclick="chooseUseMode('family')">
+      <i class="fa-solid fa-house"></i><span>Nieuwe familie</span>
+    </button>
+
+    <button type="button" class="useModeButton" onclick="chooseUseMode('code')">
+      <i class="fa-solid fa-keyboard"></i><span>Familiecode invoeren</span>
+    </button>
+
+    <button type="button" class="useModeButton" onclick="chooseUseMode('private')">
+      <i class="fa-solid fa-user"></i><span>Alleen gebruiken</span>
+    </button>
+
+    <button type="button" class="useModeSkip" onclick="chooseUseMode('skip')">
+      <i class="fa-solid fa-forward"></i><span>Overslaan</span>
+    </button>
   </div>
 </div>
 
@@ -740,23 +827,59 @@ function clearSearch() {
   document.getElementById("searchInput").value = "";
   searchList();
 }
+
 async function loadList() {
   try {
-const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
-const data = snapshot.val();
+    if (!currentHouseholdId) {
+      const householdId = await getOrCreateHousehold();
+      if (!householdId) {
+        openUseModeModal();
+        return false;
+      }
+    }
 
-    boodschappen = data || [];
+    const snapshot = await database
+      .ref("households/" + currentHouseholdId + "/boodschappen")
+      .once("value");
+
+    const data = snapshot.val();
+
+    if (Array.isArray(data)) {
+      boodschappen = data;
+    } else if (data && typeof data === "object") {
+      boodschappen = Object.values(data);
+    } else {
+      boodschappen = [];
+    }
+
     selectedIndex = -1;
-
     showList();
     updateStatus();
-    updateMemberCount();
-
+    await updateMemberCount();
+    return true;
   } catch (error) {
-    document.getElementById("status").innerText =
-      "⚠️ Kon de lijst niet laden";
+    console.error("Lijst laden mislukt:", error);
+
+    if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
+      currentHouseholdId = null;
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await database.ref("users/" + user.uid + "/householdId").remove();
+        } catch (cleanupError) {
+          console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError);
+        }
+      }
+      openUseModeModal();
+      return false;
+    }
+
+    const status = document.getElementById("status");
+    if (status) status.innerText = "⚠️ De familielijst kon niet worden geladen. Probeer opnieuw.";
+    return false;
   }
 }
+
 
 function showList() {
   const list = document.getElementById("list");
@@ -774,10 +897,42 @@ function showList() {
 }
 
 async function saveList() {
-await database.ref("households/" + currentHouseholdId + "/boodschappen").set(boodschappen);
+  if (isPrivateMode()) {
+    await savePrivateList();
+    return true;
+  }
 
-  updateStatus();
+  if (!currentHouseholdId) {
+    const householdId = await getOrCreateHousehold();
+    if (!householdId) {
+      const status = document.getElementById("status");
+      if (status) status.innerText = "Kies eerst Nieuwe familie of Familiecode invoeren.";
+      openUseModeModal();
+      return false;
+    }
+  }
+
+  try {
+    await database
+      .ref("households/" + currentHouseholdId + "/boodschappen")
+      .set(boodschappen);
+
+    updateStatus();
+    return true;
+  } catch (error) {
+    console.error("Boodschappen opslaan mislukt:", error);
+    const status = document.getElementById("status");
+    if (status) {
+      if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
+        status.innerText = "⚠️ Geen toegang tot deze familielijst.";
+      } else {
+        status.innerText = "⚠️ Opslaan van de lijst mislukt.";
+      }
+    }
+    return false;
+  }
 }
+
 
 function toggleItem(index) {
 
@@ -796,19 +951,25 @@ function toggleItem(index) {
 }
 
 async function addProduct() {
-
   const input = document.getElementById("product");
   const text = input.value.trim();
 
   if (text === "") return;
 
+  if (!currentHouseholdId && !isPrivateMode()) {
+    const householdId = await getOrCreateHousehold();
+    if (!householdId) {
+      openUseModeModal();
+      return;
+    }
+  }
+
   boodschappen.push("☐ " + text);
-
   input.value = "";
-
   showList();
   await saveList();
 }
+
 
 async function deleteProduct() {
 
@@ -941,13 +1102,43 @@ async function getOrCreateHousehold() {
 
   const userRef = database.ref("users/" + user.uid + "/householdId");
   const userSnapshot = await userRef.once("value");
+  const householdId = userSnapshot.val();
 
-  if (userSnapshot.exists()) {
-    currentHouseholdId = userSnapshot.val();
-    return currentHouseholdId;
+  if (!householdId) {
+    currentHouseholdId = null;
+    return null;
   }
-return null;
+
+  try {
+    const householdSnapshot = await database
+      .ref("households/" + householdId)
+      .once("value");
+
+    if (!householdSnapshot.exists()) {
+      await userRef.remove();
+      currentHouseholdId = null;
+      return null;
+    }
+
+    const household = householdSnapshot.val() || {};
+    const isOwner = household.owner === user.uid;
+    const isMember = !!(household.members && household.members[user.uid]);
+
+    if (!isOwner && !isMember) {
+      await userRef.remove();
+      currentHouseholdId = null;
+      return null;
+    }
+
+    currentHouseholdId = String(householdId);
+    return currentHouseholdId;
+  } catch (error) {
+    console.error("Familie controleren mislukt:", error);
+    currentHouseholdId = null;
+    throw error;
+  }
 }
+
 async function showFamilyCode() {
   const code = currentHouseholdId;
 
@@ -1227,16 +1418,33 @@ function togglePassword() {
   }
 }
 async function login() {
-const email = document.getElementById("loginEmail").value;
-const password = document.getElementById("loginPassword").value;
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
 
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    alert("Inloggen gelukt!");
-document.getElementById("loginScreen").style.display = "none";
-await getOrCreateHousehold();
-    await loadList();
-    } catch (error) {
+    document.getElementById("loginScreen").style.display = "none";
+
+    const user = auth.currentUser;
+    const householdId = await getOrCreateHousehold();
+
+    if (householdId) {
+      await loadList();
+      return;
+    }
+
+    const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+
+    if (savedMode === "private") {
+      await loadPrivateList();
+    } else if (savedMode === "skip") {
+      openAppWithoutList();
+    } else {
+      openUseModeModal();
+    }
+  } catch (error) {
+    console.error("Inloggen fout:", error);
+    document.getElementById("loginScreen").style.display = "flex";
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
 }
@@ -1244,6 +1452,101 @@ await getOrCreateHousehold();
 window.login = login;
  
 
+
+
+function openUseModeModal() {
+  const modal = document.getElementById("useModeModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeUseModeModal() {
+  const modal = document.getElementById("useModeModal");
+  if (!modal) return;
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function openAppWithoutList() {
+  closeUseModeModal();
+  boodschappen = [];
+  selectedIndex = -1;
+  showList();
+  const status = document.getElementById("status");
+  if (status) status.innerText = "Kies een gebruikswijze om je lijst op te slaan.";
+  updateMemberCount();
+}
+
+async function chooseUseMode(mode) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  if (mode === "family") {
+    closeUseModeModal();
+    await createNewFamily();
+    return;
+  }
+
+  if (mode === "code") {
+    closeUseModeModal();
+    await enterFamilyCode();
+    return;
+  }
+
+  if (mode === "private") {
+    localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+    closeUseModeModal();
+    await loadPrivateList();
+    return;
+  }
+
+  localStorage.setItem("boodschappenUseMode_" + user.uid, "skip");
+  openAppWithoutList();
+}
+
+async function loadPrivateList() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const saved = localStorage.getItem("boodschappenPrivate_" + user.uid);
+    boodschappen = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(boodschappen)) boodschappen = [];
+    selectedIndex = -1;
+    showList();
+    updateStatus();
+    updateMemberCount();
+
+    const status = document.getElementById("status");
+    if (status) status.innerText = "Alleen gebruiken: deze lijst staat privé op dit apparaat.";
+  } catch (error) {
+    console.error("Privélijst laden mislukt:", error);
+    boodschappen = [];
+    selectedIndex = -1;
+    showList();
+  }
+}
+
+function isPrivateMode() {
+  const user = auth.currentUser;
+  return !!user && !currentHouseholdId &&
+    localStorage.getItem("boodschappenUseMode_" + user.uid) === "private";
+}
+
+async function savePrivateList() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  localStorage.setItem(
+    "boodschappenPrivate_" + user.uid,
+    JSON.stringify(boodschappen)
+  );
+  updateStatus();
+
+  const status = document.getElementById("status");
+  if (status) status.innerText = "Privé opgeslagen op dit apparaat.";
+}
 
 function openRegister() {
   const modal = document.getElementById("registerModal");
