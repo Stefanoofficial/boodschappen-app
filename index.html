@@ -862,6 +862,9 @@ body.dark-theme #refresh { color: #f3f5f3; }
   color:#3F5B45;
   font-size:15px;
 }
+.themeOption:first-child i{ color:transparent !important; -webkit-text-stroke:1.25px #3F5B45; text-shadow:none; }
+body.dark-theme .themeOption:first-child i{ color:transparent !important; -webkit-text-stroke:1.25px #dce9df; }
+
 body.dark-theme .themeButton{
   background:rgba(37,43,39,.78);
   color:#e4efe6;
@@ -1280,7 +1283,7 @@ body.dark-theme .familyMenu {
   align-items:center;
   justify-content:center;
   color:#69736c !important;
-  background:transparent;
+  background:transparent !important;
   font-size:13px !important;
   line-height:1;
 }
@@ -1323,7 +1326,7 @@ body.dark-theme .familyMenu {
 body.dark-theme .familyMenu { background:rgba(37,43,38,.98); }
 body.dark-theme .familyMenuItem { color:#f1f4f1; }
 body.dark-theme .familyMenuItem:hover { background:rgba(255,255,255,.07); }
-body.dark-theme .familyMenuArrow { color:#c9d1cb !important; background:rgba(255,255,255,.08); }
+body.dark-theme .familyMenuArrow { color:#c9d1cb !important; background:transparent !important; border-radius:0 !important; }
 body.dark-theme .familyMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
 body.dark-theme .familyMenuSubTitle { color:#aab4ad; }
 body.dark-theme .familyMenuDanger { border-top-color:rgba(255,255,255,.12) !important; }
@@ -1866,11 +1869,6 @@ body.logged-in .app {
       <span>Mijn familie</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
-    <button type="button" class="familyMenuItem familyMenuPrimary settingsPrimary" onclick="openSettingsSubmenu(event)">
-      <i class="fa-solid fa-gear"></i>
-      <span>Instellingen</span>
-      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
-    </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSavedListsSubmenu(event)">
       <i class="fa-solid fa-folder-open"></i>
       <span>Opgeslagen</span>
@@ -1879,6 +1877,11 @@ body.logged-in .app {
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAccountSubmenu(event)">
       <i class="fa-solid fa-user"></i>
       <span>Mijn account</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary settingsPrimary" onclick="openSettingsSubmenu(event)">
+      <i class="fa-solid fa-gear"></i>
+      <span>Instellingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAboutSubmenu(event)">
