@@ -785,7 +785,7 @@ body.dark-theme .themePicker{
 }
 body.dark-theme .themeOption{
   color:#f3f5f3;
-  border-top-color:rgba(255,255,255,.10);
+  border-top-color:rgba(255,255,255,.07);
 }
 body.dark-theme .themeOption:hover,
 body.dark-theme .themeOption:active{
@@ -1140,9 +1140,9 @@ async function loadList() {
     const data = snapshot.val();
 
     if (Array.isArray(data)) {
-      boodschappen = data;
+      boodschappen = normalizeBoodschappen(data);
     } else if (data && typeof data === "object") {
-      boodschappen = Object.values(data);
+      boodschappen = normalizeBoodschappen(Object.values(data));
     } else {
       boodschappen = [];
     }
@@ -1228,6 +1228,9 @@ function relativeCompletedTime(timestamp) {
 function showList(animationType = "") {
   const list = document.getElementById("list");
   if (!list) return;
+
+  // Keep legacy Firebase entries and new metadata entries consistent.
+  boodschappen = normalizeBoodschappen(boodschappen);
 
   // Active products first, completed products at the bottom.
   const ordered = boodschappen
@@ -1397,47 +1400,9 @@ async function clearList() {
   await saveList();
 }
 
-async function addProduct() {
-  const input = document.getElementById("product");
-  const text = input.value.trim();
-
-  if (text === "") return;
-
-  if (!currentHouseholdId && !isPrivateMode()) {
-    const householdId = await getOrCreateHousehold();
-    if (!householdId) {
-      openUseModeModal();
-      return;
-    }
-  }
-
-  boodschappen.push("☐ " + text);
-  input.value = "";
-  showList();
-  await saveList();
-}
 
 
-async function deleteProduct() {
 
-  if (selectedIndex < 0) return;
-
-  boodschappen.splice(selectedIndex, 1);
-
-  selectedIndex = -1;
-
-  showList();
-  await saveList();
-}
-
-async function clearList() {
-
-  boodschappen = [];
-  selectedIndex = -1;
-
-  showList();
-  await saveList();
-}
 
 function updateStatus() {
 
