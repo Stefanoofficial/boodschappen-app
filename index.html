@@ -1226,6 +1226,97 @@ body.dark-theme .familyMenu {
   }
 }
 
+
+/* Definitieve compacte familie-menu */
+.familyMenu {
+  width: 190px;
+  max-width: calc(100vw - 28px);
+  padding: 7px;
+  border-radius: 18px;
+  background: rgba(247,239,227,.98);
+  box-shadow: 0 12px 30px rgba(0,0,0,.20);
+}
+.familyMenuPage { width:100%; }
+.familyMenuItem {
+  width:100%;
+  min-height:42px;
+  box-sizing:border-box;
+  padding:8px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#333;
+  font-family:inherit;
+  font-size:15px;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  cursor:pointer;
+  transition:background .15s ease, transform .12s ease;
+}
+.familyMenuItem:hover { background:rgba(63,91,69,.08); }
+.familyMenuItem:active { transform:scale(.985); }
+.familyMenuPrimary { padding-right:7px; }
+.familyMenuPrimary > i:first-child {
+  background:#dff5df;
+  color:#3F5B45;
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.familyMenuArrow {
+  margin-left:auto;
+  color:#858c87 !important;
+  font-size:12px;
+}
+.familyMenuBack {
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#3F5B45;
+  padding:8px 7px 9px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  border-bottom:1px solid rgba(63,91,69,.12);
+}
+.familyMenuBack i { font-size:11px; }
+.familyMenuSubTitle {
+  padding:8px 8px 3px;
+  color:#8b928d;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.familyMenuDanger {
+  margin-top:5px;
+  padding-top:9px !important;
+  border-top:1px solid #ddd !important;
+  color:#e53935 !important;
+}
+.familyMenuDanger i {
+  color:#e53935 !important;
+  background:none !important;
+  width:auto !important;
+  height:auto !important;
+}
+body.dark-theme .familyMenu { background:rgba(37,43,38,.98); }
+body.dark-theme .familyMenuItem { color:#f1f4f1; }
+body.dark-theme .familyMenuItem:hover { background:rgba(255,255,255,.07); }
+body.dark-theme .familyMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
+body.dark-theme .familyMenuSubTitle { color:#aab4ad; }
+body.dark-theme .familyMenuDanger { border-top-color:rgba(255,255,255,.12) !important; }
 </style>
 </head>
 
@@ -1338,31 +1429,47 @@ body.dark-theme .familyMenu {
     <i class="fa-solid fa-chevron-down"></i>
   </button>
     <div id="familyMenu" class="familyMenu">
-  <div class="familyMenuItem">
-  <i class="fa-solid fa-users"></i>
-  <span>Mijn familie</span>
+  <div id="familyMenuMain" class="familyMenuPage">
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFamilySubmenu(event)">
+      <i class="fa-solid fa-users"></i>
+      <span>Mijn familie</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
   </div>
-<div class="familyMenuItem" onclick="enterFamilyCode()">
-  <i class="fa-solid fa-keyboard"></i>
-  <span>Code invoeren</span>
-</div>
 
-<div class="familyMenuItem" onclick="showFamilyMembers()">
-  <i class="fa-solid fa-user-group"></i>
-  <span id="memberLabel">Familielid (<span id="memberCount">1</span>)</span>
-</div>
-<div class="familyMenuItem" onclick="showFamilyCode()">
-  <i class="fa-solid fa-key"></i>
-  <span>Familiecode</span>
-</div>
-<div class="familyMenuItem" onclick="createNewFamily()">
-  <i class="fa-solid fa-house"></i>
-  <span>Nieuwe familie</span>
-</div>
-<div class="familyMenuItem" onclick="leaveFamily()"style="border-top: 1px solid #ddd; margin-top: 8px; padding-top: 12px;">
-  <i class="fa-solid fa-right-from-bracket" style="color: #e53935;"></i>
-  <span style="color: #e53935;">Familie verlaten</span>
-</div>
+  <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
+    <button type="button" class="familyMenuBack" onclick="closeFamilySubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Mijn familie</span>
+    </button>
+
+    <div class="familyMenuSubTitle">Familie</div>
+
+    <div class="familyMenuItem" onclick="showFamilyMembers()">
+      <i class="fa-solid fa-user-group"></i>
+      <span id="memberLabelSub">Familielid (<span id="memberCountSub">1</span>)</span>
+    </div>
+
+    <div class="familyMenuItem" onclick="showFamilyCode()">
+      <i class="fa-solid fa-key"></i>
+      <span>Familiecode</span>
+    </div>
+
+    <div class="familyMenuItem" onclick="enterFamilyCode()">
+      <i class="fa-solid fa-keyboard"></i>
+      <span>Code invoeren</span>
+    </div>
+
+    <div class="familyMenuItem" onclick="createNewFamily()">
+      <i class="fa-solid fa-house"></i>
+      <span>Nieuwe familie</span>
+    </div>
+
+    <div class="familyMenuItem familyMenuDanger" onclick="leaveFamily()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Familie verlaten</span>
+    </div>
+  </div>
 </div>
   </div>
 
@@ -1474,14 +1581,41 @@ function closeOpenMenusOnOutsideClick(event) {
 
 document.addEventListener("click", closeOpenMenusOnOutsideClick);
 
+
+function openFamilySubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const sub = document.getElementById("familyMenuSub");
+  if (main) main.style.display = "none";
+  if (sub) sub.style.display = "block";
+
+  const mainCount = document.getElementById("memberCount");
+  const subCount = document.getElementById("memberCountSub");
+  if (mainCount && subCount) subCount.innerText = mainCount.innerText;
+
+  const mainLabel = document.getElementById("memberLabel");
+  const subLabel = document.getElementById("memberLabelSub");
+  if (mainLabel && subLabel) subLabel.innerHTML = mainLabel.innerHTML;
+}
+function closeFamilySubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const sub = document.getElementById("familyMenuSub");
+  if (sub) sub.style.display = "none";
+  if (main) main.style.display = "block";
+}
 function toggleFamilyMenu() {
   const themePicker = document.querySelector(".themePicker");
   if (themePicker) themePicker.classList.remove("open");
   const menu = document.getElementById("familyMenu");
+  const main = document.getElementById("familyMenuMain");
+  const sub = document.getElementById("familyMenuSub");
 
   if (menu.style.display === "block") {
     menu.style.display = "none";
   } else {
+    if (sub) sub.style.display = "none";
+    if (main) main.style.display = "block";
     menu.style.display = "block";
   }
 }
@@ -1505,6 +1639,8 @@ function toggleFamilyMenu() {
   const count = Object.keys(members).length;
   const labelEl = document.getElementById("memberLabel");
   if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
+  const subCountEl = document.getElementById("memberCountSub");
+  if (subCountEl) subCountEl.innerText = count;
 }
   function searchList() {
   const search = document.getElementById("searchInput").value.toLowerCase();
