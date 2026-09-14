@@ -1114,6 +1114,51 @@ body.dark-theme .productSuggestion {
   border-bottom-color: rgba(255,255,255,.07);
 }
 
+
+/* ===== Stap 7: kleine, subtiele animaties ===== */
+
+/* Product verschijnt zachtjes wanneer hij aan de lijst wordt toegevoegd. */
+.item {
+  animation: productAppear .20s ease-out both;
+}
+
+@keyframes productAppear {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Suggesties komen rustig van boven binnen. */
+.productSuggestion {
+  animation: suggestionAppear .16s ease-out both;
+}
+
+.productSuggestion:nth-child(2) { animation-delay: .02s; }
+.productSuggestion:nth-child(3) { animation-delay: .04s; }
+.productSuggestion:nth-child(4) { animation-delay: .06s; }
+.productSuggestion:nth-child(5) { animation-delay: .08s; }
+
+@keyframes suggestionAppear {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Klein visueel antwoord bij afvinken, zonder de bestaande check-logica te wijzigen. */
+.item {
+  transition: opacity .20s ease, transform .20s ease;
+}
+
+.item.completed {
+  transition: opacity .20s ease, transform .20s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .productSuggestion {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 </style>
 </head>
 
