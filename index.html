@@ -1327,6 +1327,24 @@ body.dark-theme .familyMenuArrow { color:#c9d1cb !important; background:rgba(255
 body.dark-theme .familyMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
 body.dark-theme .familyMenuSubTitle { color:#aab4ad; }
 body.dark-theme .familyMenuDanger { border-top-color:rgba(255,255,255,.12) !important; }
+.settingsMenuPage { width:100%; }
+.settingsMenuItem i:first-child {
+  width:30px;
+  flex:0 0 30px;
+  text-align:center;
+  color:#3F5B45;
+}
+.settingsMenuBack {
+  width:100%; border:0; background:transparent; color:#3F5B45;
+  padding:7px 6px 8px; display:flex; align-items:center; gap:8px;
+  font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+  border-bottom:1px solid rgba(63,91,69,.12);
+}
+.settingsMenuHint { padding:8px 7px 5px; color:#8b928d; font-size:11px; line-height:1.35; }
+body.dark-theme .settingsMenuItem i:first-child { color:#dff1e2; }
+body.dark-theme .settingsMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
+body.dark-theme .settingsMenuHint { color:#aab4ad; }
+
 
 /* Moderne, compacte familie-popups */
 .familyDialogOverlay {
@@ -1466,6 +1484,27 @@ body.dark-theme .familyDialogText { color:#b9c1bb; }
 body.dark-theme .familyDialogMember { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.08); }
 body.dark-theme .familyDialogInput { background:rgba(255,255,255,.07); color:#f1f4f1; border-color:rgba(255,255,255,.14); }
 body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#dff1e2; }
+
+/* Inloggen: de boodschappenlijst komt na succesvol inloggen rustig van rechts binnen. */
+.app {
+  opacity: 0;
+  transform: translateX(34px);
+  transition: opacity .34s ease, transform .38s cubic-bezier(.22,.8,.3,1);
+}
+body.logged-in .app {
+  opacity: 1;
+  transform: translateX(0);
+}
+#loginScreen {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform .38s cubic-bezier(.22,.8,.3,1), opacity .28s ease;
+}
+#loginScreen.loginScreenLeaving {
+  transform: translateX(-34px);
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
 .familyMenu {
@@ -1722,6 +1761,11 @@ body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#d
       <span>Mijn familie</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary settingsPrimary" onclick="openSettingsSubmenu(event)">
+      <i class="fa-solid fa-gear"></i>
+      <span>Instellingen</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
   </div>
 
   <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
@@ -1756,6 +1800,23 @@ body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#d
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Familie verlaten</span>
     </div>
+  </div>
+
+  <div id="settingsMenuSub" class="familyMenuPage settingsMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeSettingsSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Instellingen</span>
+    </button>
+    <div class="familyMenuSubTitle">Instellingen</div>
+    <div class="familyMenuItem settingsMenuItem">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+      <span>Productsuggesties</span>
+    </div>
+    <div class="familyMenuItem settingsMenuItem">
+      <i class="fa-solid fa-list-check"></i>
+      <span>Lijstopties</span>
+    </div>
+    <div class="settingsMenuHint">Meer instellingen kunnen hier later worden toegevoegd.</div>
   </div>
 </div>
   </div>
@@ -1942,6 +2003,42 @@ function closeFamilySubmenu(event) {
     main.classList.add("familyMenuMainEnter");
   }, 170);
 }
+function openSettingsSubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const family = document.getElementById("familyMenuSub");
+  const settings = document.getElementById("settingsMenuSub");
+  if (!main || !settings) return;
+
+  main.classList.remove("familyMenuMainEnter");
+  main.classList.add("familyMenuMainExit");
+  setTimeout(() => {
+    main.style.display = "none";
+    if (family) { family.style.display = "none"; family.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    main.classList.remove("familyMenuMainExit");
+    settings.style.display = "block";
+    settings.classList.remove("familyMenuSubExit");
+    void settings.offsetWidth;
+    settings.classList.add("familyMenuSubEnter");
+  }, 170);
+}
+function closeSettingsSubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const settings = document.getElementById("settingsMenuSub");
+  if (!main || !settings) return;
+
+  settings.classList.remove("familyMenuSubEnter");
+  settings.classList.add("familyMenuSubExit");
+  setTimeout(() => {
+    settings.style.display = "none";
+    settings.classList.remove("familyMenuSubExit");
+    main.style.display = "block";
+    void main.offsetWidth;
+    main.classList.add("familyMenuMainEnter");
+  }, 170);
+}
+
 function toggleFamilyMenu() {
   const themePicker = document.querySelector(".themePicker");
   if (themePicker) themePicker.classList.remove("open");
@@ -1956,6 +2053,11 @@ function toggleFamilyMenu() {
     if (sub) {
       sub.style.display = "none";
       sub.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+    }
+    const settings = document.getElementById("settingsMenuSub");
+    if (settings) {
+      settings.style.display = "none";
+      settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
     }
     if (main) {
       main.style.display = "block";
@@ -2896,6 +2998,7 @@ function closeFamilyMenuForDialog() {
   closeFamilyMenu();
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
+  const settings = document.getElementById("settingsMenuSub");
   if (main) {
     main.style.display = "block";
     main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
@@ -2903,6 +3006,10 @@ function closeFamilyMenuForDialog() {
   if (sub) {
     sub.style.display = "none";
     sub.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+  }
+  if (settings) {
+    settings.style.display = "none";
+    settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
   }
 }
 
@@ -3206,8 +3313,14 @@ async function login() {
 
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    document.getElementById("loginScreen").style.display = "none";
+    const loginScreen = document.getElementById("loginScreen");
     document.body.classList.add("logged-in");
+    if (loginScreen) {
+      loginScreen.classList.add("loginScreenLeaving");
+      setTimeout(() => {
+        if (loginScreen.classList.contains("loginScreenLeaving")) loginScreen.style.display = "none";
+      }, 400);
+    }
 
     const user = auth.currentUser;
     const householdId = await getOrCreateHousehold();
@@ -3229,7 +3342,8 @@ async function login() {
   } catch (error) {
     console.error("Inloggen fout:", error);
     document.body.classList.remove("logged-in");
-    document.getElementById("loginScreen").style.display = "flex";
+    const loginScreen = document.getElementById("loginScreen");
+    if (loginScreen) { loginScreen.classList.remove("loginScreenLeaving"); loginScreen.style.display = "flex"; }
     alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
   }
 }
