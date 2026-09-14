@@ -196,6 +196,50 @@ overflow-x: hidden;
   border-bottom: none;
 }
 
+.item {
+  transition: opacity .22s ease, transform .34s cubic-bezier(.22,.61,.36,1);
+  will-change: transform, opacity;
+}
+
+.item.completed {
+  font-size: 18px;
+  opacity: .68;
+}
+
+.item.completed .completedMeta {
+  display: block;
+  margin-top: 3px;
+  margin-left: 28px;
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 400;
+  opacity: .62;
+  text-decoration: none;
+}
+
+.item.completed .completedMeta i {
+  font-size: 10px;
+  margin-right: 3px;
+}
+
+.item.completedMoving {
+  animation: completedSlideDown .34s cubic-bezier(.22,.61,.36,1);
+}
+
+@keyframes completedSlideDown {
+  from { opacity: .42; transform: translateY(-12px) scale(.985); }
+  to { opacity: .68; transform: translateY(0) scale(1); }
+}
+
+.item.uncompleting {
+  animation: uncompleteSlideUp .30s cubic-bezier(.22,.61,.36,1);
+}
+
+@keyframes uncompleteSlideUp {
+  from { opacity: .42; transform: translateY(10px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 
 .buttons {
   display: flex;
@@ -691,8 +735,8 @@ body.dark-theme #refresh { color: #f3f5f3; }
   position:fixed;
   right:18px;
   bottom:76px;
-  width:180px;
-  padding:5px 0;
+  width:170px;
+  padding:4px 0;
   box-sizing:border-box;
   background:#f7efe3;
   border:1px solid rgba(63,91,69,.08);
@@ -705,17 +749,17 @@ body.dark-theme #refresh { color: #f3f5f3; }
 .themePicker.open{display:block;}
 .themeOption{
   width:100%;
-  min-height:42px;
+  min-height:40px;
   border:0;
   border-top:1px solid rgba(63,91,69,.10);
   background:transparent;
   color:#222;
-  padding:7px 11px;
+  padding:6px 10px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:9px;
   font-family:inherit;
-  font-size:14px;
+  font-size:13.5px;
   text-align:left;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -724,11 +768,11 @@ body.dark-theme #refresh { color: #f3f5f3; }
 .themeOption:hover,
 .themeOption:active{background:rgba(63,91,69,.07);}
 .themeOption i{
-  width:19px;
-  flex:0 0 19px;
+  width:18px;
+  flex:0 0 18px;
   text-align:center;
   color:#3F5B45;
-  font-size:16px;
+  font-size:15px;
 }
 body.dark-theme .themeButton{
   background:rgba(37,43,39,.78);
@@ -758,14 +802,14 @@ body.dark-theme .themeOption i{color:#dce9df;}
   }
   .themePicker{
     right:16px;
-    bottom:68px;
-    width:180px;
-    border-radius:15px;
+    bottom:66px;
+    width:170px;
+    border-radius:14px;
   }
   .themeOption{
-    min-height:42px;
-    font-size:14px;
-    padding:7px 11px;
+    min-height:40px;
+    font-size:13.5px;
+    padding:6px 10px;
   }
 }
 </style>
@@ -1132,16 +1176,100 @@ async function loadList() {
 }
 
 
-function showList() {
+function normalizeBoodschappen(data) {
+  if (!Array.isArray(data)) return [];
+
+  return data.map(item => {
+    // Backward compatibility with the old format: "☐ Cola" / "✅ Cola"
+    if (typeof item === "string") {
+      const completed = item.startsWith("✅");
+      const text = item.substring(1).trim();
+      return {
+        text: text,
+        completed: completed,
+        completedBy: "",
+        completedAt: null
+      };
+    }
+
+    if (item && typeof item === "object") {
+      return {
+        text: String(item.text ?? item.product ?? "").trim(),
+        completed: item.completed === true,
+        completedBy: item.completedBy ? String(item.completedBy) : "",
+        completedAt: item.completedAt ? Number(item.completedAt) : null
+      };
+    }
+
+    return {
+      text: String(item ?? "").trim(),
+      completed: false,
+      completedBy: "",
+      completedAt: null
+    };
+  }).filter(item => item.text);
+}
+
+function relativeCompletedTime(timestamp) {
+  if (!timestamp) return "";
+  const diff = Math.max(0, Date.now() - Number(timestamp));
+  const minutes = Math.floor(diff / 60000);
+
+  if (minutes < 1) return "zojuist";
+  if (minutes < 60) return minutes + " min geleden";
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours + (hours === 1 ? " uur geleden" : " uur geleden");
+
+  const days = Math.floor(hours / 24);
+  return days + (days === 1 ? " dag geleden" : " dagen geleden");
+}
+
+function showList(animationType = "") {
   const list = document.getElementById("list");
+  if (!list) return;
+
+  // Active products first, completed products at the bottom.
+  const ordered = boodschappen
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => Number(a.item.completed) - Number(b.item.completed));
+
   list.innerHTML = "";
 
-  boodschappen.forEach((item, index) => {
-
+  ordered.forEach(({ item, index }) => {
     const div = document.createElement("div");
+    div.className = "item" + (item.completed ? " completed" : "");
+    div.dataset.index = String(index);
 
-    div.className = "item";
-    div.innerHTML = item.startsWith("✅") ? "✅ <span style=\"text-decoration: line-through;\">" + item.substring(1) + "</span>" : item;
+    const productText = item.text;
+    const check = item.completed ? "✅ " : "☐ ";
+
+    const productSpan = document.createElement("span");
+    productSpan.textContent = check + productText;
+    if (item.completed) {
+      productSpan.style.textDecoration = "line-through";
+    }
+    div.appendChild(productSpan);
+
+    // Only family members see who completed an item.
+    if (item.completed && currentHouseholdId && item.completedBy) {
+      const meta = document.createElement("span");
+      meta.className = "completedMeta";
+      meta.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i>';
+      const metaText = document.createTextNode(
+        "Voltooid door " + item.completedBy +
+        (item.completedAt ? " · " + relativeCompletedTime(item.completedAt) : "")
+      );
+      meta.appendChild(metaText);
+      div.appendChild(meta);
+    }
+
+    if (animationType === "completed" && item.completed && index === selectedIndex) {
+      div.classList.add("completedMoving");
+    }
+    if (animationType === "uncompleted" && !item.completed && index === selectedIndex) {
+      div.classList.add("uncompleting");
+    }
 
     list.appendChild(div);
   });
@@ -1184,21 +1312,89 @@ async function saveList() {
   }
 }
 
-
-function toggleItem(index) {
+async function toggleItem(index) {
+  if (!boodschappen[index]) return;
 
   selectedIndex = index;
+  const item = boodschappen[index];
 
-  if (boodschappen[index].startsWith("☐")) {
-    boodschappen[index] =
-      "✅" + boodschappen[index].substring(1);
+  if (!item.completed) {
+    let completedBy = "";
+
+    // The family metadata is visible only in family mode.
+    if (currentHouseholdId && auth.currentUser) {
+      try {
+        const snap = await database
+          .ref("users/" + auth.currentUser.uid + "/name")
+          .once("value");
+        completedBy = snap.val() || auth.currentUser.email || "Gebruiker";
+      } catch (_) {
+        completedBy = auth.currentUser.email || "Gebruiker";
+      }
+    }
+
+    item.completed = true;
+    item.completedBy = completedBy;
+    item.completedAt = Date.now();
+
+    // Render immediately in its new position; the item gets a subtle slide-down animation.
+    showList("completed");
+    await saveList();
   } else {
-    boodschappen[index] =
-      "☐" + boodschappen[index].substring(1);
+    item.completed = false;
+    item.completedBy = "";
+    item.completedAt = null;
+
+    showList("uncompleted");
+    await saveList();
+  }
+}
+
+async function addProduct() {
+  const input = document.getElementById("product");
+  const text = input.value.trim();
+
+  if (text === "") return;
+
+  if (!currentHouseholdId && !isPrivateMode()) {
+    const householdId = await getOrCreateHousehold();
+    if (!householdId) {
+      openUseModeModal();
+      return;
+    }
   }
 
+  boodschappen.push({
+    text: text,
+    completed: false,
+    completedBy: "",
+    completedAt: null
+  });
+  input.value = "";
   showList();
-  saveList();
+  await saveList();
+}
+
+
+async function deleteProduct() {
+
+  if (selectedIndex < 0) return;
+
+  boodschappen.splice(selectedIndex, 1);
+
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
+}
+
+async function clearList() {
+
+  boodschappen = [];
+  selectedIndex = -1;
+
+  showList();
+  await saveList();
 }
 
 async function addProduct() {
@@ -1310,10 +1506,9 @@ document.getElementById("list").addEventListener("click", function(e) {
   const item = e.target.closest(".item");
   if (!item) return;
 
-  const items = Array.from(this.children);
-  const index = items.indexOf(item);
+  const index = Number(item.dataset.index);
 
-  if (index >= 0) {
+  if (Number.isInteger(index) && index >= 0) {
     toggleItem(index);
   }
 });
@@ -1810,8 +2005,7 @@ async function loadPrivateList() {
 
   try {
     const saved = localStorage.getItem("boodschappenPrivate_" + user.uid);
-    boodschappen = saved ? JSON.parse(saved) : [];
-    if (!Array.isArray(boodschappen)) boodschappen = [];
+    boodschappen = normalizeBoodschappen(saved ? JSON.parse(saved) : []);
     selectedIndex = -1;
     showList();
     updatePrivateStatus();
