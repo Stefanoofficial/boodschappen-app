@@ -1457,85 +1457,25 @@ body.dark-theme .familyDialogMember { background:rgba(255,255,255,.06); border-c
 body.dark-theme .familyDialogInput { background:rgba(255,255,255,.07); color:#f1f4f1; border-color:rgba(255,255,255,.14); }
 body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#dff1e2; }
 
-/* Compact menu + rustige slide animaties */
-.familyMenu {
-  width: 172px;
-  max-width: calc(100vw - 28px);
-  padding: 6px;
-  border-radius: 18px;
-  opacity: 0;
-  transform: translateY(-7px) scale(.985);
-  transform-origin: top right;
-  transition: opacity .18s ease, transform .20s cubic-bezier(.22,.8,.3,1);
-  pointer-events: none;
-}
-.familyMenu.menu-open {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-.familyMenuItem {
-  min-height: 40px;
-  padding: 7px 7px;
-  gap: 9px;
-  font-size: 14px;
-}
-.familyMenuPrimary > i:first-child {
-  width: 36px;
-  height: 36px;
-  flex-basis: 36px;
-}
-.familyMenuBack { padding: 7px 6px 8px; font-size: 13px; }
-.familyMenuSubTitle { padding: 7px 7px 2px; font-size: 9px; }
-.familyMenuDanger { margin-top: 4px; padding-top: 8px !important; }
-
-/* Familie-submenu schuift horizontaal binnen hetzelfde compacte menu. */
-.familyMenuPage {
-  transition: transform .20s cubic-bezier(.22,.8,.3,1), opacity .16s ease;
-}
-.familyMenuMainExit {
-  animation: familyMenuSlideLeft .20s ease forwards;
-}
-.familyMenuSubEnter {
-  animation: familyMenuSlideInRight .20s ease forwards;
-}
-.familyMenuMainEnter {
-  animation: familyMenuSlideInLeft .20s ease forwards;
-}
-.familyMenuSubExit {
-  animation: familyMenuSlideRight .20s ease forwards;
-}
-@keyframes familyMenuSlideLeft {
-  from { opacity:1; transform:translateX(0); }
-  to { opacity:0; transform:translateX(-18px); }
-}
-@keyframes familyMenuSlideInRight {
-  from { opacity:0; transform:translateX(18px); }
-  to { opacity:1; transform:translateX(0); }
-}
-@keyframes familyMenuSlideInLeft {
-  from { opacity:0; transform:translateX(-18px); }
-  to { opacity:1; transform:translateX(0); }
-}
-@keyframes familyMenuSlideRight {
-  from { opacity:1; transform:translateX(0); }
-  to { opacity:0; transform:translateX(18px); }
-}
-
-/* Ook de moderne familie-dialogs komen rustig van onderen binnen. */
-.familyDialog {
-  animation: familyDialogSlideIn .22s cubic-bezier(.22,.8,.3,1);
-}
-@keyframes familyDialogSlideIn {
-  from { opacity:0; transform:translateY(18px) scale(.975); }
-  to { opacity:1; transform:translateY(0) scale(1); }
-}
-
-/* Laatste gerichte verfijning: familie-menu smaller + dialogs duidelijk laten inschuiven. */
+/* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
 .familyMenu {
   width: 158px;
   max-width: calc(100vw - 32px);
   padding: 5px;
+  border-radius: 18px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(18px) translateY(-2px) scale(.985);
+  transform-origin: top right;
+  transition: opacity .20s ease, transform .28s cubic-bezier(.22,.8,.3,1), visibility 0s linear .28s;
+}
+.familyMenu.menu-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0) translateY(0) scale(1);
+  transition-delay: 0s;
 }
 .familyMenuItem {
   min-height: 38px;
@@ -1548,22 +1488,111 @@ body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#d
   height: 34px;
   flex-basis: 34px;
 }
+.familyMenuBack { padding: 7px 6px 8px; font-size: 13px; }
+.familyMenuSubTitle { padding: 7px 7px 2px; font-size: 9px; }
+.familyMenuDanger { margin-top: 4px; padding-top: 8px !important; }
+
+/* De inhoud van Mijn familie schuift horizontaal als een echt tweede scherm. */
+.familyMenu {
+  overflow: hidden !important;
+}
+.familyMenuPage {
+  width: 100%;
+  transition: transform .28s cubic-bezier(.22,.8,.3,1), opacity .20s ease;
+  will-change: transform, opacity;
+}
+.familyMenuMainExit {
+  animation: familyMenuSlideLeft .28s cubic-bezier(.22,.8,.3,1) forwards;
+}
+.familyMenuSubEnter {
+  animation: familyMenuSlideInRight .28s cubic-bezier(.22,.8,.3,1) forwards;
+}
+.familyMenuMainEnter {
+  animation: familyMenuSlideInLeft .28s cubic-bezier(.22,.8,.3,1) forwards;
+}
+.familyMenuSubExit {
+  animation: familyMenuSlideRight .28s cubic-bezier(.22,.8,.3,1) forwards;
+}
+@keyframes familyMenuSlideLeft {
+  from { opacity:1; transform:translateX(0); }
+  to { opacity:0; transform:translateX(-100%); }
+}
+@keyframes familyMenuSlideInRight {
+  from { opacity:0; transform:translateX(100%); }
+  to { opacity:1; transform:translateX(0); }
+}
+@keyframes familyMenuSlideInLeft {
+  from { opacity:0; transform:translateX(-100%); }
+  to { opacity:1; transform:translateX(0); }
+}
+@keyframes familyMenuSlideRight {
+  from { opacity:1; transform:translateX(0); }
+  to { opacity:0; transform:translateX(100%); }
+}
+
+/* Familie-dialogs schuiven van rechts in en bij sluiten weer terug naar rechts. */
 .familyDialogOverlay {
   opacity: 0;
-  transition: opacity .18s ease;
+  visibility: hidden;
+  transition: opacity .18s ease, visibility 0s linear .30s;
 }
 .familyDialogOverlay.familyDialogShown {
   opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 .familyDialog {
   opacity: 0;
-  transform: translateY(34px) scale(.965);
-  transition: opacity .24s cubic-bezier(.22,.8,.3,1), transform .28s cubic-bezier(.22,.8,.3,1);
+  transform: translateX(70px) scale(.985);
+  transition: opacity .22s ease, transform .30s cubic-bezier(.22,.8,.3,1);
   animation: none !important;
 }
 .familyDialogOverlay.familyDialogShown .familyDialog {
   opacity: 1;
+  transform: translateX(0) scale(1);
+}
+.familyDialogOverlay.familyDialogClosing {
+  opacity: 0;
+}
+.familyDialogOverlay.familyDialogClosing .familyDialog {
+  opacity: 0;
+  transform: translateX(70px) scale(.985);
+}
+
+/* Het maanmenu schuift omhoog vanuit het maanknopje. */
+.themePicker {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(16px) scale(.96);
+  transform-origin: bottom right;
+  transition: opacity .18s ease, transform .25s cubic-bezier(.22,.8,.3,1), visibility 0s linear .25s;
+}
+.themePicker.open {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+.themePicker.theme-closing {
+  display: block;
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+  transform: translateY(16px) scale(.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familyMenu,
+  .familyMenuPage,
+  .familyDialog,
+  .familyDialogOverlay,
+  .themePicker {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 </style>
 </head>
@@ -1785,11 +1814,20 @@ function setTheme(theme) {
 
 function toggleThemePicker() {
   const familyMenu = document.getElementById("familyMenu");
-  if (familyMenu) familyMenu.style.display = "none";
+  if (familyMenu) closeFamilyMenu();
   const picker = document.getElementById("themePicker");
   const button = document.getElementById("themeButton");
   if (!picker) return;
-  const open = picker.classList.toggle("open");
+
+  const open = !picker.classList.contains("open");
+  if (open) {
+    picker.classList.remove("theme-closing");
+    picker.classList.add("open");
+  } else {
+    picker.classList.add("theme-closing");
+    picker.classList.remove("open");
+    setTimeout(() => picker.classList.remove("theme-closing"), 260);
+  }
   picker.setAttribute("aria-hidden", open ? "false" : "true");
   if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
 }
@@ -1797,7 +1835,12 @@ function toggleThemePicker() {
 function closeThemePicker() {
   const picker = document.getElementById("themePicker");
   const button = document.getElementById("themeButton");
-  if (picker) { picker.classList.remove("open"); picker.setAttribute("aria-hidden", "true"); }
+  if (picker && picker.classList.contains("open")) {
+    picker.classList.add("theme-closing");
+    picker.classList.remove("open");
+    setTimeout(() => picker.classList.remove("theme-closing"), 260);
+  }
+  if (picker) picker.setAttribute("aria-hidden", "true");
   if (button) button.setAttribute("aria-expanded", "false");
 }
 
@@ -1811,7 +1854,7 @@ function closeFamilyMenu() {
   menu.classList.remove("menu-open");
   setTimeout(() => {
     if (!menu.classList.contains("menu-open")) menu.style.display = "none";
-  }, 210);
+  }, 290);
 }
 
 
@@ -2320,10 +2363,7 @@ function updateProductSuggestions() {
     return;
   }
 
-  const matches = productCatalog
-    .filter(([name]) => name.startsWith(query))
-    .filter((entry, index, arr) => arr.findIndex(x => x[0] === entry[0]) === index)
-    .slice(0, 5);
+  const matches = getProductSuggestions(query).slice(0, 5).map(({name}) => [name, getProductIcon(name)]);
 
   if (!matches.length) {
     box.classList.remove("open");
@@ -2719,7 +2759,7 @@ async function showFamilyCode() {
        <div class="familyDialogCode">${currentHouseholdId}</div>`,
       `<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>`
     );
-    const finish=()=>{overlay.remove();resolve();};
+    const finish=()=>{ closeFamilyDialog(overlay, resolve); };
     overlay.querySelector("button").addEventListener("click",finish);
     overlay.addEventListener("click",e=>{if(e.target===overlay)finish();});
   });
@@ -2859,6 +2899,18 @@ function familyDialogBase(icon, title, content, buttonsHtml) {
   return overlay;
 }
 
+function closeFamilyDialog(overlay, done) {
+  if (!overlay || !overlay.isConnected) {
+    if (done) done();
+    return;
+  }
+  overlay.classList.add("familyDialogClosing");
+  setTimeout(() => {
+    overlay.remove();
+    if (done) done();
+  }, 280);
+}
+
 function familyAlert(title, message, icon="fa-circle-info") {
   return new Promise(resolve => {
     closeFamilyMenuForDialog();
@@ -2888,7 +2940,7 @@ function familyConfirm(title, message, danger=false) {
       `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
        <button type="button" class="familyDialogBtn ${danger ? "familyDialogDanger" : "familyDialogPrimary"}">Doorgaan</button>`
     );
-    const finish=value=>{ overlay.remove(); resolve(value); };
+    const finish=value=>{ closeFamilyDialog(overlay, () => resolve(value)); };
     overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(false));
     overlay.querySelector(".familyDialogActions button:last-child").addEventListener("click",()=>finish(true));
     overlay.addEventListener("click",e=>{ if(e.target===overlay) finish(false); });
@@ -2906,7 +2958,7 @@ function familyPrompt(title, message, icon="fa-keyboard", initial="") {
        <button type="button" class="familyDialogBtn familyDialogPrimary">Doorgaan</button>`
     );
     const input=overlay.querySelector(".familyDialogInput");
-    const finish=value=>{ overlay.remove(); resolve(value); };
+    const finish=value=>{ closeFamilyDialog(overlay, () => resolve(value)); };
     overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(null));
     overlay.querySelector(".familyDialogPrimary").addEventListener("click",()=>finish(input.value.trim()));
     overlay.addEventListener("click",e=>{ if(e.target===overlay) finish(null); });
