@@ -953,6 +953,54 @@ body.dark-theme .themeOption i{color:#dce9df;}
   }
 }
 
+
+/* ===== Stap 2: consistente producticonen ===== */
+.itemProductContent {
+  align-items: center;
+}
+
+.productIcon {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  font-size: 25px;
+}
+
+.productIconImage {
+  width: 30px;
+  height: 30px;
+  max-width: 30px;
+  max-height: 30px;
+  object-fit: contain;
+  display: block;
+}
+
+.productSuggestionIcon {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 23px;
+}
+
+.productSuggestionImage {
+  width: 26px;
+  height: 26px;
+  max-width: 26px;
+  max-height: 26px;
+  object-fit: contain;
+  display: block;
+}
+
 </style>
 </head>
 
@@ -1369,7 +1417,7 @@ function relativeCompletedTime(timestamp) {
   return days + (days === 1 ? " dag geleden" : " dagen geleden");
 }
 
-const productCatalog = [
+const productCatalog = [["pringles", "asset:data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2Q5MzYzMiIgZD0iTTE4IDhoMjh2NDhIMTh6Ii8+PGVsbGlwc2UgY3g9IjMyIiBjeT0iOCIgcng9IjE0IiByeT0iNCIgZmlsbD0iI2YyZDdhMCIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjU2IiByeD0iMTQiIHJ5PSI0IiBmaWxsPSIjYTkxZTIzIi8+PGVsbGlwc2UgY3g9IjMyIiBjeT0iMjMiIHJ4PSIxMCIgcnk9IjgiIGZpbGw9IiNmNGQwNWUiLz48cGF0aCBkPSJNMjUgMjJjNC01IDEwLTUgMTQgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjIyIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yNSAyOWM0IDIgMTAgMiAxNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmNmU0YTAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIzIDM5aDE4IiBzdHJva2U9IiNmN2Q0NWQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+"], 
   // Fruit
   ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
   ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
@@ -1400,7 +1448,7 @@ const productCatalog = [
   ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
 
   // Zuivel & eieren
-  ["melk", "🥛"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
+  ["melk", "asset:data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE4IDE2aDI4djQySDE4eiIvPjxwYXRoIGZpbGw9IiNkOWVmZmYiIGQ9Ik0xOCAyNWgyOHYzM0gxOHoiLz48cGF0aCBmaWxsPSIjNGFhM2RmIiBkPSJNMTggMjVoMjh2OUgxOHoiLz48cGF0aCBmaWxsPSIjOGVkMGYwIiBkPSJNMjMgMTBoMThsNSA2SDE4eiIvPjxwYXRoIGZpbGw9IiM0YWEzZGYiIGQ9Ik0yNSAxM2gxNHY1SDI1eiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iNDUiIHI9IjgiIGZpbGw9IiNmZmYiLz48cGF0aCBmaWxsPSIjNGFhM2RmIiBkPSJNMjcgNDVjMi01IDgtNSAxMCAwLTIgMy04IDMtMTAgMHoiLz48L3N2Zz4="], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
   ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
   ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
   ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
@@ -1422,7 +1470,7 @@ const productCatalog = [
   ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
   ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
   ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
-  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🫙"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
+  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
   ["mayonaise", "🫙"], ["ketchup", "🍅"], ["mosterd", "🟡"], ["pesto", "🌿"],
   ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
   ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
