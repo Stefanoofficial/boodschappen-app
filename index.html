@@ -1315,25 +1315,96 @@ function relativeCompletedTime(timestamp) {
 }
 
 const productCatalog = [
-  ["appel", "🍎"], ["appels", "🍎"],
-  ["banaan", "🍌"], ["bananen", "🍌"],
-  ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
-  ["citroen", "🍋"], ["citroenen", "🍋"],
-  ["limoen", "🍋"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
-  ["druiven", "🍇"], ["druif", "🍇"], ["watermeloen", "🍉"],
-  ["melk", "🥛"], ["chocomelk", "🥛"], ["yoghurt", "🥛"],
+  // Fruit
+  ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
+  ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
+  ["mandarijn", "🍊"], ["mandarijnen", "🍊"], ["citroen", "🍋"], ["citroenen", "🍋"],
+  ["limoen", "🍋"], ["druif", "🍇"], ["druiven", "🍇"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
+  ["framboos", "🫐"], ["frambozen", "🫐"], ["blauwe bessen", "🫐"], ["kiwi", "🥝"],
+  ["ananas", "🍍"], ["mango", "🥭"], ["perzik", "🍑"], ["nectarine", "🍑"],
+  ["pruim", "🫐"], ["kers", "🍒"], ["kersen", "🍒"], ["watermeloen", "🍉"],
+  ["meloen", "🍈"], ["avocado", "🥑"], ["kokosnoot", "🥥"],
+
+  // Groenten
+  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
+  ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
+  ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
+  ["paprika", "🫑"], ["rode paprika", "🫑"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
+  ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
+  ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
+  ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
+  ["erwt", "🫛"], ["erwten", "🫛"], ["bonen", "🫘"], ["sperziebonen", "🫛"],
+  ["champignons", "🍄"], ["champignon", "🍄"], ["biet", "🫜"], ["radijs", "🌱"],
+
+  // Brood, ontbijt & beleg
   ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
-  ["kaas", "🧀"], ["eieren", "🥚"], ["ei", "🥚"],
-  ["boter", "🧈"], ["jam", "🍓"], ["hagelslag", "🍫"],
-  ["cola", "🥤"], ["cola zero", "🥤"], ["frisdrank", "🥤"],
-  ["water", "💧"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
-  ["koffie", "☕"], ["thee", "🍵"],
-  ["kip", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"], ["vis", "🐟"],
-  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["tomaat", "🍅"], ["tomaten", "🍅"],
-  ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"], ["ui", "🧅"], ["uien", "🧅"],
-  ["paprika", "🫑"], ["sla", "🥬"], ["champignons", "🍄"],
-  ["rijst", "🍚"], ["pasta", "🍝"], ["pizza", "🍕"], ["chips", "🥔"],
-  ["koek", "🍪"], ["koekjes", "🍪"], ["chocolade", "🍫"], ["ijs", "🍦"]
+  ["meergranen brood", "🍞"], ["stokbrood", "🥖"], ["baguette", "🥖"], ["croissant", "🥐"],
+  ["bolletjes", "🥯"], ["broodjes", "🥯"], ["beschuit", "🍞"], ["cracker", "🍘"], ["crackers", "🍘"],
+  ["kaas", "🧀"], ["jonge kaas", "🧀"], ["oude kaas", "🧀"], ["ham", "🥓"], ["salami", "🥩"],
+  ["worst", "🌭"], ["pindakaas", "🥜"], ["hagelslag", "🍫"], ["chocopasta", "🍫"],
+  ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
+
+  // Zuivel & eieren
+  ["melk", "🥛"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
+  ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
+  ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
+  ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
+
+  // Vlees, vis & vegetarisch
+  ["kip", "🍗"], ["kipfilet", "🍗"], ["kippenpoten", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"],
+  ["rundvlees", "🥩"], ["varkensvlees", "🥩"], ["biefstuk", "🥩"], ["schnitzel", "🥩"],
+  ["speklap", "🥓"], ["spek", "🥓"], ["vis", "🐟"], ["zalm", "🐟"], ["tonijn", "🐟"],
+  ["garnalen", "🦐"], ["vega", "🌱"], ["tofu", "🫘"], ["worstjes", "🌭"],
+
+  // Dranken
+  ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
+  ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
+  ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
+  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"],
+  ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
+
+  // Pasta, rijst, potten & koken
+  ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
+  ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
+  ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
+  ["zout", "🧂"], ["peper", "🫙"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
+  ["mayonaise", "🫙"], ["ketchup", "🍅"], ["mosterd", "🟡"], ["pesto", "🌿"],
+  ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
+  ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
+
+  // Snacks & zoet
+  ["chips", "🥔"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
+  ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
+
+  // Diepvries & kant-en-klaar
+  ["pizza", "🍕"], ["friet", "🍟"], ["frietjes", "🍟"], ["ovenfriet", "🍟"],
+  ["diepvriesgroente", "🥦"], ["diepvriesfruit", "🍓"], ["nasi", "🍚"], ["bami", "🍜"],
+
+  // Persoonlijke verzorging
+  ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
+  ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
+  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "🧻"], ["wc papier", "🧻"],
+  ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
+
+  // Schoonmaak & huishouden
+  ["schoonmaakmiddel", "🧴"], ["allesreiniger", "🧴"], ["glasreiniger", "🧴"],
+  ["keukenreiniger", "🧴"], ["badkamerreiniger", "🧴"], ["wc reiniger", "🧴"],
+  ["toilet reiniger", "🧴"], ["afwasmiddel", "🧴"], ["vaatwastabletten", "🧼"],
+  ["wasmiddel", "🧺"], ["wasverzachter", "🧺"], ["vlekkenmiddel", "🧺"],
+  ["bleek", "🧴"], ["schuurmiddel", "🧴"], ["spons", "🧽"], ["sponzen", "🧽"],
+  ["afwasspons", "🧽"], ["keukenrol", "🧻"], ["keukenpapier", "🧻"], ["aluminiumfolie", "📦"],
+  ["vershoudfolie", "📦"], ["vuilniszakken", "🗑️"], ["vuilniszak", "🗑️"],
+  ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
+
+  // Baby & huisdieren
+  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
+  ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
+  ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
+
+  // Overig
+  ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
+  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"]
 ];
 
 function normalizeProductName(text) {
