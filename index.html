@@ -203,7 +203,7 @@ overflow-x: hidden;
 
 .item.completed {
   font-size: 18px;
-  opacity: .78;
+  opacity: .68;
 }
 
 .item.completed .completedMeta {
@@ -213,15 +213,14 @@ overflow-x: hidden;
   font-size: 12px;
   line-height: 1.3;
   font-weight: 400;
-  color: rgba(255,255,255,.80);
-  opacity: 1;
+  opacity: .94;
   text-decoration: none;
 }
 
 .item.completed .completedMeta i {
   font-size: 11px;
   margin-right: 4px;
-  opacity: .86;
+  opacity: .9;
 }
 
 .item.completedMoving {
@@ -821,12 +820,41 @@ body.dark-theme .themeOption i{color:#dce9df;}
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
 .search-clear-btn{
   display:none !important;
+}
+.search-clear-btn.has-text{
+  display:flex !important;
+}
+</style>
+<style>
+.themeSunOutline{
+  width:18px;
+  flex:0 0 18px;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  color:#3F5B45;
+  font-size:21px;
+  line-height:1;
+  font-weight:400;
+}
+.themeOption i{
+  width:18px;
+  flex:0 0 18px;
+  text-align:center;
+  color:#3F5B45;
+  font-size:18px;
+}
+</style>
+<style>
+.search-clear-btn{
+  display:none !important;
   color:#8a908c !important;
-  font-size:20px !important;
+  font-size:19px !important;
   font-weight:400 !important;
   opacity:.68;
   padding:0 3px !important;
   background:transparent !important;
+  border:0 !important;
 }
 .search-clear-btn.has-text{
   display:flex !important;
@@ -988,7 +1016,7 @@ body.dark-theme .themeOption i{color:#dce9df;}
   <div class="list" id="list"></div>
 
   <div class="buttons">
-    <button class="clear search-clear-btn" onclick="clearList()">Lijst wissen</button>
+    <button class="clear" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
 
@@ -2184,6 +2212,27 @@ function toggleRegisterPassword(fieldId, button) {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  function setupSearchClear(){
+    const input=document.getElementById('searchInput');
+    const btn=document.querySelector('.search-clear-btn');
+    if(!input || !btn) return;
+    function update(){
+      btn.classList.toggle('has-text', input.value.trim().length > 0);
+    }
+    input.addEventListener('input', update);
+    update();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', setupSearchClear);
+  }else{
+    setupSearchClear();
   }
 })();
 </script>
