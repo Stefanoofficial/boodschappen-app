@@ -1417,7 +1417,7 @@ function relativeCompletedTime(timestamp) {
   return days + (days === 1 ? " dag geleden" : " dagen geleden");
 }
 
-const productCatalog = [["pringles", "asset:data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2Q5MzYzMiIgZD0iTTE4IDhoMjh2NDhIMTh6Ii8+PGVsbGlwc2UgY3g9IjMyIiBjeT0iOCIgcng9IjE0IiByeT0iNCIgZmlsbD0iI2YyZDdhMCIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjU2IiByeD0iMTQiIHJ5PSI0IiBmaWxsPSIjYTkxZTIzIi8+PGVsbGlwc2UgY3g9IjMyIiBjeT0iMjMiIHJ4PSIxMCIgcnk9IjgiIGZpbGw9IiNmNGQwNWUiLz48cGF0aCBkPSJNMjUgMjJjNC01IDEwLTUgMTQgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjIyIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yNSAyOWM0IDIgMTAgMiAxNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmNmU0YTAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIzIDM5aDE4IiBzdHJva2U9IiNmN2Q0NWQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+"], 
+const productCatalog = [
   // Fruit
   ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
   ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
@@ -1448,7 +1448,7 @@ const productCatalog = [["pringles", "asset:data:image/svg+xml;base64,PHN2ZyB4bW
   ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
 
   // Zuivel & eieren
-  ["melk", "asset:data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE4IDE2aDI4djQySDE4eiIvPjxwYXRoIGZpbGw9IiNkOWVmZmYiIGQ9Ik0xOCAyNWgyOHYzM0gxOHoiLz48cGF0aCBmaWxsPSIjNGFhM2RmIiBkPSJNMTggMjVoMjh2OUgxOHoiLz48cGF0aCBmaWxsPSIjOGVkMGYwIiBkPSJNMjMgMTBoMThsNSA2SDE4eiIvPjxwYXRoIGZpbGw9IiM0YWEzZGYiIGQ9Ik0yNSAxM2gxNHY1SDI1eiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iNDUiIHI9IjgiIGZpbGw9IiNmZmYiLz48cGF0aCBmaWxsPSIjNGFhM2RmIiBkPSJNMjcgNDVjMi01IDgtNSAxMCAwLTIgMy04IDMtMTAgMHoiLz48L3N2Zz4="], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
+  ["melk", "milk-carton"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
   ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
   ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
   ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
@@ -1476,7 +1476,7 @@ const productCatalog = [["pringles", "asset:data:image/svg+xml;base64,PHN2ZyB4bW
   ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
 
   // Snacks & zoet
-  ["chips", "chips-bag"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["chips", "chips-bag"], ["pringles", "pringles-tube"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
   ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
   ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
 
@@ -1515,6 +1515,31 @@ function normalizeProductName(text) {
 }
 
 function productIconMarkup(icon) {
+  if (icon === "milk-carton") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M19 17h26v40H19z" fill="#f8fbff" stroke="#cfd8df" stroke-width="1.5"/>
+      <path d="M19 28h26v29H19z" fill="#d9efff"/>
+      <path d="M19 28h26v8H19z" fill="#65b6e8"/>
+      <path d="M24 11h16l5 6H19z" fill="#eaf7ff" stroke="#cfd8df" stroke-width="1.5"/>
+      <path d="M25 13h14v5H25z" fill="#65b6e8"/>
+      <path d="M27 43c2-5 8-5 10 0-2 3-8 3-10 0z" fill="#65b6e8"/>
+      <circle cx="32" cy="43" r="8" fill="none" stroke="#65b6e8" stroke-width="1.5"/>
+    </svg>`;
+  }
+
+  if (icon === "pringles-tube") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M19 9h26v47H19z" fill="#d92e2e" stroke="#a91f24" stroke-width="1.5"/>
+      <ellipse cx="32" cy="9" rx="13" ry="4" fill="#f4d9a4" stroke="#a91f24" stroke-width="1.5"/>
+      <ellipse cx="32" cy="56" rx="13" ry="4" fill="#b51f25"/>
+      <ellipse cx="32" cy="24" rx="10" ry="8" fill="#f5d15a"/>
+      <circle cx="28" cy="22" r="2" fill="#222"/>
+      <circle cx="36" cy="22" r="2" fill="#222"/>
+      <path d="M27 27c3 2 7 2 10 0" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+      <path d="M24 39h16" stroke="#f6d34f" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  }
+
   if (icon === "chips-bag") {
     return `<svg class="chipsBagIcon" viewBox="0 0 64 64" aria-hidden="true">
       <defs>
