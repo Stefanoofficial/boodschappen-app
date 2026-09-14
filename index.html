@@ -1587,9 +1587,19 @@ body.logged-in .app {
   color:inherit;
 }
 
+/* Alle submenu-regels gebruiken dezelfde compacte tekststijl als de hoofdopties. */
+.familyMenuSub .familyMenuItem > span,
+.settingsMenuPage .familyMenuItem > span,
+.savedListsMenuPage .familyMenuItem > span {
+  font-size:13.5px !important;
+  font-weight:600 !important;
+  line-height:1.2;
+  color:inherit;
+}
+
 /* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
 .familyMenu {
-  width: 220px;
+  width: 190px;
   max-width: calc(100vw - 28px);
   padding: 5px;
   border-radius: 18px;
