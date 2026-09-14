@@ -1696,7 +1696,7 @@ const productCatalog = [
   ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
   ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
   ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
-  ["mayonaise", "🫙"], ["ketchup", "🍅"], ["mosterd", "🟡"], ["pesto", "🌿"],
+  ["mayonaise", "mayonnaise-bottle"], ["ketchup", "ketchup-bottle"], ["mosterd", "🟡"], ["pesto", "🌿"],
   ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
   ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
 
@@ -1712,7 +1712,7 @@ const productCatalog = [
   // Persoonlijke verzorging
   ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
   ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
-  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "🧻"], ["wc papier", "🧻"],
+  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "toilet-paper"], ["wc papier", "🧻"],
   ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
 
   // Schoonmaak & huishouden
@@ -1733,13 +1733,57 @@ const productCatalog = [
   // Overig
   ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
   ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"]
-];
+
+  ["curry saus", "curry-sauce"],
+  ["curry", "curry-sauce"],
+  ["toilet papier", "toilet-paper"],];
 
 function normalizeProductName(text) {
   return String(text || "").toLowerCase().trim();
 }
 
 function productIconMarkup(icon) {
+
+  if (icon === "curry-sauce") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M22 13h20l-2 8v35H24V21z" fill="#e23a2f" stroke="#b92522" stroke-width="1.5"/>
+      <rect x="24" y="7" width="16" height="9" rx="3" fill="#ef3e2f"/>
+      <path d="M24 28h16v21H24z" fill="#fff"/>
+      <ellipse cx="32" cy="39" rx="7" ry="8" fill="#f2c43d"/>
+      <path d="M28 40c2-4 6-4 8 0" fill="none" stroke="#d98f1f" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (icon === "ketchup-bottle") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M22 17h20l-2 9v30H24V26z" fill="#e62d28" stroke="#b51e20" stroke-width="1.5"/>
+      <path d="M25 9h14l2 9H23z" fill="#e83a2f"/>
+      <rect x="27" y="6" width="10" height="6" rx="2" fill="#d72724"/>
+      <path d="M25 30h14v17H25z" fill="#fff"/>
+      <path d="M28 38c2-3 6-3 8 0" fill="none" stroke="#e02d2a" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (icon === "mayonnaise-bottle") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M22 17h20l-2 9v30H24V26z" fill="#f5e7b5" stroke="#c9b97b" stroke-width="1.5"/>
+      <path d="M25 9h14l2 9H23z" fill="#f1df91"/>
+      <rect x="27" y="6" width="10" height="6" rx="2" fill="#e8cd6a"/>
+      <path d="M25 30h14v17H25z" fill="#fffdf4"/>
+      <path d="M28 39c2-4 6-4 8 0" fill="none" stroke="#e6c85c" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (icon === "toilet-paper") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse cx="28" cy="22" rx="16" ry="13" fill="#fff" stroke="#d9d9d9" stroke-width="1.5"/>
+      <path d="M12 22v18c0 9 7 15 16 15s16-6 16-15V22" fill="#fff" stroke="#d9d9d9" stroke-width="1.5"/>
+      <ellipse cx="28" cy="22" rx="6" ry="5" fill="#c9a77a"/>
+      <path d="M44 28c7 2 9 7 7 13-2 6-7 9-13 7l-5-2" fill="#fff" stroke="#d9d9d9" stroke-width="1.5"/>
+      <path d="M43 38c4 1 7 3 9 6" fill="none" stroke="#ececec" stroke-width="2"/>
+    </svg>`;
+  }
+
   if (icon === "milk-carton") {
     return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
       <path d="M19 17h26v40H19z" fill="#f8fbff" stroke="#cfd8df" stroke-width="1.5"/>
