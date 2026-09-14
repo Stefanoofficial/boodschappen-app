@@ -425,8 +425,8 @@ overflow-x: hidden;
 }
 
 .searchBox > i {
-  color: #a2a7a4;
-  font-size: 20px;
+  color: #333;
+  font-size: 22px;
   margin-right: 12px;
 }
 
@@ -694,8 +694,7 @@ body.dark-theme .familyMenuItem { color: #f1f3f1; }
 body.dark-theme .familyMenuItem:first-child i { background: #304b39; color: #bfe3c7; }
 body.dark-theme input, body.dark-theme .searchBox, body.dark-theme .inputBox, body.dark-theme .registerInputBox, body.dark-theme .searchBox input { background: #252b27; color: #f3f5f3; }
 body.dark-theme input::placeholder, body.dark-theme .searchBox input::placeholder, body.dark-theme .registerInputBox input::placeholder, body.dark-theme .inputBox input::placeholder { color: #aeb5b0; }
-body.dark-theme .searchBox > i { color: #b8bfbb !important; }
-body.dark-theme .searchBox button, body.dark-theme .togglePassword, body.dark-theme .registerInputBox i, body.dark-theme .registerPasswordToggle { color: #c7cec9 !important; }
+body.dark-theme .searchBox > i, body.dark-theme .searchBox button, body.dark-theme .togglePassword, body.dark-theme .registerInputBox i, body.dark-theme .registerPasswordToggle { color: #c7cec9 !important; }
 body.dark-theme .list { background: rgba(0,0,0,.62); }
 body.dark-theme .item { border-bottom-color: rgba(255,255,255,.12); }
 body.dark-theme .status { background: #203d29; color: #bfe3c7; }
@@ -825,6 +824,15 @@ body.dark-theme .themeOption i{color:#dce9df;}
 }
 .search-clear-btn.has-text{
   display:flex !important;
+}
+</style>
+<style>
+/* Alleen het vergrootglas: lichter, rustiger en duidelijker */
+.searchBox > i {
+  color: #b8beb9 !important;
+  font-size: 29px !important;
+  margin-right: 13px !important;
+  opacity: 0.95;
 }
 </style>
 </head>
