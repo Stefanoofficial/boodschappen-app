@@ -1732,11 +1732,47 @@ const productCatalog = [
 
   // Overig
   ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
-  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"]
-
+  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"],
   ["curry saus", "curry-sauce"],
   ["curry", "curry-sauce"],
-  ["toilet papier", "toilet-paper"],];
+  ["toilet papier", "toilet-paper"],]
+/* Algemene iconenbibliotheek: suggesties en iconen gebruiken dezelfde bron. */
+const defaultProductIcon = "🛒";
+const productIconAliases = {
+  "sinaas": "sinaasappel", "orange": "sinaasappel",
+  "appels": "appel", "peren": "peer", "bananen": "banaan",
+  "tomaten": "tomaat", "komkommers": "komkommer",
+  "wortels": "wortel", "aardappelen": "aardappel", "uien": "ui",
+  "ei": "eieren", "toilet papier": "toiletpapier", "wc papier": "toiletpapier"
+};
+function normalizeProductLookup(value) {
+  return String(value || "").toLowerCase().trim().replace(/\s+/g, " ");
+}
+function getProductIcon(productName) {
+  const n = normalizeProductLookup(productName);
+  const key = productIconAliases[n] || n;
+  const exact = productCatalog.find(([name]) => normalizeProductLookup(name) === key);
+  return exact ? exact[1] : defaultProductIcon;
+}
+function getProductSuggestions(query) {
+  const q = normalizeProductLookup(query);
+  if (!q) return [];
+  const result=[], seen=new Set();
+  productCatalog.forEach(([name, icon]) => {
+    const n=normalizeProductLookup(name);
+    if (n.startsWith(q) && !seen.has(n)) {
+      seen.add(n); result.push({name, icon});
+    }
+  });
+  Object.entries(productIconAliases).forEach(([alias, canonical]) => {
+    if (alias.startsWith(q)) {
+      const found=productCatalog.find(([name]) => normalizeProductLookup(name)===canonical);
+      if (found && !seen.has(canonical)) { seen.add(canonical); result.push({name:found[0],icon:found[1]}); }
+    }
+  });
+  return result.slice(0,8);
+}
+;
 
 function normalizeProductName(text) {
   return String(text || "").toLowerCase().trim();
