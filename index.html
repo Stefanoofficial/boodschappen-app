@@ -1191,6 +1191,41 @@ body.dark-theme .productSuggestion {
 
 #status { min-height: 42px !important; padding: 7px 14px !important; border-radius: 14px !important; box-shadow: 0 3px 10px rgba(0,0,0,.07) !important; }
 
+
+/* ===== Stap 9: moderne, consistente Menu-stijl ===== */
+.familyMenu {
+  border-radius: 18px !important;
+  border: 1px solid rgba(63,91,69,.12) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.15) !important;
+  overflow: hidden !important;
+}
+
+.familyMenuItem {
+  border-radius: 12px !important;
+  transition: background-color .14s ease, transform .12s ease !important;
+}
+
+.familyMenuItem:active {
+  transform: scale(.985);
+}
+
+@media (hover: hover) {
+  .familyMenuItem:hover {
+    background: rgba(63,91,69,.07);
+  }
+}
+
+body.dark-theme .familyMenu {
+  border-color: rgba(255,255,255,.10) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.40) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familyMenuItem {
+    transition: none !important;
+  }
+}
+
 </style>
 </head>
 
