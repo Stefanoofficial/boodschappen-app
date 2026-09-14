@@ -638,6 +638,136 @@ overflow-x: hidden;
   color:#3F5B45;
 }
 
+
+/* Thema's: licht (standaard) en donker */
+body { transition: background-color .2s ease, color .2s ease; }
+body.dark-theme { background-color: #121612; background-blend-mode: multiply; color: #f3f5f3; }
+body.dark-theme .headerBar { background: #24352a; }
+body.dark-theme .familyButton { background: rgba(255,255,255,.12); color: #fff; }
+body.dark-theme .familyMenu { background: #202620; box-shadow: 0 8px 25px rgba(0,0,0,.55); }
+body.dark-theme .familyMenuItem { color: #f1f3f1; }
+body.dark-theme .familyMenuItem:first-child i { background: #304b39; color: #bfe3c7; }
+body.dark-theme input, body.dark-theme .searchBox, body.dark-theme .inputBox, body.dark-theme .registerInputBox, body.dark-theme .searchBox input { background: #252b27; color: #f3f5f3; }
+body.dark-theme input::placeholder, body.dark-theme .searchBox input::placeholder, body.dark-theme .registerInputBox input::placeholder, body.dark-theme .inputBox input::placeholder { color: #aeb5b0; }
+body.dark-theme .searchBox > i, body.dark-theme .searchBox button, body.dark-theme .togglePassword, body.dark-theme .registerInputBox i, body.dark-theme .registerPasswordToggle { color: #c7cec9 !important; }
+body.dark-theme .list { background: rgba(0,0,0,.62); }
+body.dark-theme .item { border-bottom-color: rgba(255,255,255,.12); }
+body.dark-theme .status { background: #203d29; color: #bfe3c7; }
+body.dark-theme .useModeBox, body.dark-theme .loginBox, body.dark-theme .registerBox { background: #202620; color: #f3f5f3; }
+body.dark-theme .useModeBox h2, body.dark-theme .registerBox h2, body.dark-theme .welcome h2 { color: #9ed5ad; }
+body.dark-theme .useModeBox p, body.dark-theme .welcome p, body.dark-theme .loginOr { color: #b8c0ba; }
+body.dark-theme .useModeSkip { color: #9ed5ad; border-color: #668b70; }
+body.dark-theme .registerButton { color: #9ed5ad; border-color: #668b70; }
+body.dark-theme .registerBack { color: #9ed5ad; border-color: #668b70; }
+body.dark-theme .version, body.dark-theme .copyright { color: #b8c0ba; }
+body.dark-theme .loginOr span { background: #667069; }
+body.dark-theme #refresh { color: #f3f5f3; }
+
+
+/* Thema-kiezer — altijd zichtbaar, ook op het inlogscherm */
+.themeButton{
+  position:fixed;
+  right:18px;
+  bottom:22px;
+  width:58px;
+  height:58px;
+  border:0;
+  border-radius:50%;
+  background:#f7efe3;
+  color:#3F5B45;
+  box-shadow:0 5px 18px rgba(0,0,0,.24);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  cursor:pointer;
+  z-index:10000;
+  -webkit-tap-highlight-color:transparent;
+}
+.themeButton:active{
+  transform:scale(.96);
+}
+.themePicker{
+  position:fixed;
+  right:18px;
+  bottom:94px;
+  width:250px;
+  padding:8px 0;
+  box-sizing:border-box;
+  background:#f7efe3;
+  border:1px solid rgba(63,91,69,.08);
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.24);
+  z-index:10001;
+  display:none;
+  overflow:hidden;
+}
+.themePicker.open{display:block;}
+.themeOption{
+  width:100%;
+  min-height:58px;
+  border:0;
+  border-top:1px solid rgba(63,91,69,.12);
+  background:transparent;
+  color:#222;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  gap:17px;
+  font-family:inherit;
+  font-size:17px;
+  text-align:left;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.themeOption:first-child{border-top:0;}
+.themeOption:hover,
+.themeOption:active{background:rgba(63,91,69,.07);}
+.themeOption i{
+  width:27px;
+  flex:0 0 27px;
+  text-align:center;
+  color:#3F5B45;
+  font-size:21px;
+}
+body.dark-theme .themeButton{
+  background:#252b27;
+  color:#e4efe6;
+}
+body.dark-theme .themePicker{
+  background:#202620;
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 10px 30px rgba(0,0,0,.55);
+}
+body.dark-theme .themeOption{
+  color:#f3f5f3;
+  border-top-color:rgba(255,255,255,.10);
+}
+body.dark-theme .themeOption:hover,
+body.dark-theme .themeOption:active{
+  background:rgba(255,255,255,.06);
+}
+body.dark-theme .themeOption i{color:#dce9df;}
+@media (max-width:600px){
+  .themeButton{
+    right:16px;
+    bottom:18px;
+    width:56px;
+    height:56px;
+    font-size:23px;
+  }
+  .themePicker{
+    right:16px;
+    bottom:86px;
+    width:250px;
+    border-radius:18px;
+  }
+  .themeOption{
+    min-height:56px;
+    font-size:17px;
+    padding:11px 17px;
+  }
+}
 </style>
 </head>
 
@@ -729,6 +859,21 @@ overflow-x: hidden;
   </div>
 </div>
 
+<div id="themePicker" class="themePicker" aria-hidden="true">
+  <button type="button" class="themeOption" onclick="setTheme('light')">
+    <i class="fa-solid fa-sun"></i><span>Licht thema</span>
+  </button>
+  <button type="button" class="themeOption" onclick="setTheme('dark')">
+    <i class="fa-solid fa-moon"></i><span>Donker thema</span>
+  </button>
+  <button type="button" class="themeOption" onclick="setTheme('system')">
+    <i class="fa-solid fa-sun"></i><span>Apparaat standaard</span>
+  </button>
+</div>
+<button type="button" id="themeButton" class="themeButton" onclick="toggleThemePicker()" aria-label="Thema kiezen" aria-expanded="false">
+  <i id="themeButtonIcon" class="fa-solid fa-moon"></i>
+</button>
+
 <div class="app">
 
   <div class="headerBar">
@@ -802,6 +947,54 @@ overflow-x: hidden;
 
 let boodschappen = [];
 let selectedIndex = -1;
+
+function getActiveTheme() {
+  const saved = localStorage.getItem("boodschappenTheme") || "light";
+  if (saved === "system") {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  return saved;
+}
+
+function applyTheme() {
+  const saved = localStorage.getItem("boodschappenTheme") || "light";
+  const active = getActiveTheme();
+  document.body.classList.toggle("dark-theme", active === "dark");
+  const icon = document.getElementById("themeButtonIcon");
+  if (icon) icon.className = active === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+}
+
+function setTheme(theme) {
+  localStorage.setItem("boodschappenTheme", theme);
+  applyTheme();
+  closeThemePicker();
+}
+
+function toggleThemePicker() {
+  const picker = document.getElementById("themePicker");
+  const button = document.getElementById("themeButton");
+  if (!picker) return;
+  const open = picker.classList.toggle("open");
+  picker.setAttribute("aria-hidden", open ? "false" : "true");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function closeThemePicker() {
+  const picker = document.getElementById("themePicker");
+  const button = document.getElementById("themeButton");
+  if (picker) { picker.classList.remove("open"); picker.setAttribute("aria-hidden", "true"); }
+  if (button) button.setAttribute("aria-expanded", "false");
+}
+
+function toggleTheme() {
+  setTheme(getActiveTheme() === "dark" ? "light" : "dark");
+}
+
+function closeFamilyMenu() {
+  const menu = document.getElementById("familyMenu");
+  if (menu) menu.style.display = "none";
+}
+
 function toggleFamilyMenu() {
   const menu = document.getElementById("familyMenu");
 
@@ -1104,6 +1297,7 @@ document.getElementById("list").addEventListener("click", function(e) {
     toggleItem(index);
   }
 });
+applyTheme();
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
@@ -1452,6 +1646,7 @@ async function showFamilyMembers() {
     showList();
     updatePrivateStatus();
     await updateMemberCount();
+    openUseModeModal();
   } catch (error) {
     console.error("Familie verlaten mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
