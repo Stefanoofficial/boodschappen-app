@@ -2541,25 +2541,47 @@ function openListOptionsSettings() {
 
   async function updateMemberCount() {
   const countEl = document.getElementById("memberCount");
-  if (!countEl) return;
+  const subCountEl = document.getElementById("memberCountSub");
+  if (!countEl && !subCountEl) return;
 
-  if (!currentHouseholdId) {
-    countEl.innerText = "1";
-    const labelEl = document.getElementById("memberLabel");
-    if (labelEl) {
-      labelEl.innerHTML = 'Familielid (<span id="memberCount">1</span>)';
+  const user = auth.currentUser;
+  let householdId = currentHouseholdId;
+
+  // Gebruik altijd de werkelijk gekoppelde familie uit Firebase.
+  if (!householdId && user) {
+    try {
+      const snap = await database.ref("users/" + user.uid + "/householdId").once("value");
+      householdId = snap.val() ? String(snap.val()) : null;
+    } catch (error) {
+      console.error("Familie-ID ophalen mislukt:", error);
     }
+  }
+
+  if (!householdId) {
+    const count = user ? 1 : 0;
+    if (countEl) countEl.innerText = String(count);
+    if (subCountEl) subCountEl.innerText = String(count);
+    const labelEl = document.getElementById("memberLabel");
+    if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
     return;
   }
 
-  const snapshot = await database
-    .ref("households/" + currentHouseholdId + "/members")
-    .once("value");
-  const members = snapshot.val() || {}; const memberIds = new Set(Object.keys(members)); if (auth.currentUser && auth.currentUser.uid) memberIds.add(auth.currentUser.uid); const count = memberIds.size;
-  const labelEl = document.getElementById("memberLabel");
-  if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
-  const subCountEl = document.getElementById("memberCountSub");
-  if (subCountEl) subCountEl.innerText = count;
+  try {
+    const snapshot = await database.ref("households/" + householdId + "/members").once("value");
+    const members = snapshot.val() || {};
+    const memberIds = new Set(Object.keys(members));
+    if (user && user.uid) memberIds.add(user.uid);
+    const count = memberIds.size;
+
+    currentHouseholdId = householdId;
+    if (countEl) countEl.innerText = String(count);
+    if (subCountEl) subCountEl.innerText = String(count);
+
+    const labelEl = document.getElementById("memberLabel");
+    if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
+  } catch (error) {
+    console.error("Aantal familieleden ophalen mislukt:", error);
+  }
 }
   function searchList() {
   const search = document.getElementById("searchInput").value.toLowerCase();
@@ -3311,6 +3333,8 @@ document.getElementById("list").addEventListener("click", function(e) {
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
+// Bewaar de Firebase-inlogsessie lokaal totdat de gebruiker zelf uitlogt.
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => console.error("Loginpersistentie instellen mislukt:", error));
   let currentHouseholdId = null;
 let currentSharedListId = null;
 let currentSharedListUnsubscribe = null;
@@ -3377,7 +3401,7 @@ function makeSharedListLink(code){
 async function createSharedList(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const name=await familyTextPrompt("Nieuwe lijst","Geef je deellijst een naam, bijvoorbeeld Feestelijk of BBQ met vrienden.","fa-list");
+  const name=await familyTextPrompt("Nieuwe lijst","Geef je lijst een naam, bijvoorbeeld Kerst of BBQ met vrienden.","fa-list");
   if(!name) return;
   let code=null, id=null;
   for(let i=0;i<8;i++){
