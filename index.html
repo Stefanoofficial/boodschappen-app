@@ -1449,7 +1449,7 @@ function getProductIcon(text) {
   if (value === "zout" || value.includes("zout")) return "🧂";
   if (value === "zwarte peper" || value === "witte peper" ||
       value.includes("zwarte peper") || value.includes("witte peper")) return "🫙";
-  if (value === "peper" || value === "peperkorrels" || value.includes("peper")) return "🌶️";
+  if (value === "peper" || value === "peperkorrels" || value === "gemalen peper") return "🌶️";
 
   const exact = productCatalog.find(([name]) => value === name);
   if (exact) return exact[1];
