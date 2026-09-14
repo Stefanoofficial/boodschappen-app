@@ -256,18 +256,15 @@ overflow-x: hidden;
   font-size: 21px;
   line-height: 1;
 }
-.productIconImage {
+.chipsBagIcon {
   width: 28px;
   height: 28px;
-  object-fit: contain;
   display: block;
   margin: 0 auto;
 }
-.productSuggestionImage {
+.productSuggestionIcon .chipsBagIcon {
   width: 24px;
   height: 24px;
-  object-fit: contain;
-  display: block;
 }
 
 .item {
@@ -1380,13 +1377,13 @@ const productCatalog = [
   ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
   ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
   ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
-  ["zout", "🧂"], ["peper", "🫙"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
+  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🫙"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
   ["mayonaise", "🫙"], ["ketchup", "🍅"], ["mosterd", "🟡"], ["pesto", "🌿"],
   ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
   ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
 
   // Snacks & zoet
-  ["chips", "asset:chipszakje.png"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["chips", "chips-bag"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
   ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
   ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
 
@@ -1422,6 +1419,25 @@ const productCatalog = [
 
 function normalizeProductName(text) {
   return String(text || "").toLowerCase().trim();
+}
+
+function productIconMarkup(icon) {
+  if (icon === "chips-bag") {
+    return `<svg class="chipsBagIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="chipsBagRed" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#f0443e"/>
+          <stop offset="1" stop-color="#b9161b"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 9h40l-3 7v34l3 5H12l3-5V16z" fill="url(#chipsBagRed)" stroke="#9f1419" stroke-width="1.5"/>
+      <path d="M12 9h40M12 55h40" stroke="#f78a83" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="32" cy="29" rx="13" ry="9" fill="#ffd34d" stroke="#fff0a0" stroke-width="1.5"/>
+      <path d="M21 28c6 3 15 3 22-1" fill="none" stroke="#df2427" stroke-width="5" stroke-linecap="round"/>
+      <path d="M21 39c2-5 7-5 10 0s7 5 10 0c1-2 4-2 5 1" fill="none" stroke="#f8c34a" stroke-width="5" stroke-linecap="round"/>
+    </svg>`;
+  }
+  return icon || "";
 }
 
 function getProductIcon(text) {
@@ -1471,10 +1487,7 @@ function updateProductSuggestions() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "productSuggestion";
-    const suggestionIcon = icon.startsWith("asset:")
-      ? `<img src="${icon.slice(6)}" alt="" class="productSuggestionImage">`
-      : icon;
-    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${suggestionIcon}</span>`;
+    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${productIconMarkup(icon)}</span>`;
     button.addEventListener("click", () => {
       input.value = name.charAt(0).toUpperCase() + name.slice(1);
       box.classList.remove("open");
@@ -1540,15 +1553,7 @@ function showList(animationType = "") {
     const icon = document.createElement("span");
     icon.className = "productIcon";
     const iconValue = getProductIcon(productText);
-    if (iconValue.startsWith("asset:")) {
-      const img = document.createElement("img");
-      img.src = iconValue.slice(6);
-      img.alt = "";
-      img.className = "productIconImage";
-      icon.appendChild(img);
-    } else {
-      icon.textContent = iconValue;
-    }
+    icon.innerHTML = productIconMarkup(iconValue);
     if (!iconValue) icon.style.visibility = "hidden";
     productWrap.appendChild(icon);
 
