@@ -1272,8 +1272,17 @@ body.dark-theme .familyMenu {
 }
 .familyMenuArrow {
   margin-left:auto;
-  color:#858c87 !important;
-  font-size:12px;
+  width:26px;
+  height:26px;
+  flex:0 0 26px;
+  border-radius:50%;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  color:#69736c !important;
+  background:rgba(63,91,69,.07);
+  font-size:13px !important;
+  line-height:1;
 }
 .familyMenuBack {
   width:100%;
@@ -1314,6 +1323,7 @@ body.dark-theme .familyMenu {
 body.dark-theme .familyMenu { background:rgba(37,43,38,.98); }
 body.dark-theme .familyMenuItem { color:#f1f4f1; }
 body.dark-theme .familyMenuItem:hover { background:rgba(255,255,255,.07); }
+body.dark-theme .familyMenuArrow { color:#c9d1cb !important; background:rgba(255,255,255,.08); }
 body.dark-theme .familyMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
 body.dark-theme .familyMenuSubTitle { color:#aab4ad; }
 body.dark-theme .familyMenuDanger { border-top-color:rgba(255,255,255,.12) !important; }
@@ -1821,29 +1831,43 @@ function toggleThemePicker() {
 
   const open = !picker.classList.contains("open");
   if (open) {
+    // Eerst zichtbaar maken in de beginstand, daarna pas de open-klasse toevoegen.
+    // Zo ziet de browser daadwerkelijk de startpositie en schuift het maanmenu
+    // bij het openen omhoog, in plaats van direct op zijn eindpositie te verschijnen.
     picker.classList.remove("theme-closing");
-    picker.classList.add("open");
+    picker.style.display = "block";
+    picker.classList.remove("open");
+    void picker.offsetWidth;
+    requestAnimationFrame(() => picker.classList.add("open"));
   } else {
     picker.classList.add("theme-closing");
     picker.classList.remove("open");
-    setTimeout(() => picker.classList.remove("theme-closing"), 260);
+    setTimeout(() => {
+      if (!picker.classList.contains("open")) {
+        picker.classList.remove("theme-closing");
+        picker.style.display = "none";
+      }
+    }, 260);
   }
   picker.setAttribute("aria-hidden", open ? "false" : "true");
   if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
 }
-
 function closeThemePicker() {
   const picker = document.getElementById("themePicker");
   const button = document.getElementById("themeButton");
-  if (picker && picker.classList.contains("open")) {
+  if (picker && (picker.classList.contains("open") || picker.style.display === "block")) {
     picker.classList.add("theme-closing");
     picker.classList.remove("open");
-    setTimeout(() => picker.classList.remove("theme-closing"), 260);
+    setTimeout(() => {
+      if (!picker.classList.contains("open")) {
+        picker.classList.remove("theme-closing");
+        picker.style.display = "none";
+      }
+    }, 260);
   }
   if (picker) picker.setAttribute("aria-hidden", "true");
   if (button) button.setAttribute("aria-expanded", "false");
 }
-
 function toggleTheme() {
   setTheme(getActiveTheme() === "dark" ? "light" : "dark");
 }
