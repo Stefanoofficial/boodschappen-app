@@ -143,10 +143,67 @@ h2 {
   margin-bottom: 12px;
 }
 
+.input-row-wrap {
+  position: relative;
+}
+
 .input-row {
   display: flex;
   gap: 8px;
 }
+
+.productSuggestions {
+  position: absolute;
+  left: 0;
+  right: 40%;
+  top: calc(100% + 5px);
+  background: rgba(247, 239, 227, .98);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+  overflow: hidden;
+  z-index: 5000;
+  display: none;
+}
+
+.productSuggestions.open {
+  display: block;
+}
+
+.productSuggestion {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(63,91,69,.10);
+  border-radius: 0;
+  background: transparent;
+  color: #263229;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.productSuggestion:last-child { border-bottom: 0; }
+.productSuggestion:active, .productSuggestion:hover { background: rgba(63,91,69,.08); }
+.productSuggestionIcon { font-size: 20px; line-height: 1; }
+
+body.dark-theme .productSuggestions {
+  background: rgba(32,38,32,.98);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+}
+body.dark-theme .productSuggestion {
+  color: #f3f5f3;
+  border-bottom-color: rgba(255,255,255,.07);
+}
+body.dark-theme .productSuggestion:active, body.dark-theme .productSuggestion:hover {
+  background: rgba(255,255,255,.06);
+}
+
 
 input {
   flex: 1;
@@ -182,6 +239,22 @@ button {
 max-height: 300px !important;
 overflow-y: auto !important;
 overflow-x: hidden;
+}
+
+.itemProductContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.productIcon {
+  flex: 0 0 auto;
+  width: 28px;
+  text-align: center;
+  font-size: 21px;
+  line-height: 1;
 }
 
 .item {
@@ -968,9 +1041,12 @@ body.dark-theme .themeOption i{color:#dce9df;}
 
   <h2>Voeg iets toe aan je lijst</h2>
 
-  <div class="input-row">
-    <input id="product" placeholder="Bijv. melk, brood, eieren...">
-    <button class="add" onclick="addProduct()">+ Toevoegen</button>
+  <div class="input-row-wrap">
+    <div class="input-row">
+      <input id="product" placeholder="Bijv. melk, brood, eieren..." autocomplete="off">
+      <button class="add" onclick="addProduct()">+ Toevoegen</button>
+    </div>
+    <div id="productSuggestions" class="productSuggestions" aria-label="Productsuggesties"></div>
   </div>
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
@@ -1238,6 +1314,102 @@ function relativeCompletedTime(timestamp) {
   return days + (days === 1 ? " dag geleden" : " dagen geleden");
 }
 
+const productCatalog = [
+  ["appel", "🍎"], ["appels", "🍎"],
+  ["banaan", "🍌"], ["bananen", "🍌"],
+  ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
+  ["citroen", "🍋"], ["citroenen", "🍋"],
+  ["limoen", "🍋"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
+  ["druiven", "🍇"], ["druif", "🍇"], ["watermeloen", "🍉"],
+  ["melk", "🥛"], ["chocomelk", "🥛"], ["yoghurt", "🥛"],
+  ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
+  ["kaas", "🧀"], ["eieren", "🥚"], ["ei", "🥚"],
+  ["boter", "🧈"], ["jam", "🍓"], ["hagelslag", "🍫"],
+  ["cola", "🥤"], ["cola zero", "🥤"], ["frisdrank", "🥤"],
+  ["water", "💧"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
+  ["koffie", "☕"], ["thee", "🍵"],
+  ["kip", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"], ["vis", "🐟"],
+  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["tomaat", "🍅"], ["tomaten", "🍅"],
+  ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"], ["ui", "🧅"], ["uien", "🧅"],
+  ["paprika", "🫑"], ["sla", "🥬"], ["champignons", "🍄"],
+  ["rijst", "🍚"], ["pasta", "🍝"], ["pizza", "🍕"], ["chips", "🥔"],
+  ["koek", "🍪"], ["koekjes", "🍪"], ["chocolade", "🍫"], ["ijs", "🍦"]
+];
+
+function normalizeProductName(text) {
+  return String(text || "").toLowerCase().trim();
+}
+
+function getProductIcon(text) {
+  const value = normalizeProductName(text);
+  if (!value) return "";
+  const exact = productCatalog.find(([name]) => value === name);
+  if (exact) return exact[1];
+
+  // Match common compound names such as "volle melk" or "bruin brood".
+  const contains = productCatalog
+    .filter(([name]) => value.includes(name))
+    .sort((a, b) => b[0].length - a[0].length)[0];
+  return contains ? contains[1] : "";
+}
+
+function updateProductSuggestions() {
+  const input = document.getElementById("product");
+  const box = document.getElementById("productSuggestions");
+  if (!input || !box) return;
+
+  const query = normalizeProductName(input.value);
+  box.innerHTML = "";
+  if (!query) {
+    box.classList.remove("open");
+    return;
+  }
+
+  const matches = productCatalog
+    .filter(([name]) => name.startsWith(query))
+    .filter((entry, index, arr) => arr.findIndex(x => x[0] === entry[0]) === index)
+    .slice(0, 5);
+
+  if (!matches.length) {
+    box.classList.remove("open");
+    return;
+  }
+
+  matches.forEach(([name, icon]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "productSuggestion";
+    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${icon}</span>`;
+    button.addEventListener("click", () => {
+      input.value = name;
+      box.classList.remove("open");
+      input.focus();
+    });
+    box.appendChild(button);
+  });
+  box.classList.add("open");
+}
+
+function initProductSuggestions() {
+  const input = document.getElementById("product");
+  if (!input) return;
+  input.addEventListener("input", updateProductSuggestions);
+  input.addEventListener("focus", updateProductSuggestions);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const box = document.getElementById("productSuggestions");
+      if (box) box.classList.remove("open");
+    }
+  });
+  document.addEventListener("click", (e) => {
+    const wrap = document.querySelector(".input-row-wrap");
+    if (wrap && !wrap.contains(e.target)) {
+      const box = document.getElementById("productSuggestions");
+      if (box) box.classList.remove("open");
+    }
+  });
+}
+
 function showList(animationType = "") {
   const list = document.getElementById("list");
   if (!list) return;
@@ -1260,12 +1432,23 @@ function showList(animationType = "") {
     const productText = item.text;
     const check = item.completed ? "✅ " : "☐ ";
 
+    const productWrap = document.createElement("div");
+    productWrap.className = "itemProductContent";
+
     const productSpan = document.createElement("span");
     productSpan.textContent = check + productText;
     if (item.completed) {
       productSpan.style.textDecoration = "line-through";
     }
-    div.appendChild(productSpan);
+    productWrap.appendChild(productSpan);
+
+    const icon = document.createElement("span");
+    icon.className = "productIcon";
+    icon.textContent = getProductIcon(productText);
+    if (!icon.textContent) icon.style.visibility = "hidden";
+    productWrap.appendChild(icon);
+
+    div.appendChild(productWrap);
 
     // Only family members see who completed an item.
     if (item.completed && currentHouseholdId && item.completedBy) {
@@ -1490,6 +1673,7 @@ document.getElementById("list").addEventListener("click", function(e) {
     toggleItem(index);
   }
 });
+initProductSuggestions();
 applyTheme();
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
