@@ -823,73 +823,6 @@ body.dark-theme .themeOption i{color:#dce9df;}
   display:flex !important;
 }
 </style>
-
-<style id="visual-refinements-v17">
-/* 1. Search icon — soft, medium-sized outline */
-.searchBox > i.fa-magnifying-glass {
-  color: #8a908c !important;
-  font-size: 26px !important;
-  font-weight: 400 !important;
-  margin-right: 11px !important;
-}
-
-/* 2. Completed-by text — readable, regular weight, still secondary */
-.item.completed .completedMeta {
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  opacity: 0.94 !important;
-  color: rgba(255,255,255,.80) !important;
-}
-
-/* 3. Theme popup — calm text and a clearly visible OPEN sun */
-.themeOption {
-  font-size: 13.5px !important;
-  font-weight: 400 !important;
-}
-.themeOption + .themeOption {
-  border-top: 1px solid rgba(63,91,69,.055) !important;
-}
-.themeOption .fa-sun {
-  font-size: 0 !important;
-  width: 24px !important;
-  flex: 0 0 24px !important;
-  position: relative !important;
-}
-.themeOption .fa-sun::before {
-  content: "☼" !important;
-  font-family: Arial, sans-serif !important;
-  font-size: 25px !important;
-  font-weight: 400 !important;
-  color: #3F5B45 !important;
-}
-.themeOption .fa-moon {
-  width: 24px !important;
-  flex: 0 0 24px !important;
-  font-size: 21px !important;
-}
-
-/* 4. Search clear — small and quiet, hidden until there is text */
-.search-clear-btn {
-  display: none !important;
-  width: 26px !important;
-  min-width: 26px !important;
-  height: 26px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #8a908c !important;
-  font-size: 18px !important;
-  font-weight: 400 !important;
-  opacity: .68 !important;
-}
-.search-clear-btn.has-text {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-</style>
-
 </head>
 
 <body>
@@ -1039,7 +972,7 @@ body.dark-theme .themeOption i{color:#dce9df;}
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
-  <button type="button" class="search-clear-btn" onclick="clearSearch()">✕</button>
+  <button type="button" onclick="clearSearch()">✕</button>
 </div>
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
 
@@ -2240,29 +2173,6 @@ function toggleRegisterPassword(fieldId, button) {
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
-
-
-<script id="search-clear-visibility-v17">
-(function () {
-  function syncSearchClear() {
-    var input = document.getElementById("searchInput");
-    var button = document.querySelector(".search-clear-btn");
-    if (!input || !button) return;
-    button.classList.toggle("has-text", input.value.trim().length > 0);
-  }
-  function init() {
-    var input = document.getElementById("searchInput");
-    if (!input) return;
-    input.addEventListener("input", syncSearchClear);
-    syncSearchClear();
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
