@@ -1023,6 +1023,40 @@ body.dark-theme .themeOption i{color:#dce9df;}
   outline: none !important;
 }
 
+
+/* ===== Stap 4: moderne knoppen ===== */
+.add,
+.clear,
+.delete {
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.add:active,
+.clear:active,
+.delete:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 7px rgba(0,0,0,0.10);
+}
+
+@media (hover: hover) {
+  .add:hover,
+  .clear:hover,
+  .delete:hover {
+    filter: brightness(1.03);
+    box-shadow: 0 5px 14px rgba(0,0,0,0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add,
+  .clear,
+  .delete {
+    transition: none;
+  }
+}
+
 </style>
 </head>
 
