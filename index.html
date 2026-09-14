@@ -1530,6 +1530,41 @@ body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#d
   from { opacity:0; transform:translateY(18px) scale(.975); }
   to { opacity:1; transform:translateY(0) scale(1); }
 }
+
+/* Laatste gerichte verfijning: familie-menu smaller + dialogs duidelijk laten inschuiven. */
+.familyMenu {
+  width: 158px;
+  max-width: calc(100vw - 32px);
+  padding: 5px;
+}
+.familyMenuItem {
+  min-height: 38px;
+  padding: 6px 6px;
+  font-size: 13.5px;
+  gap: 8px;
+}
+.familyMenuPrimary > i:first-child {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+}
+.familyDialogOverlay {
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.familyDialogOverlay.familyDialogShown {
+  opacity: 1;
+}
+.familyDialog {
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  transition: opacity .24s cubic-bezier(.22,.8,.3,1), transform .28s cubic-bezier(.22,.8,.3,1);
+  animation: none !important;
+}
+.familyDialogOverlay.familyDialogShown .familyDialog {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 </style>
 </head>
 
@@ -2037,7 +2072,7 @@ const productCatalog = [
   ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
   ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
   ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
-  ["paprika", "🫑"], ["rode paprika", "🫑"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
+  ["paprika", "🫑"], ["rode paprika", "red-bell-pepper"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
   ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
   ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
   ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
@@ -2159,6 +2194,14 @@ function normalizeProductName(text) {
 }
 
 function productIconMarkup(icon) {
+  if (icon === "red-bell-pepper") {
+    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M31 14c-1.7-4.4 1.1-8.2 5.1-9.2 1.3-.3 2.6.7 2.4 2-.3 2.3-1.8 4.1-4 5.1l-.4 2.1z" fill="#4f6b42"/>
+      <path d="M27 15c-10.8-.8-19 6.8-19 17.8C8 46 17.7 56 31.8 56S56 46 56 32.8C56 21.4 47.1 14.2 37 15c-3.1.3-6.7.3-10 0Z" fill="#e94a3f"/>
+      <path d="M12 30c1.7-7.2 7.6-11.7 14.7-12.5" fill="none" stroke="#f46c5f" stroke-width="3" stroke-linecap="round"/>
+      <path d="M38 17c3.4 2.6 5.2 6.8 5.2 11.1" fill="none" stroke="#c93431" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+    </svg>`;
+  }
 
   if (icon === "curry-sauce") {
     return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
@@ -2812,6 +2855,7 @@ function familyDialogBase(icon, title, content, buttonsHtml) {
       ${buttonsHtml ? `<div class="familyDialogActions">${buttonsHtml}</div>` : ""}
     </div>`;
   document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add("familyDialogShown"));
   return overlay;
 }
 
