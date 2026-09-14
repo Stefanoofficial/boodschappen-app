@@ -1346,6 +1346,50 @@ body.dark-theme .settingsMenuBack { color:#dff1e2; border-bottom-color:rgba(255,
 body.dark-theme .settingsMenuHint { color:#aab4ad; }
 
 
+/* Opgeslagen lijsten en instellingen */
+.savedListsContainer {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  max-height:250px;
+  overflow:auto;
+  padding:2px 0;
+}
+.savedListRow {
+  width:100%;
+  min-height:40px;
+  box-sizing:border-box;
+  border:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.42);
+  color:#333;
+  padding:7px 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font:inherit;
+  font-size:13px;
+  text-align:left;
+  cursor:pointer;
+}
+.savedListRow i:first-child { color:#3F5B45; width:22px; text-align:center; }
+.savedListRow span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.savedListCount { color:#8b928d; font-size:10px; white-space:nowrap; }
+.savedListsEmpty { padding:10px 7px; color:#8b928d; font-size:11px; line-height:1.35; }
+.settingsMenuToggleRow { justify-content:space-between; }
+.settingsToggle {
+  width:34px; height:20px; border:0; border-radius:20px; background:#c8cec9; padding:2px;
+  display:flex; align-items:center; justify-content:flex-start; cursor:pointer;
+}
+.settingsToggle::after { content:""; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.18); transition:transform .2s ease; }
+.settingsToggle.on { background:#3F5B45; justify-content:flex-end; }
+.settingsToggle.on::after { transform:translateX(0); }
+body.dark-theme .savedListRow { background:rgba(255,255,255,.06); color:#f1f4f1; }
+body.dark-theme .savedListRow i:first-child { color:#dff1e2; }
+body.dark-theme .savedListCount { color:#aab4ad; }
+body.dark-theme .savedListsEmpty { color:#aab4ad; }
+body.dark-theme .settingsToggle { background:#59635c; }
+
 /* Moderne, compacte familie-popups */
 .familyDialogOverlay {
   position: fixed;
@@ -1508,8 +1552,8 @@ body.logged-in .app {
 
 /* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
 .familyMenu {
-  width: 158px;
-  max-width: calc(100vw - 32px);
+  width: 220px;
+  max-width: calc(100vw - 28px);
   padding: 5px;
   border-radius: 18px;
   opacity: 0;
@@ -1766,6 +1810,11 @@ body.logged-in .app {
       <span>Instellingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSavedListsSubmenu(event)">
+      <i class="fa-solid fa-folder-open"></i>
+      <span>Opgeslagen lijsten</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
   </div>
 
   <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
@@ -1808,15 +1857,31 @@ body.logged-in .app {
       <span>Instellingen</span>
     </button>
     <div class="familyMenuSubTitle">Instellingen</div>
-    <div class="familyMenuItem settingsMenuItem">
+    <button type="button" class="familyMenuItem settingsMenuItem" onclick="openProductSuggestionSettings()">
       <i class="fa-solid fa-wand-magic-sparkles"></i>
       <span>Productsuggesties</span>
-    </div>
-    <div class="familyMenuItem settingsMenuItem">
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem settingsMenuItem" onclick="openListOptionsSettings()">
       <i class="fa-solid fa-list-check"></i>
       <span>Lijstopties</span>
-    </div>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <div class="settingsMenuHint">Meer instellingen kunnen hier later worden toegevoegd.</div>
+  </div>
+
+  <div id="savedListsMenuSub" class="familyMenuPage savedListsMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeSavedListsSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Opgeslagen lijsten</span>
+    </button>
+    <div class="familyMenuSubTitle">Mijn lijsten</div>
+    <button type="button" class="familyMenuItem savedListSaveBtn" onclick="saveCurrentListAs()">
+      <i class="fa-solid fa-floppy-disk"></i>
+      <span>Lijst opslaan</span>
+    </button>
+    <div id="savedListsContainer" class="savedListsContainer"></div>
+    <div class="settingsMenuHint">Opgeslagen lijsten staan op dit apparaat. Je huidige boodschappenlijst blijft gewoon bestaan.</div>
   </div>
 </div>
   </div>
@@ -2008,6 +2073,7 @@ function openSettingsSubmenu(event) {
   const main = document.getElementById("familyMenuMain");
   const family = document.getElementById("familyMenuSub");
   const settings = document.getElementById("settingsMenuSub");
+  const savedLists = document.getElementById("savedListsMenuSub");
   if (!main || !settings) return;
 
   main.classList.remove("familyMenuMainEnter");
@@ -2015,6 +2081,7 @@ function openSettingsSubmenu(event) {
   setTimeout(() => {
     main.style.display = "none";
     if (family) { family.style.display = "none"; family.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    if (savedLists) { savedLists.style.display = "none"; savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
     main.classList.remove("familyMenuMainExit");
     settings.style.display = "block";
     settings.classList.remove("familyMenuSubExit");
@@ -2039,6 +2106,123 @@ function closeSettingsSubmenu(event) {
   }, 170);
 }
 
+function openSavedListsSubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const family = document.getElementById("familyMenuSub");
+  const settings = document.getElementById("settingsMenuSub");
+  const saved = document.getElementById("savedListsMenuSub");
+  if (!main || !saved) return;
+  main.classList.remove("familyMenuMainEnter");
+  main.classList.add("familyMenuMainExit");
+  setTimeout(() => {
+    main.style.display = "none";
+    if (family) { family.style.display = "none"; family.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    if (settings) { settings.style.display = "none"; settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    main.classList.remove("familyMenuMainExit");
+    saved.style.display = "block";
+    saved.classList.remove("familyMenuSubExit");
+    void saved.offsetWidth;
+    saved.classList.add("familyMenuSubEnter");
+    renderSavedLists();
+  }, 170);
+}
+function closeSavedListsSubmenu(event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const saved = document.getElementById("savedListsMenuSub");
+  if (!main || !saved) return;
+  saved.classList.remove("familyMenuSubEnter");
+  saved.classList.add("familyMenuSubExit");
+  setTimeout(() => {
+    saved.style.display = "none";
+    saved.classList.remove("familyMenuSubExit");
+    main.style.display = "block";
+    void main.offsetWidth;
+    main.classList.add("familyMenuMainEnter");
+  }, 170);
+}
+
+function getSavedListsKey() {
+  const user = auth && auth.currentUser;
+  return user ? "boodschappenSavedLists_" + user.uid : null;
+}
+function readSavedLists() {
+  const key = getSavedListsKey();
+  if (!key) return [];
+  try { return JSON.parse(localStorage.getItem(key) || "[]") || []; }
+  catch (_) { return []; }
+}
+function writeSavedLists(lists) {
+  const key = getSavedListsKey();
+  if (!key) return;
+  localStorage.setItem(key, JSON.stringify(lists));
+}
+function renderSavedLists() {
+  const box = document.getElementById("savedListsContainer");
+  if (!box) return;
+  const lists = readSavedLists();
+  box.innerHTML = "";
+  if (!lists.length) {
+    box.innerHTML = '<div class="savedListsEmpty">Je hebt nog geen opgeslagen lijsten.</div>';
+    return;
+  }
+  lists.forEach((saved, index) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "savedListRow";
+    row.innerHTML = '<i class="fa-solid fa-list"></i><span></span><small class="savedListCount"></small><i class="fa-solid fa-chevron-right"></i>';
+    row.querySelector("span").textContent = saved.name || "Naamloze lijst";
+    row.querySelector(".savedListCount").textContent = String((saved.items || []).length);
+    row.addEventListener("click", () => loadSavedList(index));
+    box.appendChild(row);
+  });
+}
+function saveCurrentListAs() {
+  if (!boodschappen.length) {
+    familyAlert("Lijst opslaan", "Je lijst is nog leeg. Voeg eerst één of meer producten toe.", "fa-floppy-disk");
+    return;
+  }
+  closeFamilyMenuForDialog();
+  const overlay = familyDialogBase(
+    "fa-floppy-disk", "Lijst opslaan",
+    '<div class="familyDialogText">Geef je lijst een herkenbare naam, bijvoorbeeld Weekboodschappen of BBQ.</div><input id="savedListNameInput" class="familyDialogInput" type="text" maxlength="40" placeholder="Naam van je lijst">',
+    '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>'
+  );
+  const input = overlay.querySelector("#savedListNameInput");
+  const finish = value => closeFamilyDialog(overlay, value);
+  overlay.querySelector(".familyDialogCancel").addEventListener("click", () => finish(false));
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => {
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    const lists = readSavedLists();
+    const existing = lists.findIndex(x => String(x.name || "").toLowerCase() === name.toLowerCase());
+    const record = { name, items: normalizeBoodschappen(boodschappen), savedAt: Date.now() };
+    if (existing >= 0) lists[existing] = record; else lists.unshift(record);
+    writeSavedLists(lists);
+    finish(true);
+    setTimeout(() => {
+      const menu = document.getElementById("familyMenu");
+      if (menu) { menu.style.display = "block"; menu.classList.add("menu-open"); }
+      const main = document.getElementById("familyMenuMain");
+      const saved = document.getElementById("savedListsMenuSub");
+      if (main && saved) { main.style.display="none"; saved.style.display="block"; renderSavedLists(); }
+    }, 300);
+  });
+  setTimeout(() => input && input.focus(), 30);
+}
+async function loadSavedList(index) {
+  const lists = readSavedLists();
+  const saved = lists[index];
+  if (!saved) return;
+  const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
+  if (!proceed) return;
+  boodschappen = normalizeBoodschappen(saved.items || []);
+  selectedIndex = -1;
+  showList();
+  await saveList();
+}
+
 function toggleFamilyMenu() {
   const themePicker = document.querySelector(".themePicker");
   if (themePicker) themePicker.classList.remove("open");
@@ -2059,6 +2243,11 @@ function toggleFamilyMenu() {
       settings.style.display = "none";
       settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
     }
+    const savedLists = document.getElementById("savedListsMenuSub");
+    if (savedLists) {
+      savedLists.style.display = "none";
+      savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+    }
     if (main) {
       main.style.display = "block";
       main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
@@ -2067,6 +2256,44 @@ function toggleFamilyMenu() {
     requestAnimationFrame(() => menu.classList.add("menu-open"));
   }
 }
+function openProductSuggestionSettings() {
+  closeFamilyMenuForDialog();
+  const enabled = localStorage.getItem("boodschappenSuggestionsEnabled") !== "false";
+  const overlay = familyDialogBase(
+    "fa-wand-magic-sparkles", "Productsuggesties",
+    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div>',
+    '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
+  );
+  const toggle = overlay.querySelector(".settingsToggle");
+  toggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !toggle.classList.contains("on");
+    toggle.classList.toggle("on", next);
+    localStorage.setItem("boodschappenSuggestionsEnabled", next ? "true" : "false");
+    const box = document.getElementById("productSuggestions");
+    if (!next && box) box.classList.remove("open");
+  });
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
+}
+function openListOptionsSettings() {
+  closeFamilyMenuForDialog();
+  const enabled = localStorage.getItem("boodschappenCompletedBottom") !== "false";
+  const overlay = familyDialogBase(
+    "fa-list-check", "Lijstopties",
+    '<div class="familyDialogText">Bepaal hoe je boodschappenlijst wordt weergegeven.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Voltooide producten onderaan</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Voltooide producten onderaan"></button></div>',
+    '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
+  );
+  const toggle = overlay.querySelector(".settingsToggle");
+  toggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !toggle.classList.contains("on");
+    toggle.classList.toggle("on", next);
+    localStorage.setItem("boodschappenCompletedBottom", next ? "true" : "false");
+    showList();
+  });
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
+}
+
   async function updateMemberCount() {
   const countEl = document.getElementById("memberCount");
   if (!countEl) return;
@@ -2484,6 +2711,10 @@ function updateProductSuggestions() {
 
   const query = normalizeProductName(input.value);
   box.innerHTML = "";
+  if (localStorage.getItem("boodschappenSuggestionsEnabled") === "false") {
+    box.classList.remove("open");
+    return;
+  }
   if (!query) {
     box.classList.remove("open");
     return;
@@ -2539,9 +2770,10 @@ function showList(animationType = "") {
   boodschappen = normalizeBoodschappen(boodschappen);
 
   // Active products first, completed products at the bottom.
+  const completedBottom = localStorage.getItem("boodschappenCompletedBottom") !== "false";
   const ordered = boodschappen
     .map((item, index) => ({ item, index }))
-    .sort((a, b) => Number(a.item.completed) - Number(b.item.completed));
+    .sort((a, b) => completedBottom ? Number(a.item.completed) - Number(b.item.completed) : 0);
 
   list.innerHTML = "";
 
@@ -2999,6 +3231,7 @@ function closeFamilyMenuForDialog() {
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
   const settings = document.getElementById("settingsMenuSub");
+  const savedLists = document.getElementById("savedListsMenuSub");
   if (main) {
     main.style.display = "block";
     main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
@@ -3010,6 +3243,10 @@ function closeFamilyMenuForDialog() {
   if (settings) {
     settings.style.display = "none";
     settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+  }
+  if (savedLists) {
+    savedLists.style.display = "none";
+    savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
   }
 }
 
