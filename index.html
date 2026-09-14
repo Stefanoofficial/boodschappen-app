@@ -245,7 +245,7 @@ overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
@@ -268,11 +268,15 @@ overflow-x: hidden;
 }
 
 .item {
-  padding: 14px 10px;
+  padding: 11px 12px;
+  margin: 5px 8px;
   font-size: 20px;
   font-weight: 500;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.055);
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .item:last-child {
@@ -1411,7 +1415,7 @@ const productCatalog = [
   ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
   ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
   ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
-  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"],
+  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"], ["coffee", "☕"],
   ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
 
   // Pasta, rijst, potten & koken
@@ -1491,6 +1495,7 @@ function getProductIcon(text) {
   if (value === "zwarte peper" || value === "witte peper" ||
       value.includes("zwarte peper") || value.includes("witte peper")) return "🫙";
   if (value === "peper" || value === "peperkorrels" || value === "gemalen peper") return "🌶️";
+  if (value === "koffie" || value === "coffee" || value.includes("koffie") || value.includes("coffee")) return "☕";
 
   const exact = productCatalog.find(([name]) => value === name);
   if (exact) return exact[1];
