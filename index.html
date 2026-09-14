@@ -213,7 +213,7 @@ overflow-x: hidden;
   font-size: 12px;
   line-height: 1.3;
   font-weight: 500;
-  opacity: .86;
+  opacity: .92;
   text-decoration: none;
 }
 
@@ -760,7 +760,7 @@ body.dark-theme #refresh { color: #f3f5f3; }
   align-items:center;
   gap:9px;
   font-family:inherit;
-  font-size:13.5px;
+  font-size:14px;
   text-align:left;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -812,6 +812,24 @@ body.dark-theme .themeOption i{color:#dce9df;}
     font-size:13.5px;
     padding:6px 10px;
   }
+}
+</style>
+<style>
+/* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
+.search-clear-btn{
+  display:none !important;
+}
+.search-clear-btn.has-text{
+  display:flex !important;
+}
+</style>
+<style>
+/* Subtieler vergrootglas */
+.search-container .fa-search,
+.search-container .fa-magnifying-glass,
+.search-container i[class*="search"] {
+  font-size: 24px;
+  color: #3f4a43;
 }
 </style>
 </head>
@@ -970,7 +988,7 @@ body.dark-theme .themeOption i{color:#dce9df;}
   <div class="list" id="list"></div>
 
   <div class="buttons">
-    <button class="clear" onclick="clearList()">Lijst wissen</button>
+    <button class="clear search-clear-btn" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
 
@@ -2145,5 +2163,30 @@ function toggleRegisterPassword(fieldId, button) {
 }
 
 </script>
+
+<script>
+(function setupSearchClearVisibility(){
+  function init(){
+    const searchInput = Array.from(document.querySelectorAll('input')).find(
+      el => (el.placeholder || '').trim() === 'Zoek in je lijst...'
+    );
+    const clearButton = document.querySelector('.search-clear-btn');
+    if (!searchInput || !clearButton) return;
+
+    function update(){
+      clearButton.classList.toggle('has-text', searchInput.value.trim().length > 0);
+    }
+    searchInput.addEventListener('input', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
 </body>
 </html>
