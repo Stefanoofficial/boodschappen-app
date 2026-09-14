@@ -1317,6 +1317,145 @@ body.dark-theme .familyMenuItem:hover { background:rgba(255,255,255,.07); }
 body.dark-theme .familyMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
 body.dark-theme .familyMenuSubTitle { color:#aab4ad; }
 body.dark-theme .familyMenuDanger { border-top-color:rgba(255,255,255,.12) !important; }
+
+/* Moderne, compacte familie-popups */
+.familyDialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(22,30,25,.28);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.familyDialog {
+  width: min(360px, calc(100vw - 36px));
+  max-height: min(78vh, 560px);
+  overflow: auto;
+  background: #f8f0e4;
+  color: #29322c;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 22px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.24);
+  padding: 18px;
+  animation: familyDialogIn .18s ease-out;
+}
+@keyframes familyDialogIn {
+  from { opacity:0; transform:translateY(8px) scale(.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+.familyDialogHeader {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+.familyDialogIcon {
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#dff5df;
+  color:#3F5B45;
+  font-size:18px;
+}
+.familyDialogTitle {
+  font-size:19px;
+  font-weight:750;
+  line-height:1.15;
+}
+.familyDialogText {
+  color:#59615b;
+  font-size:15px;
+  line-height:1.45;
+  white-space:pre-line;
+}
+.familyDialogList {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:8px;
+}
+.familyDialogMember {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:13px;
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(63,91,69,.08);
+  font-size:15px;
+}
+.familyDialogInput {
+  width:100%;
+  margin-top:12px;
+  padding:13px 14px;
+  border:1.5px solid rgba(63,91,69,.18);
+  border-radius:13px;
+  background:rgba(255,255,255,.72);
+  color:#29322c;
+  font:inherit;
+  font-size:17px;
+  letter-spacing:.08em;
+  outline:none;
+}
+.familyDialogInput:focus {
+  border-color:#7fa8e8;
+  box-shadow:0 0 0 3px rgba(127,168,232,.12);
+}
+.familyDialogActions {
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:17px;
+}
+.familyDialogBtn {
+  min-height:40px;
+  border:0;
+  border-radius:12px;
+  padding:9px 14px;
+  font:inherit;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .12s ease, opacity .12s ease;
+}
+.familyDialogBtn:active { transform:scale(.98); }
+.familyDialogCancel {
+  background:rgba(63,91,69,.08);
+  color:#3F5B45;
+}
+.familyDialogPrimary {
+  background:#3F5B45;
+  color:#fff;
+}
+.familyDialogDanger {
+  background:#e53935;
+  color:#fff;
+}
+.familyDialogCode {
+  text-align:center;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:.12em;
+  color:#3F5B45;
+  background:rgba(223,245,223,.62);
+  border-radius:15px;
+  padding:15px 10px;
+  margin-top:10px;
+}
+body.dark-theme .familyDialogOverlay { background:rgba(0,0,0,.48); }
+body.dark-theme .familyDialog { background:#252b26; color:#f1f4f1; }
+body.dark-theme .familyDialogText { color:#b9c1bb; }
+body.dark-theme .familyDialogMember { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.08); }
+body.dark-theme .familyDialogInput { background:rgba(255,255,255,.07); color:#f1f4f1; border-color:rgba(255,255,255,.14); }
+body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#dff1e2; }
 </style>
 </head>
 
@@ -2418,17 +2557,31 @@ async function getOrCreateHousehold() {
 }
 
 async function showFamilyCode() {
+
   if (!currentHouseholdId) {
-    alert("Nog geen familiecode beschikbaar.");
+    await familyAlert("Familiecode", "Nog geen familiecode beschikbaar.", "fa-key");
     return;
   }
 
-  alert("Jouw familiecode is:\n\n" + currentHouseholdId);
+  closeFamilyMenuForDialog();
+  await new Promise(resolve => {
+    const overlay=familyDialogBase(
+      "fa-key", "Familiecode",
+      `<div class="familyDialogText">Deel deze code met iemand die je aan je familie wilt toevoegen.</div>
+       <div class="familyDialogCode">${currentHouseholdId}</div>`,
+      `<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>`
+    );
+    const finish=()=>{overlay.remove();resolve();};
+    overlay.querySelector("button").addEventListener("click",finish);
+    overlay.addEventListener("click",e=>{if(e.target===overlay)finish();});
+  });
+
 }
  async function createNewFamily() {
+
   const user = auth.currentUser;
   if (!user) {
-    alert("Je bent niet ingelogd.");
+    await familyAlert("Inloggen vereist", "Je bent niet ingelogd.", "fa-user");
     return;
   }
 
@@ -2439,7 +2592,7 @@ async function showFamilyCode() {
     const existingHouseholdId = userSnapshot.val();
 
     if (existingHouseholdId) {
-      const leaveFamily = confirm(
+      const leaveFamily = await familyConfirm(
         "Je hebt al een familie.\n\n" +
         "Je moet je huidige familie eerst verlaten voordat je een nieuwe familie kunt beginnen.\n\n" +
         "Wil je je huidige familie verlaten?"
@@ -2454,7 +2607,7 @@ async function showFamilyCode() {
       if (household) {
         const isOwner = household.owner === user.uid;
         if (isOwner) {
-          const confirmOwner = confirm(
+          const confirmOwner = await familyConfirm(
             "Weet je het zeker?\n\n" +
             "Je bent de eigenaar van deze familie. Als je een nieuwe familie begint, " +
             "wordt je huidige familie beëindigd en worden alle andere leden uit deze familie gehaald."
@@ -2467,7 +2620,7 @@ async function showFamilyCode() {
           }
           await database.ref("households/" + existingHouseholdId).remove();
         } else {
-          const confirmLeave = confirm(
+          const confirmLeave = await familyConfirm(
             "Weet je het zeker?\n\n" +
             "Je verlaat je huidige familie. Daarna kun je je eigen nieuwe familie beginnen."
           );
@@ -2518,23 +2671,100 @@ async function showFamilyCode() {
     const menu = document.getElementById("familyMenu");
     if (menu) menu.style.display = "none";
 
-    alert("Nieuwe familie aangemaakt!\n\nJouw familiecode is: " + code);
+    await familyAlert("Nieuwe familie aangemaakt", "Jouw familiecode is:\n\n" + code, "fa-house");
   } catch (error) {
     console.error("Nieuwe familie aanmaken mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    alert("De nieuwe familie kon niet worden aangemaakt." + detail);
+    await familyAlert("Nieuwe familie", "De nieuwe familie kon niet worden aangemaakt." + detail, "fa-triangle-exclamation");
   }
+
+}
+
+function closeFamilyMenuForDialog() {
+  const menu = document.getElementById("familyMenu");
+  if (menu) menu.style.display = "none";
+  const main = document.getElementById("familyMenuMain");
+  const sub = document.getElementById("familyMenuSub");
+  if (main) main.style.display = "block";
+  if (sub) sub.style.display = "none";
+}
+
+function familyDialogBase(icon, title, content, buttonsHtml) {
+  const overlay = document.createElement("div");
+  overlay.className = "familyDialogOverlay";
+  overlay.innerHTML = `
+    <div class="familyDialog" role="dialog" aria-modal="true">
+      <div class="familyDialogHeader">
+        <div class="familyDialogIcon"><i class="fa-solid ${icon}"></i></div>
+        <div class="familyDialogTitle">${title}</div>
+      </div>
+      <div class="familyDialogBody">${content}</div>
+      ${buttonsHtml ? `<div class="familyDialogActions">${buttonsHtml}</div>` : ""}
+    </div>`;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function familyAlert(title, message, icon="fa-circle-info") {
+  return new Promise(resolve => {
+    closeFamilyMenuForDialog();
+    const overlay = familyDialogBase(
+      icon, title,
+      `<div class="familyDialogText">${message}</div>`,
+      `<button type="button" class="familyDialogBtn familyDialogPrimary">OK</button>`
+    );
+    const finish=()=>{ overlay.remove(); resolve(); };
+    overlay.querySelector(".familyDialogPrimary").addEventListener("click",finish);
+    overlay.addEventListener("click",e=>{ if(e.target===overlay) finish(); });
+  });
+}
+
+function familyConfirm(title, message, danger=false) {
+  return new Promise(resolve => {
+    closeFamilyMenuForDialog();
+    const overlay = familyDialogBase(
+      danger ? "fa-right-from-bracket" : "fa-circle-question",
+      title,
+      `<div class="familyDialogText">${message}</div>`,
+      `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
+       <button type="button" class="familyDialogBtn ${danger ? "familyDialogDanger" : "familyDialogPrimary"}">Doorgaan</button>`
+    );
+    const finish=value=>{ overlay.remove(); resolve(value); };
+    overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(false));
+    overlay.querySelector(".familyDialogActions button:last-child").addEventListener("click",()=>finish(true));
+    overlay.addEventListener("click",e=>{ if(e.target===overlay) finish(false); });
+  });
+}
+
+function familyPrompt(title, message, icon="fa-keyboard", initial="") {
+  return new Promise(resolve => {
+    closeFamilyMenuForDialog();
+    const overlay = familyDialogBase(
+      icon, title,
+      `<div class="familyDialogText">${message}</div>
+       <input class="familyDialogInput" inputmode="numeric" maxlength="6" autocomplete="off" value="${initial}" aria-label="${title}">`,
+      `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
+       <button type="button" class="familyDialogBtn familyDialogPrimary">Doorgaan</button>`
+    );
+    const input=overlay.querySelector(".familyDialogInput");
+    const finish=value=>{ overlay.remove(); resolve(value); };
+    overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(null));
+    overlay.querySelector(".familyDialogPrimary").addEventListener("click",()=>finish(input.value.trim()));
+    overlay.addEventListener("click",e=>{ if(e.target===overlay) finish(null); });
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") finish(input.value.trim()); });
+    setTimeout(()=>input.focus(),30);
+  });
 }
 async function showFamilyMembers() {
+
   const user = auth.currentUser;
   if (!user) return;
 
   try {
-    // Privé/Alleen gebruiken: toon altijd de eigen naam met kroon.
     if (!currentHouseholdId) {
       const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
       const name = nameSnapshot.val() || user.email || "Gebruiker";
-      alert("Account:\n\n👑 " + name);
+      await familyAlert("Mijn account", "👑 " + name, "fa-user");
       return;
     }
 
@@ -2547,23 +2777,18 @@ async function showFamilyMembers() {
     const members = membersSnapshot.val() || {};
     const ownerUid = ownerSnapshot.val();
 
-    // Eigenaar altijd als eerste tonen; daarna de overige familieleden.
     const memberIds = Object.keys(members).sort((a, b) => {
       if (a === ownerUid) return -1;
       if (b === ownerUid) return 1;
       return 0;
     });
 
-    // Haal de namen afzonderlijk op. Dit past bij de huidige Firebase-structuur
-    // waarin members nog als UID: true worden opgeslagen.
     const names = await Promise.all(memberIds.map(async (uid) => {
       try {
         const nameSnapshot = await database.ref("users/" + uid + "/name").once("value");
         const name = nameSnapshot.val() || "Onbekend";
         return uid === ownerUid ? "👑 " + name : "👤 " + name;
       } catch (nameError) {
-        // Als een naam niet leesbaar is, laat de lijst niet volledig crashen.
-        // De eigen naam is altijd beschikbaar voor de ingelogde gebruiker.
         if (uid === user.uid) {
           try {
             const ownNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
@@ -2576,24 +2801,29 @@ async function showFamilyMembers() {
       }
     }));
 
-    alert("Familieleden:\n\n" + (names.length ? names.join("\n") : "Nog geen familieleden."));
+    const list = names.length
+      ? `<div class="familyDialogList">${names.map(n => `<div class="familyDialogMember">${n}</div>`).join("")}</div>`
+      : `<div class="familyDialogText">Nog geen familieleden.</div>`;
+    await familyAlert("Familieleden", list, "fa-user-group");
   } catch (error) {
     console.error("Familieleden konden niet worden geladen:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    alert("De familieleden konden niet worden geladen." + detail);
+    await familyAlert("Familieleden", "De familieleden konden niet worden geladen." + detail, "fa-triangle-exclamation");
   }
+
 }
  async function enterFamilyCode() {
-  const code = prompt("Voer de 6-cijferige familiecode in:");
+
+  const code = await familyPrompt("Familiecode invoeren", "Voer de 6-cijferige familiecode in.", "fa-keyboard");
   if (!code) return;
   if (!/^\d{6}$/.test(code)) {
-    alert("Voer een geldige 6-cijferige familiecode in.");
+    await familyAlert("Ongeldige code", "Voer een geldige 6-cijferige familiecode in.", "fa-triangle-exclamation");
     return;
   }
 
   const user = auth.currentUser;
   if (!user) {
-    alert("Je bent niet ingelogd.");
+    await familyAlert("Inloggen vereist", "Je bent niet ingelogd.", "fa-user");
     return;
   }
 
@@ -2602,7 +2832,7 @@ async function showFamilyMembers() {
       .ref("users/" + user.uid + "/householdId")
       .once("value");
     if (userSnapshot.exists() && userSnapshot.val()) {
-      alert("Je bent al aangesloten bij een familie.\n\nVerlaat eerst je huidige familie voordat je een andere familiecode invoert.");
+      await familyAlert("Al aangesloten", "Je bent al aangesloten bij een familie.\n\nVerlaat eerst je huidige familie voordat je een andere familiecode invoert.", "fa-users");
       return;
     }
 
@@ -2624,18 +2854,20 @@ async function showFamilyMembers() {
 
     const menu = document.getElementById("familyMenu");
     if (menu) menu.style.display = "none";
-    alert("Je bent toegevoegd aan de familie!");
+    await familyAlert("Welkom bij de familie", "Je bent toegevoegd aan de familie!", "fa-user-plus");
   } catch (error) {
     console.error("Fout bij toetreden tot familie:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    alert("Je kon niet aan deze familie worden toegevoegd." + detail);
+    await familyAlert("Familiecode", "Je kon niet aan deze familie worden toegevoegd." + detail, "fa-triangle-exclamation");
   }
+
 }
   async function leaveFamily() {
+
   const user = auth.currentUser;
 
   if (!user || !currentHouseholdId) {
-    alert("Je bent niet aangesloten bij een familie.");
+    await familyAlert("Mijn familie", "Je bent niet aangesloten bij een familie.", "fa-users");
     return;
   }
 
@@ -2650,14 +2882,14 @@ async function showFamilyMembers() {
     if (!household) {
       await database.ref("users/" + user.uid + "/householdId").remove();
       currentHouseholdId = null;
-      alert("Je familie bestaat niet meer. Je bent losgekoppeld.");
+      await familyAlert("Familie", "Je familie bestaat niet meer. Je bent losgekoppeld.", "fa-circle-info");
       return;
     }
 
     const isOwner = household.owner === user.uid;
 
     if (isOwner) {
-      const confirmOwner = confirm(
+      const confirmOwner = await familyConfirm(
         "Weet je zeker dat je de familie wilt verlaten?\n\n" +
         "Je bent de hoofdeigenaar. Als je vertrekt, wordt de familie beëindigd en worden alle andere leden losgekoppeld. Zij kunnen daarna zelf een nieuwe familie maken of een andere familiecode gebruiken."
       );
@@ -2675,9 +2907,9 @@ async function showFamilyMembers() {
       await database.ref("households/" + householdId).remove();
       currentHouseholdId = null;
 
-      alert("De familie is beëindigd. Alle familieleden zijn losgekoppeld.");
+      await familyAlert("Familie beëindigd", "De familie is beëindigd. Alle familieleden zijn losgekoppeld.", "fa-right-from-bracket");
     } else {
-      const confirmMember = confirm(
+      const confirmMember = await familyConfirm(
         "Weet je zeker dat je de familie wilt verlaten?\n\n" +
         "Je wordt losgekoppeld en kunt daarna zelf een nieuwe familie maken of een andere familiecode invoeren."
       );
@@ -2690,7 +2922,7 @@ async function showFamilyMembers() {
 
       currentHouseholdId = null;
 
-      alert("Je hebt de familie verlaten.");
+      await familyAlert("Familie verlaten", "Je hebt de familie verlaten.", "fa-right-from-bracket");
     }
 
     boodschappen = [];
@@ -2702,8 +2934,9 @@ async function showFamilyMembers() {
   } catch (error) {
     console.error("Familie verlaten mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    alert("De familie kon niet worden verlaten." + detail);
+    await familyAlert("Familie verlaten", "De familie kon niet worden verlaten." + detail, "fa-triangle-exclamation");
   }
+
 }
 function togglePassword() {
   const password = document.getElementById("loginPassword");
