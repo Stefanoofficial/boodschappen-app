@@ -1986,7 +1986,13 @@ async function showFamilyMembers() {
 
     const members = membersSnapshot.val() || {};
     const ownerUid = ownerSnapshot.val();
-    const memberIds = Object.keys(members);
+
+    // Zet de eigenaar altijd bovenaan; overige familieleden volgen daarna.
+    const memberIds = Object.keys(members).sort((a, b) => {
+      if (a === ownerUid) return -1;
+      if (b === ownerUid) return 1;
+      return 0;
+    });
 
     // Haal de namen afzonderlijk op. Dit past bij de huidige Firebase-structuur
     // waarin members nog als UID: true worden opgeslagen.
