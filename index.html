@@ -1275,12 +1275,12 @@ body.dark-theme .familyMenu {
   width:26px;
   height:26px;
   flex:0 0 26px;
-  border-radius:50%;
+  border-radius:0;
   display:flex !important;
   align-items:center;
   justify-content:center;
   color:#69736c !important;
-  background:rgba(63,91,69,.07);
+  background:transparent;
   font-size:13px !important;
   line-height:1;
 }
@@ -1294,7 +1294,7 @@ body.dark-theme .familyMenu {
   align-items:center;
   gap:8px;
   font-family:inherit;
-  font-size:14px;
+  font-size:13.5px;
   font-weight:700;
   cursor:pointer;
   border-bottom:1px solid rgba(63,91,69,.12);
@@ -1350,8 +1350,8 @@ body.dark-theme .settingsMenuHint { color:#aab4ad; }
 /* Direct opslaan-knop: altijd zichtbaar bij de boodschappenlijst. */
 .saveListMainBtn {
   width:100%;
-  min-height:44px;
-  margin:10px 0 8px;
+  min-height:38px;
+  margin:8px 0 7px;
   border:1px solid rgba(63,91,69,.18);
   border-radius:14px;
   background:#f7efe3;
@@ -1417,6 +1417,20 @@ body.dark-theme .savedListRow i:first-child { color:#dff1e2; }
 body.dark-theme .savedListCount { color:#aab4ad; }
 body.dark-theme .savedListsEmpty { color:#aab4ad; }
 body.dark-theme .settingsToggle { background:#59635c; }
+
+/* Account en Over de app: compacte submenu's in dezelfde stijl. */
+.accountMenuPage, .aboutMenuPage { width:100%; }
+.accountMenuPage .familyMenuItem, .aboutMenuPage .familyMenuItem {
+  min-height:38px;
+}
+.accountMenuHint, .aboutMenuHint {
+  padding:8px 7px 5px; color:#8b928d; font-size:11px; line-height:1.35;
+}
+.accountMenuEmail {
+  padding:2px 8px 7px; color:#8b928d; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+body.dark-theme .accountMenuHint, body.dark-theme .aboutMenuHint, body.dark-theme .accountMenuEmail { color:#aab4ad; }
+body.dark-theme .familyDialogDanger { background:#b92e2e; }
 
 /* Moderne, compacte familie-popups */
 .familyDialogOverlay {
@@ -1536,7 +1550,7 @@ body.dark-theme .settingsToggle { background:#59635c; }
   color:#fff;
 }
 .familyDialogDanger {
-  background:#e53935;
+  background:#c93434;
   color:#fff;
 }
 .familyDialogCode {
@@ -1599,7 +1613,7 @@ body.logged-in .app {
 
 /* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
 .familyMenu {
-  width: 190px;
+  width: 176px;
   max-width: calc(100vw - 28px);
   padding: 5px;
   border-radius: 18px;
@@ -1862,6 +1876,16 @@ body.logged-in .app {
       <span>Opgeslagen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAccountSubmenu(event)">
+      <i class="fa-solid fa-user"></i>
+      <span>Mijn account</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAboutSubmenu(event)">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Over de app</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
   </div>
 
   <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
@@ -1929,6 +1953,45 @@ body.logged-in .app {
     </button>
     <div id="savedListsContainer" class="savedListsContainer"></div>
     <div class="settingsMenuHint">Opgeslagen lijsten staan op dit apparaat. Je huidige boodschappenlijst blijft gewoon bestaan.</div>
+  </div>
+
+  <div id="accountMenuSub" class="familyMenuPage accountMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeAccountSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Mijn account</span>
+    </button>
+    <div class="familyMenuSubTitle">Account</div>
+    <div id="accountMenuEmail" class="accountMenuEmail"></div>
+    <button type="button" class="familyMenuItem" onclick="showAccountName()">
+      <i class="fa-solid fa-user"></i>
+      <span>Mijn naam</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="changeAccountPassword()">
+      <i class="fa-solid fa-key"></i>
+      <span>Wachtwoord</span>
+    </button>
+    <button type="button" class="familyMenuItem familyMenuDanger" onclick="logoutFromMenu()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Uitloggen</span>
+    </button>
+  </div>
+
+  <div id="aboutMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeAboutSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Over de app</span>
+    </button>
+    <div class="familyMenuSubTitle">Over de app</div>
+    <button type="button" class="familyMenuItem" onclick="showAboutApp()">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>App-informatie</span>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="showAboutHelp()">
+      <i class="fa-solid fa-circle-question"></i>
+      <span>Help &amp; uitleg</span>
+    </button>
+    <div class="aboutMenuHint">Boodschappenlijst · versie 1.0</div>
   </div>
 </div>
   </div>
@@ -2131,6 +2194,10 @@ function openSettingsSubmenu(event) {
     main.style.display = "none";
     if (family) { family.style.display = "none"; family.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
     if (savedLists) { savedLists.style.display = "none"; savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    const account = document.getElementById("accountMenuSub");
+    const about = document.getElementById("aboutMenuSub");
+    if (account) { account.style.display = "none"; account.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    if (about) { about.style.display = "none"; about.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
     main.classList.remove("familyMenuMainExit");
     settings.style.display = "block";
     settings.classList.remove("familyMenuSubExit");
@@ -2190,6 +2257,97 @@ function closeSavedListsSubmenu(event) {
     void main.offsetWidth;
     main.classList.add("familyMenuMainEnter");
   }, 170);
+}
+
+function switchMenuPage(pageId, event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const page = document.getElementById(pageId);
+  if (!main || !page) return;
+  main.classList.remove("familyMenuMainEnter");
+  main.classList.add("familyMenuMainExit");
+  setTimeout(() => {
+    main.style.display = "none";
+    ["familyMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el !== page) { el.style.display="none"; el.classList.remove("familyMenuSubEnter","familyMenuSubExit"); }
+    });
+    main.classList.remove("familyMenuMainExit");
+    page.style.display = "block";
+    page.classList.remove("familyMenuSubExit");
+    void page.offsetWidth;
+    page.classList.add("familyMenuSubEnter");
+  }, 170);
+}
+function returnMenuToMain(pageId, event) {
+  if (event) event.stopPropagation();
+  const main = document.getElementById("familyMenuMain");
+  const page = document.getElementById(pageId);
+  if (!main || !page) return;
+  page.classList.remove("familyMenuSubEnter");
+  page.classList.add("familyMenuSubExit");
+  setTimeout(() => {
+    page.style.display = "none";
+    page.classList.remove("familyMenuSubExit");
+    main.style.display = "block";
+    void main.offsetWidth;
+    main.classList.add("familyMenuMainEnter");
+  }, 170);
+}
+function openAccountSubmenu(event) {
+  switchMenuPage("accountMenuSub", event);
+  const user = auth && auth.currentUser;
+  const email = document.getElementById("accountMenuEmail");
+  if (email) email.textContent = user ? (user.email || "") : "";
+}
+function closeAccountSubmenu(event) { returnMenuToMain("accountMenuSub", event); }
+function openAboutSubmenu(event) { switchMenuPage("aboutMenuSub", event); }
+function closeAboutSubmenu(event) { returnMenuToMain("aboutMenuSub", event); }
+async function showAccountName() {
+  const user = auth && auth.currentUser;
+  if (!user) return;
+  const snap = await database.ref("users/" + user.uid + "/name").once("value");
+  const name = snap.val() || user.email || "Gebruiker";
+  const overlay = familyDialogBase("fa-user", "Mijn naam", `<div class="familyDialogText">Je naam wordt in je familie gebruikt.</div><input id="accountNameInput" class="familyDialogInput" type="text" maxlength="40" value="${String(name).replace(/"/g,'&quot;')}">`, `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>`);
+  const input=overlay.querySelector("#accountNameInput");
+  overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>closeFamilyDialog(overlay));
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click",async()=>{
+    const next=(input.value||"").trim();
+    if(!next){ input.focus(); return; }
+    try {
+      await database.ref("users/" + user.uid + "/name").set(next);
+      closeFamilyDialog(overlay);
+      await updateMemberCount();
+      await familyAlert("Mijn account", "Je naam is opgeslagen.", "fa-user");
+    } catch(error) {
+      await familyAlert("Mijn account", "Je naam kon niet worden opgeslagen.", "fa-triangle-exclamation");
+    }
+  });
+  setTimeout(()=>input.focus(),30);
+}
+async function changeAccountPassword() {
+  const user = auth && auth.currentUser;
+  if (!user || !user.email) return;
+  closeFamilyMenuForDialog();
+  try {
+    await auth.sendPasswordResetEmail(user.email);
+    await familyAlert("Wachtwoord wijzigen", "We hebben een e-mail gestuurd naar " + user.email + " waarmee je een nieuw wachtwoord kunt instellen.", "fa-key");
+  } catch(error) {
+    await familyAlert("Wachtwoord wijzigen", "De e-mail kon niet worden verstuurd. Probeer het later opnieuw.", "fa-triangle-exclamation");
+  }
+}
+async function logoutFromMenu() {
+  const ok = await familyConfirm("Uitloggen", "Wil je uitloggen?", true);
+  if (!ok) return;
+  try { await auth.signOut(); } catch(error) { await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation"); }
+}
+function showAboutApp() {
+  closeFamilyMenuForDialog();
+  familyAlert("Over de app", "Boodschappenlijst helpt je eenvoudig boodschappen bijhouden en delen met je familie.\n\nVersie 1.0", "fa-circle-info");
+}
+function showAboutHelp() {
+  closeFamilyMenuForDialog();
+  familyAlert("Help & uitleg", "Typ een product en voeg het toe. Tik op een product om het af te vinken. Via Menu vind je je familie, instellingen en opgeslagen lijsten.\n\nJe kunt een lijst opslaan en later opnieuw laden.", "fa-circle-question");
 }
 
 function getSavedListsKey() {
@@ -2297,6 +2455,10 @@ function toggleFamilyMenu() {
       savedLists.style.display = "none";
       savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
     }
+    const account = document.getElementById("accountMenuSub");
+    if (account) { account.style.display = "none"; account.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+    const about = document.getElementById("aboutMenuSub");
+    if (about) { about.style.display = "none"; about.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
     if (main) {
       main.style.display = "block";
       main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
@@ -2309,7 +2471,7 @@ function openProductSuggestionSettings() {
   closeFamilyMenuForDialog();
   const enabled = localStorage.getItem("boodschappenSuggestionsEnabled") !== "false";
   const overlay = familyDialogBase(
-    "fa-wand-magic-sparkles", "Productsuggesties",
+    "fa-wand-magic-sparkles", "Suggesties",
     '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div>',
     '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
   );
@@ -3297,6 +3459,10 @@ function closeFamilyMenuForDialog() {
     savedLists.style.display = "none";
     savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
   }
+  const account = document.getElementById("accountMenuSub");
+  if (account) { account.style.display = "none"; account.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
+  const about = document.getElementById("aboutMenuSub");
+  if (about) { about.style.display = "none"; about.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
 }
 
 function familyDialogBase(icon, title, content, buttonsHtml) {
