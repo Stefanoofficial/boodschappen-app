@@ -1381,7 +1381,7 @@ function updateProductSuggestions() {
     button.className = "productSuggestion";
     button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${icon}</span>`;
     button.addEventListener("click", () => {
-      input.value = name;
+      input.value = name.charAt(0).toUpperCase() + name.slice(1);
       box.classList.remove("open");
       input.focus();
     });
