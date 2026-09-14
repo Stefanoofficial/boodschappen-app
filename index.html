@@ -1751,6 +1751,11 @@ body.logged-in .app {
     animation: none !important;
   }
 }
+
+.sharedListInviteBox{margin:8px 0;padding:10px 11px;border-radius:13px;background:rgba(255,255,255,.5);border:1px solid rgba(63,91,69,.10)}
+.sharedListInviteCode{font-size:21px;font-weight:800;letter-spacing:.14em;color:#3F5B45;margin:4px 0 8px}
+.sharedListActionRow{display:flex;gap:6px;flex-wrap:wrap}.sharedListAction{border:0;border-radius:10px;padding:8px 10px;background:#e5f1e5;color:#3F5B45;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}body.dark-theme .sharedListInviteCode{color:#dff1e2}.sharedListEmpty{padding:10px 7px;color:#8b928d;font-size:11px;line-height:1.35}
 </style>
 </head>
 
@@ -1869,6 +1874,11 @@ body.logged-in .app {
       <span>Mijn familie</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSharedListsSubmenu(event)">
+      <i class="fa-solid fa-people-group"></i>
+      <span>Deellijst</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSavedListsSubmenu(event)">
       <i class="fa-solid fa-folder-open"></i>
       <span>Opgeslagen</span>
@@ -1923,6 +1933,25 @@ body.logged-in .app {
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Familie verlaten</span>
     </div>
+  </div>
+
+  <div id="sharedListsMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeSharedListsSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Deellijst</span>
+    </button>
+    <div class="familyMenuSubTitle">Deellijst</div>
+    <button type="button" class="familyMenuItem savedListSaveBtn" onclick="createSharedList()">
+      <i class="fa-solid fa-plus"></i>
+      <span>Nieuwe deellijst</span>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="joinSharedListByCode()">
+      <i class="fa-solid fa-key"></i>
+      <span>Code invoeren</span>
+    </button>
+    <div class="familyMenuSubTitle">Mijn deellijsten</div>
+    <div id="sharedListsContainer" class="savedListsContainer"></div>
+    <div class="settingsMenuHint">Maak een lijst voor vrienden, familie of een feestje. Iedereen met toegang kan samen producten toevoegen en afvinken.</div>
   </div>
 
   <div id="settingsMenuSub" class="familyMenuPage settingsMenuPage" style="display:none;">
@@ -2189,6 +2218,7 @@ function openSettingsSubmenu(event) {
   const family = document.getElementById("familyMenuSub");
   const settings = document.getElementById("settingsMenuSub");
   const savedLists = document.getElementById("savedListsMenuSub");
+  const sharedLists = document.getElementById("sharedListsMenuSub");
   if (!main || !settings) return;
 
   main.classList.remove("familyMenuMainEnter");
@@ -2271,7 +2301,7 @@ function switchMenuPage(pageId, event) {
   main.classList.add("familyMenuMainExit");
   setTimeout(() => {
     main.style.display = "none";
-    ["familyMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
+    ["familyMenuSub","sharedListsMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
       const el = document.getElementById(id);
       if (el && el !== page) { el.style.display="none"; el.classList.remove("familyMenuSubEnter","familyMenuSubExit"); }
     });
@@ -2454,6 +2484,7 @@ function toggleFamilyMenu() {
       settings.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
     }
     const savedLists = document.getElementById("savedListsMenuSub");
+  const sharedLists = document.getElementById("sharedListsMenuSub");
     if (savedLists) {
       savedLists.style.display = "none";
       savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
@@ -3043,6 +3074,20 @@ function showList(animationType = "") {
 }
 
 async function saveList() {
+  if (currentSharedListId) {
+    const user = auth.currentUser;
+    if (!user) return false;
+    try {
+      await database.ref("sharedLists/" + currentSharedListId + "/boodschappen").set(boodschappen);
+      updateStatus();
+      return true;
+    } catch (error) {
+      console.error("Gedeelde lijst opslaan mislukt:", error);
+      const status = document.getElementById("status");
+      if (status) status.innerText = "⚠️ Gedeelde lijst kon niet worden opgeslagen.";
+      return false;
+    }
+  }
   if (isPrivateMode()) {
     await savePrivateList();
     return true;
@@ -3241,8 +3286,7 @@ document.getElementById("list").addEventListener("click", function(e) {
     toggleItem(index);
   }
 });
-initProductSuggestions();
-applyTheme();
+
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
@@ -3268,52 +3312,9 @@ applyTheme();
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
-
-  // Keep Firebase authentication persistent on this device/browser.
-  // Closing or swiping away the webapp will not log the user out.
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error) {
-    console.warn("Lokale login-opslag kon niet worden ingesteld:", error);
-  });
-
-  // Restore an existing Firebase session when the webapp is opened again.
-  auth.onAuthStateChanged(async function(user) {
-    if (!user || document.body.classList.contains("logged-in")) return;
-
-    const loginScreen = document.getElementById("loginScreen");
-    if (!loginScreen) return;
-
-    try {
-      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      document.body.classList.add("logged-in");
-      loginScreen.classList.add("loginScreenLeaving");
-      setTimeout(function() {
-        if (loginScreen.classList.contains("loginScreenLeaving")) {
-          loginScreen.style.display = "none";
-        }
-      }, 400);
-
-      const householdId = await getOrCreateHousehold();
-      if (householdId) {
-        await loadList();
-        return;
-      }
-
-      const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
-      if (savedMode === "private") {
-        await loadPrivateList();
-      } else if (savedMode === "skip") {
-        openAppWithoutList();
-      } else {
-        openUseModeModal();
-      }
-    } catch (error) {
-      console.error("Herstellen van ingelogde sessie mislukt:", error);
-      document.body.classList.remove("logged-in");
-      loginScreen.classList.remove("loginScreenLeaving");
-      loginScreen.style.display = "flex";
-    }
-  });
   let currentHouseholdId = null;
+let currentSharedListId = null;
+let currentSharedListUnsubscribe = null;
 
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
@@ -3361,6 +3362,97 @@ async function getOrCreateHousehold() {
   }
 }
 
+async function openSharedListsSubmenu(event) {
+  if (event) event.stopPropagation();
+  switchMenuPage("sharedListsMenuSub", event);
+  await renderSharedLists();
+}
+function closeSharedListsSubmenu(event) { returnMenuToMain("sharedListsMenuSub", event); }
+
+function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
+function makeSharedListLink(code){
+  const base = window.location.href.split("#")[0].split("?")[0];
+  return base + "?deellijst=" + encodeURIComponent(code);
+}
+
+async function createSharedList(){
+  const user=auth.currentUser;
+  if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
+  const name=await familyTextPrompt("Nieuwe deellijst","Geef je deellijst een naam, bijvoorbeeld Feestelijk of BBQ met vrienden.","fa-list");
+  if(!name) return;
+  let code=null, id=null;
+  for(let i=0;i<8;i++){
+    const candidate=makeSharedCode();
+    const ref=database.ref("sharedLists").push();
+    try{
+      await ref.set({name:name, owner:user.uid, inviteCode:candidate, members:{[user.uid]:true}, createdAt:Date.now(), boodschappen:[]});
+      id=ref.key; code=candidate; break;
+    }catch(e){ console.error(e); }
+  }
+  if(!id){ await familyAlert("Deellijst","De deellijst kon niet worden aangemaakt.","fa-triangle-exclamation"); return; }
+  await openSharedList(id, true);
+}
+
+async function joinSharedListByCode(){
+  const code=await familyPrompt("Deellijstcode","Voer de 6-cijferige code in.","fa-key");
+  if(!code) return;
+  const snap=await database.ref("sharedLists").orderByChild("inviteCode").equalTo(code).once("value");
+  if(!snap.exists()){ await familyAlert("Deellijst","Deze code bestaat niet.","fa-triangle-exclamation"); return; }
+  const data=snap.val(); const id=Object.keys(data)[0];
+  await database.ref("sharedLists/"+id+"/members/"+auth.currentUser.uid).set(true);
+  await openSharedList(id, true);
+}
+
+async function renderSharedLists(){
+  const box=document.getElementById("sharedListsContainer"); if(!box) return;
+  const user=auth.currentUser; if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
+  try{
+    const snap=await database.ref("sharedLists").once("value");
+    const all=snap.val()||{}; box.innerHTML="";
+    const mine=Object.entries(all).filter(([id,v])=>v && v.members && v.members[user.uid]===true);
+    if(!mine.length){ box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>'; return; }
+    mine.sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    mine.forEach(([id,v])=>{
+      const btn=document.createElement("button"); btn.type="button"; btn.className="savedListRow";
+      btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
+      btn.querySelector("span").textContent=v.name||"Deellijst";
+      btn.addEventListener("click",()=>openSharedList(id,false)); box.appendChild(btn);
+    });
+  }catch(e){ console.error(e); box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>'; }
+}
+
+async function openSharedList(id, showInvite){
+  const user=auth.currentUser; if(!user) return;
+  const snap=await database.ref("sharedLists/"+id).once("value"); const v=snap.val();
+  if(!v || !v.members || v.members[user.uid]!==true){ await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock"); return; }
+  currentSharedListId=id;
+  if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
+  currentSharedListUnsubscribe=database.ref("sharedLists/"+id).on("value",s=>{
+    const data=s.val()||{};
+    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; return; }
+    boodschappen=normalizeBoodschappen(data.boodschappen||[]); showList();
+    const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
+  });
+  closeFamilyMenu();
+  if(showInvite){
+    const link=makeSharedListLink(v.inviteCode);
+    const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
+    const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
+    overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
+    overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
+    overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
+  }
+}
+
+function familyTextPrompt(title,message,icon="fa-list"){
+  return new Promise(resolve=>{
+    closeFamilyMenuForDialog();
+    const overlay=familyDialogBase(icon,title,`<div class="familyDialogText">${message}</div><input class="familyDialogInput" type="text" maxlength="60" autocomplete="off" aria-label="${title}">`,`<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Aanmaken</button>`);
+    const input=overlay.querySelector(".familyDialogInput"); const finish=v=>closeFamilyDialog(overlay,()=>resolve(v));
+    overlay.querySelector(".familyDialogCancel").onclick=()=>finish(null); overlay.querySelector(".familyDialogPrimary").onclick=()=>finish(input.value.trim()); input.addEventListener("keydown",e=>{if(e.key==="Enter")finish(input.value.trim())}); setTimeout(()=>input.focus(),30);
+  });
+}
+
 async function showFamilyCode() {
 
   if (!currentHouseholdId) {
@@ -3373,11 +3465,18 @@ async function showFamilyCode() {
     const overlay=familyDialogBase(
       "fa-key", "Familiecode",
       `<div class="familyDialogText">Deel deze code met iemand die je aan je familie wilt toevoegen.</div>
-       <div class="familyDialogCode">${currentHouseholdId}</div>`,
+       <div class="familyDialogCode">${currentHouseholdId}</div>
+       <button type="button" class="sharedListAction" id="copyFamilyCodeBtn" style="margin-top:10px;">📋 Code kopiëren</button>`,
       `<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>`
     );
     const finish=()=>{ closeFamilyDialog(overlay, resolve); };
-    overlay.querySelector("button").addEventListener("click",finish);
+    const copyFamilyBtn = overlay.querySelector("#copyFamilyCodeBtn");
+    if (copyFamilyBtn) copyFamilyBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try { await navigator.clipboard.writeText(String(currentHouseholdId)); await familyAlert("Gekopieerd", "De familiecode is gekopieerd.", "fa-check"); }
+      catch (err) { await familyAlert("Familiecode", "Kopiëren wordt niet ondersteund. Code: " + currentHouseholdId, "fa-copy"); }
+    });
+    overlay.querySelector(".familyDialogActions button").addEventListener("click",finish);
     overlay.addEventListener("click",e=>{if(e.target===overlay)finish();});
   });
 
@@ -3491,6 +3590,7 @@ function closeFamilyMenuForDialog() {
   const sub = document.getElementById("familyMenuSub");
   const settings = document.getElementById("settingsMenuSub");
   const savedLists = document.getElementById("savedListsMenuSub");
+  const sharedLists = document.getElementById("sharedListsMenuSub");
   if (main) {
     main.style.display = "block";
     main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
@@ -3506,6 +3606,10 @@ function closeFamilyMenuForDialog() {
   if (savedLists) {
     savedLists.style.display = "none";
     savedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+  }
+  if (sharedLists) {
+    sharedLists.style.display = "none";
+    sharedLists.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
   }
   const account = document.getElementById("accountMenuSub");
   if (account) { account.style.display = "none"; account.classList.remove("familyMenuSubEnter", "familyMenuSubExit"); }
@@ -3812,7 +3916,6 @@ async function login() {
   const password = document.getElementById("loginPassword").value;
 
   try {
-    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, password);
     const loginScreen = document.getElementById("loginScreen");
     document.body.classList.add("logged-in");
@@ -4121,6 +4224,30 @@ function toggleRegisterPassword(fieldId, button) {
   } else {
     init();
   }
+})();
+// Open een gedeelde-lijst-uitnodiging automatisch wanneer de webapp via een link is geopend.
+(function setupSharedListInvite(){
+  let handled = false;
+  async function handle(){
+    if (handled) return;
+    const code = new URLSearchParams(window.location.search).get("deellijst");
+    if (!code || !window.auth || !auth.currentUser || !window.database) return;
+    handled = true;
+    try {
+      const snap = await database.ref("sharedLists").orderByChild("inviteCode").equalTo(code).once("value");
+      if (!snap.exists()) { await familyAlert("Deellijst", "Deze uitnodigingslink is niet geldig of de lijst bestaat niet meer.", "fa-triangle-exclamation"); return; }
+      const data=snap.val(); const id=Object.keys(data)[0]; const list=data[id]||{};
+      if (list.members && list.members[auth.currentUser.uid]===true) { await openSharedList(id,false); return; }
+      const join=await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + (list.name||"Deellijst") + "”?");
+      if (!join) return;
+      await database.ref("sharedLists/"+id+"/members/"+auth.currentUser.uid).set(true);
+      await openSharedList(id,false);
+    } catch(error) {
+      console.error("Deellijst-uitnodiging mislukt:",error);
+      await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
+    }
+  }
+  if (window.auth && auth.onAuthStateChanged) auth.onAuthStateChanged(()=>setTimeout(handle,120));
 })();
 </script>
 
