@@ -1456,6 +1456,80 @@ body.dark-theme .familyDialogText { color:#b9c1bb; }
 body.dark-theme .familyDialogMember { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.08); }
 body.dark-theme .familyDialogInput { background:rgba(255,255,255,.07); color:#f1f4f1; border-color:rgba(255,255,255,.14); }
 body.dark-theme .familyDialogCancel { background:rgba(255,255,255,.08); color:#dff1e2; }
+
+/* Compact menu + rustige slide animaties */
+.familyMenu {
+  width: 172px;
+  max-width: calc(100vw - 28px);
+  padding: 6px;
+  border-radius: 18px;
+  opacity: 0;
+  transform: translateY(-7px) scale(.985);
+  transform-origin: top right;
+  transition: opacity .18s ease, transform .20s cubic-bezier(.22,.8,.3,1);
+  pointer-events: none;
+}
+.familyMenu.menu-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.familyMenuItem {
+  min-height: 40px;
+  padding: 7px 7px;
+  gap: 9px;
+  font-size: 14px;
+}
+.familyMenuPrimary > i:first-child {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+}
+.familyMenuBack { padding: 7px 6px 8px; font-size: 13px; }
+.familyMenuSubTitle { padding: 7px 7px 2px; font-size: 9px; }
+.familyMenuDanger { margin-top: 4px; padding-top: 8px !important; }
+
+/* Familie-submenu schuift horizontaal binnen hetzelfde compacte menu. */
+.familyMenuPage {
+  transition: transform .20s cubic-bezier(.22,.8,.3,1), opacity .16s ease;
+}
+.familyMenuMainExit {
+  animation: familyMenuSlideLeft .20s ease forwards;
+}
+.familyMenuSubEnter {
+  animation: familyMenuSlideInRight .20s ease forwards;
+}
+.familyMenuMainEnter {
+  animation: familyMenuSlideInLeft .20s ease forwards;
+}
+.familyMenuSubExit {
+  animation: familyMenuSlideRight .20s ease forwards;
+}
+@keyframes familyMenuSlideLeft {
+  from { opacity:1; transform:translateX(0); }
+  to { opacity:0; transform:translateX(-18px); }
+}
+@keyframes familyMenuSlideInRight {
+  from { opacity:0; transform:translateX(18px); }
+  to { opacity:1; transform:translateX(0); }
+}
+@keyframes familyMenuSlideInLeft {
+  from { opacity:0; transform:translateX(-18px); }
+  to { opacity:1; transform:translateX(0); }
+}
+@keyframes familyMenuSlideRight {
+  from { opacity:1; transform:translateX(0); }
+  to { opacity:0; transform:translateX(18px); }
+}
+
+/* Ook de moderne familie-dialogs komen rustig van onderen binnen. */
+.familyDialog {
+  animation: familyDialogSlideIn .22s cubic-bezier(.22,.8,.3,1);
+}
+@keyframes familyDialogSlideIn {
+  from { opacity:0; transform:translateY(18px) scale(.975); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
 </style>
 </head>
 
@@ -1698,7 +1772,11 @@ function toggleTheme() {
 
 function closeFamilyMenu() {
   const menu = document.getElementById("familyMenu");
-  if (menu) menu.style.display = "none";
+  if (!menu) return;
+  menu.classList.remove("menu-open");
+  setTimeout(() => {
+    if (!menu.classList.contains("menu-open")) menu.style.display = "none";
+  }, 210);
 }
 
 
@@ -1725,13 +1803,22 @@ function openFamilySubmenu(event) {
   if (event) event.stopPropagation();
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
-  if (main) main.style.display = "none";
-  if (sub) sub.style.display = "block";
+  if (!main || !sub) return;
+
+  main.classList.remove("familyMenuMainEnter");
+  main.classList.add("familyMenuMainExit");
+  setTimeout(() => {
+    main.style.display = "none";
+    main.classList.remove("familyMenuMainExit");
+    sub.style.display = "block";
+    sub.classList.remove("familyMenuSubExit");
+    void sub.offsetWidth;
+    sub.classList.add("familyMenuSubEnter");
+  }, 170);
 
   const mainCount = document.getElementById("memberCount");
   const subCount = document.getElementById("memberCountSub");
   if (mainCount && subCount) subCount.innerText = mainCount.innerText;
-
   const mainLabel = document.getElementById("memberLabel");
   const subLabel = document.getElementById("memberLabelSub");
   if (mainLabel && subLabel) subLabel.innerHTML = mainLabel.innerHTML;
@@ -1740,8 +1827,18 @@ function closeFamilySubmenu(event) {
   if (event) event.stopPropagation();
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
-  if (sub) sub.style.display = "none";
-  if (main) main.style.display = "block";
+  if (!main || !sub) return;
+
+  sub.classList.remove("familyMenuSubEnter");
+  sub.classList.add("familyMenuSubExit");
+  setTimeout(() => {
+    sub.style.display = "none";
+    sub.classList.remove("familyMenuSubExit");
+    main.style.display = "block";
+    main.classList.remove("familyMenuMainExit");
+    void main.offsetWidth;
+    main.classList.add("familyMenuMainEnter");
+  }, 170);
 }
 function toggleFamilyMenu() {
   const themePicker = document.querySelector(".themePicker");
@@ -1749,13 +1846,21 @@ function toggleFamilyMenu() {
   const menu = document.getElementById("familyMenu");
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
+  if (!menu) return;
 
-  if (menu.style.display === "block") {
-    menu.style.display = "none";
+  if (menu.classList.contains("menu-open")) {
+    closeFamilyMenu();
   } else {
-    if (sub) sub.style.display = "none";
-    if (main) main.style.display = "block";
+    if (sub) {
+      sub.style.display = "none";
+      sub.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+    }
+    if (main) {
+      main.style.display = "block";
+      main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
+    }
     menu.style.display = "block";
+    requestAnimationFrame(() => menu.classList.add("menu-open"));
   }
 }
   async function updateMemberCount() {
@@ -2669,7 +2774,7 @@ async function showFamilyCode() {
     await updateMemberCount();
 
     const menu = document.getElementById("familyMenu");
-    if (menu) menu.style.display = "none";
+    if (menu) { menu.classList.remove("menu-open"); menu.style.display = "none"; }
 
     await familyAlert("Nieuwe familie aangemaakt", "Jouw familiecode is:\n\n" + code, "fa-house");
   } catch (error) {
@@ -2681,12 +2786,17 @@ async function showFamilyCode() {
 }
 
 function closeFamilyMenuForDialog() {
-  const menu = document.getElementById("familyMenu");
-  if (menu) menu.style.display = "none";
+  closeFamilyMenu();
   const main = document.getElementById("familyMenuMain");
   const sub = document.getElementById("familyMenuSub");
-  if (main) main.style.display = "block";
-  if (sub) sub.style.display = "none";
+  if (main) {
+    main.style.display = "block";
+    main.classList.remove("familyMenuMainExit", "familyMenuMainEnter");
+  }
+  if (sub) {
+    sub.style.display = "none";
+    sub.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+  }
 }
 
 function familyDialogBase(icon, title, content, buttonsHtml) {
@@ -2720,6 +2830,11 @@ function familyAlert(title, message, icon="fa-circle-info") {
 }
 
 function familyConfirm(title, message, danger=false) {
+  if (message === undefined) {
+    message = title;
+    title = "Familie";
+  }
+
   return new Promise(resolve => {
     closeFamilyMenuForDialog();
     const overlay = familyDialogBase(
@@ -2853,7 +2968,7 @@ async function showFamilyMembers() {
     await updateMemberCount();
 
     const menu = document.getElementById("familyMenu");
-    if (menu) menu.style.display = "none";
+    if (menu) { menu.classList.remove("menu-open"); menu.style.display = "none"; }
     await familyAlert("Welkom bij de familie", "Je bent toegevoegd aan de familie!", "fa-user-plus");
   } catch (error) {
     console.error("Fout bij toetreden tot familie:", error);
