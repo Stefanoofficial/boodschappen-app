@@ -213,7 +213,7 @@ overflow-x: hidden;
   font-size: 12px;
   line-height: 1.3;
   font-weight: 500;
-  opacity: .92;
+  opacity: .86;
   text-decoration: none;
 }
 
@@ -760,7 +760,7 @@ body.dark-theme #refresh { color: #f3f5f3; }
   align-items:center;
   gap:9px;
   font-family:inherit;
-  font-size:14px;
+  font-size:13.5px;
   text-align:left;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -821,15 +821,6 @@ body.dark-theme .themeOption i{color:#dce9df;}
 }
 .search-clear-btn.has-text{
   display:flex !important;
-}
-</style>
-<style>
-/* Subtieler vergrootglas */
-.search-container .fa-search,
-.search-container .fa-magnifying-glass,
-.search-container i[class*="search"] {
-  font-size: 24px;
-  color: #3f4a43;
 }
 </style>
 </head>
@@ -981,14 +972,14 @@ body.dark-theme .themeOption i{color:#dce9df;}
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
-  <button type="button" class="search-clear-btn" onclick="clearSearch()">✕</button>
+  <button type="button" onclick="clearSearch()">✕</button>
 </div>
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
 
   <div class="list" id="list"></div>
 
   <div class="buttons">
-    <button class="clear" onclick="clearList()">Lijst wissen</button>
+    <button class="clear search-clear-btn" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
 
