@@ -818,6 +818,9 @@ body.dark-theme .themeOption i{color:#dce9df;}
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
 .search-clear-btn{
   display:none !important;
+  color:#4b554f !important;
+  font-size:20px !important;
+  opacity:.72;
 }
 .search-clear-btn.has-text{
   display:flex !important;
@@ -972,14 +975,14 @@ body.dark-theme .themeOption i{color:#dce9df;}
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
-  <button type="button" onclick="clearSearch()">✕</button>
+  <button type="button" class="search-clear-btn" onclick="clearSearch()">✕</button>
 </div>
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
 
   <div class="list" id="list"></div>
 
   <div class="buttons">
-    <button class="clear search-clear-btn" onclick="clearList()">Lijst wissen</button>
+    <button class="clear" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
 
