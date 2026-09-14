@@ -908,6 +908,47 @@ body.dark-theme .themeOption i{color:#dce9df;}
 .search-clear-btn.has-text{
   display:flex !important;
 }
+
+/* ===== Stap 1: moderne productregels ===== */
+.productRow,
+.shoppingItem,
+.listItem {
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin: 3px 0;
+  transition: background-color .15s ease, transform .15s ease;
+}
+
+.productRow:hover,
+.shoppingItem:hover,
+.listItem:hover {
+  background: rgba(255,255,255,.055);
+}
+
+.productRow .productName,
+.shoppingItem .productName,
+.listItem .productName {
+  line-height: 1.2;
+  letter-spacing: -.1px;
+}
+
+.productIcon,
+.productIconImage {
+  flex-shrink: 0;
+}
+
+.productIconImage {
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .productRow,
+  .shoppingItem,
+  .listItem {
+    transition: none;
+  }
+}
+
 </style>
 </head>
 
@@ -1986,13 +2027,7 @@ async function showFamilyMembers() {
 
     const members = membersSnapshot.val() || {};
     const ownerUid = ownerSnapshot.val();
-
-    // Zet de eigenaar altijd bovenaan; overige familieleden volgen daarna.
-    const memberIds = Object.keys(members).sort((a, b) => {
-      if (a === ownerUid) return -1;
-      if (b === ownerUid) return 1;
-      return 0;
-    });
+    const memberIds = Object.keys(members);
 
     // Haal de namen afzonderlijk op. Dit past bij de huidige Firebase-structuur
     // waarin members nog als UID: true worden opgeslagen.
