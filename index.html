@@ -1193,9 +1193,6 @@ async function showFamilyCode() {
   }
 
   try {
-    const userNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
-    const userName = userNameSnapshot.val() || user.email || "Gebruiker";
-
     const userSnapshot = await database
       .ref("users/" + user.uid + "/householdId")
       .once("value");
@@ -1245,9 +1242,6 @@ async function showFamilyCode() {
       currentHouseholdId = null;
     }
 
-    const userNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
-    const userName = userNameSnapshot.val() || user.email || "Gebruiker";
-
     let code = null;
     let created = false;
     let lastCreateError = null;
@@ -1261,7 +1255,7 @@ async function showFamilyCode() {
         await database.ref("households/" + code).set({
           owner: user.uid,
           name: "Mijn familie",
-          members: { [user.uid]: { name: userName } }
+          members: { [user.uid]: true }
         });
         created = true;
       } catch (createError) {
@@ -1295,37 +1289,52 @@ async function showFamilyMembers() {
   const user = auth.currentUser;
   if (!user) return;
 
-  if (!currentHouseholdId) {
-    const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
-    const name = nameSnapshot.val() || user.email || "Gebruiker";
-    alert("Account:\n\n👑 " + name);
-    return;
-  }
-
   try {
-    const snapshot = await database
-      .ref("households/" + currentHouseholdId + "/members")
-      .once("value");
-
-    const members = snapshot.val() || {};
-    const householdSnapshot = await database
-      .ref("households/" + currentHouseholdId + "/owner")
-      .once("value");
-    const ownerUid = householdSnapshot.val();
-    const names = [];
-
-    for (const uid of Object.keys(members)) {
-      const member = members[uid];
-      const name = (member && typeof member === "object" && member.name)
-        ? member.name
-        : (uid === user.uid ? (await database.ref("users/" + uid + "/name").once("value")).val() : "Onbekend");
-      names.push(uid === ownerUid ? "👑 " + (name || "Onbekend") : "👤 " + (name || "Onbekend"));
+    // Privé/Alleen gebruiken: toon altijd de eigen naam met kroon.
+    if (!currentHouseholdId) {
+      const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
+      const name = nameSnapshot.val() || user.email || "Gebruiker";
+      alert("Account:\n\n👑 " + name);
+      return;
     }
 
-    alert("Familieleden:\n\n" + names.join("\n"));
+    const householdRef = database.ref("households/" + currentHouseholdId);
+    const [membersSnapshot, ownerSnapshot] = await Promise.all([
+      householdRef.child("members").once("value"),
+      householdRef.child("owner").once("value")
+    ]);
+
+    const members = membersSnapshot.val() || {};
+    const ownerUid = ownerSnapshot.val();
+    const memberIds = Object.keys(members);
+
+    // Haal de namen afzonderlijk op. Dit past bij de huidige Firebase-structuur
+    // waarin members nog als UID: true worden opgeslagen.
+    const names = await Promise.all(memberIds.map(async (uid) => {
+      try {
+        const nameSnapshot = await database.ref("users/" + uid + "/name").once("value");
+        const name = nameSnapshot.val() || "Onbekend";
+        return uid === ownerUid ? "👑 " + name : "👤 " + name;
+      } catch (nameError) {
+        // Als een naam niet leesbaar is, laat de lijst niet volledig crashen.
+        // De eigen naam is altijd beschikbaar voor de ingelogde gebruiker.
+        if (uid === user.uid) {
+          try {
+            const ownNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
+            const ownName = ownNameSnapshot.val() || user.email || "Gebruiker";
+            return uid === ownerUid ? "👑 " + ownName : "👤 " + ownName;
+          } catch (_) {}
+        }
+        console.error("Naam van familielid kon niet worden geladen:", uid, nameError);
+        return "👤 Onbekend";
+      }
+    }));
+
+    alert("Familieleden:\n\n" + (names.length ? names.join("\n") : "Nog geen familieleden."));
   } catch (error) {
-    console.error("Fout bij ophalen familieleden:", error);
-    alert("De familieleden konden niet worden geladen." + (error && error.code ? "\n\nFoutcode: " + error.code : ""));
+    console.error("Familieleden konden niet worden geladen:", error);
+    const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
+    alert("De familieleden konden niet worden geladen." + detail);
   }
 }
  async function enterFamilyCode() {
@@ -1356,7 +1365,7 @@ async function showFamilyMembers() {
     // daarom via deze schrijfactie of de familiecode geldig is.
     await database
       .ref("households/" + code + "/members/" + user.uid)
-      .set({ name: userName });
+      .set(true);
     await database
       .ref("users/" + user.uid + "/householdId")
       .set(code);
