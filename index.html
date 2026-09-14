@@ -669,8 +669,8 @@ body.dark-theme #refresh { color: #f3f5f3; }
   position:fixed;
   right:18px;
   bottom:22px;
-  width:58px;
-  height:58px;
+  width:48px;
+  height:48px;
   border:0;
   border-radius:50%;
   background:#f7efe3;
@@ -690,8 +690,8 @@ body.dark-theme #refresh { color: #f3f5f3; }
 .themePicker{
   position:fixed;
   right:18px;
-  bottom:94px;
-  width:250px;
+  bottom:78px;
+  width:210px;
   padding:8px 0;
   box-sizing:border-box;
   background:#f7efe3;
@@ -705,15 +705,15 @@ body.dark-theme #refresh { color: #f3f5f3; }
 .themePicker.open{display:block;}
 .themeOption{
   width:100%;
-  min-height:58px;
+  min-height:48px;
   border:0;
   border-top:1px solid rgba(63,91,69,.12);
   background:transparent;
   color:#222;
-  padding:12px 18px;
+  padding:9px 14px;
   display:flex;
   align-items:center;
-  gap:17px;
+  gap:13px;
   font-family:inherit;
   font-size:17px;
   text-align:left;
@@ -724,11 +724,11 @@ body.dark-theme #refresh { color: #f3f5f3; }
 .themeOption:hover,
 .themeOption:active{background:rgba(63,91,69,.07);}
 .themeOption i{
-  width:27px;
-  flex:0 0 27px;
+  width:22px;
+  flex:0 0 22px;
   text-align:center;
   color:#3F5B45;
-  font-size:21px;
+  font-size:18px;
 }
 body.dark-theme .themeButton{
   background:#252b27;
@@ -752,20 +752,20 @@ body.dark-theme .themeOption i{color:#dce9df;}
   .themeButton{
     right:16px;
     bottom:18px;
-    width:56px;
-    height:56px;
-    font-size:23px;
+    width:46px;
+    height:46px;
+    font-size:20px;
   }
   .themePicker{
     right:16px;
-    bottom:86px;
-    width:250px;
-    border-radius:18px;
+    bottom:72px;
+    width:210px;
+    border-radius:16px;
   }
   .themeOption{
-    min-height:56px;
-    font-size:17px;
-    padding:11px 17px;
+    min-height:46px;
+    font-size:15px;
+    padding:8px 13px;
   }
 }
 </style>
@@ -971,6 +971,8 @@ function setTheme(theme) {
 }
 
 function toggleThemePicker() {
+  const familyMenu = document.getElementById("familyMenu");
+  if (familyMenu) familyMenu.style.display = "none";
   const picker = document.getElementById("themePicker");
   const button = document.getElementById("themeButton");
   if (!picker) return;
@@ -996,6 +998,8 @@ function closeFamilyMenu() {
 }
 
 function toggleFamilyMenu() {
+  const themePicker = document.querySelector(".themePicker");
+  if (themePicker) themePicker.classList.remove("open");
   const menu = document.getElementById("familyMenu");
 
   if (menu.style.display === "block") {
