@@ -256,6 +256,19 @@ overflow-x: hidden;
   font-size: 21px;
   line-height: 1;
 }
+.productIconImage {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+.productSuggestionImage {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
 
 .item {
   padding: 14px 10px;
@@ -1373,7 +1386,7 @@ const productCatalog = [
   ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
 
   // Snacks & zoet
-  ["chips", "🥔"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["chips", "asset:chipszakje.png"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
   ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
   ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
 
@@ -1414,6 +1427,14 @@ function normalizeProductName(text) {
 function getProductIcon(text) {
   const value = normalizeProductName(text);
   if (!value) return "";
+
+  // Explicit fallbacks for common products.
+  // This also catches variants such as "keukenzout" or "zout fijn".
+  if (value === "zout" || value.includes("zout")) return "🧂";
+  if (value === "zwarte peper" || value === "witte peper" ||
+      value.includes("zwarte peper") || value.includes("witte peper")) return "🫙";
+  if (value === "peper" || value === "peperkorrels" || value.includes("peper")) return "🌶️";
+
   const exact = productCatalog.find(([name]) => value === name);
   if (exact) return exact[1];
 
@@ -1450,7 +1471,10 @@ function updateProductSuggestions() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "productSuggestion";
-    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${icon}</span>`;
+    const suggestionIcon = icon.startsWith("asset:")
+      ? `<img src="${icon.slice(6)}" alt="" class="productSuggestionImage">`
+      : icon;
+    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${suggestionIcon}</span>`;
     button.addEventListener("click", () => {
       input.value = name.charAt(0).toUpperCase() + name.slice(1);
       box.classList.remove("open");
@@ -1515,8 +1539,17 @@ function showList(animationType = "") {
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
-    icon.textContent = getProductIcon(productText);
-    if (!icon.textContent) icon.style.visibility = "hidden";
+    const iconValue = getProductIcon(productText);
+    if (iconValue.startsWith("asset:")) {
+      const img = document.createElement("img");
+      img.src = iconValue.slice(6);
+      img.alt = "";
+      img.className = "productIconImage";
+      icon.appendChild(img);
+    } else {
+      icon.textContent = iconValue;
+    }
+    if (!iconValue) icon.style.visibility = "hidden";
     productWrap.appendChild(icon);
 
     div.appendChild(productWrap);
