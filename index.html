@@ -878,8 +878,8 @@ body.dark-theme .themeOption i{color:#dce9df;}
 
   <div class="headerBar">
   <h1>Boodschappenlijst</h1>
-  <button class="familyButton" onclick="toggleFamilyMenu()">
-    <i class="fa-solid fa-users"></i> Familie
+  <button class="familyButton" onclick="toggleFamilyMenu()" aria-label="Menu openen">
+    <i class="fa-solid fa-bars"></i> Menu
     <i class="fa-solid fa-chevron-down"></i>
   </button>
     <div id="familyMenu" class="familyMenu">
@@ -996,6 +996,25 @@ function closeFamilyMenu() {
   const menu = document.getElementById("familyMenu");
   if (menu) menu.style.display = "none";
 }
+
+
+function closeOpenMenusOnOutsideClick(event) {
+  const target = event.target;
+  const themePicker = document.getElementById("themePicker");
+  const themeButton = document.getElementById("themeButton");
+  const familyMenu = document.getElementById("familyMenu");
+  const familyButton = document.querySelector(".familyButton");
+
+  if (themePicker && themePicker.contains(target)) return;
+  if (themeButton && themeButton.contains(target)) return;
+  if (familyMenu && familyMenu.contains(target)) return;
+  if (familyButton && familyButton.contains(target)) return;
+
+  closeThemePicker();
+  closeFamilyMenu();
+}
+
+document.addEventListener("click", closeOpenMenusOnOutsideClick);
 
 function toggleFamilyMenu() {
   const themePicker = document.querySelector(".themePicker");
