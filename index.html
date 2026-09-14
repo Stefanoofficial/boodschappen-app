@@ -3268,6 +3268,51 @@ applyTheme();
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
+
+  // Keep Firebase authentication persistent on this device/browser.
+  // Closing or swiping away the webapp will not log the user out.
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error) {
+    console.warn("Lokale login-opslag kon niet worden ingesteld:", error);
+  });
+
+  // Restore an existing Firebase session when the webapp is opened again.
+  auth.onAuthStateChanged(async function(user) {
+    if (!user || document.body.classList.contains("logged-in")) return;
+
+    const loginScreen = document.getElementById("loginScreen");
+    if (!loginScreen) return;
+
+    try {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      document.body.classList.add("logged-in");
+      loginScreen.classList.add("loginScreenLeaving");
+      setTimeout(function() {
+        if (loginScreen.classList.contains("loginScreenLeaving")) {
+          loginScreen.style.display = "none";
+        }
+      }, 400);
+
+      const householdId = await getOrCreateHousehold();
+      if (householdId) {
+        await loadList();
+        return;
+      }
+
+      const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+      if (savedMode === "private") {
+        await loadPrivateList();
+      } else if (savedMode === "skip") {
+        openAppWithoutList();
+      } else {
+        openUseModeModal();
+      }
+    } catch (error) {
+      console.error("Herstellen van ingelogde sessie mislukt:", error);
+      document.body.classList.remove("logged-in");
+      loginScreen.classList.remove("loginScreenLeaving");
+      loginScreen.style.display = "flex";
+    }
+  });
   let currentHouseholdId = null;
 
 async function getOrCreateHousehold() {
@@ -3767,6 +3812,7 @@ async function login() {
   const password = document.getElementById("loginPassword").value;
 
   try {
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, password);
     const loginScreen = document.getElementById("loginScreen");
     document.body.classList.add("logged-in");
