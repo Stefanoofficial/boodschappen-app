@@ -212,8 +212,8 @@ overflow-x: hidden;
   margin-left: 28px;
   font-size: 12px;
   line-height: 1.3;
-  font-weight: 400;
-  opacity: .94;
+  font-weight: 500;
+  opacity: .86;
   text-decoration: none;
 }
 
@@ -425,10 +425,9 @@ overflow-x: hidden;
 }
 
 .searchBox > i {
-  color: #8a908c;
-  font-size: 26px;
-  margin-right: 11px;
-  font-weight: 400;
+  color: #333;
+  font-size: 22px;
+  margin-right: 12px;
 }
 
 .searchBox input {
@@ -753,7 +752,7 @@ body.dark-theme #refresh { color: #f3f5f3; }
   width:100%;
   min-height:40px;
   border:0;
-  border-top:1px solid rgba(63,91,69,.055);
+  border-top:1px solid rgba(63,91,69,.10);
   background:transparent;
   color:#222;
   padding:6px 10px;
@@ -762,7 +761,6 @@ body.dark-theme #refresh { color: #f3f5f3; }
   gap:9px;
   font-family:inherit;
   font-size:13.5px;
-  font-weight:400;
   text-align:left;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -825,41 +823,73 @@ body.dark-theme .themeOption i{color:#dce9df;}
   display:flex !important;
 }
 </style>
-<style>
-.themeSunOutline{
-  width:18px;
-  flex:0 0 18px;
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  color:#3F5B45;
-  font-size:21px;
-  line-height:1;
-  font-weight:400;
+
+<style id="visual-refinements-v17">
+/* 1. Search icon — soft, medium-sized outline */
+.searchBox > i.fa-magnifying-glass {
+  color: #8a908c !important;
+  font-size: 26px !important;
+  font-weight: 400 !important;
+  margin-right: 11px !important;
 }
-.themeOption i{
-  width:18px;
-  flex:0 0 18px;
-  text-align:center;
-  color:#3F5B45;
-  font-size:18px;
+
+/* 2. Completed-by text — readable, regular weight, still secondary */
+.item.completed .completedMeta {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  opacity: 0.94 !important;
+  color: rgba(255,255,255,.80) !important;
+}
+
+/* 3. Theme popup — calm text and a clearly visible OPEN sun */
+.themeOption {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+}
+.themeOption + .themeOption {
+  border-top: 1px solid rgba(63,91,69,.055) !important;
+}
+.themeOption .fa-sun {
+  font-size: 0 !important;
+  width: 24px !important;
+  flex: 0 0 24px !important;
+  position: relative !important;
+}
+.themeOption .fa-sun::before {
+  content: "☼" !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 25px !important;
+  font-weight: 400 !important;
+  color: #3F5B45 !important;
+}
+.themeOption .fa-moon {
+  width: 24px !important;
+  flex: 0 0 24px !important;
+  font-size: 21px !important;
+}
+
+/* 4. Search clear — small and quiet, hidden until there is text */
+.search-clear-btn {
+  display: none !important;
+  width: 26px !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8a908c !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  opacity: .68 !important;
+}
+.search-clear-btn.has-text {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 </style>
-<style>
-.search-clear-btn{
-  display:none !important;
-  color:#8a908c !important;
-  font-size:19px !important;
-  font-weight:400 !important;
-  opacity:.68;
-  padding:0 3px !important;
-  background:transparent !important;
-  border:0 !important;
-}
-.search-clear-btn.has-text{
-  display:flex !important;
-}
-</style>
+
 </head>
 
 <body>
@@ -952,7 +982,7 @@ body.dark-theme .themeOption i{color:#dce9df;}
 
 <div id="themePicker" class="themePicker" aria-hidden="true">
   <button type="button" class="themeOption" onclick="setTheme('light')">
-    <span class="themeSunOutline" aria-hidden="true">☼</span><span>Licht thema</span>
+    <i class="fa-solid fa-sun"></i><span>Licht thema</span>
   </button>
   <button type="button" class="themeOption" onclick="setTheme('dark')">
     <i class="fa-solid fa-moon"></i><span>Donker thema</span>
@@ -1016,7 +1046,7 @@ body.dark-theme .themeOption i{color:#dce9df;}
   <div class="list" id="list"></div>
 
   <div class="buttons">
-    <button class="clear" onclick="clearList()">Lijst wissen</button>
+    <button class="clear search-clear-btn" onclick="clearList()">Lijst wissen</button>
     <button class="delete" onclick="deleteProduct()">Verwijder product</button>
   </div>
 
@@ -2217,22 +2247,24 @@ function toggleRegisterPassword(fieldId, button) {
 </script>
 
 
-<script>
-(function(){
-  function setupSearchClear(){
-    const input=document.getElementById('searchInput');
-    const btn=document.querySelector('.search-clear-btn');
-    if(!input || !btn) return;
-    function update(){
-      btn.classList.toggle('has-text', input.value.trim().length > 0);
-    }
-    input.addEventListener('input', update);
-    update();
+<script id="search-clear-visibility-v17">
+(function () {
+  function syncSearchClear() {
+    var input = document.getElementById("searchInput");
+    var button = document.querySelector(".search-clear-btn");
+    if (!input || !button) return;
+    button.classList.toggle("has-text", input.value.trim().length > 0);
   }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', setupSearchClear);
-  }else{
-    setupSearchClear();
+  function init() {
+    var input = document.getElementById("searchInput");
+    if (!input) return;
+    input.addEventListener("input", syncSearchClear);
+    syncSearchClear();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
   }
 })();
 </script>
