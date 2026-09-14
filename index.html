@@ -1943,7 +1943,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
     <div class="familyMenuSubTitle">Deellijst</div>
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="createSharedList()">
       <i class="fa-solid fa-plus"></i>
-      <span>Nieuwe deellijst</span>
+      <span>Nieuwe lijst</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="joinSharedListByCode()">
       <i class="fa-solid fa-key"></i>
@@ -2555,8 +2555,7 @@ function openListOptionsSettings() {
   const snapshot = await database
     .ref("households/" + currentHouseholdId + "/members")
     .once("value");
-  const members = snapshot.val() || {};
-  const count = Object.keys(members).length;
+  const members = snapshot.val() || {}; const memberIds = new Set(Object.keys(members)); if (auth.currentUser && auth.currentUser.uid) memberIds.add(auth.currentUser.uid); const count = memberIds.size;
   const labelEl = document.getElementById("memberLabel");
   if (labelEl) labelEl.innerHTML = 'Familielid (<span id="memberCount">' + count + '</span>)';
   const subCountEl = document.getElementById("memberCountSub");
@@ -3378,7 +3377,7 @@ function makeSharedListLink(code){
 async function createSharedList(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const name=await familyTextPrompt("Nieuwe deellijst","Geef je deellijst een naam, bijvoorbeeld Feestelijk of BBQ met vrienden.","fa-list");
+  const name=await familyTextPrompt("Nieuwe lijst","Geef je deellijst een naam, bijvoorbeeld Feestelijk of BBQ met vrienden.","fa-list");
   if(!name) return;
   let code=null, id=null;
   for(let i=0;i<8;i++){
