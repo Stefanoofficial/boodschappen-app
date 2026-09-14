@@ -1067,6 +1067,53 @@ body.dark-theme .themeOption i{color:#dce9df;}
   line-height: 1.15;
 }
 
+
+/* ===== Stap 6: moderne productsuggesties ===== */
+.productSuggestions {
+  top: calc(100% + 8px);
+  background: rgba(247, 239, 227, .98);
+  border: 1px solid rgba(63,91,69,.12);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.16);
+  overflow: hidden;
+}
+
+.productSuggestion {
+  min-height: 46px;
+  padding: 10px 14px;
+  color: #263229;
+  font-size: 16px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(63,91,69,.08);
+  transition: background-color .12s ease, transform .12s ease;
+}
+
+.productSuggestionIcon {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.productSuggestion:active {
+  transform: scale(.99);
+  background: rgba(63,91,69,.10);
+}
+
+body.dark-theme .productSuggestions {
+  background: rgba(32,38,32,.98);
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 10px 24px rgba(0,0,0,.42);
+}
+
+body.dark-theme .productSuggestion {
+  border-bottom-color: rgba(255,255,255,.07);
+}
+
 </style>
 </head>
 
