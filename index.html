@@ -1346,6 +1346,34 @@ body.dark-theme .settingsMenuBack { color:#dff1e2; border-bottom-color:rgba(255,
 body.dark-theme .settingsMenuHint { color:#aab4ad; }
 
 
+
+/* Direct opslaan-knop: altijd zichtbaar bij de boodschappenlijst. */
+.saveListMainBtn {
+  width:100%;
+  min-height:44px;
+  margin:10px 0 8px;
+  border:1px solid rgba(63,91,69,.18);
+  border-radius:14px;
+  background:#f7efe3;
+  color:#3F5B45;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,.06);
+  transition:transform .12s ease, background .15s ease;
+}
+.saveListMainBtn:active { transform:scale(.985); }
+@media (hover:hover) { .saveListMainBtn:hover { background:#f2e7d7; } }
+body.dark-theme .saveListMainBtn {
+  background:#202620; color:#dff1e2; border-color:rgba(255,255,255,.12);
+}
+@media (prefers-reduced-motion: reduce) { .saveListMainBtn { transition:none; } }
+
 /* Opgeslagen lijsten en instellingen */
 .savedListsContainer {
   display:flex;
@@ -1548,6 +1576,15 @@ body.logged-in .app {
   transform: translateX(-34px);
   opacity: 0;
   pointer-events: none;
+}
+
+
+/* Alle hoofdopties van het Menu gebruiken exact dezelfde tekststijl. */
+.familyMenuPrimary > span {
+  font-size:13.5px !important;
+  font-weight:600 !important;
+  line-height:1.2;
+  color:inherit;
 }
 
 /* Definitieve slide-animaties: menu, submenu en familie-dialogs bewegen echt. */
@@ -1812,7 +1849,7 @@ body.logged-in .app {
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSavedListsSubmenu(event)">
       <i class="fa-solid fa-folder-open"></i>
-      <span>Opgeslagen lijsten</span>
+      <span>Opgeslagen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
   </div>
@@ -1873,9 +1910,9 @@ body.logged-in .app {
   <div id="savedListsMenuSub" class="familyMenuPage savedListsMenuPage" style="display:none;">
     <button type="button" class="settingsMenuBack" onclick="closeSavedListsSubmenu(event)">
       <i class="fa-solid fa-chevron-left"></i>
-      <span>Opgeslagen lijsten</span>
+      <span>Opgeslagen</span>
     </button>
-    <div class="familyMenuSubTitle">Mijn lijsten</div>
+    <div class="familyMenuSubTitle">Opgeslagen</div>
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="saveCurrentListAs()">
       <i class="fa-solid fa-floppy-disk"></i>
       <span>Lijst opslaan</span>
@@ -1904,6 +1941,8 @@ body.logged-in .app {
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
 
   <div class="list" id="list"></div>
+
+  <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
 
   <div class="buttons">
     <button class="clear" onclick="clearList()">Lijst wissen</button>
