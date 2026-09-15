@@ -55,27 +55,35 @@ h1 {
   font-size: 26px;
   padding: 5px;
 }
-.headerBar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #3F5B45;
-  padding: 10px 15px;
-  border-radius: 12px;
-}
+ .headerBar {
+   position: relative;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 8px;
+   background: #3F5B45;
+   padding: 10px 15px;
+   border-radius: 12px;
+ }
 
-.headerBar h1 {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  margin: 0;
-  padding: 5px;
-  font-size: 21px;
-  overflow: hidden;
-text-overflow: ellipsis;
-  white-space: nowrap;
-}
+ .headerBar h1 {
+   flex: 1 1 auto;
+   min-width: 0;
+   max-width: 100%;
+   background: none;
+   margin: 0;
+   padding: 5px;
+   font-size: 21px;
+   line-height: 1.15;
+   overflow: hidden;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+   line-clamp: 2;
+   white-space: normal;
+   overflow-wrap: anywhere;
+   word-break: break-word;
+ }
 
 .familyButton {
   flex-shrink: 0;
@@ -901,6 +909,20 @@ body.dark-theme .themeOption i{color:#dce9df;}
     min-height:40px;
     font-size:13.5px;
     padding:6px 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .headerBar { gap: 6px; padding-left: 12px; padding-right: 12px; }
+  .headerBar h1 { font-size: 20px; padding-right: 2px; }
+  .familyButton { padding: 8px 9px; }
+  .sharedDeleteIconButton {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
@@ -1949,6 +1971,14 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
       <i class="fa-solid fa-key"></i>
       <span>Code invoeren</span>
     </button>
+    <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
+      <i class="fa-solid fa-user-group"></i>
+      <span>Leden (<span id="sharedMemberCount">1</span>)</span>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="showSharedListCode()">
+      <i class="fa-solid fa-link"></i>
+      <span>Deelcode</span>
+    </button>
     <button type="button" class="familyMenuItem" onclick="returnToFamilyList()">
       <i class="fa-solid fa-arrow-left"></i>
       <span>Terug naar familielijst</span>
@@ -2749,6 +2779,7 @@ function normalizeBoodschappen(data) {
         text: text,
         completed: completed,
         completedBy: "",
+        completedByUid: "",
         completedAt: null
       };
     }
@@ -2758,6 +2789,7 @@ function normalizeBoodschappen(data) {
         text: String(item.text ?? item.product ?? "").trim(),
         completed: item.completed === true,
         completedBy: item.completedBy ? String(item.completedBy) : "",
+        completedByUid: item.completedByUid ? String(item.completedByUid) : "",
         completedAt: item.completedAt ? Number(item.completedAt) : null
       };
     }
@@ -2766,6 +2798,7 @@ function normalizeBoodschappen(data) {
       text: String(item ?? "").trim(),
       completed: false,
       completedBy: "",
+      completedByUid: "",
       completedAt: null
     };
   }).filter(item => item.text);
@@ -3137,8 +3170,8 @@ function showList(animationType = "") {
 
     div.appendChild(productWrap);
 
-    // Only family members see who completed an item.
-    if (activeListType === "family" && item.completed && currentHouseholdId && item.completedBy) {
+    // In zowel de familielijst als een Deellijst is zichtbaar wie een product heeft voltooid.
+    if (item.completed && item.completedBy) {
       const meta = document.createElement("span");
       meta.className = "completedMeta";
       meta.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i>';
@@ -3221,8 +3254,8 @@ async function toggleItem(index) {
   if (!item.completed) {
     let completedBy = "";
 
-    // The family metadata is visible only in family mode.
-    if (activeListType === "family" && currentHouseholdId && auth.currentUser) {
+    // Bewaar de naam van degene die het product afvinkt, ook in een Deellijst.
+    if (auth.currentUser) {
       try {
         const snap = await database
           .ref("users/" + auth.currentUser.uid + "/name")
@@ -3235,6 +3268,7 @@ async function toggleItem(index) {
 
     item.completed = true;
     item.completedBy = completedBy;
+    item.completedByUid = auth.currentUser ? auth.currentUser.uid : "";
     item.completedAt = Date.now();
 
     // Render immediately in its new position; the item gets a subtle slide-down animation.
@@ -3243,6 +3277,7 @@ async function toggleItem(index) {
   } else {
     item.completed = false;
     item.completedBy = "";
+    item.completedByUid = "";
     item.completedAt = null;
 
     showList("uncompleted");
@@ -3504,6 +3539,7 @@ async function createSharedList(){
         owner:user.uid,
         inviteCode:candidate,
         members:{[user.uid]:true},
+        memberNames:{[user.uid]: (user.displayName || user.email || "Gebruiker")},
         createdAt:Date.now(),
         boodschappen:[]
       };
@@ -3546,6 +3582,12 @@ async function joinSharedListByCode(){
 
     const updates={};
     updates["sharedLists/" + id + "/members/" + user.uid]=true;
+    let memberName = user.displayName || user.email || "Gebruiker";
+    try {
+      const nameSnap = await database.ref("users/" + user.uid + "/name").once("value");
+      memberName = nameSnap.val() || memberName;
+    } catch (_) {}
+    updates["sharedLists/" + id + "/memberNames/" + user.uid]=memberName;
     updates["userSharedLists/" + user.uid + "/" + id]=true;
     await database.ref().update(updates);
     await openSharedList(id, true);
@@ -3599,6 +3641,87 @@ async function renderSharedLists(){
   }
 }
 
+
+async function getCurrentSharedListSnapshot(){
+  const user=auth.currentUser;
+  if(!user || activeListType!="shared" || !currentSharedListId) return null;
+  const snap=await database.ref("sharedLists/" + currentSharedListId).once("value");
+  return snap.exists() ? snap.val() : null;
+}
+
+async function showSharedListCode(){
+  const list=await getCurrentSharedListSnapshot();
+  if(!list) return;
+  const code=String(list.inviteCode || "");
+  if(!code){ await familyAlert("Deelcode","Voor deze deellijst is geen deelcode beschikbaar.","fa-link"); return; }
+  const overlay=familyDialogBase(
+    "fa-link",
+    "Deelcode",
+    `<div class="familyDialogText">Deel deze code om mensen toegang te geven tot “${String(list.name || "Deellijst").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}”.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${code}</div></div>`,
+    `<button type="button" class="familyDialogBtn familyDialogCancel">Sluiten</button><button type="button" class="familyDialogBtn familyDialogPrimary" id="copyCurrentSharedCode">📋 Kopiëren</button>`
+  );
+  overlay.querySelector("#copyCurrentSharedCode").onclick=async()=>{
+    try{ await navigator.clipboard.writeText(code); await familyAlert("Gekopieerd","De deelcode is gekopieerd.","fa-check"); }
+    catch(e){ await familyAlert("Deelcode","Kopiëren wordt niet ondersteund. Code: " + code,"fa-copy"); }
+  };
+  overlay.querySelector(".familyDialogCancel").onclick=()=>closeFamilyDialog(overlay);
+}
+
+async function showSharedListMembers(){
+  const user=auth.currentUser;
+  if(!user || activeListType!=="shared" || !currentSharedListId) return;
+  try{
+    const snap=await database.ref("sharedLists/" + currentSharedListId).once("value");
+    const list=snap.val();
+    if(!list || !list.members){
+      await familyAlert("Leden","De leden van deze deellijst konden niet worden geladen.","fa-users");
+      return;
+    }
+    const ownerUid=String(list.owner || "");
+    const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true);
+    const memberNames=list.memberNames || {};
+    const rows=[];
+    for(const uid of memberIds){
+      let name=memberNames[uid] || "";
+      if(!name && uid===user.uid){
+        try{ const ns=await database.ref("users/" + uid + "/name").once("value"); name=ns.val() || ""; }catch(_){}
+      }
+      if(!name) name="Lid";
+      const row=document.createElement("div");
+      row.className="familyDialogMember";
+      const icon=document.createElement("i");
+      icon.className="fa-solid " + (uid===ownerUid ? "fa-crown" : "fa-user");
+      icon.setAttribute("aria-hidden","true");
+      row.appendChild(icon);
+      row.appendChild(document.createTextNode(" " + name));
+      rows.push(row);
+    }
+    rows.sort((a,b)=>{
+      const ai=a.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
+      const bi=b.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
+      return ai-bi;
+    });
+    const wrap=document.createElement("div");
+    wrap.className="familyDialogList";
+    rows.forEach(r=>wrap.appendChild(r));
+    const overlay=familyDialogBase("fa-user-group", "Leden (" + memberIds.length + ")", "", '<button type="button" class="familyDialogBtn familyDialogPrimary">Sluiten</button>');
+    const content=overlay.querySelector(".familyDialogText");
+    content.replaceWith(wrap);
+    overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
+  }catch(error){
+    console.error("Deellijstleden konden niet worden geladen:",error);
+    const detail=error && error.code ? "\n\nFoutcode: " + error.code : "";
+    await familyAlert("Leden","De leden van deze deellijst konden niet worden geladen." + detail,"fa-triangle-exclamation");
+  }
+}
+
+function updateSharedMemberCount(list){
+  const el=document.getElementById("sharedMemberCount");
+  if(!el) return;
+  const members=list && list.members ? Object.keys(list.members).filter(uid=>list.members[uid]===true) : [];
+  el.textContent=String(members.length || 0);
+}
+
 async function openSharedList(id, showInvite){
   const user=auth.currentUser;
   if(!user) return;
@@ -3633,6 +3756,12 @@ async function openSharedList(id, showInvite){
     showList();
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=v.name||"Deellijst";
     updateSharedDeleteButton(v.owner === user.uid);
+    updateSharedMemberCount(v);
+    if (!v.memberNames || !v.memberNames[user.uid]) {
+      let ownName = user.displayName || user.email || "Gebruiker";
+      try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = ownNameSnap.val() || ownName; } catch (_) {}
+      try { await database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(ownName); } catch (_) {}
+    }
 
     currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
       if (activeListType !== "shared" || currentSharedListId !== id) return;
@@ -3647,6 +3776,7 @@ async function openSharedList(id, showInvite){
       boodschappen=normalizeBoodschappen(data.boodschappen||[]);
       showList();
       const header=document.querySelector(".headerBar h1"); if(header) header.textContent=data.name||"Deellijst";
+      updateSharedMemberCount(data);
     });
     closeFamilyMenu();
 
@@ -3677,9 +3807,10 @@ function updateSharedDeleteButton(isOwner){
   const btn=document.createElement("button");
   btn.type="button";
   btn.id="deleteSharedListBtn";
-  btn.className="familyButton";
+  btn.className="familyButton sharedDeleteIconButton";
   btn.setAttribute("aria-label","Deellijst verwijderen");
-  btn.innerHTML='<i class="fa-solid fa-trash"></i> Verwijderen';
+   btn.setAttribute("title","Deellijst verwijderen");
+  btn.innerHTML='<i class="fa-solid fa-trash"></i>';
   btn.onclick=deleteCurrentSharedList;
   header.insertBefore(btn, header.querySelector(".familyButton"));
 }
@@ -4653,5 +4784,162 @@ function toggleRegisterPassword(fieldId, button) {
   });
 })();
 </script>
+
+<script>
+/* Deellijst: deel-link -> bestaande aanmeldflow -> oorspronkelijke Deellijst */
+(function () {
+  const SHARED_JOIN_KEY = 'pendingSharedListId';
+  const SHARED_JOIN_CODE_KEY = 'pendingSharedListCode';
+
+  function getSharedJoinFromUrl() {
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get('sharedList');
+    const code = url.searchParams.get('code');
+    if (id || code) return { id, code };
+    const hash = new URLSearchParams((url.hash || '').replace(/^#/, ''));
+    const hid = hash.get('sharedList');
+    const hcode = hash.get('code');
+    if (hid || hcode) return { id: hid, code: hcode };
+    return null;
+  }
+
+  function rememberSharedJoin(join) {
+    if (!join) return;
+    if (join.id) sessionStorage.setItem(SHARED_JOIN_KEY, join.id);
+    if (join.code) sessionStorage.setItem(SHARED_JOIN_CODE_KEY, join.code);
+  }
+
+  function getRememberedSharedJoin() {
+    const id = sessionStorage.getItem(SHARED_JOIN_KEY);
+    const code = sessionStorage.getItem(SHARED_JOIN_CODE_KEY);
+    return (id || code) ? { id, code } : null;
+  }
+
+  function clearRememberedSharedJoin() {
+    sessionStorage.removeItem(SHARED_JOIN_KEY);
+    sessionStorage.removeItem(SHARED_JOIN_CODE_KEY);
+  }
+
+  async function resolveSharedJoin(join) {
+    if (!join) return null;
+    if (join.id) return join.id;
+    if (!join.code || typeof database === 'undefined') return null;
+    const snap = await database.ref('sharedListCodes/' + join.code).once('value');
+    return snap.exists() ? snap.val() : null;
+  }
+
+  async function finishPendingSharedJoin() {
+    const join = getRememberedSharedJoin();
+    if (!join || typeof currentUser === 'undefined' || !currentUser) return false;
+
+    try {
+      const listId = await resolveSharedJoin(join);
+      if (!listId) {
+        clearRememberedSharedJoin();
+        return false;
+      }
+
+      const ref = database.ref('sharedLists/' + listId);
+      const snap = await ref.once('value');
+      if (!snap.exists()) {
+        clearRememberedSharedJoin();
+        return false;
+      }
+
+      const list = snap.val() || {};
+      const uid = currentUser.uid;
+      const owner = list.owner === uid;
+      const alreadyMember = !!(list.members && list.members[uid] === true);
+
+      // Existing list owner/member: open immediately.
+      if (owner || alreadyMember) {
+        clearRememberedSharedJoin();
+        if (typeof openSharedList === 'function') {
+          await openSharedList(listId);
+          return true;
+        }
+      }
+
+      // New participant: add them to the existing list. Use the name
+      // already collected by the app's normal sign-in flow.
+      let name = '';
+      if (typeof currentUserName !== 'undefined' && currentUserName) name = currentUserName;
+      if (!name) {
+        const storedName = localStorage.getItem('userName') || localStorage.getItem('name');
+        if (storedName) name = storedName;
+      }
+
+      const updates = {};
+      updates['sharedLists/' + listId + '/members/' + uid] = true;
+      if (name) updates['sharedLists/' + listId + '/memberNames/' + uid] = name;
+      updates['userSharedLists/' + uid + '/' + listId] = true;
+      await database.ref().update(updates);
+
+      clearRememberedSharedJoin();
+      if (typeof openSharedList === 'function') {
+        await openSharedList(listId);
+        return true;
+      }
+    } catch (e) {
+      console.error('Deellijst join na aanmelden mislukt:', e);
+    }
+    return false;
+  }
+
+  async function routeSharedJoin() {
+    const fromUrl = getSharedJoinFromUrl();
+    if (fromUrl) rememberSharedJoin(fromUrl);
+
+    const pending = getRememberedSharedJoin();
+    if (!pending) return;
+
+    if (typeof currentUser !== 'undefined' && currentUser) {
+      await finishPendingSharedJoin();
+      return;
+    }
+
+    // Niet aangemeld: laat de bestaande app-authflow het scherm tonen.
+    // We forceren geen nieuwe registratiepagina.
+    if (typeof showLogin === 'function') {
+      showLogin();
+    } else if (typeof showAuthScreen === 'function') {
+      showAuthScreen();
+    }
+  }
+
+  window.finishPendingSharedJoin = finishPendingSharedJoin;
+  window.routeSharedJoin = routeSharedJoin;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(routeSharedJoin, 0);
+  });
+
+  // Expose a simple helper for share buttons/links.
+  window.createSharedListShareUrl = function (listId, code) {
+    const base = window.location.origin + window.location.pathname;
+    return base + '?sharedList=' + encodeURIComponent(listId) +
+      (code ? '&code=' + encodeURIComponent(code) : '');
+  };
+})();
+</script>
+
+
+<style>
+.shared-code-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  border: 0;
+  border-radius: 30px;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+@media (max-width:430px) {
+  .shared-code-button { width: 40px; height: 40px; padding: 0; display:inline-flex; align-items:center; justify-content:center; }
+}
+</style>
+
 </body>
 </html>
