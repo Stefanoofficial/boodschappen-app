@@ -2715,11 +2715,10 @@ async function loadList() {
     console.error("Lijst laden mislukt:", error);
 
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
-      // VEILIGE DEBUG-FIX: een lees-/rechtenfout mag NOOIT automatisch
-      // de bestaande householdId uit Firebase verwijderen.
-      console.error("Firebase weigert het lezen van de familielijst. De bestaande familie-koppeling blijft behouden.", error);
+      // Een permissiefout is een lees-/rechtenprobleem, geen reden om de
+      // bestaande familie-koppeling te verwijderen.
       const status = document.getElementById("status");
-      if (status) status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> De familielijst kan niet worden geladen. De familie-koppeling is behouden. Controleer de Firebase Database Rules.';
+      if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> Geen toegang tot de familielijst. Je familie-koppeling is behouden.';
       return false;
     }
 
@@ -3500,6 +3499,11 @@ async function getOrCreateHousehold() {
     throw new Error("Je bent niet ingelogd.");
   }
 
+  // Lees alleen de bestaande koppeling van de gebruiker.
+  // We controleren hier NIET de volledige household-node: die extra read
+  // kan door Firebase Rules worden geweigerd terwijl de gebruiker de
+  // boodschappenlijst zelf wel mag lezen. Een leesfout mag bovendien nooit
+  // automatisch data uit Firebase verwijderen.
   const userRef = database.ref("users/" + user.uid + "/householdId");
   const userSnapshot = await userRef.once("value");
   const householdId = userSnapshot.val();
@@ -3509,38 +3513,8 @@ async function getOrCreateHousehold() {
     return null;
   }
 
-  try {
-    const householdSnapshot = await database
-      .ref("households/" + householdId)
-      .once("value");
-
-    if (!householdSnapshot.exists()) {
-      // Een ontbrekende/onbereikbare familie mag niet automatisch de
-      // gebruiker uit Firebase loskoppelen. Laat de koppeling intact.
-      console.warn("Gekoppelde familie bestaat niet (of is niet leesbaar). De householdId blijft behouden.");
-      currentHouseholdId = String(householdId);
-      return currentHouseholdId;
-    }
-
-    const household = householdSnapshot.val() || {};
-    const isOwner = household.owner === user.uid;
-    const isMember = !!(household.members && household.members[user.uid]);
-
-    if (!isOwner && !isMember) {
-      // Nooit automatisch de Firebase-koppeling verwijderen tijdens het laden.
-      // Dit is alleen een autorisatieprobleem en moet eerst zichtbaar worden.
-      console.warn("Gebruiker is geen zichtbaar lid/eigenaar van de gekoppelde familie. De householdId blijft behouden.");
-      currentHouseholdId = String(householdId);
-      return currentHouseholdId;
-    }
-
-    currentHouseholdId = String(householdId);
-    return currentHouseholdId;
-  } catch (error) {
-    console.error("Familie controleren mislukt:", error);
-    currentHouseholdId = null;
-    throw error;
-  }
+  currentHouseholdId = String(householdId);
+  return currentHouseholdId;
 }
 
 async function openSharedListsSubmenu(event) {
@@ -4609,7 +4583,8 @@ function toggleRegisterPassword(fieldId, button) {
       // Alleen bij een echte Firebase-authfout tonen we het login-scherm.
       if (error && String(error.code || "").startsWith("auth/")) {
         document.body.classList.remove("logged-in");
-        if (loginScreen) loginScreen.style.display = "flex";
+        const restoreLoginScreen = document.getElementById("loginScreen");
+        if (restoreLoginScreen) restoreLoginScreen.style.display = "flex";
       }
     }
   });
