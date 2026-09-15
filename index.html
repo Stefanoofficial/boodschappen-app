@@ -1895,7 +1895,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
   </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
-    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFamilySubmenu(event)">
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="closeSharedListsSubmenu(event)">
       <i class="fa-solid fa-users"></i>
       <span>Mijn familie</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
@@ -2205,6 +2205,7 @@ function closeFamilyMenu() {
     const pageIds = [
       "familyMenuSub",
       "sharedListsMenuSub",
+      "sharedListActiveMenuSub",
       "settingsMenuSub",
       "savedListsMenuSub",
       "accountMenuSub",
@@ -2370,23 +2371,53 @@ function closeSavedListsSubmenu(event) {
 
 function switchMenuPage(pageId, event) {
   if (event) event.stopPropagation();
-  const main = document.getElementById("familyMenuMain");
+
   const page = document.getElementById(pageId);
-  if (!main || !page) return;
-  main.classList.remove("familyMenuMainEnter");
-  main.classList.add("familyMenuMainExit");
+  const main = document.getElementById("familyMenuMain");
+  if (!page) return;
+
+  const pageIds = [
+    "familyMenuMain",
+    "familyMenuSub",
+    "sharedListsMenuSub",
+    "sharedListActiveMenuSub",
+    "settingsMenuSub",
+    "savedListsMenuSub",
+    "accountMenuSub",
+    "aboutMenuSub"
+  ];
+
+  // Find the page that is currently visible. This makes every submenu
+  // transition use the same left/right slide, not just the main menu.
+  let current = null;
+  for (const id of pageIds) {
+    const el = document.getElementById(id);
+    if (el && el !== page && getComputedStyle(el).display !== "none") {
+      current = el;
+      break;
+    }
+  }
+
+  if (current === page) return;
+
+  if (current) {
+    current.classList.remove("familyMenuMainEnter", "familyMenuSubEnter", "familyMenuMainExit", "familyMenuSubExit");
+    void current.offsetWidth;
+    current.classList.add("familyMenuMainExit");
+  }
+
+  page.style.display = "block";
+  page.classList.remove("familyMenuMainEnter", "familyMenuSubEnter", "familyMenuMainExit", "familyMenuSubExit");
+  void page.offsetWidth;
+  page.classList.add("familyMenuSubEnter");
+
   setTimeout(() => {
-    main.style.display = "none";
-    ["familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el !== page) { el.style.display="none"; el.classList.remove("familyMenuSubEnter","familyMenuSubExit"); }
-    });
-    main.classList.remove("familyMenuMainExit");
-    page.style.display = "block";
-    page.classList.remove("familyMenuSubExit");
-    void page.offsetWidth;
-    page.classList.add("familyMenuSubEnter");
-  }, 170);
+    if (current && current !== page) {
+      current.style.display = "none";
+      current.classList.remove("familyMenuMainExit", "familyMenuSubExit");
+    }
+    page.classList.remove("familyMenuSubEnter");
+  }, 290);
 }
 function returnMenuToMain(pageId, event) {
   if (event) event.stopPropagation();
@@ -3539,9 +3570,31 @@ async function openSharedListsSubmenu(event) {
   await renderSharedLists();
 }
 function closeSharedListsSubmenu(event) {
-  if(event) event.stopPropagation();
-  returnMenuToMain("sharedListsMenuSub", event);
-  returnToFamilyList();
+  if (event) event.stopPropagation();
+
+  // From the Deellijst page, return to the main menu with the exact
+  // same submenu slide used elsewhere.
+  const sharedPage = document.getElementById("sharedListsMenuSub");
+  const main = document.getElementById("familyMenuMain");
+
+  if (sharedPage && getComputedStyle(sharedPage).display !== "none") {
+    returnMenuToMain("sharedListsMenuSub", event);
+  } else if (main) {
+    // When this is used from the main menu, close the complete menu normally.
+    closeFamilyMenu();
+  }
+
+  activeListType = "family";
+  if (currentSharedListUnsubscribe) {
+    currentSharedListUnsubscribe();
+    currentSharedListUnsubscribe = null;
+  }
+  currentSharedListId = null;
+  currentSharedListInviteCode = null;
+
+  const h = document.querySelector(".headerBar h1");
+  if (h) h.textContent = "Boodschappenlijst";
+  loadList().catch(()=>{});
 }
 
 function returnToSharedListsMenu(event){
@@ -4020,24 +4073,40 @@ async function deleteCurrentSharedList(){
 
 async function returnToFamilyList(){
   if(!auth.currentUser) return;
-  try{ returnMenuToMain("sharedListsMenuSub"); }catch(_){}
+
+  // Use the same horizontal submenu transition as all other menu pages:
+  // the current Deellijst page slides to the right and the main menu
+  // slides back in from the left.
   try{
-    const activePage=document.getElementById("sharedListActiveMenuSub");
-    if(activePage) activePage.style.display="none";
+    returnMenuToMain("sharedListActiveMenuSub");
   }catch(_){}
 
   activeListType="family";
+
   if(currentSharedListId){
     try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){}
   }
   currentSharedListId=null;
   currentSharedListInviteCode=null;
-  if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
-  const delBtn=document.getElementById("deleteSharedListBtn"); if(delBtn) delBtn.remove();
-  const h=document.querySelector(".headerBar h1"); if(h) h.textContent="Boodschappenlijst";
+
+  if(currentSharedListUnsubscribe){
+    currentSharedListUnsubscribe();
+    currentSharedListUnsubscribe=null;
+  }
+
+  const delBtn=document.getElementById("deleteSharedListBtn");
+  if(delBtn) delBtn.remove();
+
+  const h=document.querySelector(".headerBar h1");
+  if(h) h.textContent="Boodschappenlijst";
+
   boodschappen=[];
   selectedIndex=-1;
   showList();
+
+  // Loading the family list happens after the transition starts, so the
+  // menu animation is never replaced by an abrupt disappearance.
+  await new Promise(resolve=>setTimeout(resolve,180));
   await loadList();
 }
 
