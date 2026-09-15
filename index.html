@@ -2145,9 +2145,39 @@ function toggleTheme() {
 function closeFamilyMenu() {
   const menu = document.getElementById("familyMenu");
   if (!menu) return;
+
   menu.classList.remove("menu-open");
+
   setTimeout(() => {
-    if (!menu.classList.contains("menu-open")) menu.style.display = "none";
+    if (menu.classList.contains("menu-open")) return;
+
+    menu.style.display = "none";
+
+    // Always reset the menu to the main page when it closes.
+    // This prevents a submenu (for example Deellijst) from
+    // remaining visible as a long bar the next time the menu is opened.
+    const pageIds = [
+      "familyMenuSub",
+      "sharedListsMenuSub",
+      "settingsMenuSub",
+      "savedListsMenuSub",
+      "accountMenuSub",
+      "aboutMenuSub"
+    ];
+
+    pageIds.forEach(id => {
+      const page = document.getElementById(id);
+      if (page) {
+        page.style.display = "none";
+        page.classList.remove("familyMenuSubEnter", "familyMenuSubExit");
+      }
+    });
+
+    const main = document.getElementById("familyMenuMain");
+    if (main) {
+      main.style.display = "block";
+      main.classList.remove("familyMenuMainEnter", "familyMenuMainExit");
+    }
   }, 290);
 }
 
