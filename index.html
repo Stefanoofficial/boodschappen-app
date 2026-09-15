@@ -3654,7 +3654,7 @@ async function getCurrentSharedListSnapshot(){
   return snap.exists() ? snap.val() : null;
 }
 
-async async function showSharedListCode(){
+async function showSharedListCode(){
   const user=auth.currentUser;
   if(!user || activeListType!=="shared" || !currentSharedListId) return;
 
