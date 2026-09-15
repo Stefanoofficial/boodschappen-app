@@ -925,6 +925,14 @@ body.dark-theme .themeOption i{color:#dce9df;}
     justify-content: center;
   }
 }
+
+.familyMenuPage {
+  background: #f7efe3;
+  border-radius: 12px;
+}
+body.dark-theme .familyMenuPage {
+  background: #252b27;
+}
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -1675,10 +1683,27 @@ body.logged-in .app {
 .familyMenu {
   overflow: hidden !important;
 }
+.familyMenu.menu-open {
+  display: grid !important;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .familyMenuPage {
   width: 100%;
+  min-width: 0;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  box-sizing: border-box;
   transition: transform .28s cubic-bezier(.22,.8,.3,1), opacity .20s ease;
   will-change: transform, opacity;
+}
+
+/* Alle menu-pagina's liggen als één laag over elkaar. Daardoor schuift een
+   submenu echt over het vorige submenu heen, zonder oude tekst erachter. */
+.familyMenuPage[style*="display:none"] {
+  pointer-events: none;
 }
 .familyMenuMainExit {
   animation: familyMenuSlideLeft .28s cubic-bezier(.22,.8,.3,1) forwards;
@@ -1994,7 +2019,8 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
       <i class="fa-solid fa-link"></i>
       <span>Deelcode</span>
     </button>
-    <button type="button" class="familyMenuItem" onclick="returnToFamilyList()">
+    <button type="button" class="familyMenuItem" onclick="returnToFamilyList(event)">
+      <i class="fa-solid fa-list"></i>
       <span>Familielijst</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
@@ -4071,7 +4097,7 @@ async function deleteCurrentSharedList(){
   }
 }
 
-async function returnToFamilyList(){
+async function returnToFamilyList(event){
   if(!auth.currentUser) return;
 
   // Use the same horizontal submenu transition as all other menu pages:
