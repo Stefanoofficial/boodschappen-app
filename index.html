@@ -1776,6 +1776,10 @@ body.logged-in .app {
 
 .sharedListInviteBox{margin:8px 0;padding:10px 11px;border-radius:13px;background:rgba(255,255,255,.5);border:1px solid rgba(63,91,69,.10)}
 .sharedListInviteCode{font-size:21px;font-weight:800;letter-spacing:.14em;color:#3F5B45;margin:4px 0 8px}
+.sharedListCodeLink{border:0;background:transparent;padding:0;cursor:pointer;text-decoration:underline;font:inherit}
+.sharedListLinkLabel{margin-top:8px;font-size:11px;font-weight:700;opacity:.72}
+.sharedListInviteLink{display:block;word-break:break-all;font-size:11px;line-height:1.35;color:#3F5B45;text-decoration:underline}
+body.dark-theme .sharedListInviteLink{color:#dff1e2}
 .sharedListActionRow{display:flex;gap:6px;flex-wrap:wrap}.sharedListAction{border:0;border-radius:10px;padding:8px 10px;background:#e5f1e5;color:#3F5B45;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}body.dark-theme .sharedListInviteCode{color:#dff1e2}.sharedListEmpty{padding:10px 7px;color:#8b928d;font-size:11px;line-height:1.35}
 </style>
@@ -1981,7 +1985,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
     </button>
     <button type="button" class="familyMenuItem" onclick="returnToFamilyList()">
       <i class="fa-solid fa-arrow-left"></i>
-      <span>Terug naar familielijst</span>
+      <span>&lt; Familielijst</span>
     </button>
     <div class="familyMenuSubTitle">Mijn deellijsten</div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
@@ -3456,6 +3460,7 @@ const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.
 let loginFlowActive = false;
   let currentHouseholdId = null;
 let currentSharedListId = null;
+let currentSharedListInviteCode = null;
 let currentSharedListUnsubscribe = null;
 // Houd de gewone familielijst en een Deellijst strikt gescheiden.
 let activeListType = "family"; // "family" | "shared" | "private"
@@ -3516,7 +3521,7 @@ function closeSharedListsSubmenu(event) { returnMenuToMain("sharedListsMenuSub",
 function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
 function makeSharedListLink(code){
   const base = window.location.href.split("#")[0].split("?")[0];
-  return base + "?deellijst=" + encodeURIComponent(code);
+  return base + "?code=" + encodeURIComponent(code);
 }
 
 async function createSharedList(){
@@ -3650,20 +3655,34 @@ async function getCurrentSharedListSnapshot(){
 }
 
 async function showSharedListCode(){
-  const list=await getCurrentSharedListSnapshot();
-  if(!list) return;
-  const code=String(list.inviteCode || "");
-  if(!code){ await familyAlert("Deelcode","Voor deze deellijst is geen deelcode beschikbaar.","fa-link"); return; }
+  let list=null;
+  try { list=await getCurrentSharedListSnapshot(); } catch(e) { console.warn("Deellink lezen via Firebase mislukt; lokale code wordt gebruikt.",e); }
+  const code=String((list && list.inviteCode) || currentSharedListInviteCode || "");
+  if(!list) list={name:"Deellijst"};
+  if(!code){ await familyAlert("Deellink","Voor deze deellijst is geen deelcode beschikbaar.","fa-link"); return; }
+  const link=makeSharedListLink(code);
+  const safeName=String(list.name || "Deellijst").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
   const overlay=familyDialogBase(
     "fa-link",
-    "Deelcode",
-    `<div class="familyDialogText">Deel deze code om mensen toegang te geven tot “${String(list.name || "Deellijst").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}”.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${code}</div></div>`,
-    `<button type="button" class="familyDialogBtn familyDialogCancel">Sluiten</button><button type="button" class="familyDialogBtn familyDialogPrimary" id="copyCurrentSharedCode">📋 Kopiëren</button>`
+    "Deellink",
+    `<div class="familyDialogText">Deel deze code of link om toegang te geven tot “${safeName}”.</div><div class="sharedListInviteBox"><div>Deelcode</div><button type="button" class="sharedListInviteCode sharedListCodeLink" id="copyCurrentSharedCode">${code}</button><div class="sharedListLinkLabel">Deellink</div><a class="sharedListInviteLink" id="openCurrentSharedLink" href="${link}" target="_blank" rel="noopener">${link}</a></div>`,
+    `<button type="button" class="familyDialogBtn familyDialogCancel">Sluiten</button><button type="button" class="familyDialogBtn familyDialogPrimary" id="copyCurrentSharedLink">🔗 Link kopiëren</button>`
   );
-  overlay.querySelector("#copyCurrentSharedCode").onclick=async()=>{
-    try{ await navigator.clipboard.writeText(code); await familyAlert("Gekopieerd","De deelcode is gekopieerd.","fa-check"); }
-    catch(e){ await familyAlert("Deelcode","Kopiëren wordt niet ondersteund. Code: " + code,"fa-copy"); }
+  const copy=async(text,msg)=>{
+    try{
+      if(navigator.share && text===link){
+        await navigator.share({title:list.name || "Deellijst", text:"Doe mee met deze deellijst", url:link});
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      await familyAlert("Gekopieerd",msg,"fa-check");
+    }catch(e){
+      if(e && e.name === "AbortError") return;
+      await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de link of code handmatig.","fa-copy");
+    }
   };
+  overlay.querySelector("#copyCurrentSharedCode").onclick=()=>copy(code,"De deelcode is gekopieerd.");
+  overlay.querySelector("#copyCurrentSharedLink").onclick=()=>copy(link,"De deellink is gekopieerd.");
   overlay.querySelector(".familyDialogCancel").onclick=()=>closeFamilyDialog(overlay);
 }
 
@@ -3731,6 +3750,7 @@ async function openSharedList(id, showInvite){
   const previousSharedId = currentSharedListId;
   activeListType = "shared";
   currentSharedListId = id;
+  currentSharedListInviteCode = null;
 
   if(currentSharedListUnsubscribe){
     currentSharedListUnsubscribe();
@@ -3753,6 +3773,7 @@ async function openSharedList(id, showInvite){
     }
 
     boodschappen=normalizeBoodschappen(v.boodschappen||[]);
+    currentSharedListInviteCode = v.inviteCode || null;
     showList();
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=v.name||"Deellijst";
     updateSharedDeleteButton(v.owner === user.uid);
@@ -3792,6 +3813,7 @@ async function openSharedList(id, showInvite){
     console.error("Deellijst openen mislukt:", error);
     activeListType = "family";
     currentSharedListId = previousSharedId || null;
+    currentSharedListInviteCode = null;
     if (!currentSharedListId) await loadList();
     await familyAlert("Deellijst","Deellijst kon niet worden geopend. Je familielijst is niet gewijzigd.","fa-triangle-exclamation");
   }
@@ -3854,6 +3876,7 @@ async function deleteCurrentSharedList(){
 
     activeListType="family";
     currentSharedListId=null;
+    currentSharedListInviteCode=null;
     const delBtn=document.getElementById("deleteSharedListBtn");
     if(delBtn) delBtn.remove();
     await loadList();
@@ -3872,6 +3895,7 @@ async function returnToFamilyList(){
   if(!auth.currentUser) return;
   activeListType="family";
   currentSharedListId=null;
+  currentSharedListInviteCode=null;
   if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
   const delBtn=document.getElementById("deleteSharedListBtn"); if(delBtn) delBtn.remove();
   const h=document.querySelector(".headerBar h1"); if(h) h.textContent="Boodschappenlijst";
@@ -4786,19 +4810,20 @@ function toggleRegisterPassword(fieldId, button) {
 </script>
 
 <script>
-/* Deellijst: deel-link -> bestaande aanmeldflow -> oorspronkelijke Deellijst */
+/* Deellijst: deellink -> bestaande login/registratie -> oorspronkelijke Deellijst */
 (function () {
   const SHARED_JOIN_KEY = 'pendingSharedListId';
   const SHARED_JOIN_CODE_KEY = 'pendingSharedListCode';
 
   function getSharedJoinFromUrl() {
     const url = new URL(window.location.href);
-    const id = url.searchParams.get('sharedList');
     const code = url.searchParams.get('code');
-    if (id || code) return { id, code };
+    const id = url.searchParams.get('sharedList');
+    const legacyCode = url.searchParams.get('deellijst');
+    if (code || id || legacyCode) return { id, code: code || legacyCode };
     const hash = new URLSearchParams((url.hash || '').replace(/^#/, ''));
+    const hcode = hash.get('code') || hash.get('deellijst');
     const hid = hash.get('sharedList');
-    const hcode = hash.get('code');
     if (hid || hcode) return { id: hid, code: hcode };
     return null;
   }
@@ -4808,121 +4833,84 @@ function toggleRegisterPassword(fieldId, button) {
     if (join.id) sessionStorage.setItem(SHARED_JOIN_KEY, join.id);
     if (join.code) sessionStorage.setItem(SHARED_JOIN_CODE_KEY, join.code);
   }
-
   function getRememberedSharedJoin() {
     const id = sessionStorage.getItem(SHARED_JOIN_KEY);
     const code = sessionStorage.getItem(SHARED_JOIN_CODE_KEY);
     return (id || code) ? { id, code } : null;
   }
-
   function clearRememberedSharedJoin() {
     sessionStorage.removeItem(SHARED_JOIN_KEY);
     sessionStorage.removeItem(SHARED_JOIN_CODE_KEY);
   }
-
   async function resolveSharedJoin(join) {
     if (!join) return null;
     if (join.id) return join.id;
-    if (!join.code || typeof database === 'undefined') return null;
+    if (!join.code) return null;
     const snap = await database.ref('sharedListCodes/' + join.code).once('value');
     return snap.exists() ? snap.val() : null;
   }
 
   async function finishPendingSharedJoin() {
+    const user = auth.currentUser;
     const join = getRememberedSharedJoin();
-    if (!join || typeof currentUser === 'undefined' || !currentUser) return false;
-
+    if (!join || !user) return false;
     try {
       const listId = await resolveSharedJoin(join);
-      if (!listId) {
-        clearRememberedSharedJoin();
-        return false;
-      }
-
+      if (!listId) { clearRememberedSharedJoin(); return false; }
       const ref = database.ref('sharedLists/' + listId);
       const snap = await ref.once('value');
-      if (!snap.exists()) {
-        clearRememberedSharedJoin();
-        return false;
-      }
-
+      if (!snap.exists()) { clearRememberedSharedJoin(); return false; }
       const list = snap.val() || {};
-      const uid = currentUser.uid;
-      const owner = list.owner === uid;
+      const uid = user.uid;
       const alreadyMember = !!(list.members && list.members[uid] === true);
-
-      // Existing list owner/member: open immediately.
-      if (owner || alreadyMember) {
-        clearRememberedSharedJoin();
-        if (typeof openSharedList === 'function') {
-          await openSharedList(listId);
-          return true;
-        }
+      if (!alreadyMember && list.owner !== uid) {
+        let name = '';
+        try {
+          const ns = await database.ref('users/' + uid + '/name').once('value');
+          name = ns.val() || '';
+        } catch (_) {}
+        if (!name) name = user.displayName || user.email || 'Gebruiker';
+        const updates = {};
+        updates['sharedLists/' + listId + '/members/' + uid] = true;
+        updates['sharedLists/' + listId + '/memberNames/' + uid] = name;
+        updates['userSharedLists/' + uid + '/' + listId] = true;
+        await database.ref().update(updates);
       }
-
-      // New participant: add them to the existing list. Use the name
-      // already collected by the app's normal sign-in flow.
-      let name = '';
-      if (typeof currentUserName !== 'undefined' && currentUserName) name = currentUserName;
-      if (!name) {
-        const storedName = localStorage.getItem('userName') || localStorage.getItem('name');
-        if (storedName) name = storedName;
-      }
-
-      const updates = {};
-      updates['sharedLists/' + listId + '/members/' + uid] = true;
-      if (name) updates['sharedLists/' + listId + '/memberNames/' + uid] = name;
-      updates['userSharedLists/' + uid + '/' + listId] = true;
-      await database.ref().update(updates);
-
       clearRememberedSharedJoin();
-      if (typeof openSharedList === 'function') {
-        await openSharedList(listId);
-        return true;
-      }
+      await openSharedList(listId, false);
+      return true;
     } catch (e) {
       console.error('Deellijst join na aanmelden mislukt:', e);
+      return false;
     }
-    return false;
   }
 
   async function routeSharedJoin() {
     const fromUrl = getSharedJoinFromUrl();
     if (fromUrl) rememberSharedJoin(fromUrl);
-
-    const pending = getRememberedSharedJoin();
-    if (!pending) return;
-
-    if (typeof currentUser !== 'undefined' && currentUser) {
+    if (!getRememberedSharedJoin()) return;
+    if (auth.currentUser) {
       await finishPendingSharedJoin();
       return;
     }
-
-    // Niet aangemeld: laat de bestaande app-authflow het scherm tonen.
-    // We forceren geen nieuwe registratiepagina.
-    if (typeof showLogin === 'function') {
-      showLogin();
-    } else if (typeof showAuthScreen === 'function') {
-      showAuthScreen();
-    }
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen) loginScreen.style.display = 'flex';
   }
 
   window.finishPendingSharedJoin = finishPendingSharedJoin;
   window.routeSharedJoin = routeSharedJoin;
-
-  document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(routeSharedJoin, 0);
-  });
-
-  // Expose a simple helper for share buttons/links.
+  document.addEventListener('DOMContentLoaded', () => setTimeout(routeSharedJoin, 0));
+  if (typeof auth !== 'undefined' && auth && typeof auth.onAuthStateChanged === 'function') {
+    auth.onAuthStateChanged(async (user) => {
+      if (user && getRememberedSharedJoin()) await finishPendingSharedJoin();
+    });
+  }
   window.createSharedListShareUrl = function (listId, code) {
     const base = window.location.origin + window.location.pathname;
-    return base + '?sharedList=' + encodeURIComponent(listId) +
-      (code ? '&code=' + encodeURIComponent(code) : '');
+    return base + '?code=' + encodeURIComponent(code || '');
   };
 })();
 </script>
-
 
 <style>
 .shared-code-button {
