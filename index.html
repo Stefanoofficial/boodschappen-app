@@ -1705,6 +1705,10 @@ body.logged-in .app {
 .familyMenuPage[style*="display:none"] {
   pointer-events: none;
 }
+.menuSlideOutLeft { animation: familyMenuSlideLeft .28s cubic-bezier(.22,.8,.3,1) forwards; }
+.menuSlideInRight { animation: familyMenuSlideInRight .28s cubic-bezier(.22,.8,.3,1) forwards; }
+.menuSlideOutRight { animation: familyMenuSlideRight .28s cubic-bezier(.22,.8,.3,1) forwards; }
+.menuSlideInLeft { animation: familyMenuSlideInLeft .28s cubic-bezier(.22,.8,.3,1) forwards; }
 .familyMenuMainExit {
   animation: familyMenuSlideLeft .28s cubic-bezier(.22,.8,.3,1) forwards;
 }
@@ -2215,6 +2219,7 @@ function toggleTheme() {
 }
 
 function closeFamilyMenu() {
+  if (__menuTransitionTimer) { clearTimeout(__menuTransitionTimer); __menuTransitionTimer = null; }
   const menu = document.getElementById("familyMenu");
   if (!menu) return;
 
@@ -2276,45 +2281,15 @@ document.addEventListener("click", closeOpenMenusOnOutsideClick);
 
 function openFamilySubmenu(event) {
   if (event) event.stopPropagation();
-  const main = document.getElementById("familyMenuMain");
-  const sub = document.getElementById("familyMenuSub");
-  if (!main || !sub) return;
-
-  main.classList.remove("familyMenuMainEnter");
-  main.classList.add("familyMenuMainExit");
-  setTimeout(() => {
-    main.style.display = "none";
-    main.classList.remove("familyMenuMainExit");
-    sub.style.display = "block";
-    sub.classList.remove("familyMenuSubExit");
-    void sub.offsetWidth;
-    sub.classList.add("familyMenuSubEnter");
-  }, 170);
-
   const mainCount = document.getElementById("memberCount");
   const subCount = document.getElementById("memberCountSub");
   if (mainCount && subCount) subCount.innerText = mainCount.innerText;
   const mainLabel = document.getElementById("memberLabel");
   const subLabel = document.getElementById("memberLabelSub");
   if (mainLabel && subLabel) subLabel.innerHTML = mainLabel.innerHTML;
+  switchMenuPage("familyMenuSub", event);
 }
-function closeFamilySubmenu(event) {
-  if (event) event.stopPropagation();
-  const main = document.getElementById("familyMenuMain");
-  const sub = document.getElementById("familyMenuSub");
-  if (!main || !sub) return;
-
-  sub.classList.remove("familyMenuSubEnter");
-  sub.classList.add("familyMenuSubExit");
-  setTimeout(() => {
-    sub.style.display = "none";
-    sub.classList.remove("familyMenuSubExit");
-    main.style.display = "block";
-    main.classList.remove("familyMenuMainExit");
-    void main.offsetWidth;
-    main.classList.add("familyMenuMainEnter");
-  }, 170);
-}
+function closeFamilySubmenu(event) { returnMenuToMain("familyMenuSub", event); }
 function openSettingsSubmenu(event) {
   if (event) event.stopPropagation();
   const main = document.getElementById("familyMenuMain");
@@ -2395,72 +2370,71 @@ function closeSavedListsSubmenu(event) {
   }, 170);
 }
 
+let __menuTransitionTimer = null;
+let __menuCurrentPage = "familyMenuMain";
+
+function __resetMenuPageClasses(el){
+  if(!el) return;
+  el.classList.remove("familyMenuMainEnter","familyMenuSubEnter","familyMenuMainExit","familyMenuSubExit",
+    "menuSlideOutLeft","menuSlideInRight","menuSlideOutRight","menuSlideInLeft");
+}
+
 function switchMenuPage(pageId, event) {
   if (event) event.stopPropagation();
-
   const page = document.getElementById(pageId);
-  const main = document.getElementById("familyMenuMain");
   if (!page) return;
 
-  const pageIds = [
-    "familyMenuMain",
-    "familyMenuSub",
-    "sharedListsMenuSub",
-    "sharedListActiveMenuSub",
-    "settingsMenuSub",
-    "savedListsMenuSub",
-    "accountMenuSub",
-    "aboutMenuSub"
-  ];
+  if (__menuTransitionTimer) { clearTimeout(__menuTransitionTimer); __menuTransitionTimer = null; }
 
-  // Find the page that is currently visible. This makes every submenu
-  // transition use the same left/right slide, not just the main menu.
-  let current = null;
-  for (const id of pageIds) {
-    const el = document.getElementById(id);
-    if (el && el !== page && getComputedStyle(el).display !== "none") {
-      current = el;
-      break;
-    }
+  const pageIds = ["familyMenuMain","familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub",
+    "settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"];
+  let current = document.getElementById(__menuCurrentPage);
+  if (!current || current === page || getComputedStyle(current).display === "none") {
+    current = pageIds.map(id=>document.getElementById(id)).find(el => el && el !== page && getComputedStyle(el).display !== "none") || null;
   }
-
   if (current === page) return;
 
+  const forward = true;
   if (current) {
-    current.classList.remove("familyMenuMainEnter", "familyMenuSubEnter", "familyMenuMainExit", "familyMenuSubExit");
-    void current.offsetWidth;
-    current.classList.add("familyMenuMainExit");
+    __resetMenuPageClasses(current);
+    current.classList.add("menuSlideOutLeft");
   }
-
+  __resetMenuPageClasses(page);
   page.style.display = "block";
-  page.classList.remove("familyMenuMainEnter", "familyMenuSubEnter", "familyMenuMainExit", "familyMenuSubExit");
-  void page.offsetWidth;
-  page.classList.add("familyMenuSubEnter");
+  page.classList.add("menuSlideInRight");
+  __menuCurrentPage = pageId;
 
-  setTimeout(() => {
-    if (current && current !== page) {
-      current.style.display = "none";
-      current.classList.remove("familyMenuMainExit", "familyMenuSubExit");
-    }
-    page.classList.remove("familyMenuSubEnter");
-  }, 290);
+  __menuTransitionTimer = setTimeout(()=>{
+    if(current && current !== page){ current.style.display="none"; __resetMenuPageClasses(current); }
+    __resetMenuPageClasses(page);
+    __menuTransitionTimer=null;
+  },290);
 }
+
 function returnMenuToMain(pageId, event) {
   if (event) event.stopPropagation();
-  const main = document.getElementById("familyMenuMain");
   const page = document.getElementById(pageId);
-  if (!main || !page) return;
-  page.classList.remove("familyMenuSubEnter");
-  page.classList.add("familyMenuSubExit");
-  setTimeout(() => {
-    page.style.display = "none";
-    page.classList.remove("familyMenuSubExit");
-    main.style.display = "block";
-    void main.offsetWidth;
-    main.classList.add("familyMenuMainEnter");
-  }, 170);
+  const main = document.getElementById("familyMenuMain");
+  if (!page || !main) return;
+
+  if (__menuTransitionTimer) { clearTimeout(__menuTransitionTimer); __menuTransitionTimer=null; }
+  __resetMenuPageClasses(page);
+  __resetMenuPageClasses(main);
+  page.style.display="block";
+  main.style.display="block";
+  page.classList.add("menuSlideOutRight");
+  main.classList.add("menuSlideInLeft");
+  __menuCurrentPage="familyMenuMain";
+
+  __menuTransitionTimer=setTimeout(()=>{
+    page.style.display="none";
+    __resetMenuPageClasses(page);
+    __resetMenuPageClasses(main);
+    __menuTransitionTimer=null;
+  },290);
 }
 function openAccountSubmenu(event) {
+
   switchMenuPage("accountMenuSub", event);
   const user = auth && auth.currentUser;
   const email = document.getElementById("accountMenuEmail");
@@ -3625,23 +3599,22 @@ function closeSharedListsSubmenu(event) {
 
 function returnToSharedListsMenu(event){
   if(event) event.stopPropagation();
-
-  const from = document.getElementById("sharedListActiveMenuSub");
-  const to = document.getElementById("sharedListsMenuSub");
+  const from=document.getElementById("sharedListActiveMenuSub");
+  const to=document.getElementById("sharedListsMenuSub");
   if(!from || !to) return;
-
-  from.classList.remove("familyMenuSubEnter","familyMenuSubExit");
-  from.classList.add("familyMenuSubExit");
-
+  if(__menuTransitionTimer){ clearTimeout(__menuTransitionTimer); __menuTransitionTimer=null; }
+  __resetMenuPageClasses(from);
+  __resetMenuPageClasses(to);
+  from.style.display="block";
   to.style.display="block";
-  to.classList.remove("familyMenuSubEnter","familyMenuSubExit");
-  void to.offsetWidth;
-  to.classList.add("familyMenuSubEnter");
-
-  setTimeout(()=>{
+  from.classList.add("menuSlideOutRight");
+  to.classList.add("menuSlideInLeft");
+  __menuCurrentPage="sharedListsMenuSub";
+  __menuTransitionTimer=setTimeout(()=>{
     from.style.display="none";
-    from.classList.remove("familyMenuSubExit");
-    to.classList.remove("familyMenuSubEnter");
+    __resetMenuPageClasses(from);
+    __resetMenuPageClasses(to);
+    __menuTransitionTimer=null;
     renderSharedLists();
   },290);
 }
@@ -4121,61 +4094,37 @@ async function returnToFamilyList(event){
   const activePage=document.getElementById("sharedListActiveMenuSub");
   const menu=document.getElementById("familyMenu");
 
-  // Close the shared-list menu page with the same right-slide animation.
+  if(__menuTransitionTimer){ clearTimeout(__menuTransitionTimer); __menuTransitionTimer=null; }
   if(activePage){
-    activePage.classList.remove("familyMenuSubEnter","familyMenuSubExit");
-    activePage.classList.add("familyMenuSubExit");
+    __resetMenuPageClasses(activePage);
+    activePage.style.display="block";
+    activePage.classList.add("menuSlideOutRight");
   }
 
-  // Clean up the shared-list state immediately so the family header can never
-  // retain the shared-list delete button.
+  // Shared-list UI must disappear immediately; the family list itself is
+  // loaded only after the menu transition so no shared-list frame leaks through.
+  document.querySelectorAll("#deleteSharedListBtn,.sharedDeleteIconButton").forEach(el=>el.remove());
+
   activeListType="family";
-  if(currentSharedListId){
-    try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){}
-  }
+  if(currentSharedListId){ try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){} }
   currentSharedListId=null;
   currentSharedListInviteCode=null;
-
-  if(currentSharedListUnsubscribe){
-    currentSharedListUnsubscribe();
-    currentSharedListUnsubscribe=null;
-  }
-
-  // Remove any shared-list delete button, including a stale header instance.
-  document.querySelectorAll("#deleteSharedListBtn,.sharedDeleteIconButton").forEach(el=>el.remove());
+  if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
 
   const h=document.querySelector(".headerBar h1");
   if(h) h.textContent="Boodschappenlijst";
 
-  boodschappen=[];
-  selectedIndex=-1;
-
-  // Let the slide finish, then close the complete menu and load the family list.
-  await new Promise(resolve=>setTimeout(resolve,290));
-
-  if(activePage){
-    activePage.style.display="none";
-    activePage.classList.remove("familyMenuSubExit");
-  }
-
   if(menu){
     menu.classList.remove("menu-open");
-    menu.style.display="none";
   }
 
-  // Reset every submenu page so reopening the menu always starts at the main page.
-  ["familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id=>{
-    const page=document.getElementById(id);
-    if(page){
-      page.style.display="none";
-      page.classList.remove("familyMenuMainEnter","familyMenuMainExit","familyMenuSubEnter","familyMenuSubExit");
-    }
-  });
+  await new Promise(resolve=>setTimeout(resolve,290));
+  if(activePage){ activePage.style.display="none"; __resetMenuPageClasses(activePage); }
+  const pageIds=["familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"];
+  pageIds.forEach(id=>{ const p=document.getElementById(id); if(p){ p.style.display="none"; __resetMenuPageClasses(p); }});
   const main=document.getElementById("familyMenuMain");
-  if(main){
-    main.style.display="block";
-    main.classList.remove("familyMenuMainEnter","familyMenuMainExit","familyMenuSubEnter","familyMenuSubExit");
-  }
+  if(main){ main.style.display="block"; __resetMenuPageClasses(main); }
+  __menuCurrentPage="familyMenuMain";
 
   await loadList();
 }
