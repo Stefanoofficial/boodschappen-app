@@ -2715,10 +2715,8 @@ async function loadList() {
     console.error("Lijst laden mislukt:", error);
 
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
-      // Een permissiefout is een lees-/rechtenprobleem, geen reden om de
-      // bestaande familie-koppeling te verwijderen.
       const status = document.getElementById("status");
-      if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> Geen toegang tot de familielijst. Je familie-koppeling is behouden.';
+      if (status) status.innerHTML = '<i class="fa-solid fa-lock" aria-hidden="true"></i> Geen toegang tot de familielijst. Controleer de Firebase Database Rules.';
       return false;
     }
 
@@ -3494,25 +3492,10 @@ async function returnToFamilyList() {
 
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
-
-  if (!user) {
-    throw new Error("Je bent niet ingelogd.");
-  }
-
-  // Lees alleen de bestaande koppeling van de gebruiker.
-  // We controleren hier NIET de volledige household-node: die extra read
-  // kan door Firebase Rules worden geweigerd terwijl de gebruiker de
-  // boodschappenlijst zelf wel mag lezen. Een leesfout mag bovendien nooit
-  // automatisch data uit Firebase verwijderen.
-  const userRef = database.ref("users/" + user.uid + "/householdId");
-  const userSnapshot = await userRef.once("value");
+  if (!user) throw new Error("Je bent niet ingelogd.");
+  const userSnapshot = await database.ref("users/" + user.uid + "/householdId").once("value");
   const householdId = userSnapshot.val();
-
-  if (!householdId) {
-    currentHouseholdId = null;
-    return null;
-  }
-
+  if (!householdId) { currentHouseholdId = null; return null; }
   currentHouseholdId = String(householdId);
   return currentHouseholdId;
 }
@@ -4583,8 +4566,7 @@ function toggleRegisterPassword(fieldId, button) {
       // Alleen bij een echte Firebase-authfout tonen we het login-scherm.
       if (error && String(error.code || "").startsWith("auth/")) {
         document.body.classList.remove("logged-in");
-        const restoreLoginScreen = document.getElementById("loginScreen");
-        if (restoreLoginScreen) restoreLoginScreen.style.display = "flex";
+        if (loginScreen) loginScreen.style.display = "flex";
       }
     }
   });
