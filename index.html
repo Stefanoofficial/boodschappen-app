@@ -1920,7 +1920,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
   </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
-    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="closeSharedListsSubmenu(event)">
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFamilySubmenu(event)">
       <i class="fa-solid fa-users"></i>
       <span>Mijn familie</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
@@ -3625,8 +3625,25 @@ function closeSharedListsSubmenu(event) {
 
 function returnToSharedListsMenu(event){
   if(event) event.stopPropagation();
-  returnMenuToMain("sharedListActiveMenuSub", event);
-  setTimeout(()=>renderSharedLists(), 180);
+
+  const from = document.getElementById("sharedListActiveMenuSub");
+  const to = document.getElementById("sharedListsMenuSub");
+  if(!from || !to) return;
+
+  from.classList.remove("familyMenuSubEnter","familyMenuSubExit");
+  from.classList.add("familyMenuSubExit");
+
+  to.style.display="block";
+  to.classList.remove("familyMenuSubEnter","familyMenuSubExit");
+  void to.offsetWidth;
+  to.classList.add("familyMenuSubEnter");
+
+  setTimeout(()=>{
+    from.style.display="none";
+    from.classList.remove("familyMenuSubExit");
+    to.classList.remove("familyMenuSubEnter");
+    renderSharedLists();
+  },290);
 }
 
 function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
@@ -4098,17 +4115,21 @@ async function deleteCurrentSharedList(){
 }
 
 async function returnToFamilyList(event){
+  if(event) event.stopPropagation();
   if(!auth.currentUser) return;
 
-  // Use the same horizontal submenu transition as all other menu pages:
-  // the current Deellijst page slides to the right and the main menu
-  // slides back in from the left.
-  try{
-    returnMenuToMain("sharedListActiveMenuSub");
-  }catch(_){}
+  const activePage=document.getElementById("sharedListActiveMenuSub");
+  const menu=document.getElementById("familyMenu");
 
+  // Close the shared-list menu page with the same right-slide animation.
+  if(activePage){
+    activePage.classList.remove("familyMenuSubEnter","familyMenuSubExit");
+    activePage.classList.add("familyMenuSubExit");
+  }
+
+  // Clean up the shared-list state immediately so the family header can never
+  // retain the shared-list delete button.
   activeListType="family";
-
   if(currentSharedListId){
     try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){}
   }
@@ -4120,19 +4141,42 @@ async function returnToFamilyList(event){
     currentSharedListUnsubscribe=null;
   }
 
-  const delBtn=document.getElementById("deleteSharedListBtn");
-  if(delBtn) delBtn.remove();
+  // Remove any shared-list delete button, including a stale header instance.
+  document.querySelectorAll("#deleteSharedListBtn,.sharedDeleteIconButton").forEach(el=>el.remove());
 
   const h=document.querySelector(".headerBar h1");
   if(h) h.textContent="Boodschappenlijst";
 
   boodschappen=[];
   selectedIndex=-1;
-  showList();
 
-  // Loading the family list happens after the transition starts, so the
-  // menu animation is never replaced by an abrupt disappearance.
-  await new Promise(resolve=>setTimeout(resolve,180));
+  // Let the slide finish, then close the complete menu and load the family list.
+  await new Promise(resolve=>setTimeout(resolve,290));
+
+  if(activePage){
+    activePage.style.display="none";
+    activePage.classList.remove("familyMenuSubExit");
+  }
+
+  if(menu){
+    menu.classList.remove("menu-open");
+    menu.style.display="none";
+  }
+
+  // Reset every submenu page so reopening the menu always starts at the main page.
+  ["familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id=>{
+    const page=document.getElementById(id);
+    if(page){
+      page.style.display="none";
+      page.classList.remove("familyMenuMainEnter","familyMenuMainExit","familyMenuSubEnter","familyMenuSubExit");
+    }
+  });
+  const main=document.getElementById("familyMenuMain");
+  if(main){
+    main.style.display="block";
+    main.classList.remove("familyMenuMainEnter","familyMenuMainExit","familyMenuSubEnter","familyMenuSubExit");
+  }
+
   await loadList();
 }
 
