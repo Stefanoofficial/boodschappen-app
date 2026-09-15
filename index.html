@@ -3367,6 +3367,12 @@ document.getElementById("list").addEventListener("click", function(e) {
   }
 });
 
+// Activeer productsuggesties zodra de pagina klaar is.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initProductSuggestions);
+} else {
+  initProductSuggestions();
+}
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
