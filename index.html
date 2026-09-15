@@ -2729,7 +2729,7 @@ async function loadList() {
     }
 
     const status = document.getElementById("status");
-    if (status) status.innerText = "⚠️ De familielijst kon niet worden geladen. Probeer opnieuw.";
+    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
     return false;
   }
 }
@@ -3436,31 +3436,57 @@ function handleMainMenuButton() {
 
 async function returnToFamilyList() {
   const user = auth.currentUser;
+
   if (currentSharedListUnsubscribe) {
     currentSharedListUnsubscribe();
     currentSharedListUnsubscribe = null;
   }
+
   currentSharedListId = null;
   boodschappen = [];
+  selectedIndex = -1;
+
   const h = document.querySelector(".headerBar h1");
   if (h) h.textContent = "Boodschappenlijst";
   updateMainMenuButton();
   closeFamilyMenu();
 
+  if (!user) return;
+
   try {
-    if (user) {
-      const householdId = await getOrCreateHousehold();
-      if (householdId) {
-        await loadList();
+    // Restore the existing family connection directly instead of routing
+    // through the normal startup flow. This prevents the family list from
+    // being reported as unavailable when returning from a shared list.
+    const householdSnap = await database.ref("users/" + user.uid + "/householdId").once("value");
+    const householdId = householdSnap.val() ? String(householdSnap.val()) : null;
+
+    if (householdId) {
+      currentHouseholdId = householdId;
+      const listSnap = await database.ref("households/" + householdId + "/boodschappen").once("value");
+      const data = listSnap.val();
+
+      if (Array.isArray(data)) {
+        boodschappen = normalizeBoodschappen(data);
+      } else if (data && typeof data === "object") {
+        boodschappen = normalizeBoodschappen(Object.values(data));
       } else {
-        const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
-        if (savedMode === "private") await loadPrivateList();
-        else if (savedMode === "skip") openAppWithoutList();
-        else await loadList();
+        boodschappen = [];
       }
+
+      showList();
+      updateStatus();
+      await updateMemberCount();
+    } else if (isPrivateMode()) {
+      currentHouseholdId = null;
+      await loadPrivateList();
+    } else {
+      currentHouseholdId = null;
+      openUseModeModal();
     }
   } catch (error) {
     console.error("Terug naar familielijst mislukt:", error);
+    const status = document.getElementById("status");
+    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
   }
 
   try {
@@ -3471,7 +3497,6 @@ async function returnToFamilyList() {
     }
   } catch (e) {}
 }
-
 
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
