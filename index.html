@@ -3075,22 +3075,26 @@ function updateProductSuggestions() {
 
 function initProductSuggestions() {
   const input = document.getElementById("product");
-  if (!input) return;
+  const box = document.getElementById("productSuggestions");
+  if (!input || !box || input.dataset.productSuggestionsReady === "true") return;
+
+  input.dataset.productSuggestionsReady = "true";
   input.addEventListener("input", updateProductSuggestions);
   input.addEventListener("focus", updateProductSuggestions);
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const box = document.getElementById("productSuggestions");
-      if (box) box.classList.remove("open");
-    }
+    if (e.key === "Escape") box.classList.remove("open");
   });
+
   document.addEventListener("click", (e) => {
     const wrap = document.querySelector(".input-row-wrap");
-    if (wrap && !wrap.contains(e.target)) {
-      const box = document.getElementById("productSuggestions");
-      if (box) box.classList.remove("open");
-    }
+    if (wrap && !wrap.contains(e.target)) box.classList.remove("open");
   });
+
+  // Respect the existing user setting. Suggestions are on by default unless
+  // the user explicitly disabled them in Instellingen → Suggesties.
+  if (localStorage.getItem("boodschappenSuggestionsEnabled") !== "false") {
+    updateProductSuggestions();
+  }
 }
 
 function showList(animationType = "") {
