@@ -3431,79 +3431,72 @@ function makeSharedListLink(code){
   return base + "?deellijst=" + encodeURIComponent(code);
 }
 
-async function ensureSharedListIndex(listId, listData) {
-  const user = auth.currentUser;
-  if (!user || !listId || !listData) return;
-  if (!listData.members || listData.members[user.uid] !== true) return;
-
-  const updates = {};
-  updates["userSharedLists/" + user.uid + "/" + listId] = true;
-  if (listData.inviteCode) {
-    updates["sharedListCodes/" + listData.inviteCode] = listId;
-  }
-  try {
-    await database.ref().update(updates);
-  } catch (error) {
-    console.warn("Deellijst-index kon nog niet worden bijgewerkt:", error);
-  }
-}
-
-// Eénmalige koppeling van de al bestaande Kerst-lijst die vóór de nieuwe index-structuur is aangemaakt.
-// Dit verandert de lijst zelf niet; het voegt alleen een persoonlijke index en code-index toe.
-async function migrateExistingKerstList() {
-  const user = auth.currentUser;
-  const legacyId = "-P1Ynay-f0rDEYHk8Vx4";
-  if (!user) return;
-  try {
-    const snap = await database.ref("sharedLists/" + legacyId).once("value");
-    if (!snap.exists()) return;
-    const list = snap.val() || {};
-    if (list.name !== "Kerst" || !list.members || list.members[user.uid] !== true) return;
-    await ensureSharedListIndex(legacyId, list);
-  } catch (error) {
-    console.warn("Bestaande Kerst-lijst kon niet worden gekoppeld:", error);
-  }
-}
-
 async function createSharedList(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
   const name=await familyTextPrompt("Nieuwe lijst","Geef je lijst een naam, bijvoorbeeld Kerst of BBQ met vrienden.","fa-list");
   if(!name) return;
+
   let code=null, id=null;
   for(let i=0;i<8;i++){
     const candidate=makeSharedCode();
-    const ref=database.ref("sharedLists").push();
     try{
-      await ref.set({name:name, owner:user.uid, inviteCode:candidate, members:{[user.uid]:true}, createdAt:Date.now(), boodschappen:[]});
-      id=ref.key; code=candidate;
-      await ensureSharedListIndex(id, {name:name, owner:user.uid, inviteCode:candidate, members:{[user.uid]:true}});
+      const codeSnap=await database.ref("sharedListCodes/" + candidate).once("value");
+      if(codeSnap.exists()) continue;
+
+      const ref=database.ref("sharedLists").push();
+      const listId=ref.key;
+      const listData={
+        name:name,
+        owner:user.uid,
+        inviteCode:candidate,
+        members:{[user.uid]:true},
+        createdAt:Date.now(),
+        boodschappen:[]
+      };
+
+      const updates={};
+      updates["sharedLists/" + listId]=listData;
+      updates["userSharedLists/" + user.uid + "/" + listId]=true;
+      updates["sharedListCodes/" + candidate]=listId;
+      await database.ref().update(updates);
+      id=listId; code=candidate;
       break;
-    }catch(e){ console.error(e); }
+    }catch(e){ console.error("Deellijst aanmaken mislukt:",e); }
   }
-  if(!id){ await familyAlert("Deellijst","De deellijst kon niet worden aangemaakt.","fa-triangle-exclamation"); return; }
+
+  if(!id){
+    await familyAlert("Deellijst","De deellijst kon niet worden aangemaakt. Controleer de Firebase-regels.","fa-triangle-exclamation");
+    return;
+  }
   await openSharedList(id, true);
 }
 
 async function joinSharedListByCode(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const code=(await familyPrompt("Deellijstcode","Voer de 6-cijferige code in.","fa-key")||"").trim();
+  const code=(await familyPrompt("Deellijstcode","Voer de 6-cijferige code in.","fa-key") || "").trim();
   if(!code) return;
-  try {
+
+  try{
     const codeSnap=await database.ref("sharedListCodes/" + code).once("value");
     const id=codeSnap.val();
     if(!id){ await familyAlert("Deellijst","Deze code bestaat niet.","fa-triangle-exclamation"); return; }
+
     const listSnap=await database.ref("sharedLists/" + id).once("value");
-    const list=listSnap.val()||{};
-    if(!listSnap.exists()){ await familyAlert("Deellijst","Deze lijst bestaat niet meer.","fa-triangle-exclamation"); return; }
-    if(list.members && list.members[user.uid]===true){ await openSharedList(id,true); return; }
+    const list=listSnap.val();
+    if(!list){ await familyAlert("Deellijst","Deze lijst bestaat niet meer.","fa-triangle-exclamation"); return; }
+    if(list.members && list.members[user.uid]===true){ await openSharedList(id, true); return; }
+
     const join=await familyConfirm("Deellijst","Wil je deelnemen aan de deellijst “" + (list.name||"Deellijst") + "”?");
     if(!join) return;
-    await database.ref("sharedLists/"+id+"/members/"+user.uid).set(true);
-    await ensureSharedListIndex(id, Object.assign({}, list, {members:Object.assign({}, list.members||{}, {[user.uid]:true})}));
-    await openSharedList(id,true);
-  } catch(error) {
+
+    const updates={};
+    updates["sharedLists/" + id + "/members/" + user.uid]=true;
+    updates["userSharedLists/" + user.uid + "/" + id]=true;
+    await database.ref().update(updates);
+    await openSharedList(id, true);
+  }catch(error){
     console.error("Deellijst via code mislukt:",error);
     await familyAlert("Deellijst","De code kon niet worden verwerkt. Controleer de Firebase-regels.","fa-triangle-exclamation");
   }
@@ -3511,75 +3504,80 @@ async function joinSharedListByCode(){
 
 async function renderSharedLists(){
   const box=document.getElementById("sharedListsContainer"); if(!box) return;
-  const user=auth.currentUser; if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
-  box.innerHTML='<div class="sharedListEmpty">Deellijsten laden…</div>';
-  try{
-    await migrateExistingKerstList();
-    let index = {};
-    try {
-      const indexSnap=await database.ref("userSharedLists/" + user.uid).once("value");
-      index=indexSnap.val()||{};
-    } catch(indexError) {
-      console.warn("Gebruikersindex nog niet beschikbaar:", indexError);
-    }
-    let ids=Object.keys(index).filter(id=>index[id]===true);
+  const user=auth.currentUser;
+  if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
 
-    // Compatibiliteit voor de bestaande Kerst-lijst tijdens de overgang naar de nieuwe index.
-    const legacyId = "-P1Ynay-f0rDEYHk8Vx4";
-    if (!ids.includes(legacyId)) ids.push(legacyId);
-    if(!ids.length){ box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>'; return; }
+  try{
+    const indexSnap=await database.ref("userSharedLists/" + user.uid).once("value");
+    const index=indexSnap.val()||{};
+    const ids=Object.keys(index).filter(id=>index[id]===true);
+
+    if(!ids.length){
+      box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
+      return;
+    }
 
     const results=await Promise.all(ids.map(async id=>{
-      try {
-        const snap=await database.ref("sharedLists/"+id).once("value");
-        if(!snap.exists()) return null;
-        const v=snap.val()||{};
-        if(!v.members || v.members[user.uid]!==true) return null;
-        return [id,v];
-      } catch(e) { console.warn("Deellijst ophalen mislukt",id,e); return null; }
+      try{
+        const snap=await database.ref("sharedLists/" + id).once("value");
+        return snap.exists() ? [id,snap.val()] : null;
+      }catch(e){ return null; }
     }));
-    const mine=results.filter(Boolean);
+
+    const mine=results.filter(Boolean).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
     box.innerHTML="";
-    if(!mine.length){ box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>'; return; }
-    mine.sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    if(!mine.length){
+      box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
+      return;
+    }
+
     mine.forEach(([id,v])=>{
-      const btn=document.createElement("button"); btn.type="button"; btn.className="savedListRow";
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="savedListRow";
       btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
       btn.querySelector("span").textContent=v.name||"Deellijst";
-      btn.addEventListener("click",()=>openSharedList(id,false)); box.appendChild(btn);
+      btn.addEventListener("click",()=>openSharedList(id,false));
+      box.appendChild(btn);
     });
-  }catch(e){ console.error(e); box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>'; }
+  }catch(e){
+    console.error("Mijn deellijsten laden mislukt:",e);
+    box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>';
+  }
 }
 
 async function openSharedList(id, showInvite){
   const user=auth.currentUser; if(!user) return;
-  try {
-    const snap=await database.ref("sharedLists/"+id).once("value"); const v=snap.val();
-    if(!v || !v.members || v.members[user.uid]!==true){ await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock"); return; }
-    await ensureSharedListIndex(id,v);
-    // Voorkom dat de vorige familie-/privélijst zichtbaar blijft terwijl de deellijst wordt geladen.
-    boodschappen=[];
+
+  // Laat nooit de oude familie-/privélijst in beeld staan terwijl de gedeelde lijst opent.
+  boodschappen=[];
+  showList();
+
+  const snap=await database.ref("sharedLists/" + id).once("value");
+  const v=snap.val();
+  if(!v || !v.members || v.members[user.uid]!==true){
+    await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
+    return;
+  }
+
+  currentSharedListId=id;
+  if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
+  currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
+    const data=s.val()||{};
+    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; return; }
+    boodschappen=normalizeBoodschappen(data.boodschappen||[]);
     showList();
-    currentSharedListId=id;
-    if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
-    currentSharedListUnsubscribe=database.ref("sharedLists/"+id).on("value",s=>{
-      const data=s.val()||{};
-      if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; if(currentSharedListUnsubscribe) currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; return; }
-      boodschappen=normalizeBoodschappen(data.boodschappen||[]); showList();
-      const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
-    });
-    closeFamilyMenu();
-    if(showInvite){
-      const link=makeSharedListLink(v.inviteCode);
-      const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
-      const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
-      overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
-      overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
-      overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
-    }
-  } catch(error) {
-    console.error("Deellijst openen mislukt:",error);
-    await familyAlert("Deellijst","De deellijst kon niet worden geopend.","fa-triangle-exclamation");
+    const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
+  });
+  closeFamilyMenu();
+
+  if(showInvite){
+    const link=makeSharedListLink(v.inviteCode);
+    const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
+    const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
+    overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
+    overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
+    overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
   }
 }
 
@@ -4379,22 +4377,33 @@ function toggleRegisterPassword(fieldId, button) {
 (function setupSharedListInvite(){
   let handled = false;
   async function handle(){
-    if (handled || !auth.currentUser) return;
+    if (handled) return;
     const code = new URLSearchParams(window.location.search).get("deellijst");
-    if (!code) return;
+    if (!code || !auth.currentUser) return;
     handled = true;
     try {
       const codeSnap = await database.ref("sharedListCodes/" + code).once("value");
       const id = codeSnap.val();
-      if (!id) { await familyAlert("Deellijst", "Deze uitnodigingslink is niet geldig of de lijst bestaat niet meer.", "fa-triangle-exclamation"); return; }
-      const snap = await database.ref("sharedLists/" + id).once("value");
-      const list = snap.val() || {};
-      if (!snap.exists()) { await familyAlert("Deellijst", "Deze lijst bestaat niet meer.", "fa-triangle-exclamation"); return; }
-      if (list.members && list.members[auth.currentUser.uid] === true) { await openSharedList(id,false); return; }
-      const join = await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + (list.name||"Deellijst") + "”?");
+      if (!id) {
+        await familyAlert("Deellijst", "Deze uitnodigingslink is niet geldig of de lijst bestaat niet meer.", "fa-triangle-exclamation");
+        return;
+      }
+      const listSnap = await database.ref("sharedLists/" + id).once("value");
+      const list = listSnap.val() || {};
+      if (!list.name) {
+        await familyAlert("Deellijst", "Deze lijst bestaat niet meer.", "fa-triangle-exclamation");
+        return;
+      }
+      if (list.members && list.members[auth.currentUser.uid] === true) {
+        await openSharedList(id,false);
+        return;
+      }
+      const join = await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + list.name + "”?" );
       if (!join) return;
-      await database.ref("sharedLists/"+id+"/members/"+auth.currentUser.uid).set(true);
-      await ensureSharedListIndex(id, Object.assign({}, list, {members:Object.assign({}, list.members||{}, {[auth.currentUser.uid]:true})}));
+      const updates = {};
+      updates["sharedLists/" + id + "/members/" + auth.currentUser.uid] = true;
+      updates["userSharedLists/" + auth.currentUser.uid + "/" + id] = true;
+      await database.ref().update(updates);
       await openSharedList(id,false);
     } catch(error) {
       console.error("Deellijst-uitnodiging mislukt:",error);
@@ -4402,7 +4411,7 @@ function toggleRegisterPassword(fieldId, button) {
     }
   }
   auth.onAuthStateChanged(()=>setTimeout(handle,120));
-})();
+})();;
 </script>
 
 <script>
