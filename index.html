@@ -2715,16 +2715,10 @@ async function loadList() {
     console.error("Lijst laden mislukt:", error);
 
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
-      currentHouseholdId = null;
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          await database.ref("users/" + user.uid + "/householdId").remove();
-        } catch (cleanupError) {
-          console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError);
-        }
-      }
-      openUseModeModal();
+      // Bewaar de bestaande familie-koppeling. Een leesfout mag nooit de
+      // householdId uit Firebase verwijderen; de familiegegevens blijven zo intact.
+      const status = document.getElementById("status");
+      if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> Geen toegang tot de familielijst. Controleer de Firebase-regels.';
       return false;
     }
 
@@ -3075,8 +3069,10 @@ function updateProductSuggestions() {
 
 function initProductSuggestions() {
   const input = document.getElementById("product");
-  if (!input) return;
+  if (!input || input.dataset.suggestionsInitialized === "true") return;
+  input.dataset.suggestionsInitialized = "true";
   input.addEventListener("input", updateProductSuggestions);
+  input.addEventListener("keyup", updateProductSuggestions);
   input.addEventListener("focus", updateProductSuggestions);
   input.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -3134,6 +3130,19 @@ function showList(animationType = "") {
     productWrap.appendChild(icon);
 
     div.appendChild(productWrap);
+    div.setAttribute("role", "button");
+    div.setAttribute("tabindex", "0");
+    div.addEventListener("click", () => {
+      const current = Number(div.dataset.index);
+      if (Number.isInteger(current) && current >= 0) toggleItem(current);
+    });
+    div.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const current = Number(div.dataset.index);
+        if (Number.isInteger(current) && current >= 0) toggleItem(current);
+      }
+    });
 
     // Only family members see who completed an item.
     if (item.completed && currentHouseholdId && item.completedBy) {
@@ -3375,10 +3384,13 @@ document.getElementById("list").addEventListener("click", function(e) {
 
 // Activeer productsuggesties zodra de pagina klaar is.
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initProductSuggestions);
+  document.addEventListener("DOMContentLoaded", initProductSuggestions, { once: true });
 } else {
   initProductSuggestions();
 }
+// Extra vangnet voor mobiele browsers waarin de DOM tijdens het laden wordt
+// opgebouwd voordat alle scripts klaar zijn. De dataset voorkomt dubbele handlers.
+setTimeout(initProductSuggestions, 250);
 </script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
@@ -3438,7 +3450,7 @@ async function returnToFamilyList() {
   const user = auth.currentUser;
 
   if (currentSharedListUnsubscribe) {
-    currentSharedListUnsubscribe();
+    try { currentSharedListUnsubscribe(); } catch (e) { console.error("Gedeelde-lijst watcher stoppen mislukt:", e); }
     currentSharedListUnsubscribe = null;
   }
 
@@ -3688,14 +3700,26 @@ async function openSharedList(id, showInvite){
 
   currentSharedListId=id;
   updateMainMenuButton();
-  if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
-  currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
+  if(currentSharedListUnsubscribe) {
+    try { currentSharedListUnsubscribe(); } catch (e) { console.error("Vorige gedeelde-lijst watcher stoppen mislukt:", e); }
+    currentSharedListUnsubscribe = null;
+  }
+
+  const sharedListRef = database.ref("sharedLists/" + id);
+  const sharedListHandler = (s) => {
     const data=s.val()||{};
-    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; updateMainMenuButton(); return; }
+    if(!data.members || data.members[user.uid]!==true){
+      currentSharedListId=null;
+      updateMainMenuButton();
+      return;
+    }
     boodschappen=normalizeBoodschappen(data.boodschappen||[]);
     showList();
-    const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
-  });
+    const h=document.querySelector(".headerBar h1");
+    if(h) h.textContent=data.name||"Deellijst";
+  };
+  sharedListRef.on("value", sharedListHandler);
+  currentSharedListUnsubscribe = () => sharedListRef.off("value", sharedListHandler);
   closeFamilyMenu();
 
   if(showInvite){
