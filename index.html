@@ -2635,32 +2635,6 @@ function clearSearch() {
 
 async function loadList() {
   try {
-    // Een geopende deellijst heeft voorrang. Voorkom dat een familie-/privélijst
-    // door een normale reload (bijv. na inloggen of pull-to-refresh) over de
-    // actieve deellijst heen wordt geladen.
-    if (currentSharedListId) {
-      const sharedRef = database.ref("sharedLists/" + currentSharedListId);
-      const sharedSnapshot = await sharedRef.once("value");
-      const sharedData = sharedSnapshot.val();
-      if (!sharedData || !sharedData.members || sharedData.members[auth.currentUser.uid] !== true) {
-        currentSharedListId = null;
-        if (currentSharedListUnsubscribe) {
-          currentSharedListUnsubscribe();
-          currentSharedListUnsubscribe = null;
-        }
-        boodschappen = [];
-        selectedIndex = -1;
-        showList();
-        return false;
-      }
-      boodschappen = normalizeBoodschappen(sharedData.boodschappen || []);
-      selectedIndex = -1;
-      showList();
-      const sharedHeader = document.querySelector(".headerBar h1");
-      if (sharedHeader) sharedHeader.textContent = sharedData.name || "Deellijst";
-      return true;
-    }
-
     // Een privé-lijst wordt lokaal opgeslagen en hoeft dus niet via Firebase geladen te worden.
     if (isPrivateMode()) {
       await loadPrivateList();
@@ -3489,9 +3463,15 @@ async function renderSharedLists(){
   const box=document.getElementById("sharedListsContainer"); if(!box) return;
   const user=auth.currentUser; if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
   try{
-    const snap=await database.ref("sharedLists").once("value");
+    // Veilig: vraag alleen de deellijsten op waarin deze gebruiker lid is.
+    // Een volledige read van /sharedLists is bewust niet toegestaan door de Firebase Rules.
+    const memberPath = "members/" + user.uid;
+    const snap = await database.ref("sharedLists")
+      .orderByChild(memberPath)
+      .equalTo(true)
+      .once("value");
     const all=snap.val()||{}; box.innerHTML="";
-    const mine=Object.entries(all).filter(([id,v])=>v && v.members && v.members[user.uid]===true);
+    const mine=Object.entries(all);
     if(!mine.length){ box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>'; return; }
     mine.sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
     mine.forEach(([id,v])=>{
@@ -3500,105 +3480,44 @@ async function renderSharedLists(){
       btn.querySelector("span").textContent=v.name||"Deellijst";
       btn.addEventListener("click",()=>openSharedList(id,false)); box.appendChild(btn);
     });
-  }catch(e){ console.error(e); box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>'; }
+  }catch(e){
+    console.error("Deellijsten laden mislukt:", e);
+    box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>';
+  }
 }
 
 async function openSharedList(id, showInvite){
-  const user=auth.currentUser;
-  if(!user) return;
-
-  // Stop eerst een eventueel vorige deellijst-abonnement.
-  if(currentSharedListUnsubscribe){
+  const user=auth.currentUser; if(!user) return;
+  // Voorkom dat de vorige familie-/privélijst zichtbaar blijft tijdens het laden.
+  if(currentSharedListUnsubscribe) {
     currentSharedListUnsubscribe();
     currentSharedListUnsubscribe=null;
   }
-
-  // Zet de actieve context meteen op de nieuwe deellijst en wis de oude
-  // familie-/privélijst uit het scherm. Zo kan oude inhoud nooit zichtbaar
-  // blijven terwijl Firebase de nieuwe lijst laadt.
-  currentSharedListId=id;
+  currentSharedListId=null;
   boodschappen=[];
-  selectedIndex=-1;
   showList();
 
-  try{
-    const snap=await database.ref("sharedLists/"+id).once("value");
-    const v=snap.val();
-
-    if(!v || !v.members || v.members[user.uid]!==true){
-      currentSharedListId=null;
-      boodschappen=[];
-      selectedIndex=-1;
-      showList();
-      await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
-      return;
-    }
-
-    // Laad uitsluitend de boodschappen van deze specifieke deellijst.
-    boodschappen=normalizeBoodschappen(v.boodschappen||[]);
-    selectedIndex=-1;
-    showList();
-
-    const h=document.querySelector(".headerBar h1");
-    if(h) h.textContent=v.name||"Deellijst";
-
-    // Live synchroniseren met deze specifieke deellijst.
-    currentSharedListUnsubscribe=database.ref("sharedLists/"+id).on("value",s=>{
-      const data=s.val()||{};
-
-      if(!data.members || data.members[user.uid]!==true){
-        if(currentSharedListUnsubscribe){
-          currentSharedListUnsubscribe();
-          currentSharedListUnsubscribe=null;
-        }
-        currentSharedListId=null;
-        boodschappen=[];
-        selectedIndex=-1;
-        showList();
-        return;
-      }
-
-      boodschappen=normalizeBoodschappen(data.boodschappen||[]);
-      selectedIndex=-1;
-      showList();
-
-      const header=document.querySelector(".headerBar h1");
-      if(header) header.textContent=data.name||"Deellijst";
-    });
-
-    closeFamilyMenu();
-
-    if(showInvite){
-      const link=makeSharedListLink(v.inviteCode);
-      const overlay=familyDialogBase(
-        "fa-people-group",
-        v.name||"Deellijst",
-        `<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,
-        `<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`
-      );
-      const copy=async(text,msg)=>{
-        try{
-          await navigator.clipboard.writeText(text);
-          await familyAlert("Gekopieerd",msg,"fa-check");
-        }catch(e){
-          await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");
-        }
-      };
-      overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
-      overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
-      overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
-    }
-  }catch(error){
-    console.error("Deellijst openen mislukt:",error);
-    currentSharedListId=null;
-    if(currentSharedListUnsubscribe){
-      currentSharedListUnsubscribe();
-      currentSharedListUnsubscribe=null;
-    }
-    boodschappen=[];
-    selectedIndex=-1;
-    showList();
-    await familyAlert("Deellijst","De deellijst kon niet worden geopend.","fa-triangle-exclamation");
+  const snap=await database.ref("sharedLists/"+id).once("value"); const v=snap.val();
+  if(!v || !v.members || v.members[user.uid]!==true){
+    await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
+    return;
+  }
+  currentSharedListId=id;
+  if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
+  currentSharedListUnsubscribe=database.ref("sharedLists/"+id).on("value",s=>{
+    const data=s.val()||{};
+    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; return; }
+    boodschappen=normalizeBoodschappen(data.boodschappen||[]); showList();
+    const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
+  });
+  closeFamilyMenu();
+  if(showInvite){
+    const link=makeSharedListLink(v.inviteCode);
+    const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
+    const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
+    overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
+    overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
+    overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
   }
 }
 
@@ -4400,7 +4319,7 @@ function toggleRegisterPassword(fieldId, button) {
   async function handle(){
     if (handled) return;
     const code = new URLSearchParams(window.location.search).get("deellijst");
-    if (!code || !window.auth || !auth.currentUser || !window.database) return;
+    if (!code || !auth.currentUser) return;
     handled = true;
     try {
       const snap = await database.ref("sharedLists").orderByChild("inviteCode").equalTo(code).once("value");
@@ -4416,7 +4335,7 @@ function toggleRegisterPassword(fieldId, button) {
       await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
     }
   }
-  if (window.auth && auth.onAuthStateChanged) auth.onAuthStateChanged(()=>setTimeout(handle,120));
+  auth.onAuthStateChanged(()=>setTimeout(handle,120));
 })();
 </script>
 
