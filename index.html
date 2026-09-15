@@ -2583,6 +2583,35 @@ function openListOptionsSettings() {
     console.error("Aantal familieleden ophalen mislukt:", error);
   }
 }
+// Houd het aantal familieleden automatisch actueel, inclusief de ingelogde gebruiker.
+let memberCountListenerHouseholdId = null;
+let memberCountListenerRef = null;
+function watchMemberCount() {
+  const user = auth.currentUser;
+  if (!user) return;
+  database.ref("users/" + user.uid + "/householdId").once("value").then(snap => {
+    const householdId = snap.val() ? String(snap.val()) : null;
+    if (!householdId) {
+      updateMemberCount();
+      if (memberCountListenerRef) {
+        memberCountListenerRef.off("value");
+        memberCountListenerRef = null;
+        memberCountListenerHouseholdId = null;
+      }
+      return;
+    }
+    if (memberCountListenerHouseholdId === householdId && memberCountListenerRef) {
+      updateMemberCount();
+      return;
+    }
+    if (memberCountListenerRef) memberCountListenerRef.off("value");
+    memberCountListenerHouseholdId = householdId;
+    memberCountListenerRef = database.ref("households/" + householdId + "/members");
+    memberCountListenerRef.on("value", () => updateMemberCount());
+    updateMemberCount();
+  }).catch(error => console.error("Familieleden volgen mislukt:", error));
+}
+
   function searchList() {
   const search = document.getElementById("searchInput").value.toLowerCase();
 
@@ -3334,7 +3363,11 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 // Bewaar de Firebase-inlogsessie lokaal totdat de gebruiker zelf uitlogt.
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => console.error("Loginpersistentie instellen mislukt:", error));
+const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
+  console.error("Loginpersistentie instellen mislukt:", error);
+  throw error;
+});
+let loginFlowActive = false;
   let currentHouseholdId = null;
 let currentSharedListId = null;
 let currentSharedListUnsubscribe = null;
@@ -3939,6 +3972,10 @@ async function login() {
   const password = document.getElementById("loginPassword").value;
 
   try {
+    // Wacht tot LOCAL-persistentie is ingesteld vóórdat de login wordt uitgevoerd.
+    // Zo wordt de sessie ook na het sluiten/wegvegen van de webapp behouden.
+    await authPersistenceReady;
+    loginFlowActive = true;
     await auth.signInWithEmailAndPassword(email, password);
     const loginScreen = document.getElementById("loginScreen");
     document.body.classList.add("logged-in");
@@ -3954,6 +3991,9 @@ async function login() {
 
     if (householdId) {
       await loadList();
+      await updateMemberCount();
+      watchMemberCount();
+      loginFlowActive = false;
       return;
     }
 
@@ -3966,7 +4006,11 @@ async function login() {
     } else {
       openUseModeModal();
     }
+    await updateMemberCount();
+    watchMemberCount();
+    loginFlowActive = false;
   } catch (error) {
+    loginFlowActive = false;
     console.error("Inloggen fout:", error);
     document.body.classList.remove("logged-in");
     const loginScreen = document.getElementById("loginScreen");
@@ -4274,5 +4318,65 @@ function toggleRegisterPassword(fieldId, button) {
 })();
 </script>
 
+<script>
+// Herstel een lokale Firebase-sessie automatisch bij het openen van de webapp.
+// De gebruiker hoeft alleen opnieuw in te loggen nadat hij/zij expliciet Uitloggen kiest.
+(function restoreFirebaseSession() {
+  let firstAuthState = true;
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      if (firstAuthState) {
+        document.body.classList.remove("logged-in");
+        const loginScreen = document.getElementById("loginScreen");
+        if (loginScreen) {
+          loginScreen.classList.remove("loginScreenLeaving");
+          loginScreen.style.display = "flex";
+        }
+      }
+      firstAuthState = false;
+      return;
+    }
+
+    firstAuthState = false;
+
+    // Tijdens een normale login doet login() zelf de overgang en het laden.
+    if (loginFlowActive) return;
+
+    // Dit is een herstelde sessie na opnieuw openen van de webapp.
+    document.body.classList.add("logged-in");
+    const loginScreen = document.getElementById("loginScreen");
+    if (loginScreen) {
+      loginScreen.classList.remove("loginScreenLeaving");
+      loginScreen.style.display = "none";
+    }
+
+    try {
+      const householdId = await getOrCreateHousehold();
+      if (householdId) {
+        await loadList();
+      } else {
+        const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+        if (savedMode === "private") {
+          await loadPrivateList();
+        } else if (savedMode === "skip") {
+          openAppWithoutList();
+        } else {
+          openUseModeModal();
+        }
+      }
+      await updateMemberCount();
+      watchMemberCount();
+    } catch (error) {
+      console.error("Herstellen van de ingelogde sessie mislukt:", error);
+      // Alleen bij een echte Firebase-authfout tonen we het login-scherm.
+      if (error && String(error.code || "").startsWith("auth/")) {
+        document.body.classList.remove("logged-in");
+        if (loginScreen) loginScreen.style.display = "flex";
+      }
+    }
+  });
+})();
+</script>
 </body>
 </html>
