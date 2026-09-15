@@ -3463,11 +3463,8 @@ async function renderSharedLists(){
   const box=document.getElementById("sharedListsContainer"); if(!box) return;
   const user=auth.currentUser; if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
   try{
-    // Veilig: vraag alleen de deellijsten op waarin deze gebruiker lid is.
-    // Een volledige read van /sharedLists is bewust niet toegestaan door de Firebase Rules.
-    const memberPath = "members/" + user.uid;
-    const snap = await database.ref("sharedLists")
-      .orderByChild(memberPath)
+    const snap=await database.ref("sharedLists")
+      .orderByChild("members/" + user.uid)
       .equalTo(true)
       .once("value");
     const all=snap.val()||{}; box.innerHTML="";
@@ -3480,28 +3477,13 @@ async function renderSharedLists(){
       btn.querySelector("span").textContent=v.name||"Deellijst";
       btn.addEventListener("click",()=>openSharedList(id,false)); box.appendChild(btn);
     });
-  }catch(e){
-    console.error("Deellijsten laden mislukt:", e);
-    box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>';
-  }
+  }catch(e){ console.error(e); box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>'; }
 }
 
 async function openSharedList(id, showInvite){
   const user=auth.currentUser; if(!user) return;
-  // Voorkom dat de vorige familie-/privélijst zichtbaar blijft tijdens het laden.
-  if(currentSharedListUnsubscribe) {
-    currentSharedListUnsubscribe();
-    currentSharedListUnsubscribe=null;
-  }
-  currentSharedListId=null;
-  boodschappen=[];
-  showList();
-
   const snap=await database.ref("sharedLists/"+id).once("value"); const v=snap.val();
-  if(!v || !v.members || v.members[user.uid]!==true){
-    await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
-    return;
-  }
+  if(!v || !v.members || v.members[user.uid]!==true){ await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock"); return; }
   currentSharedListId=id;
   if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
   currentSharedListUnsubscribe=database.ref("sharedLists/"+id).on("value",s=>{
@@ -4319,7 +4301,7 @@ function toggleRegisterPassword(fieldId, button) {
   async function handle(){
     if (handled) return;
     const code = new URLSearchParams(window.location.search).get("deellijst");
-    if (!code || !auth.currentUser) return;
+    if (!code || !window.auth || !auth.currentUser || !window.database) return;
     handled = true;
     try {
       const snap = await database.ref("sharedLists").orderByChild("inviteCode").equalTo(code).once("value");
@@ -4335,7 +4317,9 @@ function toggleRegisterPassword(fieldId, button) {
       await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
     }
   }
-  auth.onAuthStateChanged(()=>setTimeout(handle,120));
+  if (typeof auth !== "undefined" && auth && auth.onAuthStateChanged) {
+    auth.onAuthStateChanged(()=>setTimeout(handle,120));
+  }
 })();
 </script>
 
