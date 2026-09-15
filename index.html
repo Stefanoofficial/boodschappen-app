@@ -1863,9 +1863,9 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 
   <div class="headerBar">
   <h1>Boodschappenlijst</h1>
-  <button class="familyButton" onclick="toggleFamilyMenu()" aria-label="Menu openen">
-    <i class="fa-solid fa-bars"></i> Menu
-    <i class="fa-solid fa-chevron-down"></i>
+  <button id="mainMenuButton" class="familyButton" onclick="handleMainMenuButton()" aria-label="Menu openen">
+    <i id="mainMenuButtonIcon" class="fa-solid fa-bars"></i> <span id="mainMenuButtonText">Menu</span>
+    <i id="mainMenuButtonArrow" class="fa-solid fa-chevron-down"></i>
   </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
@@ -2199,6 +2199,12 @@ function closeOpenMenusOnOutsideClick(event) {
 }
 
 document.addEventListener("click", closeOpenMenusOnOutsideClick);
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", updateMainMenuButton);
+} else {
+  updateMainMenuButton();
+}
 
 
 function openFamilySubmenu(event) {
@@ -3408,6 +3414,65 @@ let loginFlowActive = false;
 let currentSharedListId = null;
 let currentSharedListUnsubscribe = null;
 
+function updateMainMenuButton() {
+  const btn = document.getElementById("mainMenuButton");
+  const icon = document.getElementById("mainMenuButtonIcon");
+  const text = document.getElementById("mainMenuButtonText");
+  const arrow = document.getElementById("mainMenuButtonArrow");
+  const inShared = !!currentSharedListId;
+  if (btn) btn.setAttribute("aria-label", inShared ? "Terug naar mijn familielijst" : "Menu openen");
+  if (icon) { icon.className = inShared ? "fa-solid fa-arrow-left" : "fa-solid fa-bars"; }
+  if (text) text.textContent = inShared ? "Familie" : "Menu";
+  if (arrow) arrow.style.display = inShared ? "none" : "inline-block";
+}
+
+function handleMainMenuButton() {
+  if (currentSharedListId) {
+    returnToFamilyList();
+  } else {
+    toggleFamilyMenu();
+  }
+}
+
+async function returnToFamilyList() {
+  const user = auth.currentUser;
+  if (currentSharedListUnsubscribe) {
+    currentSharedListUnsubscribe();
+    currentSharedListUnsubscribe = null;
+  }
+  currentSharedListId = null;
+  boodschappen = [];
+  const h = document.querySelector(".headerBar h1");
+  if (h) h.textContent = "Boodschappenlijst";
+  updateMainMenuButton();
+  closeFamilyMenu();
+
+  try {
+    if (user) {
+      const householdId = await getOrCreateHousehold();
+      if (householdId) {
+        await loadList();
+      } else {
+        const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+        if (savedMode === "private") await loadPrivateList();
+        else if (savedMode === "skip") openAppWithoutList();
+        else await loadList();
+      }
+    }
+  } catch (error) {
+    console.error("Terug naar familielijst mislukt:", error);
+  }
+
+  try {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("deellijst")) {
+      url.searchParams.delete("deellijst");
+      window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
+    }
+  } catch (e) {}
+}
+
+
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
 
@@ -3597,10 +3662,11 @@ async function openSharedList(id, showInvite){
   }
 
   currentSharedListId=id;
+  updateMainMenuButton();
   if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
   currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
     const data=s.val()||{};
-    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; return; }
+    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; updateMainMenuButton(); return; }
     boodschappen=normalizeBoodschappen(data.boodschappen||[]);
     showList();
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
@@ -4432,6 +4498,11 @@ function toggleRegisterPassword(fieldId, button) {
       }
       if (list.members && list.members[auth.currentUser.uid] === true) {
         await openSharedList(id,false);
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("deellijst");
+          window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
+        } catch (e) {}
         return;
       }
       const join = await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + list.name + "”?" );
@@ -4441,6 +4512,11 @@ function toggleRegisterPassword(fieldId, button) {
       updates["userSharedLists/" + auth.currentUser.uid + "/" + id] = true;
       await database.ref().update(updates);
       await openSharedList(id,false);
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("deellijst");
+        window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
+      } catch (e) {}
     } catch(error) {
       console.error("Deellijst-uitnodiging mislukt:",error);
       await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
@@ -4484,6 +4560,11 @@ function toggleRegisterPassword(fieldId, button) {
     }
 
     try {
+      // Wanneer de app via een deellijst-link is geopend, laat de uitnodigingshandler
+      // de juiste lijst openen. De gewone familielijst mag deze flow niet overschrijven.
+      const pendingSharedInvite = new URLSearchParams(window.location.search).get("deellijst");
+      if (pendingSharedInvite) return;
+
       const householdId = await getOrCreateHousehold();
       if (householdId) {
         await loadList();
