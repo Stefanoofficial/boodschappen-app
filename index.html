@@ -1975,9 +1975,20 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
       <i class="fa-solid fa-key"></i>
       <span>Code invoeren</span>
     </button>
+    <div class="familyMenuSubTitle">Mijn deellijsten</div>
+    <div id="sharedListsContainer" class="savedListsContainer"></div>
+    <div class="settingsMenuHint">Maak een lijst voor vrienden, familie of een feestje. Iedereen met toegang kan samen producten toevoegen en afvinken.</div>
+  </div>
+
+  <div id="sharedListActiveMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="returnToSharedListsMenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Deellijst</span>
+    </button>
+    <div class="familyMenuSubTitle" id="sharedListActiveMenuTitle">Deellijst</div>
     <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
       <i class="fa-solid fa-user-group"></i>
-      <span>Leden (<span id="sharedMemberCount">0</span>)</span>
+      <span>Leden (<span id="sharedMemberCountActive">0</span>)</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="showSharedListCode()">
       <i class="fa-solid fa-link"></i>
@@ -1985,10 +1996,8 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
     </button>
     <button type="button" class="familyMenuItem" onclick="returnToFamilyList()">
       <span>Familielijst</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
-    <div class="familyMenuSubTitle">Mijn deellijsten</div>
-    <div id="sharedListsContainer" class="savedListsContainer"></div>
-    <div class="settingsMenuHint">Maak een lijst voor vrienden, familie of een feestje. Iedereen met toegang kan samen producten toevoegen en afvinken.</div>
   </div>
 
   <div id="settingsMenuSub" class="familyMenuPage settingsMenuPage" style="display:none;">
@@ -2368,7 +2377,7 @@ function switchMenuPage(pageId, event) {
   main.classList.add("familyMenuMainExit");
   setTimeout(() => {
     main.style.display = "none";
-    ["familyMenuSub","sharedListsMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
+    ["familyMenuSub","sharedListsMenuSub","sharedListActiveMenuSub","settingsMenuSub","savedListsMenuSub","accountMenuSub","aboutMenuSub"].forEach(id => {
       const el = document.getElementById(id);
       if (el && el !== page) { el.style.display="none"; el.classList.remove("familyMenuSubEnter","familyMenuSubExit"); }
     });
@@ -3535,6 +3544,12 @@ function closeSharedListsSubmenu(event) {
   returnToFamilyList();
 }
 
+function returnToSharedListsMenu(event){
+  if(event) event.stopPropagation();
+  returnMenuToMain("sharedListActiveMenuSub", event);
+  setTimeout(()=>renderSharedLists(), 180);
+}
+
 function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
 function makeSharedListLink(code){
   const base = window.location.href.split("#")[0].split("?")[0];
@@ -3656,7 +3671,9 @@ async function renderSharedLists(){
       btn.querySelector("span").textContent=v.name||"Deellijst";
       btn.addEventListener("click",async()=>{
         await openSharedList(id,false);
-        switchMenuPage("sharedListsMenuSub");
+        if(activeListType==="shared" && currentSharedListId===id){
+          switchMenuPage("sharedListActiveMenuSub");
+        }
       });
       box.appendChild(btn);
     });
@@ -3792,9 +3809,10 @@ async function showSharedListMembers(){
       const row=document.createElement("div");
       row.className="familyDialogMember";
 
-      const icon=document.createElement("i");
-      icon.className="fa-solid " + (uid===ownerUid ? "fa-crown" : "fa-user");
+      const icon=document.createElement("span");
+      icon.textContent = uid===ownerUid ? "👑" : "👤";
       icon.setAttribute("aria-hidden","true");
+      icon.className = "sharedMemberEmoji";
 
       const nameNode=document.createElement("span");
       nameNode.textContent=name;
@@ -3805,8 +3823,8 @@ async function showSharedListMembers(){
     }
 
     rows.sort((a,b)=>{
-      const ai=a.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
-      const bi=b.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
+      const ai=a.querySelector(".sharedMemberEmoji")?.textContent==="👑" ? 0 : 1;
+      const bi=b.querySelector(".sharedMemberEmoji")?.textContent==="👑" ? 0 : 1;
       return ai-bi;
     });
 
@@ -3816,7 +3834,7 @@ async function showSharedListMembers(){
 
     const overlay=familyDialogBase(
       "fa-user-group",
-      "Leden (" + memberIds.length + ")",
+      "Leden",
       "",
       '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>'
     );
@@ -3882,6 +3900,13 @@ async function openSharedList(id, showInvite){
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=v.name||"Deellijst";
     updateSharedDeleteButton(v.owner === user.uid);
     updateSharedMemberCount(v);
+    const activeCount=document.getElementById("sharedMemberCountActive");
+    if(activeCount){
+      const members=v.members||{};
+      activeCount.textContent=String(Object.keys(members).filter(uid=>members[uid]===true).length);
+    }
+    const activeTitle=document.getElementById("sharedListActiveMenuTitle");
+    if(activeTitle) activeTitle.textContent=v.name||"Deellijst";
     if (!v.memberNames || !v.memberNames[user.uid]) {
       let ownName = user.displayName || user.email || "Gebruiker";
       try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = ownNameSnap.val() || ownName; } catch (_) {}
@@ -3903,8 +3928,6 @@ async function openSharedList(id, showInvite){
       const header=document.querySelector(".headerBar h1"); if(header) header.textContent=data.name||"Deellijst";
       updateSharedMemberCount(data);
     });
-    closeFamilyMenu();
-
     if(showInvite){
       const link=makeSharedListLink(v.inviteCode);
       const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
@@ -3998,6 +4021,10 @@ async function deleteCurrentSharedList(){
 async function returnToFamilyList(){
   if(!auth.currentUser) return;
   try{ returnMenuToMain("sharedListsMenuSub"); }catch(_){}
+  try{
+    const activePage=document.getElementById("sharedListActiveMenuSub");
+    if(activePage) activePage.style.display="none";
+  }catch(_){}
 
   activeListType="family";
   if(currentSharedListId){
