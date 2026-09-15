@@ -1976,15 +1976,14 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
     </button>
     <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
       <i class="fa-solid fa-user-group"></i>
-      <span>Leden (<span id="sharedMemberCount">1</span>)</span>
+      <span>Leden (<span id="sharedMemberCount">0</span>)</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="showSharedListCode()">
       <i class="fa-solid fa-link"></i>
       <span>Deelcode</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="returnToFamilyList()">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>&lt; Familielijst</span>
+      <span>Familielijst</span>
     </button>
     <div class="familyMenuSubTitle">Mijn deellijsten</div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
@@ -2443,11 +2442,11 @@ async function logoutFromMenu() {
 }
 function showAboutApp() {
   closeFamilyMenuForDialog();
-  familyAlert("Over de app", "Boodschappenlijst helpt je eenvoudig boodschappen bijhouden en delen met je familie.\n\nVersie 1.0", "fa-circle-info");
+  familyAlert("Over de app", "Boodschappenlijst helpt je eenvoudig boodschappen bijhouden en delen met je familie.\n\nDeellijst: maak een aparte lijst voor vrienden, familie of een feestje. Je kunt een Deellijst delen met een deelcode of Deellink en bij Leden de deelnemers bekijken.\n\nVersie 1.0", "fa-circle-info");
 }
 function showAboutHelp() {
   closeFamilyMenuForDialog();
-  familyAlert("Help & uitleg", "Typ een product en voeg het toe. Tik op een product om het af te vinken. Via Menu vind je je familie, instellingen en opgeslagen lijsten.\n\nJe kunt een lijst opslaan en later opnieuw laden.", "fa-circle-question");
+  familyAlert("Help & uitleg", "Typ een product en voeg het toe. Tik op een product om het af te vinken. Via Menu vind je je familie, instellingen en opgeslagen lijsten.\n\nDeellijst: ga naar Deellijst om een nieuwe lijst te maken of een deelcode in te voeren. Open Deelcode om de code te kopiëren of een Deellink te delen. Bij Leden zie je automatisch het aantal deelnemers uit de database en na het openen de namen van de leden. Een afgevinkt product laat zien wie het heeft voltooid. Met Familielijst ga je terug naar je gewone familielijst.\n\nJe kunt een lijst opslaan en later opnieuw laden.", "fa-circle-question");
 }
 
 function getSavedListsKey() {
@@ -3655,38 +3654,91 @@ async function getCurrentSharedListSnapshot(){
   return snap.exists() ? snap.val() : null;
 }
 
-async function showSharedListCode(){
+async async function showSharedListCode(){
+  const user=auth.currentUser;
+  if(!user || activeListType!=="shared" || !currentSharedListId) return;
+
   let list=null;
-  try { list=await getCurrentSharedListSnapshot(); } catch(e) { console.warn("Deellink lezen via Firebase mislukt; lokale code wordt gebruikt.",e); }
+  try{
+    list=await getCurrentSharedListSnapshot();
+  }catch(e){
+    console.warn("Deelcode lezen via Firebase mislukt; lokale code wordt gebruikt.",e);
+  }
+
   const code=String((list && list.inviteCode) || currentSharedListInviteCode || "");
   if(!list) list={name:"Deellijst"};
-  if(!code){ await familyAlert("Deellink","Voor deze deellijst is geen deelcode beschikbaar.","fa-link"); return; }
+  if(!code){
+    await familyAlert("Deelcode","Voor deze deellijst is geen deelcode beschikbaar.","fa-link");
+    return;
+  }
+
+  currentSharedListInviteCode=code;
+  try{ localStorage.setItem("sharedListInviteCode:"+currentSharedListId,code); }catch(_){}
+
   const link=makeSharedListLink(code);
-  const safeName=String(list.name || "Deellijst").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+  const safeName=String(list.name || "Deellijst").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+
   const overlay=familyDialogBase(
     "fa-link",
-    "Deellink",
-    `<div class="familyDialogText">Deel deze code of link om toegang te geven tot “${safeName}”.</div><div class="sharedListInviteBox"><div>Deelcode</div><button type="button" class="sharedListInviteCode sharedListCodeLink" id="copyCurrentSharedCode">${code}</button><div class="sharedListLinkLabel">Deellink</div><a class="sharedListInviteLink" id="openCurrentSharedLink" href="${link}" target="_blank" rel="noopener">${link}</a></div>`,
-    `<button type="button" class="familyDialogBtn familyDialogCancel">Sluiten</button><button type="button" class="familyDialogBtn familyDialogPrimary" id="copyCurrentSharedLink">🔗 Link kopiëren</button>`
+    "Deelcode",
+    `<div class="familyDialogText">Deel “${safeName}” met anderen.</div>
+     <div class="sharedListInviteBox">
+       <div class="sharedListLinkLabel">Deelcode</div>
+       <div class="sharedListInviteCode" id="sharedCodeDisplay">${code}</div>
+       <div class="sharedListActionRow">
+         <button type="button" class="sharedListAction" id="copyCurrentSharedCode">📋 Kopiëren</button>
+         <button type="button" class="sharedListAction sharedListShareButton" id="shareCurrentSharedLink">🔗 Deellink</button>
+       </div>
+     </div>`,
+    `<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeCurrentSharedCode">Sluiten</button>`
   );
-  const copy=async(text,msg)=>{
+
+  async function copyText(value, message){
     try{
-      if(navigator.share && text===link){
-        await navigator.share({title:list.name || "Deellijst", text:"Doe mee met deze deellijst", url:link});
-        return;
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(value);
+      }else{
+        const ta=document.createElement("textarea");
+        ta.value=value;
+        ta.setAttribute("readonly","");
+        ta.style.position="fixed";
+        ta.style.opacity="0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
       }
-      await navigator.clipboard.writeText(text);
-      await familyAlert("Gekopieerd",msg,"fa-check");
+      await familyAlert("Gekopieerd",message,"fa-check");
     }catch(e){
-      if(e && e.name === "AbortError") return;
-      await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de link of code handmatig.","fa-copy");
+      await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat.","fa-copy");
+    }
+  }
+
+  overlay.querySelector("#copyCurrentSharedCode").onclick=()=>{
+    copyText(code,"De deelcode is gekopieerd.");
+  };
+
+  overlay.querySelector("#shareCurrentSharedLink").onclick=async()=>{
+    try{
+      if(navigator.share){
+        await navigator.share({
+          title:list.name || "Deellijst",
+          text:"Doe mee met deze deellijst",
+          url:link
+        });
+      }else{
+        await copyText(link,"Deellink is gekopieerd.");
+      }
+    }catch(e){
+      if(e && e.name==="AbortError") return;
+      await copyText(link,"Deellink is gekopieerd.");
     }
   };
-  overlay.querySelector("#copyCurrentSharedCode").onclick=()=>copy(code,"De deelcode is gekopieerd.");
-  overlay.querySelector("#copyCurrentSharedLink").onclick=()=>copy(link,"De deellink is gekopieerd.");
-  overlay.querySelector(".familyDialogCancel").onclick=()=>closeFamilyDialog(overlay);
-}
 
+  overlay.querySelector("#closeCurrentSharedCode").onclick=()=>{
+    closeFamilyDialog(overlay);
+  };
+}
 async function showSharedListMembers(){
   const user=auth.currentUser;
   if(!user || activeListType!=="shared" || !currentSharedListId) return;
@@ -3895,6 +3947,9 @@ async function deleteCurrentSharedList(){
 async function returnToFamilyList(){
   if(!auth.currentUser) return;
   activeListType="family";
+  if(currentSharedListId){
+    try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){}
+  }
   currentSharedListId=null;
   currentSharedListInviteCode=null;
   if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
