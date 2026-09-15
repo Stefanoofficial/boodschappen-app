@@ -1963,6 +1963,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 
   <div id="sharedListsMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
     <button type="button" class="settingsMenuBack" onclick="closeSharedListsSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
       <span>Familielijst</span>
     </button>
     <div class="familyMenuSubTitle">Deellijst</div>
@@ -3512,11 +3513,27 @@ async function getOrCreateHousehold() {
 async function openSharedListsSubmenu(event) {
   if (event) event.stopPropagation();
   switchMenuPage("sharedListsMenuSub", event);
+  const countEl=document.getElementById("sharedMemberCount");
+  if(countEl){
+    if(activeListType==="shared" && currentSharedListId){
+      try{
+        const snap=await database.ref("sharedLists/" + currentSharedListId + "/members").once("value");
+        const members=snap.val()||{};
+        countEl.textContent=String(Object.keys(members).filter(uid=>members[uid]===true).length);
+      }catch(_){
+        countEl.textContent="0";
+      }
+    }else{
+      countEl.textContent="—";
+    }
+  }
   await renderSharedLists();
 }
 function closeSharedListsSubmenu(event) {
-  try { if (typeof activeListType !== "undefined") activeListType = "family"; } catch (_) {}
- returnMenuToMain("sharedListsMenuSub", event); }
+  if(event) event.stopPropagation();
+  returnMenuToMain("sharedListsMenuSub", event);
+  returnToFamilyList();
+}
 
 function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
 function makeSharedListLink(code){
@@ -3637,7 +3654,10 @@ async function renderSharedLists(){
       btn.className="savedListRow";
       btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
       btn.querySelector("span").textContent=v.name||"Deellijst";
-      btn.addEventListener("click",()=>openSharedList(id,false));
+      btn.addEventListener("click",async()=>{
+        await openSharedList(id,false);
+        switchMenuPage("sharedListsMenuSub");
+      });
       box.appendChild(btn);
     });
   }catch(e){
@@ -3742,44 +3762,72 @@ async function showSharedListCode(){
 async function showSharedListMembers(){
   const user=auth.currentUser;
   if(!user || activeListType!=="shared" || !currentSharedListId) return;
+
   try{
     const snap=await database.ref("sharedLists/" + currentSharedListId).once("value");
     const list=snap.val();
+
     if(!list || !list.members){
       await familyAlert("Leden","De leden van deze deellijst konden niet worden geladen.","fa-users");
       return;
     }
+
     const ownerUid=String(list.owner || "");
     const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true);
     const memberNames=list.memberNames || {};
+
     const rows=[];
     for(const uid of memberIds){
       let name=memberNames[uid] || "";
-      if(!name && uid===user.uid){
-        try{ const ns=await database.ref("users/" + uid + "/name").once("value"); name=ns.val() || ""; }catch(_){}
+
+      if(!name){
+        try{
+          const ns=await database.ref("users/" + uid + "/name").once("value");
+          name=ns.val() || "";
+        }catch(_){}
       }
-      if(!name) name="Lid";
+
+      if(!name) name=uid===user.uid ? (user.displayName || user.email || "Gebruiker") : "Lid";
+
       const row=document.createElement("div");
       row.className="familyDialogMember";
+
       const icon=document.createElement("i");
       icon.className="fa-solid " + (uid===ownerUid ? "fa-crown" : "fa-user");
       icon.setAttribute("aria-hidden","true");
+
+      const nameNode=document.createElement("span");
+      nameNode.textContent=name;
+
       row.appendChild(icon);
-      row.appendChild(document.createTextNode(" " + name));
+      row.appendChild(nameNode);
       rows.push(row);
     }
+
     rows.sort((a,b)=>{
       const ai=a.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
       const bi=b.querySelector("i")?.classList.contains("fa-crown") ? 0 : 1;
       return ai-bi;
     });
+
     const wrap=document.createElement("div");
     wrap.className="familyDialogList";
-    rows.forEach(r=>wrap.appendChild(r));
-    const overlay=familyDialogBase("fa-user-group", "Leden (" + memberIds.length + ")", "", '<button type="button" class="familyDialogBtn familyDialogPrimary">Sluiten</button>');
-    const content=overlay.querySelector(".familyDialogText");
-    content.replaceWith(wrap);
-    overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
+    rows.forEach(row=>wrap.appendChild(row));
+
+    const overlay=familyDialogBase(
+      "fa-user-group",
+      "Leden (" + memberIds.length + ")",
+      "",
+      '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>'
+    );
+
+    const body=overlay.querySelector(".familyDialogBody");
+    body.replaceChildren(wrap);
+
+    const close=()=>closeFamilyDialog(overlay);
+    const closeBtn=overlay.querySelector("#closeSharedMembers");
+    if(closeBtn) closeBtn.addEventListener("click",close);
+    overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
   }catch(error){
     console.error("Deellijstleden konden niet worden geladen:",error);
     const detail=error && error.code ? "\n\nFoutcode: " + error.code : "";
@@ -3827,6 +3875,9 @@ async function openSharedList(id, showInvite){
 
     boodschappen=normalizeBoodschappen(v.boodschappen||[]);
     currentSharedListInviteCode = v.inviteCode || null;
+    if(currentSharedListInviteCode){
+      try{ localStorage.setItem("sharedListInviteCode:"+id,String(currentSharedListInviteCode)); }catch(_){}
+    }
     showList();
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=v.name||"Deellijst";
     updateSharedDeleteButton(v.owner === user.uid);
@@ -3946,6 +3997,8 @@ async function deleteCurrentSharedList(){
 
 async function returnToFamilyList(){
   if(!auth.currentUser) return;
+  try{ returnMenuToMain("sharedListsMenuSub"); }catch(_){}
+
   activeListType="family";
   if(currentSharedListId){
     try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){}
@@ -4428,56 +4481,48 @@ function togglePassword() {
     alert("Wachtwoord resetten mislukt: " + error.message);
   }
 }
-async function login() {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
+async function login(){
+  const emailEl=document.getElementById("loginEmail");
+  const passwordEl=document.getElementById("loginPassword");
+  const email=(emailEl?.value||"").trim();
+  const password=passwordEl?.value||"";
 
-  try {
-    // Wacht tot LOCAL-persistentie is ingesteld vóórdat de login wordt uitgevoerd.
-    // Zo wordt de sessie ook na het sluiten/wegvegen van de webapp behouden.
-    await authPersistenceReady;
-    loginFlowActive = true;
-    await auth.signInWithEmailAndPassword(email, password);
-    const loginScreen = document.getElementById("loginScreen");
-    document.body.classList.add("logged-in");
-    if (loginScreen) {
-      loginScreen.classList.add("loginScreenLeaving");
-      setTimeout(() => {
-        if (loginScreen.classList.contains("loginScreenLeaving")) loginScreen.style.display = "none";
-      }, 400);
-    }
-
-    const user = auth.currentUser;
-    const householdId = await getOrCreateHousehold();
-
-    if (householdId) {
-      await loadList();
-      await updateMemberCount();
-      watchMemberCount();
-      loginFlowActive = false;
-      return;
-    }
-
-    const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
-
-    if (savedMode === "private") {
-      await loadPrivateList();
-    } else if (savedMode === "skip") {
-      openAppWithoutList();
-    } else {
-      openUseModeModal();
-    }
-    await updateMemberCount();
-    watchMemberCount();
-    loginFlowActive = false;
-  } catch (error) {
-    loginFlowActive = false;
-    console.error("Inloggen fout:", error);
-    document.body.classList.remove("logged-in");
-    const loginScreen = document.getElementById("loginScreen");
-    if (loginScreen) { loginScreen.classList.remove("loginScreenLeaving"); loginScreen.style.display = "flex"; }
-    alert("Inloggen mislukt!\n\nE-mailadres of wachtwoord is onjuist.");
+  if(!email || !password){
+    familyAlert("Inloggen","Vul je e-mailadres en wachtwoord in.","fa-right-to-bracket");
+    return false;
   }
+
+  const btn=document.querySelector('#loginScreen button[onclick*="login"], #loginScreen .loginBtn, button[type="submit"]');
+  if(btn){
+    btn.disabled=true;
+    btn.dataset.loginBusy="1";
+  }
+
+  // Do not wait for auth persistence. Firebase can sign in immediately;
+  // the existing onAuthStateChanged handler will finish the normal flow.
+  auth.signInWithEmailAndPassword(email,password)
+    .then(()=>{
+      if(btn){
+        btn.disabled=false;
+        delete btn.dataset.loginBusy;
+      }
+    })
+    .catch(err=>{
+      if(btn){
+        btn.disabled=false;
+        delete btn.dataset.loginBusy;
+      }
+      let msg="Inloggen is niet gelukt.";
+      if(err && err.code==="auth/invalid-credential") msg="E-mailadres of wachtwoord is onjuist.";
+      else if(err && err.code==="auth/user-not-found") msg="Er bestaat geen account met dit e-mailadres.";
+      else if(err && err.code==="auth/wrong-password") msg="Het wachtwoord is onjuist.";
+      else if(err && err.code==="auth/invalid-email") msg="Het e-mailadres is niet geldig.";
+      else if(err && err.code==="auth/too-many-requests") msg="Te veel pogingen. Probeer het later opnieuw.";
+      else if(err && err.message) msg=err.message;
+      familyAlert("Inloggen",msg,"fa-triangle-exclamation");
+    });
+
+  return false;
 }
 
 window.login = login;
