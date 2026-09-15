@@ -1702,6 +1702,23 @@ body.logged-in .app {
   height: 34px;
   flex-basis: 34px;
 }
+
+/* Alle menu-iconen in submenu's krijgen dezelfde ronde achtergrond als de hoofdmenu-iconen. */
+.familyMenuPage .familyMenuItem:not(.familyMenuDanger) > i:first-child:not(.familyMenuArrow) {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: #dff5df;
+  color: #3F5B45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.dark-theme .familyMenuPage .familyMenuItem:not(.familyMenuDanger) > i:first-child:not(.familyMenuArrow) {
+  background: #304b39;
+  color: #bfe3c7;
+}
 .familyMenuBack { padding: 7px 6px 8px; font-size: 13px; }
 .familyMenuSubTitle { padding: 7px 7px 2px; font-size: 9px; }
 .familyMenuDanger { margin-top: 4px; padding-top: 8px !important; }
@@ -4022,7 +4039,7 @@ async function openSharedList(id, showInvite){
     });
     if(showInvite){
       const link=makeSharedListLink(v.inviteCode);
-      const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Code kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
+      const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
       const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
       overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
       overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
@@ -4174,7 +4191,7 @@ async function showFamilyCode() {
       "fa-key", "Familiecode",
       `<div class="familyDialogText">Deel deze code met iemand die je aan je familie wilt toevoegen.</div>
        <div class="familyDialogCode">${currentHouseholdId}</div>
-       <button type="button" class="sharedListAction" id="copyFamilyCodeBtn" style="margin-top:10px;">📋 Code kopiëren</button>`,
+       <button type="button" class="sharedListAction" id="copyFamilyCodeBtn" style="margin-top:10px;">📋 Kopiëren</button>`,
       `<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>`
     );
     const finish=()=>{ closeFamilyDialog(overlay, resolve); };
