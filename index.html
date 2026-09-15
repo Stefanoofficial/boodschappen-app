@@ -1433,7 +1433,34 @@ body.dark-theme .saveListMainBtn {
   text-align:left;
   cursor:pointer;
 }
-.savedListRow i:first-child { color:#3F5B45; width:22px; text-align:center; }
+.savedListRow i:first-child {
+  color:#3F5B45;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  border-radius:50%;
+  background:#dff5df;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.sharedListsMenuPage .familyMenuItem > i:first-child:not(.familyMenuArrow) {
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  border-radius:50%;
+  background:#dff5df;
+  color:#3F5B45;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+body.dark-theme .savedListRow i:first-child,
+body.dark-theme .sharedListsMenuPage .familyMenuItem > i:first-child:not(.familyMenuArrow) {
+  background:#304b39;
+  color:#bfe3c7;
+}
 .savedListRow span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .savedListCount { color:#8b928d; font-size:10px; white-space:nowrap; }
 .savedListsEmpty { padding:10px 7px; color:#8b928d; font-size:11px; line-height:1.35; }
@@ -1999,6 +2026,10 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="createSharedList()">
       <i class="fa-solid fa-plus"></i>
       <span>Nieuwe lijst</span>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="joinSharedListByCode()">
+      <i class="fa-solid fa-keyboard"></i>
+      <span>Code invoeren</span>
     </button>
     <div class="familyMenuSubTitle">Mijn deellijsten</div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
