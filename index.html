@@ -1863,9 +1863,9 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 
   <div class="headerBar">
   <h1>Boodschappenlijst</h1>
-  <button id="mainMenuButton" class="familyButton" onclick="handleMainMenuButton()" aria-label="Menu openen">
-    <i id="mainMenuButtonIcon" class="fa-solid fa-bars"></i> <span id="mainMenuButtonText">Menu</span>
-    <i id="mainMenuButtonArrow" class="fa-solid fa-chevron-down"></i>
+  <button class="familyButton" onclick="toggleFamilyMenu()" aria-label="Menu openen">
+    <i class="fa-solid fa-bars"></i> Menu
+    <i class="fa-solid fa-chevron-down"></i>
   </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
@@ -2070,113 +2070,6 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 let boodschappen = [];
 let selectedIndex = -1;
 
-/* Productcatalogus bewust vroeg geïnitialiseerd.
-   Zo kan geen opstart-/UI-flow productCatalog gebruiken voordat deze bestaat. */
-const productCatalog = [
-  // Fruit
-  ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
-  ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
-  ["mandarijn", "🍊"], ["mandarijnen", "🍊"], ["citroen", "🍋"], ["citroenen", "🍋"],
-  ["limoen", "🍋"], ["druif", "🍇"], ["druiven", "🍇"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
-  ["framboos", "🫐"], ["frambozen", "🫐"], ["blauwe bessen", "🫐"], ["kiwi", "🥝"],
-  ["ananas", "🍍"], ["mango", "🥭"], ["perzik", "🍑"], ["nectarine", "🍑"],
-  ["pruim", "🫐"], ["kers", "🍒"], ["kersen", "🍒"], ["watermeloen", "🍉"],
-  ["meloen", "🍈"], ["avocado", "🥑"], ["kokosnoot", "🥥"],
-
-  // Groenten
-  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
-  ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
-  ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
-  ["paprika", "🫑"], ["rode paprika", "red-bell-pepper"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
-  ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
-  ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
-  ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
-  ["erwt", "🫛"], ["erwten", "🫛"], ["bonen", "🫘"], ["sperziebonen", "🫛"],
-  ["champignons", "🍄"], ["champignon", "🍄"], ["biet", "🫜"], ["radijs", "🌱"],
-
-  // Brood, ontbijt & beleg
-  ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
-  ["meergranen brood", "🍞"], ["stokbrood", "🥖"], ["baguette", "🥖"], ["croissant", "🥐"],
-  ["bolletjes", "🥯"], ["broodjes", "🥯"], ["beschuit", "🍞"], ["cracker", "🍘"], ["crackers", "🍘"],
-  ["kaas", "🧀"], ["jonge kaas", "🧀"], ["oude kaas", "🧀"], ["ham", "🥓"], ["salami", "🥩"],
-  ["worst", "🌭"], ["pindakaas", "🥜"], ["hagelslag", "🍫"], ["chocopasta", "🍫"],
-  ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
-
-  // Zuivel & eieren
-  ["melk", "milk-carton"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
-  ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
-  ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
-  ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
-
-  // Vlees, vis & vegetarisch
-  ["kip", "🍗"], ["kipfilet", "🍗"], ["kippenpoten", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"],
-  ["rundvlees", "🥩"], ["varkensvlees", "🥩"], ["biefstuk", "🥩"], ["schnitzel", "🥩"],
-  ["speklap", "🥓"], ["spek", "🥓"], ["vis", "🐟"], ["zalm", "🐟"], ["tonijn", "🐟"],
-  ["garnalen", "🦐"], ["vega", "🌱"], ["tofu", "🫘"], ["worstjes", "🌭"],
-
-  // Dranken
-  ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
-  ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
-  ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
-  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"], ["coffee", "☕"],
-  ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
-
-  // Pasta, rijst, potten & koken
-  ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
-  ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
-  ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
-  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
-  ["mayonaise", "mayonnaise-bottle"], ["ketchup", "ketchup-bottle"], ["mosterd", "🟡"], ["pesto", "🌿"],
-  ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
-  ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
-
-  // Snacks & zoet
-  ["chips", "chips-bag"], ["pringles", "pringles-tube"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
-  ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
-  ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
-
-  // Diepvries & kant-en-klaar
-  ["pizza", "🍕"], ["friet", "🍟"], ["frietjes", "🍟"], ["ovenfriet", "🍟"],
-  ["diepvriesgroente", "🥦"], ["diepvriesfruit", "🍓"], ["nasi", "🍚"], ["bami", "🍜"],
-
-  // Persoonlijke verzorging
-  ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
-  ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
-  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "toilet-paper"], ["wc papier", "🧻"],
-  ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
-
-  // Schoonmaak & huishouden
-  ["schoonmaakmiddel", "🧴"], ["allesreiniger", "🧴"], ["glasreiniger", "🧴"],
-  ["keukenreiniger", "🧴"], ["badkamerreiniger", "🧴"], ["wc reiniger", "🧴"],
-  ["toilet reiniger", "🧴"], ["afwasmiddel", "🧴"], ["vaatwastabletten", "🧼"],
-  ["wasmiddel", "🧺"], ["wasverzachter", "🧺"], ["vlekkenmiddel", "🧺"],
-  ["bleek", "🧴"], ["schuurmiddel", "🧴"], ["spons", "🧽"], ["sponzen", "🧽"],
-  ["afwasspons", "🧽"], ["keukenrol", "🧻"], ["keukenpapier", "🧻"], ["aluminiumfolie", "📦"],
-  ["vershoudfolie", "📦"], ["vuilniszakken", "🗑️"], ["vuilniszak", "🗑️"],
-  ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
-
-  // Baby & huisdieren
-  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
-  ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
-  ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
-
-  // Overig
-  ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
-  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"],
-  ["curry saus", "curry-sauce"],
-  ["curry", "curry-sauce"],
-  ["toilet papier", "toilet-paper"],]
-/* Algemene iconenbibliotheek: suggesties en iconen gebruiken dezelfde bron. */
-const defaultProductIcon = "🛒";
-const productIconAliases = {
-  "sinaas": "sinaasappel", "orange": "sinaasappel",
-  "appels": "appel", "peren": "peer", "bananen": "banaan",
-  "tomaten": "tomaat", "komkommers": "komkommer",
-  "wortels": "wortel", "aardappelen": "aardappel", "uien": "ui",
-  "ei": "eieren", "toilet papier": "toiletpapier", "wc papier": "toiletpapier"
-};
-
-
 function getActiveTheme() {
   const saved = localStorage.getItem("boodschappenTheme") || "light";
   if (saved === "system") {
@@ -2306,12 +2199,6 @@ function closeOpenMenusOnOutsideClick(event) {
 }
 
 document.addEventListener("click", closeOpenMenusOnOutsideClick);
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", updateMainMenuButton);
-} else {
-  updateMainMenuButton();
-}
 
 
 function openFamilySubmenu(event) {
@@ -2822,17 +2709,21 @@ async function loadList() {
     console.error("Lijst laden mislukt:", error);
 
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
-      // Nooit de bestaande familie-koppeling verwijderen als een leesactie mislukt.
-      // Een permission/read-fout betekent niet dat het huishouden niet bestaat.
-      const status = document.getElementById("status");
-      if (status) {
-        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Geen toegang tot de familielijst. Je gegevens zijn niet verwijderd.';
+      currentHouseholdId = null;
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await database.ref("users/" + user.uid + "/householdId").remove();
+        } catch (cleanupError) {
+          console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError);
+        }
       }
+      openUseModeModal();
       return false;
     }
 
     const status = document.getElementById("status");
-    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
+    if (status) status.innerText = "⚠️ De familielijst kon niet worden geladen. Probeer opnieuw.";
     return false;
   }
 }
@@ -2887,6 +2778,109 @@ function relativeCompletedTime(timestamp) {
   return days + (days === 1 ? " dag geleden" : " dagen geleden");
 }
 
+const productCatalog = [
+  // Fruit
+  ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
+  ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
+  ["mandarijn", "🍊"], ["mandarijnen", "🍊"], ["citroen", "🍋"], ["citroenen", "🍋"],
+  ["limoen", "🍋"], ["druif", "🍇"], ["druiven", "🍇"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
+  ["framboos", "🫐"], ["frambozen", "🫐"], ["blauwe bessen", "🫐"], ["kiwi", "🥝"],
+  ["ananas", "🍍"], ["mango", "🥭"], ["perzik", "🍑"], ["nectarine", "🍑"],
+  ["pruim", "🫐"], ["kers", "🍒"], ["kersen", "🍒"], ["watermeloen", "🍉"],
+  ["meloen", "🍈"], ["avocado", "🥑"], ["kokosnoot", "🥥"],
+
+  // Groenten
+  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
+  ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
+  ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
+  ["paprika", "🫑"], ["rode paprika", "red-bell-pepper"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
+  ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
+  ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
+  ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
+  ["erwt", "🫛"], ["erwten", "🫛"], ["bonen", "🫘"], ["sperziebonen", "🫛"],
+  ["champignons", "🍄"], ["champignon", "🍄"], ["biet", "🫜"], ["radijs", "🌱"],
+
+  // Brood, ontbijt & beleg
+  ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
+  ["meergranen brood", "🍞"], ["stokbrood", "🥖"], ["baguette", "🥖"], ["croissant", "🥐"],
+  ["bolletjes", "🥯"], ["broodjes", "🥯"], ["beschuit", "🍞"], ["cracker", "🍘"], ["crackers", "🍘"],
+  ["kaas", "🧀"], ["jonge kaas", "🧀"], ["oude kaas", "🧀"], ["ham", "🥓"], ["salami", "🥩"],
+  ["worst", "🌭"], ["pindakaas", "🥜"], ["hagelslag", "🍫"], ["chocopasta", "🍫"],
+  ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
+
+  // Zuivel & eieren
+  ["melk", "milk-carton"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
+  ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
+  ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
+  ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
+
+  // Vlees, vis & vegetarisch
+  ["kip", "🍗"], ["kipfilet", "🍗"], ["kippenpoten", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"],
+  ["rundvlees", "🥩"], ["varkensvlees", "🥩"], ["biefstuk", "🥩"], ["schnitzel", "🥩"],
+  ["speklap", "🥓"], ["spek", "🥓"], ["vis", "🐟"], ["zalm", "🐟"], ["tonijn", "🐟"],
+  ["garnalen", "🦐"], ["vega", "🌱"], ["tofu", "🫘"], ["worstjes", "🌭"],
+
+  // Dranken
+  ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
+  ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
+  ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
+  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"], ["coffee", "☕"],
+  ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
+
+  // Pasta, rijst, potten & koken
+  ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
+  ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
+  ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
+  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
+  ["mayonaise", "mayonnaise-bottle"], ["ketchup", "ketchup-bottle"], ["mosterd", "🟡"], ["pesto", "🌿"],
+  ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
+  ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
+
+  // Snacks & zoet
+  ["chips", "chips-bag"], ["pringles", "pringles-tube"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
+  ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
+
+  // Diepvries & kant-en-klaar
+  ["pizza", "🍕"], ["friet", "🍟"], ["frietjes", "🍟"], ["ovenfriet", "🍟"],
+  ["diepvriesgroente", "🥦"], ["diepvriesfruit", "🍓"], ["nasi", "🍚"], ["bami", "🍜"],
+
+  // Persoonlijke verzorging
+  ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
+  ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
+  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "toilet-paper"], ["wc papier", "🧻"],
+  ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
+
+  // Schoonmaak & huishouden
+  ["schoonmaakmiddel", "🧴"], ["allesreiniger", "🧴"], ["glasreiniger", "🧴"],
+  ["keukenreiniger", "🧴"], ["badkamerreiniger", "🧴"], ["wc reiniger", "🧴"],
+  ["toilet reiniger", "🧴"], ["afwasmiddel", "🧴"], ["vaatwastabletten", "🧼"],
+  ["wasmiddel", "🧺"], ["wasverzachter", "🧺"], ["vlekkenmiddel", "🧺"],
+  ["bleek", "🧴"], ["schuurmiddel", "🧴"], ["spons", "🧽"], ["sponzen", "🧽"],
+  ["afwasspons", "🧽"], ["keukenrol", "🧻"], ["keukenpapier", "🧻"], ["aluminiumfolie", "📦"],
+  ["vershoudfolie", "📦"], ["vuilniszakken", "🗑️"], ["vuilniszak", "🗑️"],
+  ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
+
+  // Baby & huisdieren
+  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
+  ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
+  ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
+
+  // Overig
+  ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
+  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"],
+  ["curry saus", "curry-sauce"],
+  ["curry", "curry-sauce"],
+  ["toilet papier", "toilet-paper"],]
+/* Algemene iconenbibliotheek: suggesties en iconen gebruiken dezelfde bron. */
+const defaultProductIcon = "🛒";
+const productIconAliases = {
+  "sinaas": "sinaasappel", "orange": "sinaasappel",
+  "appels": "appel", "peren": "peer", "bananen": "banaan",
+  "tomaten": "tomaat", "komkommers": "komkommer",
+  "wortels": "wortel", "aardappelen": "aardappel", "uien": "ui",
+  "ei": "eieren", "toilet papier": "toiletpapier", "wc papier": "toiletpapier"
+};
 function normalizeProductLookup(value) {
   return String(value || "").toLowerCase().trim().replace(/\s+/g, " ");
 }
@@ -3075,26 +3069,22 @@ function updateProductSuggestions() {
 
 function initProductSuggestions() {
   const input = document.getElementById("product");
-  const box = document.getElementById("productSuggestions");
-  if (!input || !box || input.dataset.productSuggestionsReady === "true") return;
-
-  input.dataset.productSuggestionsReady = "true";
+  if (!input) return;
   input.addEventListener("input", updateProductSuggestions);
   input.addEventListener("focus", updateProductSuggestions);
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") box.classList.remove("open");
+    if (e.key === "Escape") {
+      const box = document.getElementById("productSuggestions");
+      if (box) box.classList.remove("open");
+    }
   });
-
   document.addEventListener("click", (e) => {
     const wrap = document.querySelector(".input-row-wrap");
-    if (wrap && !wrap.contains(e.target)) box.classList.remove("open");
+    if (wrap && !wrap.contains(e.target)) {
+      const box = document.getElementById("productSuggestions");
+      if (box) box.classList.remove("open");
+    }
   });
-
-  // Respect the existing user setting. Suggestions are on by default unless
-  // the user explicitly disabled them in Instellingen → Suggesties.
-  if (localStorage.getItem("boodschappenSuggestionsEnabled") !== "false") {
-    updateProductSuggestions();
-  }
 }
 
 function showList(animationType = "") {
@@ -3418,90 +3408,6 @@ let loginFlowActive = false;
 let currentSharedListId = null;
 let currentSharedListUnsubscribe = null;
 
-function updateMainMenuButton() {
-  const btn = document.getElementById("mainMenuButton");
-  const icon = document.getElementById("mainMenuButtonIcon");
-  const text = document.getElementById("mainMenuButtonText");
-  const arrow = document.getElementById("mainMenuButtonArrow");
-  const inShared = !!currentSharedListId;
-  if (btn) btn.setAttribute("aria-label", inShared ? "Terug naar mijn familielijst" : "Menu openen");
-  if (icon) { icon.className = inShared ? "fa-solid fa-arrow-left" : "fa-solid fa-bars"; }
-  if (text) text.textContent = inShared ? "Familie" : "Menu";
-  if (arrow) arrow.style.display = inShared ? "none" : "inline-block";
-}
-
-function handleMainMenuButton() {
-  if (currentSharedListId) {
-    returnToFamilyList();
-  } else {
-    toggleFamilyMenu();
-  }
-}
-
-async function returnToFamilyList() {
-  const user = auth.currentUser;
-
-  if (currentSharedListUnsubscribe) {
-    currentSharedListUnsubscribe();
-    currentSharedListUnsubscribe = null;
-  }
-
-  currentSharedListId = null;
-  boodschappen = [];
-  selectedIndex = -1;
-
-  const h = document.querySelector(".headerBar h1");
-  if (h) h.textContent = "Boodschappenlijst";
-  updateMainMenuButton();
-  closeFamilyMenu();
-
-  if (!user) return;
-
-  try {
-    // Restore the existing family connection directly instead of routing
-    // through the normal startup flow. This prevents the family list from
-    // being reported as unavailable when returning from a shared list.
-    const householdSnap = await database.ref("users/" + user.uid + "/householdId").once("value");
-    const householdId = householdSnap.val() ? String(householdSnap.val()) : null;
-
-    if (householdId) {
-      currentHouseholdId = householdId;
-      const listSnap = await database.ref("households/" + householdId + "/boodschappen").once("value");
-      const data = listSnap.val();
-
-      if (Array.isArray(data)) {
-        boodschappen = normalizeBoodschappen(data);
-      } else if (data && typeof data === "object") {
-        boodschappen = normalizeBoodschappen(Object.values(data));
-      } else {
-        boodschappen = [];
-      }
-
-      showList();
-      updateStatus();
-      await updateMemberCount();
-    } else if (isPrivateMode()) {
-      currentHouseholdId = null;
-      await loadPrivateList();
-    } else {
-      currentHouseholdId = null;
-      openUseModeModal();
-    }
-  } catch (error) {
-    console.error("Terug naar familielijst mislukt:", error);
-    const status = document.getElementById("status");
-    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
-  }
-
-  try {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("deellijst")) {
-      url.searchParams.delete("deellijst");
-      window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
-    }
-  } catch (e) {}
-}
-
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
 
@@ -3691,11 +3597,10 @@ async function openSharedList(id, showInvite){
   }
 
   currentSharedListId=id;
-  updateMainMenuButton();
   if(currentSharedListUnsubscribe) currentSharedListUnsubscribe();
   currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
     const data=s.val()||{};
-    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; updateMainMenuButton(); return; }
+    if(!data.members || data.members[user.uid]!==true){ currentSharedListId=null; return; }
     boodschappen=normalizeBoodschappen(data.boodschappen||[]);
     showList();
     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=data.name||"Deellijst";
@@ -4527,11 +4432,6 @@ function toggleRegisterPassword(fieldId, button) {
       }
       if (list.members && list.members[auth.currentUser.uid] === true) {
         await openSharedList(id,false);
-        try {
-          const url = new URL(window.location.href);
-          url.searchParams.delete("deellijst");
-          window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
-        } catch (e) {}
         return;
       }
       const join = await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + list.name + "”?" );
@@ -4541,11 +4441,6 @@ function toggleRegisterPassword(fieldId, button) {
       updates["userSharedLists/" + auth.currentUser.uid + "/" + id] = true;
       await database.ref().update(updates);
       await openSharedList(id,false);
-      try {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("deellijst");
-        window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : "") + (url.hash || ""));
-      } catch (e) {}
     } catch(error) {
       console.error("Deellijst-uitnodiging mislukt:",error);
       await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
@@ -4589,11 +4484,6 @@ function toggleRegisterPassword(fieldId, button) {
     }
 
     try {
-      // Wanneer de app via een deellijst-link is geopend, laat de uitnodigingshandler
-      // de juiste lijst openen. De gewone familielijst mag deze flow niet overschrijven.
-      const pendingSharedInvite = new URLSearchParams(window.location.search).get("deellijst");
-      if (pendingSharedInvite) return;
-
       const householdId = await getOrCreateHousehold();
       if (householdId) {
         await loadList();
