@@ -2070,6 +2070,113 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 let boodschappen = [];
 let selectedIndex = -1;
 
+/* Productcatalogus bewust vroeg geïnitialiseerd.
+   Zo kan geen opstart-/UI-flow productCatalog gebruiken voordat deze bestaat. */
+const productCatalog = [
+  // Fruit
+  ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
+  ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
+  ["mandarijn", "🍊"], ["mandarijnen", "🍊"], ["citroen", "🍋"], ["citroenen", "🍋"],
+  ["limoen", "🍋"], ["druif", "🍇"], ["druiven", "🍇"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
+  ["framboos", "🫐"], ["frambozen", "🫐"], ["blauwe bessen", "🫐"], ["kiwi", "🥝"],
+  ["ananas", "🍍"], ["mango", "🥭"], ["perzik", "🍑"], ["nectarine", "🍑"],
+  ["pruim", "🫐"], ["kers", "🍒"], ["kersen", "🍒"], ["watermeloen", "🍉"],
+  ["meloen", "🍈"], ["avocado", "🥑"], ["kokosnoot", "🥥"],
+
+  // Groenten
+  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
+  ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
+  ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
+  ["paprika", "🫑"], ["rode paprika", "red-bell-pepper"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
+  ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
+  ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
+  ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
+  ["erwt", "🫛"], ["erwten", "🫛"], ["bonen", "🫘"], ["sperziebonen", "🫛"],
+  ["champignons", "🍄"], ["champignon", "🍄"], ["biet", "🫜"], ["radijs", "🌱"],
+
+  // Brood, ontbijt & beleg
+  ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
+  ["meergranen brood", "🍞"], ["stokbrood", "🥖"], ["baguette", "🥖"], ["croissant", "🥐"],
+  ["bolletjes", "🥯"], ["broodjes", "🥯"], ["beschuit", "🍞"], ["cracker", "🍘"], ["crackers", "🍘"],
+  ["kaas", "🧀"], ["jonge kaas", "🧀"], ["oude kaas", "🧀"], ["ham", "🥓"], ["salami", "🥩"],
+  ["worst", "🌭"], ["pindakaas", "🥜"], ["hagelslag", "🍫"], ["chocopasta", "🍫"],
+  ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
+
+  // Zuivel & eieren
+  ["melk", "milk-carton"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
+  ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
+  ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
+  ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
+
+  // Vlees, vis & vegetarisch
+  ["kip", "🍗"], ["kipfilet", "🍗"], ["kippenpoten", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"],
+  ["rundvlees", "🥩"], ["varkensvlees", "🥩"], ["biefstuk", "🥩"], ["schnitzel", "🥩"],
+  ["speklap", "🥓"], ["spek", "🥓"], ["vis", "🐟"], ["zalm", "🐟"], ["tonijn", "🐟"],
+  ["garnalen", "🦐"], ["vega", "🌱"], ["tofu", "🫘"], ["worstjes", "🌭"],
+
+  // Dranken
+  ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
+  ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
+  ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
+  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"], ["coffee", "☕"],
+  ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
+
+  // Pasta, rijst, potten & koken
+  ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
+  ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
+  ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
+  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
+  ["mayonaise", "mayonnaise-bottle"], ["ketchup", "ketchup-bottle"], ["mosterd", "🟡"], ["pesto", "🌿"],
+  ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
+  ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
+
+  // Snacks & zoet
+  ["chips", "chips-bag"], ["pringles", "pringles-tube"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
+  ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
+  ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
+
+  // Diepvries & kant-en-klaar
+  ["pizza", "🍕"], ["friet", "🍟"], ["frietjes", "🍟"], ["ovenfriet", "🍟"],
+  ["diepvriesgroente", "🥦"], ["diepvriesfruit", "🍓"], ["nasi", "🍚"], ["bami", "🍜"],
+
+  // Persoonlijke verzorging
+  ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
+  ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
+  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "toilet-paper"], ["wc papier", "🧻"],
+  ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
+
+  // Schoonmaak & huishouden
+  ["schoonmaakmiddel", "🧴"], ["allesreiniger", "🧴"], ["glasreiniger", "🧴"],
+  ["keukenreiniger", "🧴"], ["badkamerreiniger", "🧴"], ["wc reiniger", "🧴"],
+  ["toilet reiniger", "🧴"], ["afwasmiddel", "🧴"], ["vaatwastabletten", "🧼"],
+  ["wasmiddel", "🧺"], ["wasverzachter", "🧺"], ["vlekkenmiddel", "🧺"],
+  ["bleek", "🧴"], ["schuurmiddel", "🧴"], ["spons", "🧽"], ["sponzen", "🧽"],
+  ["afwasspons", "🧽"], ["keukenrol", "🧻"], ["keukenpapier", "🧻"], ["aluminiumfolie", "📦"],
+  ["vershoudfolie", "📦"], ["vuilniszakken", "🗑️"], ["vuilniszak", "🗑️"],
+  ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
+
+  // Baby & huisdieren
+  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
+  ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
+  ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
+
+  // Overig
+  ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
+  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"],
+  ["curry saus", "curry-sauce"],
+  ["curry", "curry-sauce"],
+  ["toilet papier", "toilet-paper"],]
+/* Algemene iconenbibliotheek: suggesties en iconen gebruiken dezelfde bron. */
+const defaultProductIcon = "🛒";
+const productIconAliases = {
+  "sinaas": "sinaasappel", "orange": "sinaasappel",
+  "appels": "appel", "peren": "peer", "bananen": "banaan",
+  "tomaten": "tomaat", "komkommers": "komkommer",
+  "wortels": "wortel", "aardappelen": "aardappel", "uien": "ui",
+  "ei": "eieren", "toilet papier": "toiletpapier", "wc papier": "toiletpapier"
+};
+
+
 function getActiveTheme() {
   const saved = localStorage.getItem("boodschappenTheme") || "light";
   if (saved === "system") {
@@ -2715,21 +2822,17 @@ async function loadList() {
     console.error("Lijst laden mislukt:", error);
 
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
-      // NOOIT de householdId verwijderen bij een lees-/rechtenfout.
-      // De familiegegevens blijven volledig intact in Firebase.
+      // Nooit de bestaande familie-koppeling verwijderen als een leesactie mislukt.
+      // Een permission/read-fout betekent niet dat het huishouden niet bestaat.
       const status = document.getElementById("status");
       if (status) {
-        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Geen toegang tot de familielijst. Je familiegegevens zijn niet gewijzigd.<br><small>Code: ' + String(error.code || "permission-denied") + '</small>';
+        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Geen toegang tot de familielijst. Je gegevens zijn niet verwijderd.';
       }
       return false;
     }
 
     const status = document.getElementById("status");
-    if (status) {
-      const code = error && error.code ? String(error.code) : "onbekend";
-      const msg = error && error.message ? String(error.message) : String(error || "onbekende fout");
-      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Fout bij laden familielijst.<br><small>Code: ' + code + '<br>' + msg.replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</small>';
-    }
+    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
     return false;
   }
 }
@@ -2784,109 +2887,6 @@ function relativeCompletedTime(timestamp) {
   return days + (days === 1 ? " dag geleden" : " dagen geleden");
 }
 
-const productCatalog = [
-  // Fruit
-  ["appel", "🍎"], ["appels", "🍎"], ["peer", "🍐"], ["peren", "🍐"],
-  ["banaan", "🍌"], ["bananen", "🍌"], ["sinaas", "🍊"], ["sinaasappel", "🍊"], ["sinaasappels", "🍊"],
-  ["mandarijn", "🍊"], ["mandarijnen", "🍊"], ["citroen", "🍋"], ["citroenen", "🍋"],
-  ["limoen", "🍋"], ["druif", "🍇"], ["druiven", "🍇"], ["aardbei", "🍓"], ["aardbeien", "🍓"],
-  ["framboos", "🫐"], ["frambozen", "🫐"], ["blauwe bessen", "🫐"], ["kiwi", "🥝"],
-  ["ananas", "🍍"], ["mango", "🥭"], ["perzik", "🍑"], ["nectarine", "🍑"],
-  ["pruim", "🫐"], ["kers", "🍒"], ["kersen", "🍒"], ["watermeloen", "🍉"],
-  ["meloen", "🍈"], ["avocado", "🥑"], ["kokosnoot", "🥥"],
-
-  // Groenten
-  ["aardappel", "🥔"], ["aardappelen", "🥔"], ["zoete aardappel", "🍠"],
-  ["tomaat", "🍅"], ["tomaten", "🍅"], ["komkommer", "🥒"], ["wortel", "🥕"], ["wortels", "🥕"],
-  ["ui", "🧅"], ["uien", "🧅"], ["rode ui", "🧅"], ["knoflook", "🧄"],
-  ["paprika", "🫑"], ["rode paprika", "red-bell-pepper"], ["groene paprika", "🫑"], ["gele paprika", "🫑"],
-  ["sla", "🥬"], ["spinazie", "🥬"], ["broccoli", "🥦"], ["bloemkool", "🥦"],
-  ["courgette", "🥒"], ["aubergine", "🍆"], ["prei", "🥬"], ["boerenkool", "🥬"],
-  ["spruitjes", "🥦"], ["asperges", "🌱"], ["mais", "🌽"], ["maïs", "🌽"],
-  ["erwt", "🫛"], ["erwten", "🫛"], ["bonen", "🫘"], ["sperziebonen", "🫛"],
-  ["champignons", "🍄"], ["champignon", "🍄"], ["biet", "🫜"], ["radijs", "🌱"],
-
-  // Brood, ontbijt & beleg
-  ["brood", "🍞"], ["bruin brood", "🍞"], ["wit brood", "🍞"], ["volkoren brood", "🍞"],
-  ["meergranen brood", "🍞"], ["stokbrood", "🥖"], ["baguette", "🥖"], ["croissant", "🥐"],
-  ["bolletjes", "🥯"], ["broodjes", "🥯"], ["beschuit", "🍞"], ["cracker", "🍘"], ["crackers", "🍘"],
-  ["kaas", "🧀"], ["jonge kaas", "🧀"], ["oude kaas", "🧀"], ["ham", "🥓"], ["salami", "🥩"],
-  ["worst", "🌭"], ["pindakaas", "🥜"], ["hagelslag", "🍫"], ["chocopasta", "🍫"],
-  ["jam", "🍓"], ["honing", "🍯"], ["stroop", "🍯"], ["boter", "🧈"], ["margarine", "🧈"],
-
-  // Zuivel & eieren
-  ["melk", "milk-carton"], ["volle melk", "🥛"], ["halfvolle melk", "🥛"], ["magere melk", "🥛"],
-  ["chocomelk", "🥛"], ["karnemelk", "🥛"], ["yoghurt", "🥛"], ["kwark", "🥛"],
-  ["vla", "🍮"], ["slagroom", "🥛"], ["room", "🥛"], ["creme fraiche", "🥛"],
-  ["crème fraîche", "🥛"], ["pudding", "🍮"], ["eieren", "🥚"], ["ei", "🥚"],
-
-  // Vlees, vis & vegetarisch
-  ["kip", "🍗"], ["kipfilet", "🍗"], ["kippenpoten", "🍗"], ["vlees", "🥩"], ["gehakt", "🥩"],
-  ["rundvlees", "🥩"], ["varkensvlees", "🥩"], ["biefstuk", "🥩"], ["schnitzel", "🥩"],
-  ["speklap", "🥓"], ["spek", "🥓"], ["vis", "🐟"], ["zalm", "🐟"], ["tonijn", "🐟"],
-  ["garnalen", "🦐"], ["vega", "🌱"], ["tofu", "🫘"], ["worstjes", "🌭"],
-
-  // Dranken
-  ["water", "💧"], ["mineraalwater", "💧"], ["bruiswater", "💧"], ["cola", "🥤"],
-  ["cola zero", "🥤"], ["frisdrank", "🥤"], ["sinas", "🥤"], ["sprite", "🥤"],
-  ["fanta", "🥤"], ["7up", "🥤"], ["sap", "🧃"], ["appelsap", "🧃"], ["sinaasappelsap", "🧃"],
-  ["dubbelfris", "🧃"], ["limonade", "🧃"], ["energiedrank", "🥤"], ["koffie", "☕"], ["coffee", "☕"],
-  ["koffiebonen", "☕"], ["thee", "🍵"], ["ijsthee", "🍵"], ["cacao", "☕"],
-
-  // Pasta, rijst, potten & koken
-  ["rijst", "🍚"], ["basmatirijst", "🍚"], ["pasta", "🍝"], ["spaghetti", "🍝"],
-  ["macaroni", "🍝"], ["lasagne", "🍝"], ["noedels", "🍜"], ["mie", "🍜"],
-  ["bloem", "🌾"], ["meel", "🌾"], ["suiker", "🧂"], ["poedersuiker", "🧂"],
-  ["zout", "🧂"], ["zwarte peper", "🫙"], ["witte peper", "🫙"], ["peper", "🌶️"], ["olijfolie", "🫒"], ["olie", "🫒"], ["azijn", "🍶"],
-  ["mayonaise", "mayonnaise-bottle"], ["ketchup", "ketchup-bottle"], ["mosterd", "🟡"], ["pesto", "🌿"],
-  ["bouillon", "🍲"], ["soep", "🍲"], ["pastasaus", "🍅"], ["tomatensaus", "🍅"],
-  ["bonen", "🫘"], ["kikkererwten", "🫘"], ["linzen", "🫘"], ["noten", "🥜"],
-
-  // Snacks & zoet
-  ["chips", "chips-bag"], ["pringles", "pringles-tube"], ["nootjes", "🥜"], ["noten", "🥜"], ["popcorn", "🍿"], ["koek", "🍪"],
-  ["koekjes", "🍪"], ["chocolade", "🍫"], ["snoep", "🍬"], ["drop", "🍬"], ["kauwgom", "🍬"],
-  ["ijs", "🍦"], ["ijsjes", "🍦"], ["taart", "🍰"], ["cake", "🍰"], ["pannenkoeken", "🥞"],
-
-  // Diepvries & kant-en-klaar
-  ["pizza", "🍕"], ["friet", "🍟"], ["frietjes", "🍟"], ["ovenfriet", "🍟"],
-  ["diepvriesgroente", "🥦"], ["diepvriesfruit", "🍓"], ["nasi", "🍚"], ["bami", "🍜"],
-
-  // Persoonlijke verzorging
-  ["shampoo", "🧴"], ["conditioner", "🧴"], ["zeep", "🧼"], ["handzeep", "🧼"],
-  ["douchegel", "🧴"], ["tandpasta", "🪥"], ["tandenborstel", "🪥"], ["deodorant", "🧴"],
-  ["scheerschuim", "🪒"], ["scheermes", "🪒"], ["toiletpapier", "toilet-paper"], ["wc papier", "🧻"],
-  ["zakdoekjes", "🤧"], ["wattenstaafjes", "🧴"], ["wattenschijfjes", "🧴"], ["zonnebrand", "🧴"],
-
-  // Schoonmaak & huishouden
-  ["schoonmaakmiddel", "🧴"], ["allesreiniger", "🧴"], ["glasreiniger", "🧴"],
-  ["keukenreiniger", "🧴"], ["badkamerreiniger", "🧴"], ["wc reiniger", "🧴"],
-  ["toilet reiniger", "🧴"], ["afwasmiddel", "🧴"], ["vaatwastabletten", "🧼"],
-  ["wasmiddel", "🧺"], ["wasverzachter", "🧺"], ["vlekkenmiddel", "🧺"],
-  ["bleek", "🧴"], ["schuurmiddel", "🧴"], ["spons", "🧽"], ["sponzen", "🧽"],
-  ["afwasspons", "🧽"], ["keukenrol", "🧻"], ["keukenpapier", "🧻"], ["aluminiumfolie", "📦"],
-  ["vershoudfolie", "📦"], ["vuilniszakken", "🗑️"], ["vuilniszak", "🗑️"],
-  ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
-
-  // Baby & huisdieren
-  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
-  ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
-  ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
-
-  // Overig
-  ["kaarsen", "🕯️"], ["batterijen", "🔋"], ["lucifers", "🔥"], ["aansteker", "🔥"],
-  ["bloemen", "💐"], ["plant", "🪴"], ["tissues", "🧻"], ["servetten", "🧻"],
-  ["curry saus", "curry-sauce"],
-  ["curry", "curry-sauce"],
-  ["toilet papier", "toilet-paper"],]
-/* Algemene iconenbibliotheek: suggesties en iconen gebruiken dezelfde bron. */
-const defaultProductIcon = "🛒";
-const productIconAliases = {
-  "sinaas": "sinaasappel", "orange": "sinaasappel",
-  "appels": "appel", "peren": "peer", "bananen": "banaan",
-  "tomaten": "tomaat", "komkommers": "komkommer",
-  "wortels": "wortel", "aardappelen": "aardappel", "uien": "ui",
-  "ei": "eieren", "toilet papier": "toiletpapier", "wc papier": "toiletpapier"
-};
 function normalizeProductLookup(value) {
   return String(value || "").toLowerCase().trim().replace(/\s+/g, " ");
 }
@@ -3505,11 +3505,6 @@ async function getOrCreateHousehold() {
     throw new Error("Je bent niet ingelogd.");
   }
 
-  // Gebruik uitsluitend de koppeling op het gebruikersprofiel.
-  // We lezen hier bewust NIET de volledige household-node: die extra read
-  // kan door Firebase Rules worden geweigerd terwijl de gebruiker de
-  // boodschappen wel mag lezen. Een leesfout mag bovendien nooit leiden
-  // tot het verwijderen van de householdId.
   const userRef = database.ref("users/" + user.uid + "/householdId");
   const userSnapshot = await userRef.once("value");
   const householdId = userSnapshot.val();
@@ -3519,8 +3514,34 @@ async function getOrCreateHousehold() {
     return null;
   }
 
-  currentHouseholdId = String(householdId);
-  return currentHouseholdId;
+  try {
+    const householdSnapshot = await database
+      .ref("households/" + householdId)
+      .once("value");
+
+    if (!householdSnapshot.exists()) {
+      await userRef.remove();
+      currentHouseholdId = null;
+      return null;
+    }
+
+    const household = householdSnapshot.val() || {};
+    const isOwner = household.owner === user.uid;
+    const isMember = !!(household.members && household.members[user.uid]);
+
+    if (!isOwner && !isMember) {
+      await userRef.remove();
+      currentHouseholdId = null;
+      return null;
+    }
+
+    currentHouseholdId = String(householdId);
+    return currentHouseholdId;
+  } catch (error) {
+    console.error("Familie controleren mislukt:", error);
+    currentHouseholdId = null;
+    throw error;
+  }
 }
 
 async function openSharedListsSubmenu(event) {
