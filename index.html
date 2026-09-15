@@ -2719,13 +2719,17 @@ async function loadList() {
       // De familiegegevens blijven volledig intact in Firebase.
       const status = document.getElementById("status");
       if (status) {
-        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> De familielijst kan niet worden gelezen. Je familiegegevens zijn niet gewijzigd.';
+        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Geen toegang tot de familielijst. Je familiegegevens zijn niet gewijzigd.<br><small>Code: ' + String(error.code || "permission-denied") + '</small>';
       }
       return false;
     }
 
     const status = document.getElementById("status");
-    if (status) status.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
+    if (status) {
+      const code = error && error.code ? String(error.code) : "onbekend";
+      const msg = error && error.message ? String(error.message) : String(error || "onbekende fout");
+      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Fout bij laden familielijst.<br><small>Code: ' + code + '<br>' + msg.replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</small>';
+    }
     return false;
   }
 }
