@@ -1857,139 +1857,6 @@ body.dark-theme .sharedListInviteLink{color:#dff1e2}
 .sharedListActionRow{display:flex;gap:6px;flex-wrap:wrap}.sharedListAction{border:0;border-radius:10px;padding:8px 10px;background:#e5f1e5;color:#3F5B45;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}body.dark-theme .sharedListInviteCode{color:#dff1e2}.sharedListEmpty{padding:10px 7px;color:#8b928d;font-size:11px;line-height:1.35}
 </style>
-
-<style id="luxury-v5-unified-ui">
-/* LUXURY V5 — één functie = één duidelijke bediening.
-   Geen dubbele snelknoppen/navigatie; bestaande functies krijgen de moderne look. */
-.app{
-  height:auto !important;
-  min-height:100svh !important;
-  overflow:visible !important;
-  padding-bottom:28px !important;
-}
-body{padding-bottom:0 !important;}
-
-/* Hoofdactie: dit is de enige primaire Opslaan-knop op het hoofdscherm. */
-.saveListMainBtn{
-  width:100% !important;
-  min-height:54px !important;
-  margin:14px 0 10px !important;
-  padding:13px 18px !important;
-  border:1px solid rgba(31,122,82,.10) !important;
-  border-radius:18px !important;
-  background:linear-gradient(135deg,#eaf7ef,#dff2e7) !important;
-  color:#1f7a52 !important;
-  font-size:15px !important;
-  font-weight:800 !important;
-  box-shadow:0 8px 22px rgba(31,122,82,.08) !important;
-}
-.saveListMainBtn i{font-size:16px !important;}
-.saveListMainBtn:hover{background:linear-gradient(135deg,#e2f4e9,#d6eddf) !important;}
-
-/* Unieke beheeracties blijven beschikbaar, maar zonder oude rode/groene bloklook. */
-.buttons{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:10px !important;
-  margin-top:8px !important;
-}
-.buttons button{
-  min-height:46px !important;
-  padding:10px 12px !important;
-  border-radius:16px !important;
-  font-size:13px !important;
-  font-weight:750 !important;
-  border:1px solid transparent !important;
-  box-shadow:none !important;
-}
-.buttons .clear{
-  background:#f1f5f2 !important;
-  color:#53625a !important;
-  border-color:rgba(31,122,82,.08) !important;
-}
-.buttons .delete{
-  background:#fff1f1 !important;
-  color:#a94b4b !important;
-  border-color:rgba(169,75,75,.08) !important;
-}
-
-/* Het hoofdmenu: alle items dezelfde moderne kaartstijl. */
-.familyMenu{
-  width:min(320px,calc(100vw - 28px)) !important;
-  padding:10px !important;
-  border-radius:24px !important;
-  background:rgba(255,255,255,.96) !important;
-  border:1px solid rgba(31,122,82,.10) !important;
-  box-shadow:0 22px 60px rgba(20,55,39,.18) !important;
-  backdrop-filter:blur(20px) saturate(140%) !important;
-  -webkit-backdrop-filter:blur(20px) saturate(140%) !important;
-}
-.familyMenuPage{background:transparent !important;border-radius:18px !important;}
-.familyMenuPrimary,.familyMenuItem{
-  min-height:54px !important;
-  margin:4px 0 !important;
-  padding:8px 10px !important;
-  border-radius:16px !important;
-  border:1px solid transparent !important;
-  color:#1b2a22 !important;
-  background:transparent !important;
-  transition:background .16s ease,transform .16s ease,border-color .16s ease !important;
-}
-.familyMenuPrimary:hover,.familyMenuItem:hover{
-  background:#f0f8f3 !important;
-  border-color:rgba(31,122,82,.08) !important;
-}
-.familyMenuPrimary > i:first-child,.familyMenuItem > i:first-child:not(.familyMenuArrow){
-  width:38px !important;height:38px !important;min-width:38px !important;
-  border-radius:12px !important;
-  display:flex !important;align-items:center !important;justify-content:center !important;
-  background:#eaf7ef !important;color:#1f7a52 !important;
-}
-.familyMenuArrow{background:transparent !important;color:#9aa49e !important;width:auto !important;height:auto !important;min-width:0 !important;}
-.familyMenuSubTitle{
-  padding:12px 10px 7px !important;
-  color:#6d7972 !important;
-  font-size:11px !important;
-  font-weight:850 !important;
-  letter-spacing:.08em !important;
-  text-transform:uppercase !important;
-}
-.familyMenuBack,.settingsMenuBack{
-  min-height:48px !important;
-  border-radius:14px !important;
-  color:#1f7a52 !important;
-  background:#f0f8f3 !important;
-  border:0 !important;
-  font-weight:800 !important;
-}
-.savedListSaveBtn{
-  background:linear-gradient(135deg,#eaf7ef,#dff2e7) !important;
-  color:#1f7a52 !important;
-  border:1px solid rgba(31,122,82,.08) !important;
-}
-.familyMenuDanger{color:#a94b4b !important;background:#fff5f5 !important;}
-
-body.dark-theme .familyMenu{
-  background:rgba(27,34,30,.98) !important;
-  border-color:rgba(255,255,255,.08) !important;
-  box-shadow:0 24px 70px rgba(0,0,0,.50) !important;
-}
-body.dark-theme .familyMenuPage{background:transparent !important;}
-body.dark-theme .familyMenuPrimary,body.dark-theme .familyMenuItem{color:#edf4ef !important;}
-body.dark-theme .familyMenuPrimary:hover,body.dark-theme .familyMenuItem:hover{background:#24312a !important;}
-body.dark-theme .familyMenuPrimary > i:first-child,body.dark-theme .familyMenuItem > i:first-child:not(.familyMenuArrow){background:#304b39 !important;color:#bfe3c7 !important;}
-body.dark-theme .familyMenuArrow{color:#89968e !important;}
-body.dark-theme .familyMenuSubTitle{color:#aab6ae !important;}
-body.dark-theme .familyMenuBack,body.dark-theme .settingsMenuBack{background:#24312a !important;color:#bfe3c7 !important;}
-body.dark-theme .savedListSaveBtn{background:#24382c !important;color:#bfe3c7 !important;}
-body.dark-theme .familyMenuDanger{background:#382a2a !important;color:#ffb7b7 !important;}
-
-@media (max-width:560px){
-  .familyMenu{width:calc(100vw - 28px) !important;}
-  .buttons{grid-template-columns:1fr 1fr !important;}
-}
-</style>
-
 </head>
 
 <body>
@@ -2297,11 +2164,24 @@ body.dark-theme .familyMenuDanger{background:#382a2a !important;color:#ffb7b7 !i
 
   <div class="list" id="list"></div>
 
+<!-- Premium quick actions / navigation -->
+<div class="luxQuickActions" aria-label="Snelle acties">
+  <button type="button" class="luxQuickAction" onclick="document.getElementById('product')?.focus()">
+    <i class="fa-solid fa-plus"></i><span>Product</span>
+  </button>
+  <button type="button" class="luxQuickAction" onclick="saveCurrentListAs()">
+    <i class="fa-solid fa-bookmark"></i><span>Opslaan</span>
+  </button>
+  <button type="button" class="luxQuickAction" onclick="(function(){const m=document.getElementById('familyMenu'); if(m && !m.classList.contains('menu-open')) toggleFamilyMenu(); setTimeout(()=>openSavedListsSubmenu({stopPropagation(){}}),340);})()">
+    <i class="fa-solid fa-layer-group"></i><span>Mijn lijsten</span>
+  </button>
+</div>
+
   <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
 
   <div class="buttons">
-    <button class="clear" onclick="clearList()">Lijst wissen</button>
-    <button class="delete" onclick="deleteProduct()">Verwijder product</button>
+    <button class="clear" onclick="clearList()"><i class="fa-solid fa-broom"></i> Lijst wissen</button>
+    <button class="delete" onclick="deleteProduct()"><i class="fa-regular fa-trash-can"></i> Verwijder product</button>
   </div>
 
   <div class="status" id="status">
@@ -2312,6 +2192,23 @@ body.dark-theme .familyMenuDanger{background:#382a2a !important;color:#ffb7b7 !i
   </div>
 
 </div>
+
+
+
+<nav class="luxBottomNav" aria-label="Snelle navigatie">
+  <button type="button" class="luxBottomBtn active" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fa-solid fa-list-check"></i><span>Lijst</span>
+  </button>
+  <button type="button" class="luxBottomBtn" onclick="saveCurrentListAs()">
+    <i class="fa-regular fa-bookmark"></i><span>Opslaan</span>
+  </button>
+  <button type="button" class="luxBottomBtn luxBottomCenter" onclick="document.getElementById('product')?.focus(); document.getElementById('product')?.scrollIntoView({behavior:'smooth',block:'center'});">
+    <i class="fa-solid fa-plus"></i><span>Toevoegen</span>
+  </button>
+  <button type="button" class="luxBottomBtn" onclick="toggleFamilyMenu()">
+    <i class="fa-solid fa-bars"></i><span>Meer</span>
+  </button>
+</nav>
 
 <script>
 
@@ -7097,6 +6994,84 @@ body.dark-theme .luxBottomBtn.active{color:#b8e7c8;background:#294034;}
   .luxBottomBtn{min-height:52px;font-size:8px;}
   .luxBottomCenter{width:50px;height:50px;}
 }
+
+/* =========================================================
+   LUXURY V6 — premium replacement for legacy action buttons
+   New premium controls stay; legacy look is removed.
+   ========================================================= */
+
+/* The modern quick actions already provide Save.
+   Keep the original element/function in the DOM for compatibility,
+   but do not show the old visual button. */
+.saveListMainBtn{
+  display:none !important;
+}
+
+/* Keep the unique legacy actions (clear/delete) functional,
+   but give them the same premium visual language. */
+.buttons{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  margin:12px 0 0 !important;
+}
+.buttons button{
+  min-height:52px !important;
+  border-radius:18px !important;
+  border:1px solid rgba(31,122,82,.10) !important;
+  box-shadow:0 8px 24px rgba(20,60,42,.07) !important;
+  font:inherit !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  letter-spacing:.1px !important;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease !important;
+}
+.buttons button:active{transform:scale(.975) !important;}
+.buttons .clear{
+  background:rgba(255,255,255,.88) !important;
+  color:#356d51 !important;
+}
+.buttons .delete{
+  background:rgba(255,244,244,.92) !important;
+  color:#a34f4f !important;
+  border-color:rgba(180,80,80,.10) !important;
+}
+.buttons .clear:hover{background:#f3faf6 !important;}
+.buttons .delete:hover{background:#fff0f0 !important;}
+
+body.dark-theme .buttons .clear{
+  background:rgba(35,47,40,.92) !important;
+  color:#b9e6c9 !important;
+  border-color:rgba(164,214,182,.10) !important;
+}
+body.dark-theme .buttons .delete{
+  background:rgba(62,35,35,.90) !important;
+  color:#f0b6b6 !important;
+  border-color:rgba(255,170,170,.10) !important;
+}
+
+/* Give the premium quick actions a little more visual hierarchy. */
+.luxQuickActions{margin-top:14px !important; margin-bottom:14px !important;}
+.luxQuickAction{
+  min-height:62px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.92) !important;
+  border-color:rgba(31,122,82,.10) !important;
+  box-shadow:0 10px 28px rgba(20,60,42,.08) !important;
+}
+.luxQuickAction i{font-size:17px !important;}
+body.dark-theme .luxQuickAction{
+  background:rgba(31,41,35,.94) !important;
+  border-color:rgba(164,214,182,.10) !important;
+  color:#edf4ef !important;
+}
+body.dark-theme .luxQuickAction i{color:#a9dfbd !important;}
+
+/* Prevent the fixed bottom bar from ever covering the last controls. */
+.app{
+  padding-bottom:170px !important;
+}
+
 </style>
 
 </body>
