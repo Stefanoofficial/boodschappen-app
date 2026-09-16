@@ -3,7 +3,7 @@
 <head>
 <link rel="apple-touch-icon" href="icoon.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Boodschappen lijst</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -6160,6 +6160,187 @@ body.dark-theme .familyMenuItem.familyMenuPrimary {
     width: 100% !important;
     padding: 29px 20px 22px !important;
     border-radius: 26px !important;
+  }
+}
+
+
+/* =========================================================
+   LUXE POLISH — functionality untouched
+   ========================================================= */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Keep focused text controls at 16px+ so iOS doesn't auto-zoom. */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Premium surfaces and depth */
+.app {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(700px 420px at 100% 0%, rgba(68,111,83,.055), transparent 62%),
+    var(--m-bg, #f5f7f4) !important;
+}
+
+.app::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -180px;
+  right: -180px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: rgba(77, 126, 93, .055);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.headerBar h1 {
+  letter-spacing: -.8px !important;
+}
+
+.headerBar h1::first-letter {
+  letter-spacing: -.4px;
+}
+
+.input-row {
+  border-radius: 18px !important;
+  box-shadow:
+    0 7px 22px rgba(26,48,34,.065),
+    0 1px 2px rgba(26,48,34,.04) !important;
+}
+
+.input-row:focus-within {
+  border-color: rgba(47,96,70,.20) !important;
+  box-shadow:
+    0 0 0 4px rgba(47,96,70,.055),
+    0 9px 25px rgba(26,48,34,.075) !important;
+}
+
+.add {
+  min-height: 45px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(145deg, #3c7254, #2f6046) !important;
+  box-shadow: 0 5px 13px rgba(47,96,70,.16) !important;
+}
+
+.searchBox {
+  border: 1px solid rgba(47,96,70,.055) !important;
+  background: #eef2ef !important;
+}
+
+.list {
+  border-radius: 21px !important;
+  box-shadow:
+    0 12px 34px rgba(26,48,34,.065),
+    0 1px 2px rgba(26,48,34,.035) !important;
+}
+
+.item {
+  min-height: 54px !important;
+  transition: background .16s ease, transform .16s ease;
+}
+
+.item:hover {
+  background: #f8faf8 !important;
+}
+
+.saveListMainBtn {
+  min-height: 43px !important;
+  background: linear-gradient(180deg, #edf5ef, #e5f0e8) !important;
+  border: 1px solid rgba(47,96,70,.055) !important;
+}
+
+.buttons button {
+  min-height: 40px !important;
+  transition: transform .14s ease, filter .14s ease;
+}
+
+.buttons button:active,
+.saveListMainBtn:active,
+.familyButton:active {
+  transform: translateY(1px) scale(.985);
+}
+
+/* Login polish */
+#loginScreen {
+  background:
+    radial-gradient(520px 360px at 100% 0%, rgba(67,121,84,.15), transparent 63%),
+    radial-gradient(480px 320px at 0% 100%, rgba(113,155,121,.08), transparent 62%),
+    #f5f8f5 !important;
+}
+
+.loginBox {
+  box-shadow:
+    0 30px 80px rgba(24,39,29,.13),
+    0 2px 5px rgba(24,39,29,.035) !important;
+}
+
+.welcome::before {
+  background: linear-gradient(145deg, #3d7455, #2f6046) !important;
+  box-shadow: 0 11px 25px rgba(47,96,70,.20) !important;
+}
+
+.loginBox > button:not(.registerButton) {
+  background: linear-gradient(145deg, #3c7254, #2f6046) !important;
+}
+
+/* Menus */
+.familyMenu {
+  border-radius: 22px !important;
+  box-shadow:
+    0 25px 65px rgba(22,40,28,.16),
+    0 2px 5px rgba(22,40,28,.04) !important;
+}
+
+/* Safe-area support for phones with a home indicator */
+@supports (padding: max(0px)) {
+  .app {
+    padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+  }
+
+  #loginScreen {
+    padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Dark mode premium depth */
+body.dark-theme .app {
+  background:
+    radial-gradient(650px 400px at 100% 0%, rgba(77,133,96,.08), transparent 62%),
+    var(--m-bg, #101611) !important;
+}
+
+body.dark-theme #loginScreen {
+  background:
+    radial-gradient(520px 360px at 100% 0%, rgba(77,133,96,.12), transparent 63%),
+    #101611 !important;
+}
+
+body.dark-theme .add,
+body.dark-theme .loginBox > button:not(.registerButton) {
+  background: linear-gradient(145deg, #42795a, #315f45) !important;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .input-row input,
+  .searchBox input,
+  .inputBox input {
+    font-size: 16px !important;
   }
 }
 
