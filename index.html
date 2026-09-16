@@ -2520,7 +2520,15 @@ async function changeAccountPassword() {
 async function logoutFromMenu() {
   const ok = await familyConfirm("Uitloggen", "Wil je uitloggen?", true);
   if (!ok) return;
-  try { await auth.signOut(); } catch(error) { await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation"); }
+  loggingOut = true;
+  onboardingUseModePending = false;
+  closeUseModeModal();
+  try {
+    await auth.signOut();
+  } catch(error) {
+    loggingOut = false;
+    await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation");
+  }
 }
 function showAboutApp() {
   closeFamilyMenuForDialog();
@@ -3538,6 +3546,9 @@ const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.
   throw error;
 });
 let loginFlowActive = false;
+// Alleen een zojuist aangemaakt account krijgt de eerste-gebruiker-keuze te zien.
+let onboardingUseModePending = false;
+let loggingOut = false;
   let currentHouseholdId = null;
 let currentSharedListId = null;
 let currentSharedListInviteCode = null;
@@ -4293,6 +4304,8 @@ async function showFamilyCode() {
     await database.ref("users/" + user.uid + "/householdId").set(code);
 
     localStorage.removeItem("boodschappenUseMode_" + user.uid);
+    localStorage.removeItem("boodschappenNeedsUseMode_" + user.uid);
+    onboardingUseModePending = false;
     currentHouseholdId = code;
     closeUseModeModal();
     await loadList();
@@ -4519,6 +4532,8 @@ async function showFamilyMembers() {
       .set(code);
 
     localStorage.removeItem("boodschappenUseMode_" + user.uid);
+    localStorage.removeItem("boodschappenNeedsUseMode_" + user.uid);
+    onboardingUseModePending = false;
     currentHouseholdId = code;
     closeUseModeModal();
     await loadList();
@@ -4705,6 +4720,9 @@ function unlockPageScroll() {
 function openUseModeModal() {
   const modal = document.getElementById("useModeModal");
   if (!modal) return;
+  const user = auth && auth.currentUser;
+  const isNewAccountOnboarding = !!(user && (onboardingUseModePending || localStorage.getItem("boodschappenNeedsUseMode_" + user.uid) === "1"));
+  if (!isNewAccountOnboarding || loggingOut) return;
   lockPageScroll();
   modal.style.display = "flex";
   modal.setAttribute("aria-hidden", "false");
@@ -4736,6 +4754,8 @@ async function chooseUseMode(mode) {
   const user = auth.currentUser;
   if (!user) return;
 
+  // Deze keuze is alleen eenmalige onboarding voor een nieuw account.
+  // De vlag wordt pas verwijderd nadat de gekozen actie succesvol is uitgevoerd.
   if (mode === "family") {
     await createNewFamily();
     return;
@@ -4749,6 +4769,8 @@ async function chooseUseMode(mode) {
   if (mode === "private") {
     document.body.classList.add("logged-in");
     localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+    localStorage.removeItem("boodschappenNeedsUseMode_" + user.uid);
+    onboardingUseModePending = false;
     closeUseModeModal();
     await loadPrivateList();
   }
@@ -4864,6 +4886,9 @@ async function register() {
     await database.ref("users/" + credential.user.uid + "/name").set(name);
 
     // Een nieuw Firebase-account wordt automatisch ingelogd.
+    // Bewaar dat juist dit nieuwe account na de eerste login de gebruikswijze mag kiezen.
+    localStorage.setItem("boodschappenNeedsUseMode_" + credential.user.uid, "1");
+    onboardingUseModePending = true;
     // Direct uitloggen voorkomt dat de gebruiker onverwacht meteen binnenkomt.
     await auth.signOut();
 
@@ -5006,6 +5031,9 @@ function toggleRegisterPassword(fieldId, button) {
 
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
+      // Uitloggen mag nooit de eerste-gebruiker-keuze openen.
+      closeUseModeModal();
+      onboardingUseModePending = false;
       if (firstAuthState) {
         document.body.classList.remove("logged-in");
         const loginScreen = document.getElementById("loginScreen");
@@ -5044,12 +5072,19 @@ function toggleRegisterPassword(fieldId, button) {
         await loadList();
       } else {
         const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
+        const needsUseMode = localStorage.getItem("boodschappenNeedsUseMode_" + user.uid) === "1";
         if (savedMode === "private") {
           await loadPrivateList();
         } else if (savedMode === "skip") {
           openAppWithoutList();
-        } else {
+        } else if (needsUseMode) {
+          onboardingUseModePending = true;
           openUseModeModal();
+        } else {
+          // Bestaande accounts krijgen na een gewone login geen onboarding-popup.
+          showList();
+          const status = document.getElementById("status");
+          if (status) status.innerText = "Je bent ingelogd. Kies via Menu hoe je je lijst wilt gebruiken.";
         }
       }
       await updateMemberCount();
