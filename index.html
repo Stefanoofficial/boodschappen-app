@@ -6918,10 +6918,20 @@ body{
 .luxQuickAction:hover{background:#f5faf7;box-shadow:0 10px 28px rgba(20,60,42,.10);}
 
 /* Bottom navigation: new, but wired only to existing functions/sections */
+/* Keep the page scrollable so the fixed navigation never sits on top of content. */
+.app {
+  height: auto !important;
+  min-height: 100svh !important;
+  overflow: visible !important;
+  padding-bottom: 150px !important;
+}
+.luxQuickActions {
+  margin-bottom: 18px !important;
+}
 .luxBottomNav{
   position:fixed;
   left:12px;right:12px;
-  bottom:max(10px,env(safe-area-inset-bottom));
+  bottom:max(12px,env(safe-area-inset-bottom));
   height:70px;
   z-index:9998;
   display:grid;grid-template-columns:1fr 1.15fr 1fr 1fr;
@@ -6948,7 +6958,7 @@ body{
   box-shadow:0 10px 25px rgba(31,122,82,.28);
 }
 .luxBottomCenter i{font-size:19px;}
-body{padding-bottom:92px;}
+body{padding-bottom:0 !important;}
 
 /* Quick-action + bottom-nav dark mode */
 body.dark-theme .familyMenu{
