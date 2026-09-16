@@ -2164,6 +2164,19 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 
   <div class="list" id="list"></div>
 
+<!-- Premium quick actions / navigation -->
+<div class="luxQuickActions" aria-label="Snelle acties">
+  <button type="button" class="luxQuickAction" onclick="document.getElementById('product')?.focus()">
+    <i class="fa-solid fa-plus"></i><span>Product</span>
+  </button>
+  <button type="button" class="luxQuickAction" onclick="saveCurrentListAs()">
+    <i class="fa-solid fa-bookmark"></i><span>Opslaan</span>
+  </button>
+  <button type="button" class="luxQuickAction" onclick="(function(){const m=document.getElementById('familyMenu'); if(m && !m.classList.contains('menu-open')) toggleFamilyMenu(); setTimeout(()=>openSavedListsSubmenu({stopPropagation(){}}),340);})()">
+    <i class="fa-solid fa-layer-group"></i><span>Mijn lijsten</span>
+  </button>
+</div>
+
   <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
 
   <div class="buttons">
@@ -2179,6 +2192,23 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
   </div>
 
 </div>
+
+
+
+<nav class="luxBottomNav" aria-label="Snelle navigatie">
+  <button type="button" class="luxBottomBtn active" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fa-solid fa-list-check"></i><span>Lijst</span>
+  </button>
+  <button type="button" class="luxBottomBtn" onclick="saveCurrentListAs()">
+    <i class="fa-regular fa-bookmark"></i><span>Opslaan</span>
+  </button>
+  <button type="button" class="luxBottomBtn luxBottomCenter" onclick="document.getElementById('product')?.focus(); document.getElementById('product')?.scrollIntoView({behavior:'smooth',block:'center'});">
+    <i class="fa-solid fa-plus"></i><span>Toevoegen</span>
+  </button>
+  <button type="button" class="luxBottomBtn" onclick="toggleFamilyMenu()">
+    <i class="fa-solid fa-bars"></i><span>Meer</span>
+  </button>
+</nav>
 
 <script>
 
@@ -6735,6 +6765,225 @@ body.dark-theme .themeOption {
   }
 }
 
+
+
+/* =========================================================
+   LUXURY V4 — premium menu + bottom navigation
+   Functional layer is untouched; this layer adds navigation
+   and quick actions around the existing features.
+   ========================================================= */
+:root{
+  --lux-green:#1f7a52;
+  --lux-green-2:#2f9b68;
+  --lux-ink:#17211b;
+  --lux-muted:#7b847f;
+  --lux-card:rgba(255,255,255,.92);
+  --lux-line:rgba(31,122,82,.11);
+}
+body{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+/* Premium main menu */
+.familyMenu{
+  width:min(348px,calc(100vw - 24px)) !important;
+  max-height:min(78vh,680px) !important;
+  overflow:hidden !important;
+  padding:10px !important;
+  border-radius:28px !important;
+  background:rgba(250,252,250,.96) !important;
+  border:1px solid rgba(255,255,255,.9) !important;
+  box-shadow:0 24px 70px rgba(24,54,40,.22),0 6px 20px rgba(0,0,0,.08) !important;
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+}
+.familyMenuPage{padding:3px !important;}
+.familyMenuMain{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.familyMenuMain::before{
+  content:"MENU";
+  display:block;
+  padding:7px 10px 8px;
+  color:#8b938e;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.14em;
+}
+.familyMenuPrimary,.familyMenuItem{
+  min-height:56px !important;
+  border:1px solid transparent !important;
+  border-radius:18px !important;
+  background:transparent !important;
+  color:var(--lux-ink) !important;
+  padding:7px 9px !important;
+  gap:11px !important;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease !important;
+}
+.familyMenuPrimary:hover,.familyMenuItem:hover{
+  background:#f0f7f3 !important;
+  border-color:var(--lux-line) !important;
+  transform:translateY(-1px);
+}
+.familyMenuPrimary > i:first-child,.familyMenuItem > i:first-child{
+  width:42px !important;height:42px !important;min-width:42px !important;
+  border-radius:14px !important;
+  display:flex !important;align-items:center;justify-content:center;
+  background:#e7f4ec !important;color:var(--lux-green) !important;
+  font-size:17px !important;
+}
+.familyMenuPrimary > span,.familyMenuItem > span{
+  flex:1;
+  font-size:14px !important;
+  font-weight:700 !important;
+  color:var(--lux-ink) !important;
+}
+.familyMenuArrow{color:#9aa39e !important;background:transparent !important;width:auto !important;height:auto !important;}
+.familyMenuMain .settingsPrimary{margin-top:5px;}
+.familyMenuMain .settingsPrimary::before,
+.familyMenuMain button[onclick*="openAboutSubmenu"]::before{
+  content:"";
+  position:absolute;
+  left:10px;right:10px;
+  transform:translateY(-32px);
+  height:1px;
+  background:rgba(31,122,82,.08);
+}
+.familyMenuDanger{color:#c73535 !important;border-top:0 !important;}
+.familyMenuDanger > i:first-child{background:#fff0f0 !important;color:#d33b3b !important;}
+.familyMenuDanger > span{color:#c73535 !important;}
+.familyMenuSubTitle{
+  padding:10px 10px 6px !important;
+  color:#8b938e !important;
+  font-size:10px !important;font-weight:800 !important;letter-spacing:.14em !important;
+}
+.familyMenuBack,.settingsMenuBack{
+  min-height:46px !important;
+  border:0 !important;border-radius:15px !important;
+  background:#f0f5f2 !important;color:var(--lux-green) !important;
+  padding:8px 11px !important;
+  font-size:13px !important;font-weight:800 !important;
+}
+.familyMenuBack:hover,.settingsMenuBack:hover{background:#e6f1eb !important;}
+.familyMenuBack i,.settingsMenuBack i{width:28px !important;height:28px !important;border-radius:10px !important;background:#fff !important;display:flex;align-items:center;justify-content:center;}
+.settingsMenuHint,.aboutMenuHint{
+  margin:8px 3px 3px !important;padding:11px 12px !important;
+  border-radius:15px !important;
+  background:#edf7f1 !important;color:#65716a !important;
+  font-size:11px !important;line-height:1.45 !important;
+}
+.savedListsContainer{gap:7px !important;max-height:280px !important;}
+.savedListRow{
+  min-height:54px !important;border-radius:17px !important;
+  background:#fff !important;border:1px solid rgba(31,122,82,.08) !important;
+  box-shadow:0 5px 18px rgba(20,60,42,.06) !important;
+}
+.savedListRow i:first-child{width:38px !important;height:38px !important;border-radius:12px !important;background:#e7f4ec !important;color:var(--lux-green) !important;display:flex;align-items:center;justify-content:center;}
+.savedListRow span{font-weight:700 !important;color:var(--lux-ink) !important;}
+.savedListCount{margin-left:auto;color:#8b938e !important;font-weight:700 !important;}
+.savedListSaveBtn{background:#eaf7ef !important;color:var(--lux-green) !important;border-color:rgba(31,122,82,.12) !important;}
+.savedListSaveBtn > i:first-child{background:#fff !important;}
+
+/* Menu trigger */
+.familyButton{
+  background:linear-gradient(135deg,#2f9b68,#1f7a52) !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  box-shadow:0 7px 20px rgba(31,122,82,.22) !important;
+  padding:9px 13px !important;
+}
+
+/* Extra premium quick actions */
+.luxQuickActions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:12px 0 4px;
+}
+.luxQuickAction{
+  min-height:58px;
+  border:1px solid rgba(31,122,82,.09);
+  border-radius:18px;
+  background:rgba(255,255,255,.86);
+  color:var(--lux-ink);
+  box-shadow:0 8px 24px rgba(20,60,42,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  font:inherit;font-size:10px;font-weight:800;cursor:pointer;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.luxQuickAction i{font-size:16px;color:var(--lux-green);}
+.luxQuickAction:active{transform:scale(.97);}
+.luxQuickAction:hover{background:#f5faf7;box-shadow:0 10px 28px rgba(20,60,42,.10);}
+
+/* Bottom navigation: new, but wired only to existing functions/sections */
+.luxBottomNav{
+  position:fixed;
+  left:12px;right:12px;
+  bottom:max(10px,env(safe-area-inset-bottom));
+  height:70px;
+  z-index:9998;
+  display:grid;grid-template-columns:1fr 1.15fr 1fr 1fr;
+  align-items:center;gap:5px;
+  padding:6px;
+  border:1px solid rgba(255,255,255,.88);
+  border-radius:25px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 18px 50px rgba(18,55,38,.18),0 3px 12px rgba(0,0,0,.07);
+  backdrop-filter:blur(20px) saturate(145%);
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
+}
+.luxBottomBtn{
+  border:0;background:transparent;color:#7b847f;border-radius:18px;
+  min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  font:inherit;font-size:9px;font-weight:800;cursor:pointer;
+}
+.luxBottomBtn i{font-size:17px;}
+.luxBottomBtn.active{color:var(--lux-green);background:#eaf7ef;}
+.luxBottomCenter{
+  width:54px;height:54px;margin:auto;border-radius:19px !important;
+  color:#fff !important;
+  background:linear-gradient(135deg,#35a56f,#1f7a52) !important;
+  box-shadow:0 10px 25px rgba(31,122,82,.28);
+}
+.luxBottomCenter i{font-size:19px;}
+body{padding-bottom:92px;}
+
+/* Quick-action + bottom-nav dark mode */
+body.dark-theme .familyMenu{
+  background:rgba(27,34,30,.97) !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.46) !important;
+}
+body.dark-theme .familyMenuPrimary,
+body.dark-theme .familyMenuItem{color:#edf4ef !important;}
+body.dark-theme .familyMenuPrimary:hover,
+body.dark-theme .familyMenuItem:hover{background:#24312a !important;border-color:rgba(164,214,182,.10) !important;}
+body.dark-theme .familyMenuPrimary > span,
+body.dark-theme .familyMenuItem > span{color:#edf4ef !important;}
+body.dark-theme .familyMenuPrimary > i:first-child,
+body.dark-theme .familyMenuItem > i:first-child{background:#294034 !important;color:#a9dfbd !important;}
+body.dark-theme .familyMenuBack,body.dark-theme .settingsMenuBack{background:#25332b !important;color:#b8e7c8 !important;}
+body.dark-theme .familyMenuBack i,body.dark-theme .settingsMenuBack i{background:#1b241f !important;}
+body.dark-theme .settingsMenuHint,body.dark-theme .aboutMenuHint{background:#21372a !important;color:#b8c6bd !important;}
+body.dark-theme .savedListRow{background:#202a24 !important;border-color:rgba(255,255,255,.07) !important;}
+body.dark-theme .savedListRow span{color:#edf4ef !important;}
+body.dark-theme .savedListRow i:first-child{background:#294034 !important;color:#a9dfbd !important;}
+body.dark-theme .luxQuickAction{background:rgba(30,39,33,.92);border-color:rgba(255,255,255,.08);color:#edf4ef;}
+body.dark-theme .luxBottomNav{background:rgba(28,35,31,.92);border-color:rgba(255,255,255,.08);}
+body.dark-theme .luxBottomBtn{color:#aab4ad;}
+body.dark-theme .luxBottomBtn.active{color:#b8e7c8;background:#294034;}
+
+@media (min-width:700px){
+  .luxBottomNav{left:50%;right:auto;width:520px;transform:translateX(-50%);}
+  .luxQuickActions{max-width:560px;margin-left:auto;margin-right:auto;}
+}
+@media (max-width:380px){
+  .luxBottomNav{left:8px;right:8px;height:66px;}
+  .luxBottomBtn{min-height:52px;font-size:8px;}
+  .luxBottomCenter{width:50px;height:50px;}
+}
 </style>
 
 </body>
