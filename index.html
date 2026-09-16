@@ -5167,6 +5167,32 @@ function toggleRegisterPassword(fieldId, button) {
     return base + '?code=' + encodeURIComponent(code || '');
   };
 })();
+
+/* Visual helper: keep the product count in the list header up to date. */
+(function () {
+  function updateProductCount() {
+    var list = document.getElementById("list");
+    if (!list) return;
+    var count = list.querySelectorAll(".item").length;
+    var label = count === 1 ? "1 product" : count + " producten";
+    list.setAttribute("data-product-count", label);
+  }
+
+  function initProductCount() {
+    var list = document.getElementById("list");
+    if (!list) return;
+    updateProductCount();
+    var observer = new MutationObserver(updateProductCount);
+    observer.observe(list, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initProductCount);
+  } else {
+    initProductCount();
+  }
+})();
+
 </script>
 
 <style>
@@ -6341,6 +6367,371 @@ body.dark-theme .loginBox > button:not(.registerButton) {
   .searchBox input,
   .inputBox input {
     font-size: 16px !important;
+  }
+}
+
+
+/* =========================================================
+   LUXURY V3 — layout, buttons, menus & pop-ups
+   Existing application logic remains untouched.
+   ========================================================= */
+
+/* Main screen: premium, airy, app-like */
+.app {
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  padding: 18px 17px 24px !important;
+}
+
+.headerBar {
+  padding: 5px 1px 17px !important;
+}
+
+.headerBar h1 {
+  font-size: 26px !important;
+  font-weight: 790 !important;
+}
+
+/* Make the menu button an icon-first premium control */
+.familyButton {
+  min-height: 42px !important;
+  padding: 9px 11px !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  border: 1px solid rgba(47,96,70,.10) !important;
+  box-shadow: 0 6px 18px rgba(26,48,34,.06) !important;
+}
+
+/* Product entry feels like one premium control */
+.input-row {
+  min-height: 54px !important;
+  padding: 5px !important;
+  border-radius: 18px !important;
+}
+
+.add {
+  min-width: 116px !important;
+  min-height: 44px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(145deg, #3f7658, #2f6046) !important;
+  box-shadow: 0 7px 15px rgba(47,96,70,.16) !important;
+}
+
+/* Product count is shown in the list header.
+   JS below only updates a data attribute; it does not alter app behavior. */
+.list {
+  position: relative !important;
+  padding-top: 8px !important;
+}
+
+.list::before {
+  content: "JOUW BOODSCHAPPEN\A" attr(data-product-count) !important;
+  white-space: pre !important;
+  display: block !important;
+  padding: 8px 3px 10px !important;
+  color: #89948c !important;
+  font-size: 10px !important;
+  line-height: 1.65 !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+}
+
+.item {
+  min-height: 55px !important;
+  padding: 10px 3px !important;
+}
+
+.item:hover {
+  border-radius: 11px !important;
+  background: #f7faf7 !important;
+}
+
+/* Save / secondary actions */
+.saveListMainBtn {
+  min-height: 44px !important;
+  margin-top: 10px !important;
+  border-radius: 13px !important;
+}
+
+.buttons {
+  gap: 9px !important;
+}
+
+.buttons button {
+  min-height: 40px !important;
+  border-radius: 12px !important;
+}
+
+/* ---------- Family / overflow menu ---------- */
+#familyMenu {
+  min-width: 300px !important;
+  max-width: calc(100vw - 28px) !important;
+  padding: 9px !important;
+  border-radius: 23px !important;
+  background: rgba(255,255,255,.985) !important;
+  border: 1px solid rgba(31,59,42,.09) !important;
+  box-shadow:
+    0 30px 80px rgba(20,38,27,.17),
+    0 5px 15px rgba(20,38,27,.06) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.familyMenuPage {
+  padding: 2px !important;
+}
+
+.familyMenuItem {
+  min-height: 56px !important;
+  margin: 3px 0 !important;
+  padding: 9px 11px !important;
+  border-radius: 16px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  transition: background .16s ease, transform .16s ease !important;
+}
+
+.familyMenuItem:hover {
+  background: #f2f6f3 !important;
+}
+
+.familyMenuItem i:first-child {
+  width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 11px !important;
+  background: #edf4ef !important;
+  color: #315d46 !important;
+  font-size: 15px !important;
+}
+
+.familyMenuItem span {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #203027 !important;
+}
+
+.familyMenuArrow {
+  width: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  color: #9aa49d !important;
+  font-size: 11px !important;
+}
+
+.familyMenuBack {
+  min-height: 42px !important;
+  padding: 8px 11px !important;
+  border-radius: 13px !important;
+  color: #315d46 !important;
+  background: #f1f6f2 !important;
+}
+
+.familyMenuSubTitle {
+  padding: 12px 10px 9px !important;
+  color: #7e8b82 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .8px !important;
+  text-transform: uppercase !important;
+}
+
+/* ---------- Modals / pop-ups ---------- */
+.registerModal,
+.useModeModal {
+  background: rgba(17,29,21,.34) !important;
+  backdrop-filter: blur(9px) !important;
+  -webkit-backdrop-filter: blur(9px) !important;
+}
+
+.registerBox,
+.useModeBox {
+  width: min(92vw, 410px) !important;
+  padding: 29px 25px 24px !important;
+  border-radius: 27px !important;
+  background: rgba(255,255,255,.985) !important;
+  border: 1px solid rgba(31,59,42,.08) !important;
+  box-shadow:
+    0 30px 90px rgba(14,28,19,.20),
+    0 3px 10px rgba(14,28,19,.05) !important;
+}
+
+.useModeBox h2,
+.registerBox h2 {
+  margin-bottom: 21px !important;
+  color: #17231b !important;
+  font-size: 23px !important;
+  line-height: 1.12 !important;
+  font-weight: 780 !important;
+  letter-spacing: -.45px !important;
+}
+
+/* Mode choices become elegant rows rather than generic buttons */
+.useModeButton {
+  width: 100% !important;
+  min-height: 62px !important;
+  margin: 7px 0 !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border-radius: 16px !important;
+  background: #f7f9f7 !important;
+  border: 1px solid #e7ece8 !important;
+  color: #1d2b22 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease !important;
+}
+
+.useModeButton:hover {
+  background: #eef5f0 !important;
+  border-color: #dbe8de !important;
+}
+
+.useModeButton i {
+  width: 39px !important;
+  height: 39px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 39px !important;
+  border-radius: 12px !important;
+  background: #e6f0e8 !important;
+  color: #315d46 !important;
+}
+
+.useModeButton span {
+  font-size: 14px !important;
+  font-weight: 720 !important;
+}
+
+/* Registration fields */
+.registerInputBox {
+  min-height: 52px !important;
+  margin-bottom: 10px !important;
+  padding: 0 13px !important;
+  border-radius: 15px !important;
+  background: #f7f9f7 !important;
+  border: 1px solid #e5ebe6 !important;
+}
+
+.registerInputBox:focus-within {
+  border-color: rgba(47,96,70,.36) !important;
+  box-shadow: 0 0 0 4px rgba(47,96,70,.06) !important;
+}
+
+.registerSubmit {
+  width: 100% !important;
+  min-height: 51px !important;
+  margin-top: 5px !important;
+  border-radius: 15px !important;
+  background: linear-gradient(145deg, #3f7658, #2f6046) !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: 0 8px 18px rgba(47,96,70,.16) !important;
+  font-weight: 750 !important;
+}
+
+.registerBack {
+  width: 100% !important;
+  min-height: 42px !important;
+  margin-top: 8px !important;
+  border-radius: 13px !important;
+  background: transparent !important;
+  color: #657169 !important;
+  border: 0 !important;
+}
+
+/* ---------- Theme picker ---------- */
+#themePicker {
+  padding: 7px !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.98) !important;
+  border: 1px solid rgba(31,59,42,.08) !important;
+  box-shadow: 0 20px 50px rgba(20,38,27,.15) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+.themeOption {
+  min-height: 45px !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  color: #27362d !important;
+}
+
+.themeOption:hover {
+  background: #f0f5f1 !important;
+}
+
+.themeOption i {
+  color: #315d46 !important;
+}
+
+/* ---------- Dark mode ---------- */
+body.dark-theme #familyMenu,
+body.dark-theme #themePicker,
+body.dark-theme .registerBox,
+body.dark-theme .useModeBox {
+  background: rgba(27,36,29,.985) !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 30px 90px rgba(0,0,0,.42) !important;
+}
+
+body.dark-theme .familyMenuItem:hover,
+body.dark-theme .useModeButton:hover,
+body.dark-theme .themeOption:hover {
+  background: #232d25 !important;
+}
+
+body.dark-theme .familyMenuItem span,
+body.dark-theme .useModeBox h2,
+body.dark-theme .registerBox h2,
+body.dark-theme .useModeButton {
+  color: #edf3ee !important;
+}
+
+body.dark-theme .familyMenuItem i:first-child,
+body.dark-theme .useModeButton i {
+  background: #263b2d !important;
+  color: #b9d8c1 !important;
+}
+
+body.dark-theme .useModeButton,
+body.dark-theme .registerInputBox {
+  background: #1b241d !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+body.dark-theme .familyMenuBack {
+  background: #243128 !important;
+  color: #b9d8c1 !important;
+}
+
+body.dark-theme .themeOption {
+  color: #edf3ee !important;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 480px) {
+  .app {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  #familyMenu {
+    min-width: 0 !important;
+    width: min(330px, calc(100vw - 24px)) !important;
+  }
+
+  .registerBox,
+  .useModeBox {
+    width: calc(100vw - 28px) !important;
+    padding: 25px 19px 20px !important;
+    border-radius: 24px !important;
   }
 }
 
