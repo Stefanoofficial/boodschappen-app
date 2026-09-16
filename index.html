@@ -933,6 +933,386 @@ body.dark-theme .themeOption i{color:#dce9df;}
 body.dark-theme .familyMenuPage {
   background: #252b27;
 }
+
+/* =========================================================
+   NIEUW HOME DESIGN — rustige, moderne boodschappenlijst
+   Alleen styling; bestaande functionaliteit blijft intact.
+   ========================================================= */
+
+body {
+  color: #203126;
+  background-color: #dfe6dd;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.app {
+  max-width: 600px;
+  min-height: 100vh;
+  height: 100vh;
+  padding: 18px 16px 22px;
+  overflow: hidden;
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(247,239,227,.12) 0%,
+      rgba(247,239,227,.30) 28%,
+      rgba(247,239,227,.82) 58%,
+      rgba(247,239,227,.96) 100%
+    );
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+/* Bovenbalk wordt luchtiger en minder als een losse kaart. */
+.headerBar {
+  background: rgba(63,91,69,.94);
+  padding: 11px 13px;
+  border-radius: 20px;
+  box-shadow: 0 8px 22px rgba(31,48,37,.14);
+  border: 1px solid rgba(255,255,255,.13);
+}
+
+.headerBar h1 {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.25px;
+  padding: 3px 4px;
+}
+
+.familyButton {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  padding: 9px 11px;
+  font-size: 14px;
+  box-shadow: none;
+}
+
+/* Titel boven invoer */
+.app > h2 {
+  text-align: left;
+  color: #203126;
+  font-size: 18px;
+  line-height: 1.2;
+  margin: 20px 3px 9px;
+  font-weight: 700;
+  letter-spacing: -.15px;
+}
+
+/* Voeg-product-regel als één geheel */
+.input-row {
+  gap: 0;
+  align-items: stretch;
+  padding: 4px;
+  background: rgba(255,255,255,.93);
+  border: 1px solid rgba(63,91,69,.10);
+  border-radius: 18px;
+  box-shadow: 0 7px 20px rgba(38,54,43,.10);
+}
+
+.input-row input {
+  background: transparent;
+  color: #203126;
+  padding: 13px 12px;
+  border-radius: 14px;
+  font-size: 16px;
+  outline: none;
+}
+
+.input-row input::placeholder {
+  color: #8a938d;
+}
+
+.add {
+  flex: 0 0 34%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #3f5b45;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(63,91,69,.18);
+  font-size: 14px;
+}
+
+.add:hover {
+  filter: brightness(1.03);
+}
+
+.searchBox {
+  height: 46px;
+  margin-top: 10px;
+  padding: 0 13px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.76);
+  border: 1px solid rgba(63,91,69,.09);
+  box-shadow: 0 5px 15px rgba(38,54,43,.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.searchBox > i {
+  color: #52695a;
+  font-size: 18px;
+  margin-right: 9px;
+}
+
+.searchBox input {
+  color: #203126;
+  font-size: 15px;
+}
+
+.searchBox input::placeholder {
+  color: #8a938d;
+}
+
+.searchBox button {
+  color: #607066;
+  font-size: 21px;
+}
+
+/* De lijst zelf is één rustige surface; de producten zijn geen losse blokken meer. */
+.list {
+  margin-top: 12px;
+  height: 310px !important;
+  max-height: 310px !important;
+  padding: 13px 11px 10px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.90);
+  border: 1px solid rgba(63,91,69,.10);
+  box-shadow: 0 9px 25px rgba(38,54,43,.10);
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(63,91,69,.28) transparent;
+}
+
+.list::before {
+  content: "Je boodschappen";
+  display: block;
+  color: #294633;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 5px 8px;
+  letter-spacing: .1px;
+}
+
+/* Productregels: witruimte + subtiele scheidingslijn i.p.v. kaart-op-kaart. */
+.item {
+  margin: 0;
+  padding: 13px 5px;
+  min-height: 52px;
+  border: 0;
+  border-bottom: 1px solid rgba(63,91,69,.10);
+  border-radius: 0;
+  background: transparent;
+  color: #25332a;
+  font-size: 17px;
+  font-weight: 550;
+  box-shadow: none;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.itemProductContent {
+  gap: 10px;
+}
+
+.productIcon {
+  order: 2;
+  width: 32px;
+  min-width: 32px;
+  font-size: 22px;
+  opacity: .95;
+}
+
+.itemProductContent > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.item.completed {
+  font-size: 16px;
+  opacity: .55;
+}
+
+.item.completed .completedMeta {
+  margin-left: 0;
+  color: #718078;
+}
+
+.item:active {
+  background: rgba(63,91,69,.045);
+  border-radius: 10px;
+}
+
+/* Opslaan is secundair, niet meer een zware knop. */
+.saveListMainBtn {
+  min-height: 40px;
+  margin: 9px 0 6px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.68);
+  border: 1px solid rgba(63,91,69,.13);
+  color: #3f5b45;
+  box-shadow: 0 4px 12px rgba(38,54,43,.06);
+  font-size: 13px;
+}
+
+/* Gevaarlijke acties bewust subtieler */
+.buttons {
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.buttons button {
+  min-height: 38px;
+  padding: 9px 10px;
+  border-radius: 13px;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.clear {
+  background: rgba(63,91,69,.10);
+  color: #3f5b45;
+  border: 1px solid rgba(63,91,69,.12);
+}
+
+.delete {
+  background: rgba(198,40,40,.07);
+  color: #a52a2a;
+  border: 1px solid rgba(198,40,40,.14);
+}
+
+/* Opslagstatus als klein, rustig informatiestrookje */
+#status {
+  min-height: 40px !important;
+  margin-top: 9px;
+  padding: 7px 12px !important;
+  border-radius: 14px !important;
+  background: rgba(223,245,223,.78) !important;
+  color: #315d3a !important;
+  border: 1px solid rgba(63,91,69,.09);
+  box-shadow: none !important;
+  font-size: 12px !important;
+}
+
+#status span {
+  font-size: 10px;
+  opacity: .75;
+}
+
+/* Menu sluit visueel beter aan op de nieuwe stijl. */
+.familyMenu {
+  border-radius: 20px !important;
+  background: rgba(247,239,227,.97) !important;
+  border: 1px solid rgba(63,91,69,.12) !important;
+  box-shadow: 0 16px 34px rgba(26,38,29,.18) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Kleine schermen */
+@media (max-width: 480px) {
+  .app {
+    padding: 14px 12px 18px;
+  }
+
+  .headerBar {
+    border-radius: 18px;
+  }
+
+  .headerBar h1 {
+    font-size: 20px;
+  }
+
+  .familyButton {
+    padding: 8px 9px;
+  }
+
+  .app > h2 {
+    margin-top: 17px;
+    font-size: 17px;
+  }
+
+  .add {
+    flex-basis: 35%;
+    font-size: 13px;
+  }
+
+  .list {
+    height: 305px !important;
+    max-height: 305px !important;
+    border-radius: 20px;
+  }
+}
+
+/* Donker thema */
+body.dark-theme {
+  background-color: #101610;
+  color: #eef3ee;
+}
+
+body.dark-theme .app {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(18,24,19,.20) 0%,
+      rgba(18,24,19,.55) 42%,
+      rgba(18,24,19,.94) 100%
+    );
+}
+
+body.dark-theme .app > h2 {
+  color: #eef3ee;
+}
+
+body.dark-theme .input-row,
+body.dark-theme .searchBox,
+body.dark-theme .list {
+  background: rgba(29,36,30,.92);
+  border-color: rgba(255,255,255,.08);
+}
+
+body.dark-theme .input-row input,
+body.dark-theme .searchBox input,
+body.dark-theme .item {
+  color: #eef3ee;
+}
+
+body.dark-theme .input-row input::placeholder,
+body.dark-theme .searchBox input::placeholder {
+  color: #9da79f;
+}
+
+body.dark-theme .list::before {
+  color: #dce8df;
+}
+
+body.dark-theme .item {
+  border-bottom-color: rgba(255,255,255,.08);
+}
+
+body.dark-theme .saveListMainBtn {
+  background: rgba(29,36,30,.82);
+  color: #dceadf;
+  border-color: rgba(255,255,255,.08);
+}
+
+body.dark-theme .clear {
+  background: rgba(255,255,255,.07);
+  color: #dceadf;
+  border-color: rgba(255,255,255,.08);
+}
+
+body.dark-theme #status {
+  background: rgba(47,78,53,.72) !important;
+  color: #dceadf !important;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -2145,7 +2525,7 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
   </div>
 
 
-  <h2>Voeg iets toe aan je lijst</h2>
+  <h2>Wat heb je nodig?</h2>
 
   <div class="input-row-wrap">
     <div class="input-row">
