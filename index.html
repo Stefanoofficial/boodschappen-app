@@ -5031,17 +5031,21 @@ function toggleRegisterPassword(fieldId, button) {
 
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
-      // Uitloggen mag nooit de eerste-gebruiker-keuze openen.
+      // Geen ingelogde gebruiker: toon altijd direct het inlogscherm.
+      // Dit geldt zowel bij het openen van de app als na Uitloggen.
+      // De onboarding-keuze hoort uitsluitend bij een nieuw account.
       closeUseModeModal();
       onboardingUseModePending = false;
-      if (firstAuthState) {
-        document.body.classList.remove("logged-in");
-        const loginScreen = document.getElementById("loginScreen");
-        if (loginScreen) {
-          loginScreen.classList.remove("loginScreenLeaving");
-          loginScreen.style.display = "flex";
-        }
+      loggingOut = false;
+      loginFlowActive = false;
+
+      document.body.classList.remove("logged-in");
+      const loginScreen = document.getElementById("loginScreen");
+      if (loginScreen) {
+        loginScreen.classList.remove("loginScreenLeaving");
+        loginScreen.style.display = "flex";
       }
+
       firstAuthState = false;
       return;
     }
