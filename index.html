@@ -934,385 +934,6 @@ body.dark-theme .familyMenuPage {
   background: #252b27;
 }
 
-/* =========================================================
-   NIEUW HOME DESIGN — rustige, moderne boodschappenlijst
-   Alleen styling; bestaande functionaliteit blijft intact.
-   ========================================================= */
-
-body {
-  color: #203126;
-  background-color: #dfe6dd;
-  background-position: center;
-  background-attachment: fixed;
-}
-
-.app {
-  max-width: 600px;
-  min-height: 100vh;
-  height: 100vh;
-  padding: 18px 16px 22px;
-  overflow: hidden;
-  position: relative;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(247,239,227,.12) 0%,
-      rgba(247,239,227,.30) 28%,
-      rgba(247,239,227,.82) 58%,
-      rgba(247,239,227,.96) 100%
-    );
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-}
-
-/* Bovenbalk wordt luchtiger en minder als een losse kaart. */
-.headerBar {
-  background: rgba(63,91,69,.94);
-  padding: 11px 13px;
-  border-radius: 20px;
-  box-shadow: 0 8px 22px rgba(31,48,37,.14);
-  border: 1px solid rgba(255,255,255,.13);
-}
-
-.headerBar h1 {
-  color: #fff;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -.25px;
-  padding: 3px 4px;
-}
-
-.familyButton {
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 14px;
-  padding: 9px 11px;
-  font-size: 14px;
-  box-shadow: none;
-}
-
-/* Titel boven invoer */
-.app > h2 {
-  text-align: left;
-  color: #203126;
-  font-size: 18px;
-  line-height: 1.2;
-  margin: 20px 3px 9px;
-  font-weight: 700;
-  letter-spacing: -.15px;
-}
-
-/* Voeg-product-regel als één geheel */
-.input-row {
-  gap: 0;
-  align-items: stretch;
-  padding: 4px;
-  background: rgba(255,255,255,.93);
-  border: 1px solid rgba(63,91,69,.10);
-  border-radius: 18px;
-  box-shadow: 0 7px 20px rgba(38,54,43,.10);
-}
-
-.input-row input {
-  background: transparent;
-  color: #203126;
-  padding: 13px 12px;
-  border-radius: 14px;
-  font-size: 16px;
-  outline: none;
-}
-
-.input-row input::placeholder {
-  color: #8a938d;
-}
-
-.add {
-  flex: 0 0 34%;
-  min-height: 44px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: #3f5b45;
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(63,91,69,.18);
-  font-size: 14px;
-}
-
-.add:hover {
-  filter: brightness(1.03);
-}
-
-.searchBox {
-  height: 46px;
-  margin-top: 10px;
-  padding: 0 13px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.76);
-  border: 1px solid rgba(63,91,69,.09);
-  box-shadow: 0 5px 15px rgba(38,54,43,.07);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.searchBox > i {
-  color: #52695a;
-  font-size: 18px;
-  margin-right: 9px;
-}
-
-.searchBox input {
-  color: #203126;
-  font-size: 15px;
-}
-
-.searchBox input::placeholder {
-  color: #8a938d;
-}
-
-.searchBox button {
-  color: #607066;
-  font-size: 21px;
-}
-
-/* De lijst zelf is één rustige surface; de producten zijn geen losse blokken meer. */
-.list {
-  margin-top: 12px;
-  height: 310px !important;
-  max-height: 310px !important;
-  padding: 13px 11px 10px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.90);
-  border: 1px solid rgba(63,91,69,.10);
-  box-shadow: 0 9px 25px rgba(38,54,43,.10);
-  overflow-y: auto !important;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(63,91,69,.28) transparent;
-}
-
-.list::before {
-  content: "Je boodschappen";
-  display: block;
-  color: #294633;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 0 5px 8px;
-  letter-spacing: .1px;
-}
-
-/* Productregels: witruimte + subtiele scheidingslijn i.p.v. kaart-op-kaart. */
-.item {
-  margin: 0;
-  padding: 13px 5px;
-  min-height: 52px;
-  border: 0;
-  border-bottom: 1px solid rgba(63,91,69,.10);
-  border-radius: 0;
-  background: transparent;
-  color: #25332a;
-  font-size: 17px;
-  font-weight: 550;
-  box-shadow: none;
-}
-
-.item:last-child {
-  border-bottom: 0;
-}
-
-.itemProductContent {
-  gap: 10px;
-}
-
-.productIcon {
-  order: 2;
-  width: 32px;
-  min-width: 32px;
-  font-size: 22px;
-  opacity: .95;
-}
-
-.itemProductContent > span:first-child {
-  flex: 1;
-  min-width: 0;
-}
-
-.item.completed {
-  font-size: 16px;
-  opacity: .55;
-}
-
-.item.completed .completedMeta {
-  margin-left: 0;
-  color: #718078;
-}
-
-.item:active {
-  background: rgba(63,91,69,.045);
-  border-radius: 10px;
-}
-
-/* Opslaan is secundair, niet meer een zware knop. */
-.saveListMainBtn {
-  min-height: 40px;
-  margin: 9px 0 6px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.68);
-  border: 1px solid rgba(63,91,69,.13);
-  color: #3f5b45;
-  box-shadow: 0 4px 12px rgba(38,54,43,.06);
-  font-size: 13px;
-}
-
-/* Gevaarlijke acties bewust subtieler */
-.buttons {
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.buttons button {
-  min-height: 38px;
-  padding: 9px 10px;
-  border-radius: 13px;
-  font-size: 13px;
-  box-shadow: none;
-}
-
-.clear {
-  background: rgba(63,91,69,.10);
-  color: #3f5b45;
-  border: 1px solid rgba(63,91,69,.12);
-}
-
-.delete {
-  background: rgba(198,40,40,.07);
-  color: #a52a2a;
-  border: 1px solid rgba(198,40,40,.14);
-}
-
-/* Opslagstatus als klein, rustig informatiestrookje */
-#status {
-  min-height: 40px !important;
-  margin-top: 9px;
-  padding: 7px 12px !important;
-  border-radius: 14px !important;
-  background: rgba(223,245,223,.78) !important;
-  color: #315d3a !important;
-  border: 1px solid rgba(63,91,69,.09);
-  box-shadow: none !important;
-  font-size: 12px !important;
-}
-
-#status span {
-  font-size: 10px;
-  opacity: .75;
-}
-
-/* Menu sluit visueel beter aan op de nieuwe stijl. */
-.familyMenu {
-  border-radius: 20px !important;
-  background: rgba(247,239,227,.97) !important;
-  border: 1px solid rgba(63,91,69,.12) !important;
-  box-shadow: 0 16px 34px rgba(26,38,29,.18) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-/* Kleine schermen */
-@media (max-width: 480px) {
-  .app {
-    padding: 14px 12px 18px;
-  }
-
-  .headerBar {
-    border-radius: 18px;
-  }
-
-  .headerBar h1 {
-    font-size: 20px;
-  }
-
-  .familyButton {
-    padding: 8px 9px;
-  }
-
-  .app > h2 {
-    margin-top: 17px;
-    font-size: 17px;
-  }
-
-  .add {
-    flex-basis: 35%;
-    font-size: 13px;
-  }
-
-  .list {
-    height: 305px !important;
-    max-height: 305px !important;
-    border-radius: 20px;
-  }
-}
-
-/* Donker thema */
-body.dark-theme {
-  background-color: #101610;
-  color: #eef3ee;
-}
-
-body.dark-theme .app {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(18,24,19,.20) 0%,
-      rgba(18,24,19,.55) 42%,
-      rgba(18,24,19,.94) 100%
-    );
-}
-
-body.dark-theme .app > h2 {
-  color: #eef3ee;
-}
-
-body.dark-theme .input-row,
-body.dark-theme .searchBox,
-body.dark-theme .list {
-  background: rgba(29,36,30,.92);
-  border-color: rgba(255,255,255,.08);
-}
-
-body.dark-theme .input-row input,
-body.dark-theme .searchBox input,
-body.dark-theme .item {
-  color: #eef3ee;
-}
-
-body.dark-theme .input-row input::placeholder,
-body.dark-theme .searchBox input::placeholder {
-  color: #9da79f;
-}
-
-body.dark-theme .list::before {
-  color: #dce8df;
-}
-
-body.dark-theme .item {
-  border-bottom-color: rgba(255,255,255,.08);
-}
-
-body.dark-theme .saveListMainBtn {
-  background: rgba(29,36,30,.82);
-  color: #dceadf;
-  border-color: rgba(255,255,255,.08);
-}
-
-body.dark-theme .clear {
-  background: rgba(255,255,255,.07);
-  color: #dceadf;
-  border-color: rgba(255,255,255,.08);
-}
-
-body.dark-theme #status {
-  background: rgba(47,78,53,.72) !important;
-  color: #dceadf !important;
-}
-
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -5563,6 +5184,385 @@ function toggleRegisterPassword(fieldId, button) {
 @media (max-width:430px) {
   .shared-code-button { width: 40px; height: 40px; padding: 0; display:inline-flex; align-items:center; justify-content:center; }
 }
+
+/* =========================================================
+   VISUAL-ONLY REDESIGN
+   IMPORTANT: CSS ONLY. Existing HTML + JavaScript untouched.
+   ========================================================= */
+
+:root {
+  --ui-green: #315d46;
+  --ui-green-dark: #244b37;
+  --ui-green-soft: #e8f1ea;
+  --ui-bg: #f6f8f6;
+  --ui-card: #ffffff;
+  --ui-text: #17221b;
+  --ui-muted: #7c867f;
+  --ui-line: #e5eae6;
+}
+
+/* ---------- Global / home ---------- */
+body {
+  background: var(--ui-bg) !important;
+  color: var(--ui-text);
+}
+
+.app {
+  background: var(--ui-bg) !important;
+  padding: 14px 16px 20px;
+}
+
+/* Header: clean, no photo, no heavy block */
+.headerBar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 2px 12px;
+  border-radius: 0 !important;
+}
+
+.headerBar h1 {
+  color: var(--ui-text) !important;
+  font-size: 25px;
+  font-weight: 760;
+  letter-spacing: -0.5px;
+}
+
+.familyButton {
+  background: #fff !important;
+  color: var(--ui-green) !important;
+  border: 1px solid var(--ui-line) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 3px 12px rgba(20,40,27,.05) !important;
+}
+
+/* Title */
+.app > h2 {
+  color: var(--ui-text) !important;
+  font-size: 20px;
+  margin: 8px 2px 10px;
+  letter-spacing: -0.25px;
+}
+
+/* Add-product field */
+.input-row {
+  padding: 5px !important;
+  gap: 4px !important;
+  background: #fff !important;
+  border: 1px solid var(--ui-line) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 5px 16px rgba(20,40,27,.055) !important;
+}
+
+.input-row input {
+  color: var(--ui-text) !important;
+  font-size: 15px;
+  padding: 13px 11px;
+}
+
+.input-row input::placeholder {
+  color: #9aa29c !important;
+}
+
+.add {
+  min-height: 43px !important;
+  min-width: 112px;
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  background: var(--ui-green) !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+/* Search */
+.searchBox {
+  margin-top: 10px !important;
+  height: 44px !important;
+  background: #eef2ee !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  box-shadow: none !important;
+}
+
+.searchBox input {
+  color: var(--ui-text) !important;
+  font-size: 14px;
+}
+
+.searchBox input::placeholder {
+  color: #929b95 !important;
+}
+
+/* Product list: one surface instead of many boxes */
+.list {
+  height: 330px !important;
+  max-height: 330px !important;
+  margin-top: 11px !important;
+  padding: 7px 13px !important;
+  background: #fff !important;
+  border: 1px solid var(--ui-line) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 18px rgba(20,40,27,.055) !important;
+  overflow-y: auto !important;
+}
+
+.list::before {
+  content: "Boodschappen";
+  display: block;
+  padding: 7px 2px 5px;
+  color: var(--ui-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .65px;
+}
+
+.item {
+  min-height: 50px !important;
+  margin: 0 !important;
+  padding: 11px 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--ui-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ui-text) !important;
+  font-size: 16px;
+}
+
+.item:last-child {
+  border-bottom: 0 !important;
+}
+
+.productIcon {
+  width: 30px !important;
+  min-width: 30px !important;
+  font-size: 20px;
+}
+
+/* Buttons: visually different, functionality unchanged */
+.buttons {
+  gap: 7px !important;
+  margin-top: 8px !important;
+}
+
+.buttons button,
+.saveListMainBtn {
+  min-height: 38px !important;
+  padding: 9px 11px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  box-shadow: none !important;
+}
+
+.saveListMainBtn {
+  background: var(--ui-green-soft) !important;
+  color: var(--ui-green) !important;
+  border: 0 !important;
+}
+
+.clear {
+  background: #eef2ee !important;
+  color: #4e5a52 !important;
+  border: 0 !important;
+}
+
+.delete {
+  background: #fff0f0 !important;
+  color: #a34747 !important;
+  border: 0 !important;
+}
+
+#status {
+  min-height: 34px !important;
+  margin-top: 8px !important;
+  padding: 6px 10px !important;
+  border-radius: 11px !important;
+  background: #edf5ef !important;
+  color: #477054 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-size: 11px !important;
+}
+
+/* ---------- Login: clean premium screen, no image ---------- */
+#loginScreen {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(71,122,87,.14), transparent 27%),
+    linear-gradient(145deg, #f7f9f7 0%, #edf3ee 100%) !important;
+  padding: 20px !important;
+}
+
+#loginScreen::before {
+  display: none !important;
+}
+
+.loginBox {
+  width: min(92%, 390px) !important;
+  padding: 34px 27px 25px !important;
+  background: rgba(255,255,255,.97) !important;
+  border: 1px solid #e5eae6 !important;
+  border-radius: 28px !important;
+  box-shadow: 0 22px 55px rgba(24,39,29,.13) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.welcome {
+  margin-bottom: 25px !important;
+}
+
+.welcome::before {
+  content: "✓";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 17px;
+  border-radius: 18px;
+  background: var(--ui-green);
+  color: #fff;
+  font-size: 27px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(49,93,70,.20);
+}
+
+.welcome h2 {
+  color: var(--ui-text) !important;
+  font-size: 29px !important;
+  font-weight: 760 !important;
+  letter-spacing: -.65px;
+}
+
+.welcome h2 + h2 {
+  color: var(--ui-green) !important;
+}
+
+.welcome p {
+  color: var(--ui-muted) !important;
+  font-size: 15px !important;
+}
+
+.inputBox {
+  min-height: 52px !important;
+  margin-bottom: 11px !important;
+  padding: 0 14px !important;
+  background: #f8faf8 !important;
+  border: 1px solid #e5eae6 !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+}
+
+.inputBox:focus-within {
+  border-color: rgba(49,93,70,.40) !important;
+  box-shadow: 0 0 0 3px rgba(49,93,70,.08) !important;
+}
+
+.inputBox input {
+  color: var(--ui-text) !important;
+  font-size: 15px !important;
+}
+
+.inputBox input::placeholder {
+  color: #98a09a !important;
+}
+
+.loginBox > button:not(.registerButton) {
+  width: 100% !important;
+  min-height: 52px !important;
+  border-radius: 15px !important;
+  background: var(--ui-green) !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: 0 8px 17px rgba(49,93,70,.18) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.registerButton {
+  width: 100% !important;
+  min-height: 48px !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  color: var(--ui-green) !important;
+  border: 1px solid #dce4de !important;
+  box-shadow: none !important;
+}
+
+/* Dark theme remains functional; only colors change */
+body.dark-theme {
+  background: #111711 !important;
+}
+
+body.dark-theme .app {
+  background: #111711 !important;
+}
+
+body.dark-theme .app > h2 {
+  color: #edf3ee !important;
+}
+
+body.dark-theme .headerBar h1 {
+  color: #edf3ee !important;
+}
+
+body.dark-theme .input-row,
+body.dark-theme .list,
+body.dark-theme .loginBox {
+  background: #1d241e !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+body.dark-theme .searchBox {
+  background: #202920 !important;
+}
+
+body.dark-theme .input-row input,
+body.dark-theme .searchBox input,
+body.dark-theme .item,
+body.dark-theme .welcome h2 {
+  color: #edf3ee !important;
+}
+
+body.dark-theme .item {
+  border-bottom-color: rgba(255,255,255,.08) !important;
+}
+
+body.dark-theme #loginScreen {
+  background: linear-gradient(145deg, #101610, #182119) !important;
+}
+
+body.dark-theme .inputBox {
+  background: #151b16 !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+body.dark-theme .registerButton {
+  background: #1d241e !important;
+  color: #b8d7bf !important;
+  border-color: rgba(255,255,255,.10) !important;
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 12px 12px 18px;
+  }
+
+  .loginBox {
+    width: 100% !important;
+    padding: 28px 20px 21px !important;
+    border-radius: 25px !important;
+  }
+
+  .welcome h2 {
+    font-size: 27px !important;
+  }
+}
+
 </style>
 
 </body>
