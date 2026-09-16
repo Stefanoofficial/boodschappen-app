@@ -1857,6 +1857,99 @@ body.dark-theme .sharedListInviteLink{color:#dff1e2}
 .sharedListActionRow{display:flex;gap:6px;flex-wrap:wrap}.sharedListAction{border:0;border-radius:10px;padding:8px 10px;background:#e5f1e5;color:#3F5B45;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}body.dark-theme .sharedListInviteCode{color:#dff1e2}.sharedListEmpty{padding:10px 7px;color:#8b928d;font-size:11px;line-height:1.35}
 </style>
+
+<style id="luxury-v7-final-layout">
+/* LUXURY V7 — final cascade: one clean layout, no legacy visual duplicates */
+:root{--v7-green:#257653;--v7-green-2:#348b68;--v7-ink:#14241c;--v7-muted:#78847e;--v7-surface:rgba(255,255,255,.92);--v7-line:rgba(37,118,83,.12)}
+
+/* The old save button is kept in the DOM for compatibility, but its old visual is removed.
+   Saving is available through the new premium controls. */
+.saveListMainBtn{display:none !important;visibility:hidden !important;height:0 !important;margin:0 !important;padding:0 !important;overflow:hidden !important}
+
+/* Premium quick actions: exactly one visual control per action. */
+.luxQuickActions{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+  width:100% !important;
+  max-width:none !important;
+  margin:18px 0 12px !important;
+}
+.luxQuickAction{
+  min-height:58px !important;
+  border:1px solid var(--v7-line) !important;
+  border-radius:20px !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(239,248,243,.94)) !important;
+  color:var(--v7-green) !important;
+  box-shadow:0 8px 22px rgba(20,60,42,.07) !important;
+  display:flex !important;align-items:center !important;justify-content:center !important;gap:7px !important;
+  font:inherit !important;font-size:13px !important;font-weight:800 !important;
+  cursor:pointer !important;
+}
+.luxQuickAction i{font-size:16px !important;color:var(--v7-green) !important}
+.luxQuickAction:active{transform:scale(.98)!important}
+
+/* Unique actions remain, but now match the same visual language. */
+.buttons{
+  display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px !important;
+  width:100% !important;margin:10px 0 18px !important;
+}
+.buttons button{
+  min-height:54px !important;border-radius:19px !important;
+  border:1px solid var(--v7-line) !important;
+  box-shadow:0 8px 22px rgba(20,60,42,.06) !important;
+  font:inherit !important;font-size:13px !important;font-weight:800 !important;
+}
+.buttons .clear{background:rgba(255,255,255,.94)!important;color:#356d51!important}
+.buttons .delete{background:linear-gradient(180deg,#fff5f4,#ffeceb)!important;color:#a64f4a!important;border-color:rgba(166,79,74,.12)!important}
+
+/* Keep content above the fixed navigation. */
+html,body{overflow-x:hidden !important}
+body{padding-bottom:0 !important}
+.app{height:auto !important;min-height:100svh !important;overflow:visible !important;padding-bottom:118px !important}
+
+/* One fixed bottom navigation, separated from page content. */
+.luxBottomNav{
+  position:fixed !important;
+  left:12px !important;right:12px !important;
+  bottom:max(10px,env(safe-area-inset-bottom)) !important;
+  width:auto !important;height:70px !important;
+  z-index:99999 !important;
+  display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:4px !important;
+  padding:6px !important;box-sizing:border-box !important;
+  border:1px solid rgba(255,255,255,.9) !important;border-radius:25px !important;
+  background:rgba(255,255,255,.92) !important;
+  box-shadow:0 18px 50px rgba(18,55,38,.18),0 3px 12px rgba(0,0,0,.07) !important;
+  backdrop-filter:blur(20px) saturate(145%) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(145%) !important;
+}
+.luxBottomBtn{min-height:56px !important;border:0!important;background:transparent!important;border-radius:18px!important;color:#7b847f!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;font:inherit!important;font-size:10px!important;font-weight:800!important}
+.luxBottomBtn i{font-size:17px!important}
+.luxBottomBtn.active{color:var(--v7-green)!important;background:#eaf7ef!important}
+.luxBottomCenter{width:56px!important;height:56px!important;margin:auto!important;border-radius:19px!important;color:#fff!important;background:linear-gradient(135deg,#35a56f,#1f7a52)!important;box-shadow:0 10px 25px rgba(31,122,82,.28)!important}
+
+/* Menu always sits above navigation and never gets trapped behind it. */
+.familyMenu,.familyDialog,.registerModal,.useModeModal,.themePicker{z-index:100000 !important}
+
+@media (max-width:380px){
+ .luxQuickActions{gap:8px!important}
+ .luxQuickAction{min-height:54px!important;font-size:12px!important}
+ .luxBottomNav{left:8px!important;right:8px!important;height:66px!important}
+ .luxBottomBtn{min-height:52px!important;font-size:9px!important}
+ .luxBottomCenter{width:50px!important;height:50px!important}
+}
+@media (min-width:700px){
+ .luxBottomNav{left:50%!important;right:auto!important;width:520px!important;transform:translateX(-50%)!important}
+}
+body.dark-theme .luxQuickAction{background:rgba(30,39,33,.96)!important;color:#edf4ef!important;border-color:rgba(255,255,255,.08)!important}
+body.dark-theme .luxQuickAction i{color:#b8e7c8!important}
+body.dark-theme .luxBottomNav{background:rgba(28,35,31,.95)!important;border-color:rgba(255,255,255,.08)!important}
+body.dark-theme .luxBottomBtn{color:#aab4ad!important}
+body.dark-theme .luxBottomBtn.active{color:#b8e7c8!important;background:#294034!important}
+body.dark-theme .buttons .clear{background:rgba(30,39,33,.96)!important;color:#b8e7c8!important}
+body.dark-theme .buttons .delete{background:rgba(80,38,37,.45)!important;color:#ffb6b1!important}
+</style>
+
 </head>
 
 <body>
