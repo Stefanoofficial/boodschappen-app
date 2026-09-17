@@ -2519,7 +2519,30 @@ async function changeAccountPassword() {
 async function logoutFromMenu() {
   const ok = await familyConfirm("Uitloggen", "Wil je uitloggen?", true);
   if (!ok) return;
-  try { await auth.signOut(); } catch(error) { await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation"); }
+
+  try {
+    await auth.signOut();
+
+    // Altijd terug naar het normale inlogscherm.
+    document.body.classList.remove("logged-in");
+
+    const loginScreen = document.getElementById("loginScreen");
+    if (loginScreen) {
+      loginScreen.classList.remove("loginScreenLeaving");
+      loginScreen.style.display = "flex";
+    }
+
+    // Sluit eventuele geopende schermen/menu's.
+    try { closeFamilyMenu(); } catch (e) {}
+    try { closeUseModeModal(); } catch (e) {}
+
+  } catch (error) {
+    await familyAlert(
+      "Uitloggen",
+      "Uitloggen is niet gelukt.",
+      "fa-triangle-exclamation"
+    );
+  }
 }
 function showAboutApp() {
   closeFamilyMenuForDialog();
