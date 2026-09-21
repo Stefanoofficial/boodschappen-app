@@ -3091,6 +3091,24 @@ html, body { -webkit-tap-highlight-color: transparent; }
 .app.more-active #familyMenu {
   transition: height .28s cubic-bezier(.22,.8,.3,1) !important;
 }
+
+<style id="stable-more-submenus-v3">
+/* Mijn account en Opgeslagen: houd de kaarthoogte vast tijdens de horizontale slide.
+   De pagina's worden tijdelijk absoluut over elkaar gelegd zodat hun inhoud nooit
+   de grid-hoogte opnieuw kan bepalen tijdens de animatie. */
+.app.more-active #familyMenu.more-stable-slide {
+  transition: opacity .20s ease, transform .28s cubic-bezier(.22,.8,.3,1) !important;
+  overflow: hidden !important;
+}
+.app.more-active #familyMenu.more-stable-slide .familyMenuPage.more-stable-slide-page {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+</style>
 </style>
 </head>
 
@@ -3920,10 +3938,15 @@ function switchMenuPage(pageId, event) {
   // alleen de horizontale slide.
   const stableHeightPage = pageId === "accountMenuSub" || pageId === "savedListsMenuSub";
   if (stableHeightPage) {
+    menu.classList.add("more-stable-slide");
     menu.style.height = menuHeights.targetHeight + "px";
     menu.style.minHeight = "0";
     menu.style.maxHeight = "none";
     menu.style.overflow = "hidden";
+    // Lock both pages to the same layer before the slide starts. This prevents
+    // the browser from using the longer page to recalculate the card height.
+    current.classList.add("more-stable-slide-page");
+    page.classList.add("more-stable-slide-page");
     void menu.offsetHeight;
   }
 
@@ -3962,6 +3985,8 @@ function switchMenuPage(pageId, event) {
     if (stableHeightPage) {
       menu.style.height = "auto";
       menu.style.overflow = "visible";
+      menu.classList.remove("more-stable-slide");
+      menu.querySelectorAll(".more-stable-slide-page").forEach(el => el.classList.remove("more-stable-slide-page"));
     } else {
       __finishMoreMenuTransition(menu, page, menuHeights.targetHeight);
     }
@@ -3992,10 +4017,13 @@ function returnMenuToPage(pageId, targetId, event) {
   const menuHeights = __prepareMoreMenuTransition(menu, page, target);
   const stableHeightPage = pageId === "accountMenuSub" || pageId === "savedListsMenuSub";
   if (stableHeightPage) {
+    menu.classList.add("more-stable-slide");
     menu.style.height = menuHeights.targetHeight + "px";
     menu.style.minHeight = "0";
     menu.style.maxHeight = "none";
     menu.style.overflow = "hidden";
+    page.classList.add("more-stable-slide-page");
+    target.classList.add("more-stable-slide-page");
     void menu.offsetHeight;
   }
   menu.style.display = "block";
@@ -4029,6 +4057,8 @@ function returnMenuToPage(pageId, targetId, event) {
     if (stableHeightPage) {
       menu.style.height = "auto";
       menu.style.overflow = "visible";
+      menu.classList.remove("more-stable-slide");
+      menu.querySelectorAll(".more-stable-slide-page").forEach(el => el.classList.remove("more-stable-slide-page"));
     } else {
       __finishMoreMenuTransition(menu, target, menuHeights.targetHeight);
     }
