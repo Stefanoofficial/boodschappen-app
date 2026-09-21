@@ -4393,6 +4393,11 @@ async function loadSavedList(index) {
   boodschappen = normalizeBoodschappen(saved.items || []);
   currentListName = String(saved.name || "Boodschappenlijst");
   selectedIndex = -1;
+
+  // Na het laden van een opgeslagen lijst meteen naar het hoofdscherm gaan.
+  // Zo blijft de gebruiker niet in het menu "Opgeslagen lijsten" staan.
+  showMainListView();
+  closeFamilyMenu();
   showList();
   await saveList();
 }
