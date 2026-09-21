@@ -3359,6 +3359,10 @@ html, body { -webkit-tap-highlight-color: transparent; }
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Uitloggen</span>
     </button>
+    <button type="button" class="familyMenuItem familyMenuDanger" onclick="deleteAccountFromMenu()">
+      <i class="fa-solid fa-trash"></i>
+      <span>Account verwijderen</span>
+    </button>
   </div>
 
   <div id="aboutMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -4043,6 +4047,175 @@ async function changeAccountPassword() {
     await familyAlert("Wachtwoord wijzigen", "De e-mail kon niet worden verstuurd. Probeer het later opnieuw.", "fa-triangle-exclamation");
   }
 }
+
+async function deleteAccountFromMenu() {
+  const user = auth && auth.currentUser;
+  if (!user) return;
+
+  const ok = await familyConfirm(
+    "Account verwijderen",
+    "Weet je zeker dat je je account wilt verwijderen? Je account en je persoonlijke gegevens worden verwijderd. Deze actie kan niet ongedaan worden.",
+    true
+  );
+  if (!ok) return;
+
+  closeFamilyMenuForDialog();
+
+  try {
+    // Firebase vereist bij het verwijderen van een account een recente login.
+    const providerIds = (user.providerData || []).map(p => p && p.providerId).filter(Boolean);
+    if (providerIds.includes("password")) {
+      const overlay = familyDialogBase(
+        "fa-lock",
+        "Bevestig verwijderen",
+        `<div class="familyDialogText">Voer je wachtwoord in om je account definitief te verwijderen.</div>
+         <input id="deleteAccountPassword" class="familyDialogInput" type="password" autocomplete="current-password" placeholder="Wachtwoord">`,
+        `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
+         <button type="button" class="familyDialogBtn familyDialogDanger">Account verwijderen</button>`
+      );
+      const input = overlay.querySelector("#deleteAccountPassword");
+      const cancel = overlay.querySelector(".familyDialogCancel");
+      const confirm = overlay.querySelector(".familyDialogDanger");
+
+      const password = await new Promise(resolve => {
+        cancel.addEventListener("click", () => { closeFamilyDialog(overlay); resolve(null); });
+        confirm.addEventListener("click", () => {
+          const value = (input.value || "");
+          if (!value) { input.focus(); return; }
+          closeFamilyDialog(overlay);
+          resolve(value);
+        });
+        setTimeout(() => input.focus(), 30);
+      });
+      if (!password) return;
+
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+      await user.reauthenticateWithCredential(credential);
+    }
+
+    const uid = user.uid;
+    const rootRef = database.ref();
+    const userSnap = await database.ref("users/" + uid).once("value");
+    const userData = userSnap.val() || {};
+    const householdId = userData.householdId ? String(userData.householdId) : null;
+    const updates = {};
+    const listsToDelete = [];
+
+    // 1. Verwijder de privégegevens van deze gebruiker.
+    updates["users/" + uid] = null;
+    updates["userSharedLists/" + uid] = null;
+
+    // 2. Haal de gebruiker uit het huishouden. Als hij/zij eigenaar is,
+    //    gaat het eigenaarschap naar een overblijvend lid.
+    if (householdId) {
+      const householdSnap = await database.ref("households/" + householdId).once("value");
+      const household = householdSnap.val();
+      if (household) {
+        const members = household.members || {};
+        const otherMembers = Object.keys(members).filter(id => id !== uid && members[id] === true);
+
+        if (String(household.owner || "") === uid) {
+          if (otherMembers.length > 0) {
+            updates["households/" + householdId + "/owner"] = otherMembers[0];
+            updates["households/" + householdId + "/members/" + uid] = null;
+          } else {
+            updates["households/" + householdId] = null;
+          }
+        } else if (members[uid] === true) {
+          updates["households/" + householdId + "/members/" + uid] = null;
+        }
+      }
+    }
+
+    // 3. Ruim alle deellijsten op die in de persoonlijke index van de gebruiker staan.
+    //    Deze index kunnen we als ingelogde gebruiker wel lezen.
+    const indexSnap = await database.ref("userSharedLists/" + uid).once("value");
+    const index = indexSnap.val() || {};
+    const listIds = Object.keys(index).filter(id => index[id] === true);
+
+    for (const listId of listIds) {
+      const listSnap = await database.ref("sharedLists/" + listId).once("value");
+      const list = listSnap.val();
+      if (!list) continue;
+
+      const members = list.members || {};
+      const otherMembers = Object.keys(members).filter(id => id !== uid && members[id] === true);
+      const isOwner = String(list.owner || "") === uid;
+      const isMember = members[uid] === true;
+
+      if (isOwner) {
+        if (otherMembers.length > 0) {
+          // Behoud de lijst voor de andere leden.
+          updates["sharedLists/" + listId + "/owner"] = otherMembers[0];
+          updates["sharedLists/" + listId + "/memberNames/" + uid] = null;
+          updates["sharedLists/" + listId + "/members/" + uid] = null;
+        } else {
+          // Niemand anders gebruikt de lijst: verwijder ook de lijst zelf.
+          if (list.inviteCode) {
+            updates["sharedListCodes/" + String(list.inviteCode)] = null;
+          }
+          updates["sharedLists/" + listId] = null;
+          listsToDelete.push(listId);
+        }
+      } else if (isMember) {
+        // Eerst memberNames, daarna members. Dit voorkomt dat de rules de tweede
+        // bewerking blokkeren zodra het lid al verwijderd is.
+        updates["sharedLists/" + listId + "/memberNames/" + uid] = null;
+        updates["sharedLists/" + listId + "/members/" + uid] = null;
+      }
+    }
+
+    // Alles wat hierboven staat wordt in één database-update uitgevoerd.
+    await rootRef.update(updates);
+
+    // 4. Verwijder ten slotte het Firebase Authentication-account.
+    await user.delete();
+
+    explicitLogoutInProgress = true;
+    loginFlowActive = false;
+    currentHouseholdId = null;
+    currentSharedListId = null;
+    currentSharedListInviteCode = null;
+    activeListType = "family";
+    boodschappen = [];
+    selectedIndex = -1;
+    __activeMainTab = 0;
+    if (typeof __resetMoreNavigation === "function") __resetMoreNavigation();
+
+    const status = document.getElementById("status");
+    if (status) status.innerText = "";
+
+    closeUseModeModal();
+    closeFamilyMenuForDialog();
+    await familyAlert("Account verwijderd", "Je account en je persoonlijke gegevens zijn verwijderd.", "fa-check");
+  } catch (error) {
+    console.error("Account verwijderen mislukt:", error);
+
+    if (error && (error.code === "auth/requires-recent-login" || error.code === "auth/user-token-expired")) {
+      await familyAlert(
+        "Opnieuw inloggen nodig",
+        "Voor het verwijderen van je account moet je opnieuw inloggen. Log uit, log opnieuw in en probeer daarna Account verwijderen opnieuw.",
+        "fa-lock"
+      );
+      return;
+    }
+
+    if (error && error.code === "auth/wrong-password") {
+      await familyAlert("Verkeerd wachtwoord", "Het ingevoerde wachtwoord klopt niet.", "fa-triangle-exclamation");
+      return;
+    }
+
+    let message = "Je account kon niet volledig worden verwijderd. Probeer het opnieuw.";
+    if (error && error.code === "PERMISSION_DENIED") {
+      message = "Firebase blokkeert één van de verwijderacties. Controleer de Database Rules voor het verwijderen van een lid uit een Deellijst.";
+    } else if (error && error.message) {
+      message = "Account verwijderen mislukt: " + error.message;
+    }
+
+    await familyAlert("Account verwijderen mislukt", message, "fa-triangle-exclamation");
+  }
+}
+
 async function logoutFromMenu() {
   const ok = await familyConfirm("Uitloggen", "Wil je uitloggen?", true);
   if (!ok) return;
@@ -5267,6 +5440,7 @@ if (document.readyState === "loading") {
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+
 <script>
   // Import the functions you need from the SDKs you need
   
