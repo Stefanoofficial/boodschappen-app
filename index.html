@@ -8066,4 +8066,184 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 /* Meer bevat geen destructieve lijstactie. */
 .app.more-active .moreMenuActions{display:none !important;}
 </style>
+
+<script id="more-stable-slide-final">
+/*
+  Definitieve fix voor "Mijn account" en "Opgeslagen".
+  Deze twee pagina's worden tijdens de slide als vaste lagen boven elkaar
+  geplaatst. De hoogte van de kaart verandert NIET tijdens de horizontale
+  animatie en er is ook geen CSS-height transition. Daardoor kan lange tekst
+  de positie tijdens de slide niet meer laten springen.
+*/
+(function () {
+  const STABLE = new Set(["accountMenuSub", "savedListsMenuSub"]);
+
+  function isStable(id) {
+    return STABLE.has(id);
+  }
+
+  function resetPageInline(page) {
+    if (!page) return;
+    page.style.removeProperty("position");
+    page.style.removeProperty("left");
+    page.style.removeProperty("top");
+    page.style.removeProperty("width");
+    page.style.removeProperty("transform");
+    page.style.removeProperty("transition");
+    page.style.removeProperty("z-index");
+    page.style.removeProperty("opacity");
+  }
+
+  function stableSlide(menu, fromPage, toPage, direction, token, targetHeight) {
+    if (!menu || !fromPage || !toPage) return;
+
+    if (window.__menuTransitionTimer) {
+      clearTimeout(window.__menuTransitionTimer);
+      window.__menuTransitionTimer = null;
+    }
+
+    menu.classList.add("more-stable-slide");
+    menu.style.setProperty("height", Math.ceil(targetHeight) + "px", "important");
+    menu.style.setProperty("min-height", "0", "important");
+    menu.style.setProperty("max-height", "none", "important");
+    menu.style.setProperty("overflow", "hidden", "important");
+    menu.style.setProperty("transition", "none", "important");
+    menu.style.setProperty("position", "relative", "important");
+
+    [fromPage, toPage].forEach(function (p) {
+      p.classList.remove(
+        "menuSlideOutLeft","menuSlideInRight",
+        "menuSlideOutRight","menuSlideInLeft",
+        "familyMenuMainEnter","familyMenuSubEnter",
+        "familyMenuMainExit","familyMenuSubExit"
+      );
+      p.style.setProperty("display", "block", "important");
+      p.style.setProperty("position", "absolute", "important");
+      p.style.setProperty("left", "0", "important");
+      p.style.setProperty("top", "0", "important");
+      p.style.setProperty("width", "100%", "important");
+      p.style.setProperty("grid-column", "auto", "important");
+      p.style.setProperty("grid-row", "auto", "important");
+      p.style.setProperty("z-index", "1", "important");
+      p.style.setProperty("transition", "none", "important");
+      p.style.setProperty("opacity", "1", "important");
+      p.style.setProperty("pointer-events", "none", "important");
+    });
+
+    const startTarget = direction === "forward" ? "100%" : "-100%";
+    const endCurrent = direction === "forward" ? "-100%" : "100%";
+
+    fromPage.style.setProperty("transform", "translate3d(0,0,0)", "important");
+    fromPage.style.setProperty("z-index", "1", "important");
+    toPage.style.setProperty("transform", "translate3d(" + startTarget + ",0,0)", "important");
+    toPage.style.setProperty("z-index", "2", "important");
+
+    // Force the browser to commit the exact starting geometry before
+    // enabling the transform transition.
+    void menu.offsetHeight;
+    void fromPage.offsetWidth;
+
+    requestAnimationFrame(function () {
+      if (token !== __menuTransitionToken) return;
+
+      fromPage.style.setProperty(
+        "transition",
+        "transform .28s cubic-bezier(.22,.8,.3,1)",
+        "important"
+      );
+      toPage.style.setProperty(
+        "transition",
+        "transform .28s cubic-bezier(.22,.8,.3,1)",
+        "important"
+      );
+
+      requestAnimationFrame(function () {
+        if (token !== __menuTransitionToken) return;
+        fromPage.style.setProperty("transform", "translate3d(" + endCurrent + ",0,0)", "important");
+        toPage.style.setProperty("transform", "translate3d(0,0,0)", "important");
+      });
+    });
+
+    __menuCurrentPage = toPage.id;
+
+    window.__menuTransitionTimer = setTimeout(function () {
+      if (token !== __menuTransitionToken) return;
+
+      __showOnlyMenuPage(toPage.id);
+
+      // Keep the exact target height. Do NOT switch to auto here: doing so
+      // was the final source of the visible jump with long pages.
+      menu.style.setProperty("height", Math.ceil(targetHeight) + "px", "important");
+      menu.style.setProperty("overflow", "hidden", "important");
+      menu.style.setProperty("transition", "none", "important");
+
+      [fromPage, toPage].forEach(function (p) {
+        resetPageInline(p);
+      });
+
+      // The selected page remains in normal flow. Its already-fixed menu
+      // height is large enough for it, so no second vertical animation occurs.
+      toPage.style.display = "block";
+      toPage.style.pointerEvents = "auto";
+
+      menu.classList.remove("more-stable-slide");
+      menu.style.removeProperty("position");
+
+      // Keep the fixed height for stable pages; the next stable navigation
+      // measures a fresh target. For other pages the original navigation
+      // code is used.
+      window.__menuTransitionTimer = null;
+    }, 330);
+  }
+
+  function stableNavigate(fromId, toId, direction) {
+    const menu = document.getElementById("familyMenu");
+    const fromPage = document.getElementById(fromId);
+    const toPage = document.getElementById(toId);
+    if (!menu || !fromPage || !toPage) return false;
+
+    __cancelMenuTransition();
+    const token = __menuTransitionToken;
+    const targetHeight = Math.max(
+      1,
+      Math.ceil(__measureMorePageHeight(menu, toPage))
+    );
+
+    stableSlide(menu, fromPage, toPage, direction, token, targetHeight);
+    return true;
+  }
+
+  // Preserve the original implementation for every other Meer-page.
+  const originalSwitch = window.switchMenuPage;
+  const originalReturn = window.returnMenuToPage;
+
+  window.switchMenuPage = function(pageId, event) {
+    if (isStable(pageId)) {
+      if (event) event.stopPropagation();
+      const currentId = __menuCurrentPage || "familyMenuMain";
+      if (currentId === pageId) return;
+      if (document.getElementById(currentId) && document.getElementById(pageId)) {
+        stableNavigate(currentId, pageId, "forward");
+        return;
+      }
+    }
+    return originalSwitch.apply(this, arguments);
+  };
+
+  window.returnMenuToPage = function(pageId, targetId, event) {
+    if (isStable(pageId)) {
+      if (event) event.stopPropagation();
+      if (document.getElementById(pageId) && document.getElementById(targetId)) {
+        stableNavigate(pageId, targetId, "back");
+        return;
+      }
+    }
+    return originalReturn.apply(this, arguments);
+  };
+
+  // The original functions are also referenced by named helpers; these
+  // helpers call the global function above, so no other menu item changes.
+})();
+</script>
+
 </html>
