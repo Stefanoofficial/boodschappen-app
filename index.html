@@ -7313,6 +7313,34 @@ function showOverviewView(){
   updateOverviewView();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function __primeMoreMenuLayout(){
+  const menu = document.getElementById("familyMenu");
+  if(!menu) return;
+  const run = () => {
+    if(!document.body.contains(menu)) return;
+    const previousTransition = menu.style.transition;
+    menu.style.transition = "none";
+    menu.style.height = "auto";
+    void menu.offsetHeight;
+    const current = __getMenuPage(__menuCurrentPage) || __getMenuPage("familyMenuMain");
+    if(current){
+      current.style.display = "block";
+      current.style.visibility = "visible";
+      void current.offsetHeight;
+      current.getBoundingClientRect();
+    }
+    menu.style.height = "auto";
+    menu.style.transition = previousTransition;
+  };
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if(document.fonts && document.fonts.ready){
+        document.fonts.ready.then(run).catch(run);
+      } else { run(); }
+    });
+  });
+}
+
 function showMoreView(){
   slideToTab(2);
   var app=document.querySelector('.app');
@@ -7324,6 +7352,7 @@ function showMoreView(){
   if(menu){ menu.style.display='block'; menu.classList.remove('menu-open'); }
   var moreView=document.getElementById('moreView');
   if(moreView) moreView.scrollTop=0;
+  __primeMoreMenuLayout();
 }
 
 /* Verplaats het bestaande menu naar de Meer-weergave zodra de DOM klaar is.
