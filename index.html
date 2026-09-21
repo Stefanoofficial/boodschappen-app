@@ -3563,6 +3563,7 @@ html, body { -webkit-tap-highlight-color: transparent; }
 
 let boodschappen = [];
 let selectedIndex = -1;
+let currentListName = "Boodschappenlijst";
 
 function getActiveTheme() {
   const saved = localStorage.getItem("boodschappenTheme") || "light";
@@ -4390,6 +4391,7 @@ async function loadSavedList(index) {
   const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
   if (!proceed) return;
   boodschappen = normalizeBoodschappen(saved.items || []);
+  currentListName = String(saved.name || "Boodschappenlijst");
   selectedIndex = -1;
   showList();
   await saveList();
@@ -4543,6 +4545,7 @@ async function loadList() {
     // Een actieve Deellijst mag nooit door deze familielijst-loader worden overschreven.
     if (activeListType === "shared" && currentSharedListId) return true;
     activeListType = isPrivateMode() ? "private" : "family";
+    currentListName = "Boodschappenlijst";
 
     // Een privé-lijst wordt lokaal opgeslagen en hoeft dus niet via Firebase geladen te worden.
     if (isPrivateMode()) {
@@ -5120,6 +5123,10 @@ function updateListProgress() {
 function showList(animationType = "") {
   const list = document.getElementById("list");
   if (!list) return;
+
+  // Keep the title in sync with the currently loaded list.
+  const title = document.querySelector(".headerBar h1");
+  if (title) title.textContent = currentListName || "Boodschappenlijst";
 
   // Keep legacy Firebase entries and new metadata entries consistent.
   boodschappen = normalizeBoodschappen(boodschappen);
@@ -6770,6 +6777,7 @@ async function chooseUseMode(mode) {
 
 async function loadPrivateList() {
   const user = auth.currentUser;
+  currentListName = "Boodschappenlijst";
   if (!user) return;
 
   try {
