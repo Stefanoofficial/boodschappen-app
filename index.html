@@ -3912,6 +3912,21 @@ function switchMenuPage(pageId, event) {
 
   const token = __menuTransitionToken;
   const menuHeights = __prepareMoreMenuTransition(menu, current, page);
+
+  // Mijn account en Opgeslagen kunnen op Android/WebView door hun inhoud
+  // een flinke hoogte hebben. Een overgang via de hoogte van het langste
+  // paneel zorgt daar voor een zichtbare "te hoog -> terug" beweging.
+  // Voor deze twee pagina's zetten we de doelhoogte meteen vast en animeren
+  // alleen de horizontale slide.
+  const stableHeightPage = pageId === "accountMenuSub" || pageId === "savedListsMenuSub";
+  if (stableHeightPage) {
+    menu.style.height = menuHeights.targetHeight + "px";
+    menu.style.minHeight = "0";
+    menu.style.maxHeight = "none";
+    menu.style.overflow = "hidden";
+    void menu.offsetHeight;
+  }
+
   __resetMenuPageClasses(current);
   __resetMenuPageClasses(page);
 
@@ -3944,7 +3959,12 @@ function switchMenuPage(pageId, event) {
   __menuTransitionTimer = setTimeout(() => {
     if(token !== __menuTransitionToken) return;
     __showOnlyMenuPage(pageId);
-    __finishMoreMenuTransition(menu, page, menuHeights.targetHeight);
+    if (stableHeightPage) {
+      menu.style.height = "auto";
+      menu.style.overflow = "visible";
+    } else {
+      __finishMoreMenuTransition(menu, page, menuHeights.targetHeight);
+    }
     __menuTransitionTimer = null;
   }, 320);
 }
@@ -3970,6 +3990,14 @@ function returnMenuToPage(pageId, targetId, event) {
 
   const token = __menuTransitionToken;
   const menuHeights = __prepareMoreMenuTransition(menu, page, target);
+  const stableHeightPage = pageId === "accountMenuSub" || pageId === "savedListsMenuSub";
+  if (stableHeightPage) {
+    menu.style.height = menuHeights.targetHeight + "px";
+    menu.style.minHeight = "0";
+    menu.style.maxHeight = "none";
+    menu.style.overflow = "hidden";
+    void menu.offsetHeight;
+  }
   menu.style.display = "block";
   __resetMenuPageClasses(page);
   __resetMenuPageClasses(target);
@@ -3998,7 +4026,12 @@ function returnMenuToPage(pageId, targetId, event) {
   __menuTransitionTimer = setTimeout(() => {
     if (token !== __menuTransitionToken) return;
     __showOnlyMenuPage(targetId);
-    __finishMoreMenuTransition(menu, target, menuHeights.targetHeight);
+    if (stableHeightPage) {
+      menu.style.height = "auto";
+      menu.style.overflow = "visible";
+    } else {
+      __finishMoreMenuTransition(menu, target, menuHeights.targetHeight);
+    }
     __menuTransitionTimer = null;
   }, 320);
 }
