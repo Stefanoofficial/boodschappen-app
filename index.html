@@ -2680,13 +2680,19 @@ body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
 
 
 <style id="feedback-menu-stable">
-.feedbackIntro{text-align:center;padding:10px 8px 10px}
+.feedbackIntro{text-align:center;padding:10px 8px 8px;color:#3F5B45 !important}
 .feedbackIcon{width:56px;height:56px;margin:0 auto 8px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#e3f1e6;color:#3F5B45;font-size:25px}
 body.dark-theme .feedbackIcon{background:#304b39;color:#dce9df}
-.feedbackIntro h3{margin:0 0 5px;font-size:20px;font-weight:800}
-.feedbackIntro p{margin:0 auto;max-width:520px;line-height:1.4;opacity:.82}
-.feedbackLabel{display:block;margin:4px 4px 7px;font-size:14px;font-weight:800}
+.feedbackIntro h3{display:block !important;visibility:visible !important;margin:0 0 5px;font-size:20px;font-weight:800;color:#3F5B45 !important;line-height:1.2}
+.feedbackIntro p{display:block !important;visibility:visible !important;margin:0 auto;max-width:520px;line-height:1.4;opacity:.82;color:#526158 !important}
+.feedbackPrompt{display:block !important;margin:4px 4px 7px;padding:10px 12px;border-radius:13px;background:#F3F7F4;color:#3F5B45 !important;font-size:14px;font-weight:800;text-align:left}
+.feedbackLabel{display:block;margin:4px 4px 7px;font-size:14px;font-weight:800;color:#526158 !important}
 .feedbackTextarea{width:100%;min-height:145px;box-sizing:border-box;resize:vertical;border:1px solid #dfe7e1;border-radius:14px;padding:13px;font:inherit;line-height:1.45;background:#fff;color:#263229;outline:none}
+body.dark-theme .feedbackIntro{color:#dce9df !important}
+body.dark-theme .feedbackIntro h3{color:#dce9df !important}
+body.dark-theme .feedbackIntro p{color:#b8c6bd !important}
+body.dark-theme .feedbackPrompt{background:#29382f;color:#dce9df !important}
+body.dark-theme .feedbackLabel{color:#b8c6bd !important}
 body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:#3b493f}
 .feedbackTextarea:focus{border-color:#7da789;box-shadow:0 0 0 3px rgba(63,91,69,.10)}
 .feedbackSendBtn{margin-top:10px;justify-content:center;background:#3F5B45 !important;color:#fff !important}
@@ -3427,6 +3433,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <h3>Jouw mening telt!</h3>
       <p>Heb je een idee, suggestie, vraag of iets gevonden dat niet goed werkt? Laat het weten.</p>
     </div>
+    <div class="feedbackPrompt">Vertel ons wat je vindt</div>
     <label class="feedbackLabel" for="feedbackText">Je feedback</label>
     <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Schrijf hier je feedback..."></textarea>
     <button type="button" class="familyMenuItem feedbackSendBtn" onclick="shareFeedback(event)">
@@ -7948,35 +7955,6 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeClearListConfirm(e);});
 })();
 </script>
-
-<script id="modal-navigation-blocker">
-(function(){
-  function modalIsOpen(){
-    return !!(
-      document.querySelector('.familyDialogOverlay') ||
-      document.querySelector('#clearListBackdrop.show') ||
-      document.querySelector('#clearListSheet.show') ||
-      document.querySelector('#barcodeOverlay.open') ||
-      document.querySelector('.useModeModal.useModeShown') ||
-      document.querySelector('#registerModal[style*="display"]')
-    );
-  }
-
-  function blockNavWhileModalOpen(e){
-    if (!modalIsOpen()) return;
-    const nav = e.target && e.target.closest ? e.target.closest('.bottomNav') : null;
-    if (!nav) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-  }
-
-  document.addEventListener('pointerdown', blockNavWhileModalOpen, true);
-  document.addEventListener('touchstart', blockNavWhileModalOpen, {capture:true, passive:false});
-  document.addEventListener('click', blockNavWhileModalOpen, true);
-})();
-</script>
-
 </body>
 
 <style id="overview-dashboard-final">
@@ -8175,18 +8153,13 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 .barcode-search-btn:active{transform:scale(.94)}
 .productBarcodeImage{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;border-radius:6px!important;display:block!important}
 .barcodeOverlay{position:fixed;inset:0;z-index:15000;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(31,49,39,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-/* Barcode-modal: de volledige viewport is modal. Ook de vaste navigatie blijft eronder en is niet klikbaar. */
-body.barcode-open .bottomNav{z-index:0!important;pointer-events:none!important}
-body.barcode-open .app{pointer-events:none!important}
-body.barcode-open #barcodeOverlay{z-index:999999!important;pointer-events:auto!important}
-body.barcode-open #barcodeOverlay .barcodeCard{pointer-events:auto!important}
 .barcodeOverlay.open{display:flex}
 .barcodeCard{width:min(430px,100%);background:#fff;border-radius:26px;padding:18px;box-sizing:border-box;box-shadow:0 20px 60px rgba(30,55,40,.25);color:#30453a}
 .barcodeHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .barcodeHead h3{margin:0;font-size:22px;color:#30453a}
 .barcodeClose{width:42px;height:42px;border:0;border-radius:13px;background:#edf3ef;color:#40584b;font-size:20px;display:flex;align-items:center;justify-content:center}
 .barcodeVideoWrap{position:relative;overflow:hidden;border-radius:20px;background:#17221c;aspect-ratio:4/3}
-#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;background:#17221c;transform:translateZ(0)}
+#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;background:#17221c;visibility:visible;opacity:1;transform:translateZ(0);-webkit-transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .barcodeFrame{position:absolute;left:12%;right:12%;top:25%;bottom:25%;border:3px solid rgba(255,255,255,.92);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.12);pointer-events:none}
 .barcodeStatus{font-size:15px;color:#68766f;text-align:center;margin:12px 2px 8px;min-height:22px}
 .barcodeManual{display:flex;gap:8px;margin-top:8px}
@@ -8222,7 +8195,6 @@ let barcodeReader = null;
 let barcodeControls = null;
 let barcodeLibraryPromise = null;
 let barcodeBusy = false;
-let nativeBarcodeLoop = null;
 
 function loadBarcodeLibrary(){
   if (window.ZXingBrowser) return Promise.resolve();
@@ -8247,160 +8219,100 @@ function loadBarcodeLibrary(){
   });
   return barcodeLibraryPromise;
 }
-
 function setBarcodeStatus(text){
   const el=document.getElementById('barcodeStatus');
   if(el) el.textContent=text;
 }
 
-function stopNativeBarcodeLoop(){
-  if(nativeBarcodeLoop){
-    cancelAnimationFrame(nativeBarcodeLoop);
-    nativeBarcodeLoop=null;
-  }
-}
-
 function stopBarcodeCamera(){
-  stopNativeBarcodeLoop();
   try{ if(barcodeControls && typeof barcodeControls.stop==='function') barcodeControls.stop(); }catch(_){ }
   barcodeControls=null;
-  if(barcodeReader){
-    try{ if(typeof barcodeReader.reset==='function') barcodeReader.reset(); }catch(_){ }
-  }
   barcodeReader=null;
   const video=document.getElementById('barcodeVideo');
-  if(video){
-    try{ video.pause(); }catch(_){ }
-    // ZXing owns the stream in the normal path and controls.stop() releases it.
-    // Explicitly stop any remaining tracks as a final cleanup for Safari.
-    try{
-      const stream=video.srcObject;
-      if(stream && typeof stream.getTracks==='function') stream.getTracks().forEach(t=>t.stop());
-    }catch(_){ }
-    try{ video.srcObject=null; }catch(_){ }
-  }
-}
-
-async function startNativeBarcodeDetector(video){
-  if(!('BarcodeDetector' in window)) return false;
-  let detector;
-  try{
-    const wanted=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'];
-    const supported = typeof BarcodeDetector.getSupportedFormats==='function'
-      ? await BarcodeDetector.getSupportedFormats() : [];
-    const formats = supported.length ? wanted.filter(f=>supported.includes(f)) : wanted;
-    detector = new BarcodeDetector({formats});
-  }catch(_){ return false; }
-
-  const scan=async()=>{
-    if(!video.srcObject || barcodeBusy || !document.getElementById('barcodeOverlay')?.classList.contains('open')) return;
-    try{
-      const codes=await detector.detect(video);
-      const hit=codes && codes.find(x=>x && x.rawValue);
-      if(hit){
-        const code=String(hit.rawValue).replace(/\D/g,'');
-        if(code.length>=8){
-          barcodeBusy=true;
-          await handleBarcode(code);
-          return;
-        }
-      }
-    }catch(_){ }
-    nativeBarcodeLoop=requestAnimationFrame(scan);
-  };
-  nativeBarcodeLoop=requestAnimationFrame(scan);
-  return true;
-}
-
-async function openBarcodeScanner(){
-  const overlay=document.getElementById('barcodeOverlay');
-  const video=document.getElementById('barcodeVideo');
-  if(!overlay || !video) return;
-
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden','false');
-  document.body.classList.add('barcode-open');
-  document.getElementById('barcodeManualInput').value='';
-  document.getElementById('barcodeResult').classList.remove('open');
-  setBarcodeStatus('Camera wordt gestart…');
-  stopBarcodeCamera();
-
-  if(!window.isSecureContext){
-    setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
-    return;
-  }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.');
-    return;
-  }
-
-  video.autoplay=true;
-  video.muted=true;
-  video.playsInline=true;
-  video.setAttribute('autoplay','');
-  video.setAttribute('muted','');
-  video.setAttribute('playsinline','');
-  video.setAttribute('webkit-playsinline','');
-
-  try{
-    // Gebruik één eigenaar voor camera + video: ZXing. De vorige versie
-    // startte eerst zelf een MediaStream en liet ZXing daarna opnieuw aan
-    // hetzelfde video-element hangen. Op Safari/iPhone kon dat de preview
-    // na enkele seconden zwart maken.
-    await loadBarcodeLibrary();
-
-    barcodeReader = new ZXingBrowser.BrowserMultiFormatReader();
-    const constraints = {
-      video: {
-        facingMode: { ideal:'environment' },
-        width: { ideal:1280 },
-        height: { ideal:720 }
-      },
-      audio:false
-    };
-
-    barcodeControls = await barcodeReader.decodeFromConstraints(
-      constraints,
-      video,
-      async (result, error) => {
-        if(result && !barcodeBusy){
-          const raw=result.getText ? result.getText() : String(result.text || result);
-          const code=raw.replace(/\D/g,'');
-          if(code.length>=8){
-            barcodeBusy=true;
-            await handleBarcode(code);
-          }
-        }
-      }
-    );
-
-    // Safari kan het eerste autoplay-moment uitstellen. De stream is dan al
-    // correct gekoppeld; nogmaals play() proberen is veilig en veroorzaakt
-    // geen nieuwe camerastream.
-    try{ await video.play(); }catch(_){ }
-    setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
-  }catch(err){
-    console.error('Barcode scanner:',err);
-    stopBarcodeCamera();
-    const name=err && err.name ? err.name : '';
-    if(name==='NotAllowedError' || name==='PermissionDeniedError'){
-      setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
-    }else if(name==='NotFoundError' || name==='OverconstrainedError'){
-      setBarcodeStatus('Geen geschikte camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
-    }else{
-      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang en probeer opnieuw.');
-    }
+  if(video && video.srcObject){
+    video.srcObject.getTracks().forEach(t=>t.stop());
+    video.srcObject=null;
   }
 }
 
 function closeBarcodeScanner(){
   stopBarcodeCamera();
   barcodeBusy=false;
-  document.body.classList.remove('barcode-open');
   const overlay=document.getElementById('barcodeOverlay');
   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
 }
 
+async function openBarcodeScanner(){
+  const overlay=document.getElementById('barcodeOverlay');
+  const video=document.getElementById('barcodeVideo');
+  if(!overlay || !video) return;
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.getElementById('barcodeManualInput').value='';
+  document.getElementById('barcodeResult').classList.remove('open');
+  setBarcodeStatus('Camera wordt gestart…');
+  stopBarcodeCamera();
+
+  try{
+    if(!window.isSecureContext){
+      setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
+      return;
+    }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder in.');
+      return;
+    }
+
+    // Laat ZXing zelf de camerastream beheren. Dit voorkomt dat iOS Safari
+    // de preview na enkele seconden zwart maakt door twee camera-koppelingen.
+    await loadBarcodeLibrary();
+    barcodeReader = new ZXingBrowser.BrowserMultiFormatReader();
+    video.muted = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+
+    const callback = async (result,error)=>{
+      if(result && !barcodeBusy){
+        const raw=result.getText ? result.getText() : String(result.text || result);
+        const code=raw.replace(/\D/g,'');
+        if(code.length>=8){
+          barcodeBusy=true;
+          await handleBarcode(code);
+        }
+      }
+    };
+
+    // Eerst de achterkant proberen. Als die constraint op een toestel niet
+    // wordt geaccepteerd, valt ZXing terug op de beschikbare camera.
+    try{
+      barcodeControls = await barcodeReader.decodeFromConstraints(
+        {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
+        video,
+        callback
+      );
+    }catch(firstErr){
+      console.warn('Environment camera niet beschikbaar:', firstErr);
+      barcodeControls = await barcodeReader.decodeFromVideoDevice(undefined, video, callback);
+    }
+
+    // Safari kan play() opnieuw nodig hebben nadat de stream is gekoppeld.
+    try{ await video.play(); }catch(_){ }
+    setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
+  }catch(err){
+    console.error('Barcode scanner:',err);
+    stopBarcodeCamera();
+    const name = err && err.name ? err.name : '';
+    if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
+      setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
+    }else if(name === 'NotFoundError'){
+      setBarcodeStatus('Geen camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
+    }else{
+      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder in.');
+    }
+  }
+}
 async function lookupManualBarcode(){
   const input=document.getElementById('barcodeManualInput');
   const code=(input?.value||'').replace(/\D/g,'');
@@ -8470,10 +8382,3 @@ document.addEventListener('keydown',function(e){
 </script>
 
 </html>
-
-<style id="feedback-visibility-fix">
-.feedback-intro, .feedback-intro *, .feedback-prompt, .feedback-label {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-</style>
