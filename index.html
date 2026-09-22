@@ -3114,7 +3114,7 @@ html, body { -webkit-tap-highlight-color: transparent; }
 .app.overview-active .mainListTrashButton,.app.more-active .mainListTrashButton{display:none!important}
 </style>
 
-<style id="smart-insights-card">
+<style id="smart-insights-card-extra"> .smart-overview-card .overview-dashboard-heading .fa-lightbulb{font-size:20px} .smartInsightsIntro span{display:block;opacity:.76} </style> <style id="smart-insights-card">
 .smartInsightsIntro{margin:10px 0 16px;padding:14px 16px;border-radius:16px;background:rgba(63,91,69,.08);line-height:1.45}
 .smartInsightsIntro strong{display:block;margin-bottom:4px}
 .smartInsightsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -3559,12 +3559,28 @@ body.dark-theme .smartInsightsIntro,body.dark-theme .smartInsightsItem{backgroun
       </div>
     </button>
 
-    <section class="overview-dashboard-card" aria-label="Slimme inzichten">
-      <h3 class="overview-dashboard-heading"><i class="fa-solid fa-chart-simple"></i> Jouw boodschappen</h3>
-      <div class="overview-dashboard-stats">
-        <div class="overview-dashboard-stat"><strong id="overviewStatProducts">0</strong><span>Deze lijst</span></div>
-        <div class="overview-dashboard-stat"><strong id="overviewStatCompleted">0</strong><span>Voltooid</span></div>
-        <div class="overview-dashboard-stat"><strong id="overviewStatHistory">0</strong><span>Historie</span></div>
+    <section class="overview-dashboard-card smart-overview-card" aria-label="Slimme inzichten">
+      <h3 class="overview-dashboard-heading"><i class="fa-solid fa-lightbulb"></i> Slimme inzichten</h3>
+      <div class="smartInsightsIntro">
+        <strong id="smartInsightMain">Je boodschappen in één oogopslag.</strong>
+        <span id="smartInsightSub">Je voortgang en recente activiteit worden hier slim samengevat.</span>
+      </div>
+      <div class="smartInsightsGrid">
+        <div class="smartInsightsItem">
+          <i class="fa-solid fa-basket-shopping siIcon"></i>
+          <strong id="smartInsightRemaining">0</strong>
+          <span>Nog op je lijst</span>
+        </div>
+        <div class="smartInsightsItem">
+          <i class="fa-solid fa-check siIcon"></i>
+          <strong id="smartInsightCompleted">0%</strong>
+          <span>Voltooid</span>
+        </div>
+        <div class="smartInsightsItem">
+          <i class="fa-solid fa-calendar-week siIcon"></i>
+          <strong id="smartInsightWeek">0</strong>
+          <span>Deze week</span>
+        </div>
       </div>
     </section>
 
@@ -7443,15 +7459,21 @@ function updateOverviewDashboard(){
   var history = readOverviewHistory();
   var lists = (typeof readSavedLists === "function") ? readSavedLists() : [];
 
-  var productsEl=document.getElementById("overviewStatProducts");
-  var completedEl=document.getElementById("overviewStatCompleted");
-  var historyEl=document.getElementById("overviewStatHistory");
-  if(productsEl) productsEl.textContent=String(total);
-  if(completedEl) completedEl.textContent=String(completed);
-  if(historyEl) historyEl.textContent=String(history.length);
+  var remainingEl=document.getElementById("smartInsightRemaining");
+  var completedInsightEl=document.getElementById("smartInsightCompleted");
+  var mainInsightEl=document.getElementById("smartInsightMain");
+  var subInsightEl=document.getElementById("smartInsightSub");
+  var remaining=Math.max(0,total-completed);
+  var completionPct=total>0 ? Math.round((completed/total)*100) : 0;
+  if(remainingEl) remainingEl.textContent=String(remaining);
+  if(completedInsightEl) completedInsightEl.textContent=String(completionPct)+"%";
+  if(mainInsightEl) mainInsightEl.textContent = total===0 ? "Je lijst is klaar voor nieuwe boodschappen." : (completionPct===100 ? "Alles op je lijst is voltooid." : "Je bent "+completionPct+"% klaar met je lijst.");
+  if(subInsightEl) subInsightEl.textContent = total===0 ? "Voeg producten toe om je voortgang hier te zien." : (remaining===1 ? "Nog 1 product te gaan." : "Nog "+remaining+" producten te gaan.");
 
   var now=Date.now(), weekStart=now-7*24*60*60*1000;
   var weekTrips=Array.isArray(history) ? history.filter(function(trip){ return Number(trip.savedAt||0)>=weekStart; }) : [];
+  var weekInsightEl=document.getElementById("smartInsightWeek");
+  if(weekInsightEl) weekInsightEl.textContent=String(weekTrips.length);
   var weekProducts=weekTrips.reduce(function(sum,trip){ return sum+((trip.items||[]).length); },0);
   var weekCompleted=weekTrips.reduce(function(sum,trip){
     return sum+(trip.items||[]).filter(function(item){return item && item.completed;}).length;
@@ -7850,7 +7872,7 @@ function openWeekCompleted(){
   box-sizing:border-box;
   background:#fff;
   color:#243128;
-  z-index:9999;
+  z-index:110001;
   transform:translate(105%, -50%);
   transition:transform .28s cubic-bezier(.22,.8,.25,1);
   box-shadow:-14px 0 35px rgba(0,0,0,.16);
