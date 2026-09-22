@@ -3105,26 +3105,15 @@ html, body { -webkit-tap-highlight-color: transparent; }
 }
 </style>
 
-<style id="clear-list-side-popup">
-.clearListBackdrop{position:fixed;inset:0;background:rgba(15,25,19,.30);z-index:9998;opacity:0;pointer-events:none;transition:opacity .22s ease}
-.clearListBackdrop.show{opacity:1;pointer-events:auto}
-.clearListSheet{position:fixed;top:0;right:0;bottom:0;width:min(390px,92vw);background:#fff;color:#243128;z-index:9999;transform:translateX(105%);transition:transform .28s cubic-bezier(.22,.8,.25,1);box-shadow:-14px 0 35px rgba(0,0,0,.16);border-radius:22px 0 0 22px;padding:24px 20px;display:flex;flex-direction:column;box-sizing:border-box}
-.clearListSheet.show{transform:translateX(0)}
-.clearListClose{width:40px;height:40px;border:0;border-radius:50%;background:rgba(0,0,0,.06);font-size:20px;align-self:flex-end}
-.clearListIcon{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#f3e5e3;color:#a94b42;font-size:25px;margin:10px 0 18px}
-.clearListSheet h2{margin:0 0 9px;font-size:22px}.clearListSheet p{margin:0;line-height:1.5;opacity:.78}
-.clearListStats{margin:20px 0;padding:14px;border-radius:15px;background:rgba(63,91,69,.08);line-height:1.55}
-.clearListActions{margin-top:auto;display:grid;gap:10px}.clearListCancel,.clearListConfirm{width:100%;padding:13px 16px;border-radius:14px;font-weight:750;border:0}
-.clearListCancel{background:rgba(0,0,0,.06);color:inherit}.clearListConfirm{background:#a94b42;color:#fff}
-body.dark-theme .clearListSheet{background:#202821;color:#e7eee9}
-body.dark-theme .clearListClose,body.dark-theme .clearListCancel{background:rgba(255,255,255,.08);color:#e7eee9}
-body.dark-theme .clearListStats{background:rgba(126,170,137,.12)}
-</style>
-<style id="main-list-trash-style">
-.mainListTrashButton{background:rgba(255,255,255,.16)!important;color:#fff!important}
+
+<style id="main-list-trash-layout">
+.headerBar #mainListTrashButton{margin-left:auto!important}
+.headerBar #listOptionsButton{margin-left:0!important}
+.mainListTrashButton{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.16)!important;color:#fff!important;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;flex:0 0 auto}
 .mainListTrashButton:active{transform:scale(.96)}
 .app.overview-active .mainListTrashButton,.app.more-active .mainListTrashButton{display:none!important}
-</style></head>
+</style>
+</head>
 
 <body>
 <div id="loginScreen">
@@ -3527,11 +3516,6 @@ body.dark-theme .clearListStats{background:rgba(126,170,137,.12)}
     <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
   </div>
 
-  <div class="buttons">
-    <button class="clear" onclick="openClearListConfirm(event)"><i class="fa-solid fa-trash-can"></i> Lijst wissen</button>
-    
-  </div>
-
   <div class="status" id="status">
    <i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen
     <span>Laatste update: vandaag</span>
@@ -3588,7 +3572,7 @@ body.dark-theme .clearListStats{background:rgba(126,170,137,.12)}
 
   <div id="listOptionsPanel" class="listOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <button type="button" class="listOptionItem listOptionDanger" onclick="clearListFromOptions()">
+      <button type="button" class="listOptionItem listOptionDanger" onclick="openClearListConfirm(event); closeListOptions();">
         <i class="fa-solid fa-trash-can"></i><span>Lijst wissen</span>
       </button>
       <button type="button" class="listOptionItem" onclick="openSortOptions()">
@@ -7830,64 +7814,63 @@ function openWeekCompleted(){
 }
 </script>
 
-<div id="clearListBackdrop" class="clearListBackdrop" onclick="closeClearListConfirm(event)"></div>
-<aside id="clearListSheet" class="clearListSheet" aria-hidden="true">
 
-<div class="clearListIcon"><i class="fa-solid fa-trash"></i></div>
-<h2>Boodschappenlijst wissen?</h2>
-<p>Weet je zeker dat je je huidige boodschappenlijst wilt wissen?</p>
-<div class="clearListHistoryNote">
-  <i class="fa-solid fa-circle-check"></i>
-  <span>Afgevinkte producten worden bewaard in je boodschappenhistorie.<br>
-  Niet-afgevinkte producten worden verwijderd.</span>
-</div>
-<div id="clearListStats" class="clearListStats"></div>
-<div class="clearListActions">
-<button type="button" class="clearListCancel" onclick="closeClearListConfirm(event)">Annuleren</button>
-<button type="button" class="clearListConfirm" onclick="confirmClearList(event)">Lijst wissen</button>
-</div>
+<div id="clearListBackdrop" class="clearListBackdrop" aria-hidden="true"></div>
+<aside id="clearListSheet" class="clearListSheet" role="dialog" aria-modal="true" aria-labelledby="clearListTitle" aria-describedby="clearListDescription" aria-hidden="true">
+  <div class="clearListIcon"><i class="fa-solid fa-trash-can"></i></div>
+  <h2 id="clearListTitle">Boodschappenlijst wissen?</h2>
+  <p id="clearListDescription">Weet je zeker dat je je huidige boodschappenlijst wilt wissen?</p>
+  <div class="clearListHistoryNote"><i class="fa-solid fa-circle-check"></i><span>Je huidige lijst wordt eerst bewaard in je boodschappenhistorie.</span></div>
+  <div class="clearListActions">
+    <button type="button" class="clearListCancel" onclick="closeClearListConfirm(event)">Annuleren</button>
+    <button type="button" class="clearListConfirm" onclick="confirmClearList(event)"><i class="fa-solid fa-trash-can"></i> Lijst wissen</button>
+  </div>
 </aside>
-
-<script id="clear-list-side-popup-js">
+<style id="clear-list-clean-style">
+.clearListBackdrop{position:fixed;inset:0;background:rgba(24,35,28,.28);z-index:110000;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.clearListBackdrop.show{opacity:1;pointer-events:auto}
+.clearListSheet{position:fixed;right:18px;top:50%;width:min(390px,calc(100vw - 36px));max-height:min(78vh,620px);overflow:auto;box-sizing:border-box;padding:24px;border-radius:24px;background:#fff;color:#2f3f35;z-index:110001;box-shadow:-10px 14px 40px rgba(0,0,0,.18);transform:translate(120%,-50%);transition:transform .28s cubic-bezier(.22,.8,.25,1);}
+.clearListSheet.show{transform:translate(0,-50%)}
+.clearListIcon{width:58px;height:58px;border-radius:18px;background:#f4e7e4;color:#a9544b;display:flex;align-items:center;justify-content:center;font-size:23px;margin-bottom:18px}
+.clearListSheet h2{margin:0 0 12px;font-size:25px;line-height:1.15;color:#315b40}
+.clearListSheet p{margin:0;font-size:17px;line-height:1.5;color:#536057}
+.clearListHistoryNote{margin:18px 0 24px;padding:15px 16px;border-radius:16px;background:#f1f5f2;display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.45;color:#3e4d43}
+.clearListHistoryNote i{color:#3f5b45;margin-top:3px;flex:0 0 auto}
+.clearListActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.clearListActions button{min-height:50px;border:0;border-radius:15px;padding:12px 14px;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.clearListCancel{background:#eef0ef;color:#344039}
+.clearListConfirm{background:#b6534a;color:#fff}
+.clearListConfirm i{margin-right:7px}
+body.dark-theme .clearListSheet{background:#202923;color:#e5ece7}
+body.dark-theme .clearListSheet h2{color:#bfe0c9}
+body.dark-theme .clearListSheet p{color:#b6c1ba}
+body.dark-theme .clearListHistoryNote{background:#2a352e;color:#d9e2dc}
+body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
+@media(max-width:600px){.clearListSheet{right:12px;width:calc(100vw - 24px);padding:22px;border-radius:22px}.clearListActions{grid-template-columns:1fr 1fr}}
+</style>
+<script id="clear-list-clean-logic">
 (function(){
-window.openClearListConfirm=function(event){
- if(event)event.stopPropagation();
- const s=document.getElementById("clearListSheet"),b=document.getElementById("clearListBackdrop"),st=document.getElementById("clearListStats");
- if(!s||!b)return;
- let items=[];
- const candidates=[window.shoppingList,window.currentShoppingList,window.boodschappenlijst,window.boodschappenList,window.shoppingItems,window.currentList];
- for(const c of candidates)if(Array.isArray(c)){items=c;break}
- let checked=items.filter(x=>x&&(x.checked===true||x.completed===true||x.done===true||x.afgevinkt===true)).length;
- let total=items.length;
- st.innerHTML=total ? "<b>"+checked+" afgevinkt</b> wordt aan je boodschappenhistorie toegevoegd."+((total-checked)?"<br>"+(total-checked)+" niet-afgevinkt wordt verwijderd zonder als gekocht te worden opgeslagen.":"") : "Je boodschappenlijst is leeg.";
- s.classList.add("show");b.classList.add("show");s.setAttribute("aria-hidden","false");
-};
-window.closeClearListConfirm=function(event){
- if(event)event.stopPropagation();
- const s=document.getElementById("clearListSheet"),b=document.getElementById("clearListBackdrop");
- if(s){s.classList.remove("show");s.setAttribute("aria-hidden","true")} if(b)b.classList.remove("show");
-};
-window.confirmClearList=function(event){
- if(event)event.stopPropagation(); window.closeClearListConfirm();
- if(typeof window.clearList==="function")window.clearList();
- else if(typeof window.clearShoppingList==="function")window.clearShoppingList();
-};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")window.closeClearListConfirm()});
+  var sheet=document.getElementById('clearListSheet'),backdrop=document.getElementById('clearListBackdrop');
+  window.openClearListConfirm=function(e){
+    if(e){e.preventDefault();e.stopPropagation();}
+    if(!sheet||!backdrop)return;
+    sheet.classList.add('show');backdrop.classList.add('show');sheet.setAttribute('aria-hidden','false');backdrop.setAttribute('aria-hidden','false');
+  };
+  window.closeClearListConfirm=function(e){
+    if(e){e.preventDefault();e.stopPropagation();}
+    if(!sheet||!backdrop)return;
+    sheet.classList.remove('show');backdrop.classList.remove('show');sheet.setAttribute('aria-hidden','true');backdrop.setAttribute('aria-hidden','true');
+  };
+  window.confirmClearList=async function(e){
+    if(e){e.preventDefault();e.stopPropagation();}
+    closeClearListConfirm();
+    if(typeof clearList==='function') await clearList();
+  };
+  if(backdrop)backdrop.addEventListener('click',closeClearListConfirm);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeClearListConfirm(e);});
 })();
 </script>
-<script id="main-list-trash-visibility">
-(function(){
-  function syncMainTrash(){
-    var main=document.getElementById("mainListTrashButton");
-    if(!main) return;
-    var shared=(typeof activeListType!=="undefined" && activeListType==="shared");
-    main.style.display=shared ? "none" : "";
-  }
-  window.syncMainTrash=syncMainTrash;
-  document.addEventListener("DOMContentLoaded",syncMainTrash);
-  setInterval(syncMainTrash,500);
-})();
-</script></body>
+</body>
 
 <style id="overview-dashboard-final">
 .overview-dashboard-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:15px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
