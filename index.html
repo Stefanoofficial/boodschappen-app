@@ -2680,13 +2680,13 @@ body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
 
 
 <style id="feedback-menu-stable">
-.feedbackIntro{text-align:center;padding:10px 8px 14px}
-.feedbackIcon{width:56px;height:56px;margin:0 auto 10px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#e3f1e6;color:#3F5B45;font-size:25px}
+.feedbackIntro{text-align:center;padding:10px 8px 10px}
+.feedbackIcon{width:56px;height:56px;margin:0 auto 8px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#e3f1e6;color:#3F5B45;font-size:25px}
 body.dark-theme .feedbackIcon{background:#304b39;color:#dce9df}
-.feedbackIntro h3{margin:0 0 6px;font-size:20px;font-weight:800}
-.feedbackIntro p{margin:0;line-height:1.45;opacity:.82}
+.feedbackIntro h3{margin:0 0 5px;font-size:20px;font-weight:800}
+.feedbackIntro p{margin:0 auto;max-width:520px;line-height:1.4;opacity:.82}
 .feedbackLabel{display:block;margin:4px 4px 7px;font-size:14px;font-weight:800}
-.feedbackTextarea{width:100%;min-height:150px;box-sizing:border-box;resize:vertical;border:1px solid #dfe7e1;border-radius:14px;padding:13px;font:inherit;line-height:1.45;background:#fff;color:#263229;outline:none}
+.feedbackTextarea{width:100%;min-height:145px;box-sizing:border-box;resize:vertical;border:1px solid #dfe7e1;border-radius:14px;padding:13px;font:inherit;line-height:1.45;background:#fff;color:#263229;outline:none}
 body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:#3b493f}
 .feedbackTextarea:focus{border-color:#7da789;box-shadow:0 0 0 3px rgba(63,91,69,.10)}
 .feedbackSendBtn{margin-top:10px;justify-content:center;background:#3F5B45 !important;color:#fff !important}
@@ -8152,7 +8152,7 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 .barcodeHead h3{margin:0;font-size:22px;color:#30453a}
 .barcodeClose{width:42px;height:42px;border:0;border-radius:13px;background:#edf3ef;color:#40584b;font-size:20px;display:flex;align-items:center;justify-content:center}
 .barcodeVideoWrap{position:relative;overflow:hidden;border-radius:20px;background:#17221c;aspect-ratio:4/3}
-#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover}
+#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;background:#17221c;transform:translateZ(0)}
 .barcodeFrame{position:absolute;left:12%;right:12%;top:25%;bottom:25%;border:3px solid rgba(255,255,255,.92);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.12);pointer-events:none}
 .barcodeStatus{font-size:15px;color:#68766f;text-align:center;margin:12px 2px 8px;min-height:22px}
 .barcodeManual{display:flex;gap:8px;margin-top:8px}
@@ -8170,7 +8170,7 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
       <button type="button" class="barcodeClose" onclick="closeBarcodeScanner()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="barcodeVideoWrap">
-      <video id="barcodeVideo" playsinline muted></video>
+      <video id="barcodeVideo" playsinline webkit-playsinline autoplay muted></video>
       <div class="barcodeFrame"></div>
     </div>
     <div id="barcodeStatus" class="barcodeStatus">Camera wordt gestart…</div>
@@ -8188,32 +8188,51 @@ let barcodeReader = null;
 let barcodeControls = null;
 let barcodeLibraryPromise = null;
 let barcodeBusy = false;
+let nativeBarcodeLoop = null;
 
 function loadBarcodeLibrary(){
   if (window.ZXingBrowser) return Promise.resolve();
   if (barcodeLibraryPromise) return barcodeLibraryPromise;
   barcodeLibraryPromise = new Promise((resolve,reject)=>{
-    const script=document.createElement('script');
-    script.src='https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';
-    script.onload=()=>window.ZXingBrowser?resolve():reject(new Error('Scannerbibliotheek niet geladen'));
-    script.onerror=()=>reject(new Error('Scannerbibliotheek kon niet worden geladen'));
-    document.head.appendChild(script);
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js',
+      'https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js'
+    ];
+    let i = 0;
+    const tryNext = () => {
+      if (window.ZXingBrowser) return resolve();
+      if (i >= urls.length) return reject(new Error('Scannerbibliotheek niet geladen'));
+      const script = document.createElement('script');
+      script.src = urls[i++];
+      script.async = true;
+      script.onload = () => window.ZXingBrowser ? resolve() : tryNext();
+      script.onerror = () => tryNext();
+      document.head.appendChild(script);
+    };
+    tryNext();
   });
   return barcodeLibraryPromise;
 }
-
 function setBarcodeStatus(text){
   const el=document.getElementById('barcodeStatus');
   if(el) el.textContent=text;
 }
 
+function stopNativeBarcodeLoop(){
+  if(nativeBarcodeLoop){
+    cancelAnimationFrame(nativeBarcodeLoop);
+    nativeBarcodeLoop=null;
+  }
+}
+
 function stopBarcodeCamera(){
+  stopNativeBarcodeLoop();
   try{ if(barcodeControls && typeof barcodeControls.stop==='function') barcodeControls.stop(); }catch(_){ }
   barcodeControls=null;
   barcodeReader=null;
   const video=document.getElementById('barcodeVideo');
   if(video && video.srcObject){
-    video.srcObject.getTracks().forEach(t=>t.stop());
+    try{ video.srcObject.getTracks().forEach(t=>t.stop()); }catch(_){ }
     video.srcObject=null;
   }
 }
@@ -8225,43 +8244,117 @@ function closeBarcodeScanner(){
   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
 }
 
+async function startNativeBarcodeDetector(video){
+  if(!('BarcodeDetector' in window)) return false;
+  let detector;
+  try{
+    const wanted=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'];
+    const supported = typeof BarcodeDetector.getSupportedFormats==='function'
+      ? await BarcodeDetector.getSupportedFormats() : [];
+    const formats = supported.length ? wanted.filter(f=>supported.includes(f)) : wanted;
+    detector = new BarcodeDetector({formats});
+  }catch(_){ return false; }
+
+  const scan=async()=>{
+    if(!video.srcObject || barcodeBusy || !document.getElementById('barcodeOverlay')?.classList.contains('open')) return;
+    try{
+      const codes=await detector.detect(video);
+      const hit=codes && codes.find(x=>x && x.rawValue);
+      if(hit){
+        const code=String(hit.rawValue).replace(/\D/g,'');
+        if(code.length>=8){
+          barcodeBusy=true;
+          await handleBarcode(code);
+          return;
+        }
+      }
+    }catch(_){ }
+    nativeBarcodeLoop=requestAnimationFrame(scan);
+  };
+  nativeBarcodeLoop=requestAnimationFrame(scan);
+  return true;
+}
+
 async function openBarcodeScanner(){
   const overlay=document.getElementById('barcodeOverlay');
-  if(!overlay) return;
+  const video=document.getElementById('barcodeVideo');
+  if(!overlay || !video) return;
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden','false');
   document.getElementById('barcodeManualInput').value='';
   document.getElementById('barcodeResult').classList.remove('open');
   setBarcodeStatus('Camera wordt gestart…');
+  stopBarcodeCamera();
+
   try{
-    await loadBarcodeLibrary();
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      setBarcodeStatus('Camera wordt niet ondersteund. Voer de barcode hieronder in.');
+    if(!window.isSecureContext){
+      setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
       return;
     }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder in.');
+      return;
+    }
+
+    // Eerst expliciet toestemming vragen. Dit werkt in Safari/iPhone én Chrome/Android.
+    let stream;
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}}
+      });
+    }catch(firstErr){
+      console.warn('Achtercamera niet beschikbaar met exact constraint:', firstErr);
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({
+          audio:false,
+          video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
+        });
+      }catch(secondErr){
+        console.warn('Achtercamera niet beschikbaar met ideal constraint:', secondErr);
+        stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      }
+    }
+
+    video.autoplay=true;
+    video.muted=true;
+    video.playsInline=true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    video.srcObject=stream;
+    await video.play();
+    setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
+
+    // Android Chrome kan vaak native barcodes herkennen. Op iPhone/iPad valt dit
+    // automatisch terug op ZXing, zodat dezelfde scanner op beide platformen werkt.
+    const nativeStarted=await startNativeBarcodeDetector(video);
+    if(nativeStarted) return;
+
+    await loadBarcodeLibrary();
     barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
-    const video=document.getElementById('barcodeVideo');
-    barcodeControls=await barcodeReader.decodeFromConstraints(
-      {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
-      video,
-      async (result,error)=>{
-        if(result && !barcodeBusy){
-          const raw=result.getText ? result.getText() : String(result.text || result);
-          const code=raw.replace(/\D/g,'');
-          if(code.length>=8){
-            barcodeBusy=true;
-            await handleBarcode(code);
-          }
+    barcodeControls=await barcodeReader.decodeFromStream(stream,video,async(result,error)=>{
+      if(result && !barcodeBusy){
+        const raw=result.getText ? result.getText() : String(result.text || result);
+        const code=raw.replace(/\D/g,'');
+        if(code.length>=8){
+          barcodeBusy=true;
+          await handleBarcode(code);
         }
       }
-    );
-    setBarcodeStatus('Richt de barcode binnen het kader.');
+    });
   }catch(err){
     console.error('Barcode scanner:',err);
-    setBarcodeStatus('Camera kon niet starten. Geef cameratoegang of voer de barcode hieronder in.');
+    stopBarcodeCamera();
+    const name=err && err.name ? err.name : '';
+    if(name==='NotAllowedError' || name==='PermissionDeniedError'){
+      setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
+    }else if(name==='NotFoundError' || name==='OverconstrainedError'){
+      setBarcodeStatus('Geen geschikte camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
+    }else{
+      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder handmatig in.');
+    }
   }
 }
-
 async function lookupManualBarcode(){
   const input=document.getElementById('barcodeManualInput');
   const code=(input?.value||'').replace(/\D/g,'');
