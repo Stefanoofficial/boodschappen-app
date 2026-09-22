@@ -2691,38 +2691,6 @@ body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:
 .feedbackTextarea:focus{border-color:#7da789;box-shadow:0 0 0 3px rgba(63,91,69,.10)}
 .feedbackSendBtn{margin-top:10px;justify-content:center;background:#3F5B45 !important;color:#fff !important}
 </style>
-<style id="feedback-visibility-final">
-/* Feedbackpagina: inhoud altijd zichtbaar en niet afhankelijk van de oude slide-state. */
-#feedbackMenuSub.feedbackMenuPage {
-  display:block;
-  opacity:1 !important;
-  visibility:visible !important;
-  transform:none !important;
-  position:relative;
-  padding:8px 6px 16px;
-  box-sizing:border-box;
-}
-#feedbackMenuSub .feedbackIntro {
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  text-align:center;
-  padding:14px 8px 12px;
-}
-#feedbackMenuSub .feedbackIntro h3,
-#feedbackMenuSub .feedbackIntro p,
-#feedbackMenuSub .feedbackLabel,
-#feedbackMenuSub .feedbackTextarea,
-#feedbackMenuSub .feedbackSendBtn,
-#feedbackMenuSub .settingsMenuHint {
-  visibility:visible !important;
-  opacity:1 !important;
-}
-#feedbackMenuSub .feedbackIntro h3 { color:#3F5B45 !important; font-size:20px !important; }
-#feedbackMenuSub .feedbackIntro p { color:#68766f !important; font-size:14px !important; }
-#feedbackMenuSub .feedbackLabel { color:#53635a !important; }
-#feedbackMenuSub .feedbackTextarea { color:#263229 !important; background:#fff !important; }
-</style>
 <style id="more-submenu-horizontal-fix">
 /* In Meer staan de submenu's boven elkaar in dezelfde ruimte.
    Daardoor komt Mijn account/Over de app niet meer van onderen binnen,
@@ -8207,18 +8175,13 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 .barcode-search-btn:active{transform:scale(.94)}
 .productBarcodeImage{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;border-radius:6px!important;display:block!important}
 .barcodeOverlay{position:fixed;inset:0;z-index:15000;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(31,49,39,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-/* Barcode-modal: de volledige viewport is modal. Ook de vaste navigatie blijft eronder en is niet klikbaar. */
-body.barcode-open .bottomNav{z-index:0!important;pointer-events:none!important}
-body.barcode-open .app{pointer-events:none!important}
-body.barcode-open #barcodeOverlay{z-index:999999!important;pointer-events:auto!important}
-body.barcode-open #barcodeOverlay .barcodeCard{pointer-events:auto!important}
 .barcodeOverlay.open{display:flex}
 .barcodeCard{width:min(430px,100%);background:#fff;border-radius:26px;padding:18px;box-sizing:border-box;box-shadow:0 20px 60px rgba(30,55,40,.25);color:#30453a}
 .barcodeHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .barcodeHead h3{margin:0;font-size:22px;color:#30453a}
 .barcodeClose{width:42px;height:42px;border:0;border-radius:13px;background:#edf3ef;color:#40584b;font-size:20px;display:flex;align-items:center;justify-content:center}
 .barcodeVideoWrap{position:relative;overflow:hidden;border-radius:20px;background:#17221c;aspect-ratio:4/3}
-#barcodeVideo{position:relative!important;z-index:1!important;width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;background:#17221c!important;transform:none!important;opacity:1!important;visibility:visible!important}
+#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;background:#17221c;transform:translateZ(0)}
 .barcodeFrame{position:absolute;left:12%;right:12%;top:25%;bottom:25%;border:3px solid rgba(255,255,255,.92);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.12);pointer-events:none}
 .barcodeStatus{font-size:15px;color:#68766f;text-align:center;margin:12px 2px 8px;min-height:22px}
 .barcodeManual{display:flex;gap:8px;margin-top:8px}
@@ -8254,8 +8217,12 @@ let barcodeReader = null;
 let barcodeControls = null;
 let barcodeLibraryPromise = null;
 let barcodeBusy = false;
-let barcodeStream = null;
 let nativeBarcodeLoop = null;
+let barcodeStream = null;
+let barcodeWatchdog = null;
+let barcodeRestarting = false;
+let barcodeLastVideoTime = -1;
+let barcodeLastVideoTick = 0;
 
 function loadBarcodeLibrary(){
   if (window.ZXingBrowser) return Promise.resolve();
@@ -8270,7 +8237,8 @@ function loadBarcodeLibrary(){
       if (window.ZXingBrowser) return resolve();
       if (i >= urls.length) return reject(new Error('Scannerbibliotheek niet geladen'));
       const script = document.createElement('script');
-      script.src = urls[i++]; script.async = true;
+      script.src = urls[i++];
+      script.async = true;
       script.onload = () => window.ZXingBrowser ? resolve() : tryNext();
       script.onerror = () => tryNext();
       document.head.appendChild(script);
@@ -8279,160 +8247,340 @@ function loadBarcodeLibrary(){
   });
   return barcodeLibraryPromise;
 }
-function setBarcodeStatus(text){ const el=document.getElementById('barcodeStatus'); if(el) el.textContent=text; }
-function stopNativeBarcodeLoop(){ if(nativeBarcodeLoop){ cancelAnimationFrame(nativeBarcodeLoop); nativeBarcodeLoop=null; } }
+function setBarcodeStatus(text){
+  const el=document.getElementById('barcodeStatus');
+  if(el) el.textContent=text;
+}
+
+function stopNativeBarcodeLoop(){
+  if(nativeBarcodeLoop){
+    cancelAnimationFrame(nativeBarcodeLoop);
+    nativeBarcodeLoop=null;
+  }
+}
+
 function stopBarcodeCamera(){
   stopNativeBarcodeLoop();
+  if(barcodeWatchdog){
+    clearInterval(barcodeWatchdog);
+    barcodeWatchdog=null;
+  }
   try{ if(barcodeControls && typeof barcodeControls.stop==='function') barcodeControls.stop(); }catch(_){ }
-  barcodeControls=null; barcodeReader=null;
-  if(barcodeStream){ try{ barcodeStream.getTracks().forEach(t=>t.stop()); }catch(_){ } barcodeStream=null; }
+  barcodeControls=null;
+  barcodeReader=null;
+  barcodeStream=null;
+  barcodeRestarting=false;
+  barcodeLastVideoTime=-1;
+  barcodeLastVideoTick=0;
   const video=document.getElementById('barcodeVideo');
-  if(video){ try{ video.pause(); }catch(_){ } try{ video.srcObject=null; }catch(_){ } }
+  if(video && video.srcObject){
+    try{ video.pause(); }catch(_){ }
+    try{ video.srcObject.getTracks().forEach(t=>t.stop()); }catch(_){ }
+    video.srcObject=null;
+  }
+}
+
+function startBarcodeWatchdog(){
+  if(barcodeWatchdog) clearInterval(barcodeWatchdog);
+  barcodeLastVideoTime=-1;
+  barcodeLastVideoTick=Date.now();
+
+  barcodeWatchdog=setInterval(async function(){
+    const overlay=document.getElementById('barcodeOverlay');
+    const video=document.getElementById('barcodeVideo');
+    if(!overlay || !overlay.classList.contains('open') || !video || barcodeBusy) return;
+
+    const stream=video.srcObject || barcodeStream;
+    const tracks=stream && typeof stream.getVideoTracks==='function' ? stream.getVideoTracks() : [];
+    const track=tracks[0];
+
+    if(!track || track.readyState !== 'live'){
+      if(!barcodeRestarting) await restartBarcodeCamera();
+      return;
+    }
+
+    // Safari can leave the video element paused/blank while the MediaStream
+    // itself is still live. Resume playback without replacing the stream.
+    if(video.paused){
+      try{ await video.play(); }catch(_){}
+    }
+
+    const now=Date.now();
+    const currentTime=Number(video.currentTime || 0);
+    if(currentTime !== barcodeLastVideoTime){
+      barcodeLastVideoTime=currentTime;
+      barcodeLastVideoTick=now;
+    } else if(video.readyState >= 2 && now - barcodeLastVideoTick > 1800){
+      // Preview has stopped advancing: restart only the camera stream.
+      if(!barcodeRestarting) await restartBarcodeCamera();
+    }
+  }, 700);
+}
+
+async function restartBarcodeCamera(){
+  if(barcodeRestarting || barcodeBusy) return;
+  barcodeRestarting=true;
+
+  const video=document.getElementById('barcodeVideo');
+  const overlay=document.getElementById('barcodeOverlay');
+  if(!video || !overlay || !overlay.classList.contains('open')){
+    barcodeRestarting=false;
+    return;
+  }
+
+  try{
+    const oldStream=video.srcObject || barcodeStream;
+    if(oldStream){
+      try{ oldStream.getTracks().forEach(t=>t.stop()); }catch(_){}
+    }
+    video.srcObject=null;
+
+    let stream;
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}}
+      });
+    }catch(_){
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({
+          audio:false,
+          video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
+        });
+      }catch(__){
+        stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      }
+    }
+
+    barcodeStream=stream;
+    video.srcObject=stream;
+    video.muted=true;
+    video.autoplay=true;
+    video.playsInline=true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    await video.play();
+    barcodeLastVideoTime=video.currentTime || 0;
+    barcodeLastVideoTick=Date.now();
+    setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
+
+    // Restart decoding on the new stream.
+    stopNativeBarcodeLoop();
+    try{
+      const nativeStarted=await startNativeBarcodeDetector(video);
+      if(!nativeStarted){
+        await loadBarcodeLibrary();
+        barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
+        barcodeControls=await barcodeReader.decodeFromStream(stream,video,async(result)=>{
+          if(result && !barcodeBusy){
+            const raw=result.getText ? result.getText() : String(result.text || result);
+            const code=raw.replace(/\D/g,'');
+            if(code.length>=8){
+              barcodeBusy=true;
+              await handleBarcode(code);
+            }
+          }
+        });
+      }
+    }catch(err){
+      console.warn('Barcode decoder opnieuw starten:',err);
+    }
+  }catch(err){
+    console.warn('Camera opnieuw starten mislukt:',err);
+    setBarcodeStatus('Camera wordt opnieuw gestart…');
+  }finally{
+    barcodeRestarting=false;
+  }
+}
+
+function closeBarcodeScanner(){
+  stopBarcodeCamera();
+  barcodeBusy=false;
+  const overlay=document.getElementById('barcodeOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
 }
 
 async function startNativeBarcodeDetector(video){
   if(!('BarcodeDetector' in window)) return false;
+  let detector;
   try{
     const wanted=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'];
-    const supported=typeof BarcodeDetector.getSupportedFormats==='function' ? await BarcodeDetector.getSupportedFormats() : [];
-    const formats=supported.length ? wanted.filter(f=>supported.includes(f)) : wanted;
-    const detector=new BarcodeDetector({formats});
-    const scan=async()=>{
-      if(!video.srcObject || !document.getElementById('barcodeOverlay')?.classList.contains('open')) return;
-      if(!barcodeBusy){
-        try{
-          const codes=await detector.detect(video);
-          const hit=codes && codes.find(x=>x && x.rawValue);
-          if(hit){ const code=String(hit.rawValue).replace(/\D/g,''); if(code.length>=8){ barcodeBusy=true; await handleBarcode(code); return; } }
-        }catch(_){ }
-      }
-      nativeBarcodeLoop=requestAnimationFrame(scan);
-    };
-    nativeBarcodeLoop=requestAnimationFrame(scan);
-    return true;
+    const supported = typeof BarcodeDetector.getSupportedFormats==='function'
+      ? await BarcodeDetector.getSupportedFormats() : [];
+    const formats = supported.length ? wanted.filter(f=>supported.includes(f)) : wanted;
+    detector = new BarcodeDetector({formats});
   }catch(_){ return false; }
-}
 
-async function startZXingOnExistingVideo(video){
-  try{
-    await loadBarcodeLibrary();
-    if(!window.ZXingBrowser) return false;
-    barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
-    // Belangrijk: de camera-stream is al door getUserMedia aan het video-element gekoppeld.
-    // ZXing decodeert alleen het bestaande video-element en opent geen tweede camera-stream.
-    if(typeof barcodeReader.decodeFromVideoElement==='function'){
-      barcodeControls=await barcodeReader.decodeFromVideoElement(video, async (result)=>{
-        if(result && !barcodeBusy){
-          const raw=result.getText ? result.getText() : String(result.text || result);
-          const code=raw.replace(/\D/g,'');
-          if(code.length>=8){ barcodeBusy=true; await handleBarcode(code); }
+  const scan=async()=>{
+    if(!video.srcObject || barcodeBusy || !document.getElementById('barcodeOverlay')?.classList.contains('open')) return;
+    try{
+      const codes=await detector.detect(video);
+      const hit=codes && codes.find(x=>x && x.rawValue);
+      if(hit){
+        const code=String(hit.rawValue).replace(/\D/g,'');
+        if(code.length>=8){
+          barcodeBusy=true;
+          await handleBarcode(code);
+          return;
         }
-      });
-      return true;
-    }
-  }catch(err){ console.warn('ZXing decode gestart zonder preview te blokkeren:',err); }
-  return false;
+      }
+    }catch(_){ }
+    nativeBarcodeLoop=requestAnimationFrame(scan);
+  };
+  nativeBarcodeLoop=requestAnimationFrame(scan);
+  return true;
 }
 
 async function openBarcodeScanner(){
   const overlay=document.getElementById('barcodeOverlay');
   const video=document.getElementById('barcodeVideo');
   if(!overlay || !video) return;
-  overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); document.body.classList.add('barcode-open');
-  barcodeBusy=false;
-  const manual=document.getElementById('barcodeManualInput'); if(manual) manual.value='';
-  const result=document.getElementById('barcodeResult'); if(result) result.classList.remove('open');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.getElementById('barcodeManualInput').value='';
+  document.getElementById('barcodeResult').classList.remove('open');
   setBarcodeStatus('Camera wordt gestart…');
   stopBarcodeCamera();
 
-  if(!window.isSecureContext){ setBarcodeStatus('Camera werkt alleen via een beveiligde HTTPS-verbinding.'); return; }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.'); return; }
-
-  video.autoplay=true; video.muted=true; video.playsInline=true;
-  video.setAttribute('autoplay',''); video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('webkit-playsinline','');
-
   try{
-    // Eén en slechts één eigenaar van de camera: getUserMedia.
-    // Dit voorkomt de zwarte preview die ontstond wanneer ZXing zelf opnieuw een stream opende.
-    barcodeStream=await navigator.mediaDevices.getUserMedia({
-      audio:false,
-      video:{facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720}}
-    });
-    video.srcObject=barcodeStream;
-    await new Promise(resolve=>{
-      if(video.readyState>=2) return resolve();
-      const done=()=>{ video.removeEventListener('loadedmetadata',done); resolve(); };
-      video.addEventListener('loadedmetadata',done,{once:true});
-      setTimeout(resolve,1500);
-    });
+    if(!window.isSecureContext){
+      setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
+      return;
+    }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder in.');
+      return;
+    }
+
+    // Eerst expliciet toestemming vragen. Dit werkt in Safari/iPhone én Chrome/Android.
+    let stream;
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}}
+      });
+    }catch(firstErr){
+      console.warn('Achtercamera niet beschikbaar met exact constraint:', firstErr);
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({
+          audio:false,
+          video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
+        });
+      }catch(secondErr){
+        console.warn('Achtercamera niet beschikbaar met ideal constraint:', secondErr);
+        stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      }
+    }
+
+    video.autoplay=true;
+    video.muted=true;
+    video.playsInline=true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    barcodeStream=stream;
+    video.srcObject=stream;
     await video.play();
-    // Laat de browser een echte cameraframe tonen voordat we de decoder starten.
+    barcodeLastVideoTime=video.currentTime || 0;
+    barcodeLastVideoTick=Date.now();
+    startBarcodeWatchdog();
     setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
-    const native=await startNativeBarcodeDetector(video);
-    if(!native) await startZXingOnExistingVideo(video);
+
+    // Android Chrome kan vaak native barcodes herkennen. Op iPhone/iPad valt dit
+    // automatisch terug op ZXing, zodat dezelfde scanner op beide platformen werkt.
+    const nativeStarted=await startNativeBarcodeDetector(video);
+    if(nativeStarted) return;
+
+    await loadBarcodeLibrary();
+    barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
+    barcodeControls=await barcodeReader.decodeFromStream(stream,video,async(result,error)=>{
+      if(result && !barcodeBusy){
+        const raw=result.getText ? result.getText() : String(result.text || result);
+        const code=raw.replace(/\D/g,'');
+        if(code.length>=8){
+          barcodeBusy=true;
+          await handleBarcode(code);
+        }
+      }
+    });
   }catch(err){
-    console.error('Barcode camera:',err);
+    console.error('Barcode scanner:',err);
     stopBarcodeCamera();
     const name=err && err.name ? err.name : '';
-    if(name==='NotAllowedError' || name==='PermissionDeniedError') setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
-    else if(name==='NotFoundError' || name==='OverconstrainedError') setBarcodeStatus('Geen geschikte camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
-    else setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang en probeer opnieuw.');
+    if(name==='NotAllowedError' || name==='PermissionDeniedError'){
+      setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
+    }else if(name==='NotFoundError' || name==='OverconstrainedError'){
+      setBarcodeStatus('Geen geschikte camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
+    }else{
+      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder handmatig in.');
+    }
   }
 }
-
-function closeBarcodeScanner(){
-  const overlay=document.getElementById('barcodeOverlay');
-  if(overlay){ overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); }
-  document.body.classList.remove('barcode-open'); barcodeBusy=false; stopBarcodeCamera();
+async function lookupManualBarcode(){
+  const input=document.getElementById('barcodeManualInput');
+  const code=(input?.value||'').replace(/\D/g,'');
+  if(code.length<8){setBarcodeStatus('Voer een geldige barcode in.');return;}
+  barcodeBusy=true;
+  await handleBarcode(code);
 }
 
 async function handleBarcode(code){
-  setBarcodeStatus('Barcode gevonden — product wordt opgezocht…');
+  setBarcodeStatus('Product wordt opgezocht…');
   try{
-    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json');
+    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=code,product_name,brands,image_front_small_url,image_front_url');
+    if(!response.ok) throw new Error('Netwerkfout');
     const data=await response.json();
-    if(data && data.status===1 && data.product){
-      const p=data.product;
-      const name=p.product_name_nl || p.product_name || p.generic_name_nl || p.generic_name || ('Barcode '+code);
-      const brand=p.brands ? ' · '+p.brands.split(',')[0].trim() : '';
-      const image=p.image_front_small_url || p.image_front_thumb_url || p.image_url || '';
+    const p=data && data.product;
+    if(!p || data.status!==1 || !p.product_name){
       const result=document.getElementById('barcodeResult');
-      if(result){ result.innerHTML='<strong>'+escapeHtml(name)+'</strong>'+escapeHtml(brand)+(image?'<br><img src="'+escapeHtml(image)+'" alt="" style="width:48px;height:48px;object-fit:contain;margin-top:6px;border-radius:8px">':''); result.classList.add('open'); }
-      setBarcodeStatus('Product gevonden.');
-      // Vul de normale product-invoer als die bestaat.
-      const input=document.querySelector('input[placeholder*="melk" i], .input-row input');
-      if(input){ input.value=name; input.dispatchEvent(new Event('input',{bubbles:true})); }
-    }else{
-      setBarcodeStatus('Geen product gevonden voor deze barcode.');
+      result.textContent='Geen product gevonden voor deze barcode. Je kunt de barcode wel bewaren als je het product handmatig toevoegt.';
+      result.classList.add('open');
+      setBarcodeStatus('Geen product gevonden.');
+      barcodeBusy=false;
+      return;
     }
-  }catch(_){ setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.'); }
-  finally{ barcodeBusy=false; }
+
+    const name=String(p.product_name).trim();
+    const brand=String(p.brands||'').split(',')[0].trim();
+    const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
+    await addScannedProduct({text:name,barcode:code,brand,imageUrl});
+    const result=document.getElementById('barcodeResult');
+    result.textContent=(brand?brand+' · ':'')+name+' is toegevoegd aan je lijst.';
+    result.classList.add('open');
+    setBarcodeStatus('Gevonden ✓');
+    setTimeout(closeBarcodeScanner,900);
+  }catch(err){
+    console.error('Product lookup:',err);
+    setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
+  }finally{
+    barcodeBusy=false;
+  }
 }
 
-function escapeHtml(value){
-  return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch]));
+async function addScannedProduct(product){
+  if(activeListType !== 'shared' && !currentHouseholdId && !isPrivateMode()){
+    const householdId=await getOrCreateHousehold();
+    if(!householdId){openUseModeModal();return;}
+  }
+  boodschappen.push({
+    text:product.text,
+    completed:false,
+    completedBy:'',
+    completedByUid:'',
+    completedAt:null,
+    barcode:product.barcode || '',
+    imageUrl:product.imageUrl || '',
+    brand:product.brand || ''
+  });
+  showList();
+  await saveList();
 }
 
-function lookupManualBarcode(){
-  const input=document.getElementById('barcodeManualInput');
-  const code=(input?.value||'').replace(/\D/g,'');
-  if(code.length<8){ setBarcodeStatus('Vul een geldige barcode in.'); return; }
-  barcodeBusy=true; handleBarcode(code);
-}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const overlay=document.getElementById('barcodeOverlay');
+    if(overlay && overlay.classList.contains('open')) closeBarcodeScanner();
+  }
+});
 </script>
 
-
-<style id="feedback-visible-final-2">
-#feedbackMenuSub { min-height: 360px !important; overflow: visible !important; }
-#feedbackMenuSub .feedbackIntro { min-height: 110px !important; }
-#feedbackMenuSub .feedbackIntro h3 { display:block !important; }
-#feedbackMenuSub .feedbackIntro p { display:block !important; }
-</style>
 </html>
-
-<style id="feedback-visibility-fix">
-.feedback-intro, .feedback-intro *, .feedback-prompt, .feedback-label {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-</style>
