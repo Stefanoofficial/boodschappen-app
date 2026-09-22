@@ -3563,13 +3563,6 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       </div>
     </button>
 
-    <button type="button" class="overview-new-card overview-click-card" onclick="openSavedListsFromOverview()">
-      <div class="overview-new-title"><i class="fa-solid fa-list overview-new-lists"></i><span>Mijn lijsten</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
-      <div class="overview-new-row">
-        <div><strong>Opgeslagen boodschappenlijsten</strong><div class="overview-new-muted">Bekijk en gebruik je opgeslagen lijsten.</div></div>
-      </div>
-    </button>
-
     <section class="overview-dashboard-card smart-overview-card" aria-label="Slimme inzichten">
       <h3 class="overview-dashboard-heading"><i class="fa-solid fa-lightbulb"></i> Slimme inzichten</h3>
       <div class="smartInsightsIntro">
@@ -7292,17 +7285,6 @@ function updateOverviewSavedLists(){
     box.textContent='Je opgeslagen lijsten verschijnen hier.';
   }
 }
-function openSavedListsFromOverview(){
-  showMoreView();
-  setTimeout(function(){
-    try{
-      if(typeof openSavedListsSubmenu==='function'){
-        openSavedListsSubmenu({preventDefault:function(){},stopPropagation:function(){}});
-      }
-    }catch(e){ console.error(e); }
-  },60);
-}
-
 /* === Bottom navigation === */
 function setBottomNav(active){
   document.querySelectorAll('.bottomNavBtn').forEach(function(b){b.classList.remove('active');});
@@ -7908,7 +7890,19 @@ body.dark-theme .clearListSheet h2{color:#bfe0c9}
 body.dark-theme .clearListSheet p{color:#b6c1ba}
 body.dark-theme .clearListHistoryNote{background:#2a352e;color:#d9e2dc}
 body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
-@media(max-width:600px){.clearListSheet{right:12px;width:calc(100vw - 24px);padding:22px;border-radius:22px}.clearListActions{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .clearListSheet{
+    left:32px;
+    right:32px;
+    width:auto;
+    max-width:none;
+    padding:22px;
+    border-radius:22px;
+    transform:translate(105%,-50%);
+  }
+  .clearListSheet.show{transform:translate(0,-50%)}
+  .clearListActions{grid-template-columns:1fr 1fr}
+}
 </style>
 <script id="clear-list-clean-logic">
 (function(){
