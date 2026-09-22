@@ -2679,6 +2679,18 @@ body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
 </style>
 
 
+<style id="feedback-menu-stable">
+.feedbackIntro{text-align:center;padding:10px 8px 14px}
+.feedbackIcon{width:56px;height:56px;margin:0 auto 10px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#e3f1e6;color:#3F5B45;font-size:25px}
+body.dark-theme .feedbackIcon{background:#304b39;color:#dce9df}
+.feedbackIntro h3{margin:0 0 6px;font-size:20px;font-weight:800}
+.feedbackIntro p{margin:0;line-height:1.45;opacity:.82}
+.feedbackLabel{display:block;margin:4px 4px 7px;font-size:14px;font-weight:800}
+.feedbackTextarea{width:100%;min-height:150px;box-sizing:border-box;resize:vertical;border:1px solid #dfe7e1;border-radius:14px;padding:13px;font:inherit;line-height:1.45;background:#fff;color:#263229;outline:none}
+body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:#3b493f}
+.feedbackTextarea:focus{border-color:#7da789;box-shadow:0 0 0 3px rgba(63,91,69,.10)}
+.feedbackSendBtn{margin-top:10px;justify-content:center;background:#3F5B45 !important;color:#fff !important}
+</style>
 <style id="more-submenu-horizontal-fix">
 /* In Meer staan de submenu's boven elkaar in dezelfde ruimte.
    Daardoor komt Mijn account/Over de app niet meer van onderen binnen,
@@ -3229,6 +3241,11 @@ html, body { -webkit-tap-highlight-color: transparent; }
       <span>Instellingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFeedbackSubmenu(event)">
+      <i class="fa-solid fa-comment-dots"></i>
+      <span>Feedback</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAboutSubmenu(event)">
       <i class="fa-solid fa-circle-info"></i>
       <span>Over de app</span>
@@ -3363,6 +3380,26 @@ html, body { -webkit-tap-highlight-color: transparent; }
       <i class="fa-solid fa-trash"></i>
       <span>Account verwijderen</span>
     </button>
+  </div>
+
+  <div id="feedbackMenuSub" class="familyMenuPage aboutMenuPage feedbackMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeFeedbackSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Feedback</span>
+    </button>
+    <div class="familyMenuSubTitle">FEEDBACK</div>
+    <div class="feedbackIntro">
+      <div class="feedbackIcon"><i class="fa-solid fa-comment-dots"></i></div>
+      <h3>Jouw mening telt!</h3>
+      <p>Heb je een idee, suggestie, vraag of iets gevonden dat niet goed werkt? Laat het weten.</p>
+    </div>
+    <label class="feedbackLabel" for="feedbackText">Je feedback</label>
+    <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Schrijf hier je feedback..."></textarea>
+    <button type="button" class="familyMenuItem feedbackSendBtn" onclick="shareFeedback(event)">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>Feedback delen</span>
+    </button>
+    <div class="settingsMenuHint">Je kunt daarna zelf kiezen via welke app je de feedback wilt delen, bijvoorbeeld e-mail of WhatsApp.</div>
   </div>
 
   <div id="aboutMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -3653,6 +3690,7 @@ const __menuPageIds = [
   "settingsMenuSub",
   "savedListsMenuSub",
   "accountMenuSub",
+  "feedbackMenuSub",
   "aboutMenuSub",
   "appInfoMenuSub",
   "helpMenuSub"
@@ -3891,62 +3929,12 @@ function switchMenuPage(pageId, event) {
   const menu = document.getElementById("familyMenu");
   if (!page || !menu) return;
 
+  // Stabiele Meer-navigatie: één pagina tegelijk, zonder slide-animatie,
+  // requestAnimationFrame of dynamische height-meting.
   __cancelMenuTransition();
-
-  let current = __getMenuPage(__menuCurrentPage);
-  if (!current || current === page || current.style.display === "none") {
-    current = __menuPageIds
-      .map(__getMenuPage)
-      .find(el => el && el !== page && el.style.display !== "none") || null;
-  }
-
-  if (current === page) return;
-
-  // Ensure the More container is visible before both pages are composed.
   menu.style.display = "block";
-
-  if (!current) {
-    __showOnlyMenuPage(pageId);
-    return;
-  }
-
-  const token = __menuTransitionToken;
-  const menuHeights = __prepareMoreMenuTransition(menu, current, page);
-  __resetMenuPageClasses(current);
-  __resetMenuPageClasses(page);
-
-  // Both pages occupy the exact same grid cell. This prevents a page from
-  // dropping below the other one on Android/iOS during a fast transition.
-  current.style.display = "block";
-  page.style.display = "block";
-  current.style.pointerEvents = "none";
-  page.style.pointerEvents = "none";
-
-  // Two animation frames are more reliable than a single forced reflow on
-  // Safari/WebKit and Chromium WebView when the page was just made visible.
-  requestAnimationFrame(() => {
-    if(token !== __menuTransitionToken) return;
-    requestAnimationFrame(() => {
-      if(token !== __menuTransitionToken) return;
-      __resetMenuPageClasses(current);
-      __resetMenuPageClasses(page);
-      current.style.display = "block";
-      page.style.display = "block";
-      current.style.pointerEvents = "none";
-      page.style.pointerEvents = "none";
-      current.classList.add("menuSlideOutLeft");
-      page.classList.add("menuSlideInRight");
-    });
-  });
-
-  __menuCurrentPage = pageId;
-
-  __menuTransitionTimer = setTimeout(() => {
-    if(token !== __menuTransitionToken) return;
-    __showOnlyMenuPage(pageId);
-    __finishMoreMenuTransition(menu, page, menuHeights.targetHeight);
-    __menuTransitionTimer = null;
-  }, 320);
+  __showOnlyMenuPage(pageId);
+  page.scrollTop = 0;
 }
 
 function returnMenuToMain(pageId, event) {
@@ -3956,51 +3944,14 @@ function returnMenuToMain(pageId, event) {
 function returnMenuToPage(pageId, targetId, event) {
   if (event) event.stopPropagation();
 
-  const page = __getMenuPage(pageId);
   const target = __getMenuPage(targetId);
   const menu = document.getElementById("familyMenu");
-  if (!page || !target || !menu) return;
+  if (!target || !menu) return;
 
   __cancelMenuTransition();
-
-  if (page === target) {
-    __showOnlyMenuPage(targetId);
-    return;
-  }
-
-  const token = __menuTransitionToken;
-  const menuHeights = __prepareMoreMenuTransition(menu, page, target);
   menu.style.display = "block";
-  __resetMenuPageClasses(page);
-  __resetMenuPageClasses(target);
-  page.style.display = "block";
-  target.style.display = "block";
-  page.style.pointerEvents = "none";
-  target.style.pointerEvents = "none";
-
-  requestAnimationFrame(() => {
-    if (token !== __menuTransitionToken) return;
-    requestAnimationFrame(() => {
-      if (token !== __menuTransitionToken) return;
-      __resetMenuPageClasses(page);
-      __resetMenuPageClasses(target);
-      page.style.display = "block";
-      target.style.display = "block";
-      page.style.pointerEvents = "none";
-      target.style.pointerEvents = "none";
-      page.classList.add("menuSlideOutRight");
-      target.classList.add("menuSlideInLeft");
-    });
-  });
-
-  __menuCurrentPage = targetId;
-
-  __menuTransitionTimer = setTimeout(() => {
-    if (token !== __menuTransitionToken) return;
-    __showOnlyMenuPage(targetId);
-    __finishMoreMenuTransition(menu, target, menuHeights.targetHeight);
-    __menuTransitionTimer = null;
-  }, 320);
+  __showOnlyMenuPage(targetId);
+  target.scrollTop = 0;
 }
 
 function openAccountSubmenu(event) {
@@ -4011,6 +3962,44 @@ function openAccountSubmenu(event) {
   if (email) email.textContent = user ? (user.email || "") : "";
 }
 function closeAccountSubmenu(event) { returnMenuToMain("accountMenuSub", event); }
+function openFeedbackSubmenu(event) {
+  if (event) event.stopPropagation();
+  switchMenuPage("feedbackMenuSub", event);
+}
+function closeFeedbackSubmenu(event) {
+  returnMenuToMain("feedbackMenuSub", event);
+}
+async function shareFeedback(event) {
+  if (event) event.stopPropagation();
+  const input = document.getElementById("feedbackText");
+  const text = (input && input.value || "").trim();
+  if (!text) {
+    await familyAlert("Feedback", "Schrijf eerst je feedback.", "fa-comment-dots");
+    if (input) input.focus();
+    return;
+  }
+
+  const shareText = "Feedback voor Boodschappenlijst:\n\n" + text;
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: "Feedback Boodschappenlijst",
+        text: shareText
+      });
+      return;
+    }
+    await navigator.clipboard.writeText(shareText);
+    await familyAlert("Feedback", "Je feedback is gekopieerd. Je kunt hem nu delen.", "fa-copy");
+  } catch (error) {
+    if (error && error.name === "AbortError") return;
+    try {
+      await navigator.clipboard.writeText(shareText);
+      await familyAlert("Feedback", "Je feedback is gekopieerd. Je kunt hem nu delen.", "fa-copy");
+    } catch (_) {
+      await familyAlert("Feedback", "Het delen van je feedback is niet gelukt.", "fa-triangle-exclamation");
+    }
+  }
+}
 function openAboutSubmenu(event) { switchMenuPage("aboutMenuSub", event); }
 function closeAboutSubmenu(event) { returnMenuToMain("aboutMenuSub", event); }
 async function showAccountName() {
@@ -5586,24 +5575,11 @@ function closeSharedListsSubmenu(event) {
 
 function returnToSharedListsMenu(event){
   if(event) event.stopPropagation();
-  const from=document.getElementById("sharedListActiveMenuSub");
   const to=document.getElementById("sharedListsMenuSub");
-  if(!from || !to) return;
-  if(__menuTransitionTimer){ clearTimeout(__menuTransitionTimer); __menuTransitionTimer=null; }
-  __resetMenuPageClasses(from);
-  __resetMenuPageClasses(to);
-  from.style.display="block";
-  to.style.display="block";
-  from.classList.add("menuSlideOutRight");
-  to.classList.add("menuSlideInLeft");
-  __menuCurrentPage="sharedListsMenuSub";
-  __menuTransitionTimer=setTimeout(()=>{
-    from.style.display="none";
-    __resetMenuPageClasses(from);
-    __resetMenuPageClasses(to);
-    __menuTransitionTimer=null;
-    renderSharedLists();
-  },290);
+  if(!to) return;
+  __cancelMenuTransition();
+  __showOnlyMenuPage("sharedListsMenuSub");
+  renderSharedLists();
 }
 
 function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
@@ -6177,12 +6153,10 @@ async function returnToFamilyList(event){
   if(__menuTransitionTimer){ clearTimeout(__menuTransitionTimer); __menuTransitionTimer=null; }
   if(activePage){
     __resetMenuPageClasses(activePage);
-    activePage.style.display="block";
-    activePage.classList.add("menuSlideOutRight");
+    activePage.style.display="none";
   }
 
-  // Shared-list UI must disappear immediately; the family list itself is
-  // loaded only after the menu transition so no shared-list frame leaks through.
+  // Shared-list UI verdwijnt direct; er is geen tussenframe met een slide.
   document.querySelectorAll("#deleteSharedListBtn,.sharedDeleteIconButton").forEach(el=>el.remove());
 
   activeListType="family";
