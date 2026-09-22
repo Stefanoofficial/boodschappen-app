@@ -3091,8 +3091,7 @@ html, body { -webkit-tap-highlight-color: transparent; }
 .app.more-active #familyMenu {
   transition: height .28s cubic-bezier(.22,.8,.3,1) !important;
 }
-
-
+</style>
 </head>
 
 <body>
@@ -3913,7 +3912,6 @@ function switchMenuPage(pageId, event) {
 
   const token = __menuTransitionToken;
   const menuHeights = __prepareMoreMenuTransition(menu, current, page);
-
   __resetMenuPageClasses(current);
   __resetMenuPageClasses(page);
 
