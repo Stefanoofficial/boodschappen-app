@@ -3526,6 +3526,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
+  <button type="button" class="barcode-search-btn" onclick="openBarcodeScanner()" aria-label="Scan barcode" title="Barcode scannen"><i class="fa-solid fa-barcode"></i></button>
   <button type="button" class="search-clear-btn" onclick="clearSearch()">✕</button>
 </div>
   <div id="refresh">↻ Loslaten om te vernieuwen</div>
@@ -4677,7 +4678,10 @@ function normalizeBoodschappen(data) {
         completed: completed,
         completedBy: "",
         completedByUid: "",
-        completedAt: null
+        completedAt: null,
+        barcode: "",
+        imageUrl: "",
+        brand: ""
       };
     }
 
@@ -4687,7 +4691,10 @@ function normalizeBoodschappen(data) {
         completed: item.completed === true,
         completedBy: item.completedBy ? String(item.completedBy) : "",
         completedByUid: item.completedByUid ? String(item.completedByUid) : "",
-        completedAt: item.completedAt ? Number(item.completedAt) : null
+        completedAt: item.completedAt ? Number(item.completedAt) : null,
+        barcode: item.barcode ? String(item.barcode) : "",
+        imageUrl: item.imageUrl ? String(item.imageUrl) : "",
+        brand: item.brand ? String(item.brand) : ""
       };
     }
 
@@ -5222,9 +5229,24 @@ function showList(animationType = "") {
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
-    const iconValue = getProductIcon(productText);
-    icon.innerHTML = productIconMarkup(iconValue);
-    if (!iconValue) icon.style.visibility = "hidden";
+    if (item.imageUrl) {
+      const img = document.createElement("img");
+      img.className = "productRealImage productBarcodeImage";
+      img.src = item.imageUrl;
+      img.alt = "";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        const iconValue = getProductIcon(productText);
+        icon.innerHTML = productIconMarkup(iconValue);
+        if (!iconValue) icon.style.visibility = "hidden";
+      };
+      icon.appendChild(img);
+    } else {
+      const iconValue = getProductIcon(productText);
+      icon.innerHTML = productIconMarkup(iconValue);
+      if (!iconValue) icon.style.visibility = "hidden";
+    }
     productWrap.appendChild(icon);
 
     const trashButton = document.createElement("button");
@@ -8118,4 +8140,194 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 /* Meer bevat geen destructieve lijstactie. */
 .app.more-active .moreMenuActions{display:none !important;}
 </style>
+
+<style id="barcode-scanner-system">
+.barcode-search-btn{background:none!important;border:0!important;color:#607069!important;font-size:20px!important;padding:0 8px!important;width:38px!important;height:38px!important;display:inline-flex!important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 38px!important}
+.barcode-search-btn:active{transform:scale(.94)}
+.productBarcodeImage{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;border-radius:6px!important;display:block!important}
+.barcodeOverlay{position:fixed;inset:0;z-index:15000;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(31,49,39,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.barcodeOverlay.open{display:flex}
+.barcodeCard{width:min(430px,100%);background:#fff;border-radius:26px;padding:18px;box-sizing:border-box;box-shadow:0 20px 60px rgba(30,55,40,.25);color:#30453a}
+.barcodeHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.barcodeHead h3{margin:0;font-size:22px;color:#30453a}
+.barcodeClose{width:42px;height:42px;border:0;border-radius:13px;background:#edf3ef;color:#40584b;font-size:20px;display:flex;align-items:center;justify-content:center}
+.barcodeVideoWrap{position:relative;overflow:hidden;border-radius:20px;background:#17221c;aspect-ratio:4/3}
+#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover}
+.barcodeFrame{position:absolute;left:12%;right:12%;top:25%;bottom:25%;border:3px solid rgba(255,255,255,.92);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.12);pointer-events:none}
+.barcodeStatus{font-size:15px;color:#68766f;text-align:center;margin:12px 2px 8px;min-height:22px}
+.barcodeManual{display:flex;gap:8px;margin-top:8px}
+.barcodeManual input{min-width:0;border:1px solid #dce7e0!important;background:#f7faf8!important;border-radius:13px!important;padding:12px!important;font-size:16px!important}
+.barcodeManual button{background:#46634e!important;color:#fff!important;border-radius:13px!important;font-weight:700!important;padding:12px 15px!important}
+.barcodeResult{display:none;margin-top:10px;padding:12px;border-radius:14px;background:#eef5f0;color:#40584b;font-size:14px}
+.barcodeResult.open{display:block}
+body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barcodeHead h3{color:#e5eee8}.dark-theme .barcodeClose{background:#2d3b32;color:#e5eee8}.dark-theme .barcodeStatus{color:#b7c4bc}.dark-theme .barcodeManual input{background:#29342e!important;color:#f2f5f3!important;border-color:#3b4b42!important}.dark-theme .barcodeResult{background:#2b3a31;color:#dce9e1}
+</style>
+
+<div id="barcodeOverlay" class="barcodeOverlay" aria-hidden="true">
+  <div class="barcodeCard" role="dialog" aria-modal="true" aria-labelledby="barcodeTitle">
+    <div class="barcodeHead">
+      <h3 id="barcodeTitle"><i class="fa-solid fa-barcode"></i> Barcode scannen</h3>
+      <button type="button" class="barcodeClose" onclick="closeBarcodeScanner()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="barcodeVideoWrap">
+      <video id="barcodeVideo" playsinline muted></video>
+      <div class="barcodeFrame"></div>
+    </div>
+    <div id="barcodeStatus" class="barcodeStatus">Camera wordt gestart…</div>
+    <div id="barcodeResult" class="barcodeResult"></div>
+    <div class="barcodeManual">
+      <input id="barcodeManualInput" inputmode="numeric" autocomplete="off" placeholder="Of voer barcode in…" maxlength="14">
+      <button type="button" onclick="lookupManualBarcode()">Zoeken</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Barcode scanner + Open Food Facts product lookup. Productfoto's blijven klein in de lijst. */
+let barcodeReader = null;
+let barcodeControls = null;
+let barcodeLibraryPromise = null;
+let barcodeBusy = false;
+
+function loadBarcodeLibrary(){
+  if (window.ZXingBrowser) return Promise.resolve();
+  if (barcodeLibraryPromise) return barcodeLibraryPromise;
+  barcodeLibraryPromise = new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';
+    script.onload=()=>window.ZXingBrowser?resolve():reject(new Error('Scannerbibliotheek niet geladen'));
+    script.onerror=()=>reject(new Error('Scannerbibliotheek kon niet worden geladen'));
+    document.head.appendChild(script);
+  });
+  return barcodeLibraryPromise;
+}
+
+function setBarcodeStatus(text){
+  const el=document.getElementById('barcodeStatus');
+  if(el) el.textContent=text;
+}
+
+function stopBarcodeCamera(){
+  try{ if(barcodeControls && typeof barcodeControls.stop==='function') barcodeControls.stop(); }catch(_){ }
+  barcodeControls=null;
+  barcodeReader=null;
+  const video=document.getElementById('barcodeVideo');
+  if(video && video.srcObject){
+    video.srcObject.getTracks().forEach(t=>t.stop());
+    video.srcObject=null;
+  }
+}
+
+function closeBarcodeScanner(){
+  stopBarcodeCamera();
+  barcodeBusy=false;
+  const overlay=document.getElementById('barcodeOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
+}
+
+async function openBarcodeScanner(){
+  const overlay=document.getElementById('barcodeOverlay');
+  if(!overlay) return;
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.getElementById('barcodeManualInput').value='';
+  document.getElementById('barcodeResult').classList.remove('open');
+  setBarcodeStatus('Camera wordt gestart…');
+  try{
+    await loadBarcodeLibrary();
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      setBarcodeStatus('Camera wordt niet ondersteund. Voer de barcode hieronder in.');
+      return;
+    }
+    barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
+    const video=document.getElementById('barcodeVideo');
+    barcodeControls=await barcodeReader.decodeFromConstraints(
+      {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
+      video,
+      async (result,error)=>{
+        if(result && !barcodeBusy){
+          const raw=result.getText ? result.getText() : String(result.text || result);
+          const code=raw.replace(/\D/g,'');
+          if(code.length>=8){
+            barcodeBusy=true;
+            await handleBarcode(code);
+          }
+        }
+      }
+    );
+    setBarcodeStatus('Richt de barcode binnen het kader.');
+  }catch(err){
+    console.error('Barcode scanner:',err);
+    setBarcodeStatus('Camera kon niet starten. Geef cameratoegang of voer de barcode hieronder in.');
+  }
+}
+
+async function lookupManualBarcode(){
+  const input=document.getElementById('barcodeManualInput');
+  const code=(input?.value||'').replace(/\D/g,'');
+  if(code.length<8){setBarcodeStatus('Voer een geldige barcode in.');return;}
+  barcodeBusy=true;
+  await handleBarcode(code);
+}
+
+async function handleBarcode(code){
+  setBarcodeStatus('Product wordt opgezocht…');
+  try{
+    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=code,product_name,brands,image_front_small_url,image_front_url');
+    if(!response.ok) throw new Error('Netwerkfout');
+    const data=await response.json();
+    const p=data && data.product;
+    if(!p || data.status!==1 || !p.product_name){
+      const result=document.getElementById('barcodeResult');
+      result.textContent='Geen product gevonden voor deze barcode. Je kunt de barcode wel bewaren als je het product handmatig toevoegt.';
+      result.classList.add('open');
+      setBarcodeStatus('Geen product gevonden.');
+      barcodeBusy=false;
+      return;
+    }
+
+    const name=String(p.product_name).trim();
+    const brand=String(p.brands||'').split(',')[0].trim();
+    const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
+    await addScannedProduct({text:name,barcode:code,brand,imageUrl});
+    const result=document.getElementById('barcodeResult');
+    result.textContent=(brand?brand+' · ':'')+name+' is toegevoegd aan je lijst.';
+    result.classList.add('open');
+    setBarcodeStatus('Gevonden ✓');
+    setTimeout(closeBarcodeScanner,900);
+  }catch(err){
+    console.error('Product lookup:',err);
+    setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
+  }finally{
+    barcodeBusy=false;
+  }
+}
+
+async function addScannedProduct(product){
+  if(activeListType !== 'shared' && !currentHouseholdId && !isPrivateMode()){
+    const householdId=await getOrCreateHousehold();
+    if(!householdId){openUseModeModal();return;}
+  }
+  boodschappen.push({
+    text:product.text,
+    completed:false,
+    completedBy:'',
+    completedByUid:'',
+    completedAt:null,
+    barcode:product.barcode || '',
+    imageUrl:product.imageUrl || '',
+    brand:product.brand || ''
+  });
+  showList();
+  await saveList();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const overlay=document.getElementById('barcodeOverlay');
+    if(overlay && overlay.classList.contains('open')) closeBarcodeScanner();
+  }
+});
+</script>
+
 </html>
