@@ -3120,7 +3120,11 @@ body.dark-theme .clearListSheet{background:#202821;color:#e7eee9}
 body.dark-theme .clearListClose,body.dark-theme .clearListCancel{background:rgba(255,255,255,.08);color:#e7eee9}
 body.dark-theme .clearListStats{background:rgba(126,170,137,.12)}
 </style>
-</head>
+<style id="main-list-trash-style">
+.mainListTrashButton{background:rgba(255,255,255,.16)!important;color:#fff!important}
+.mainListTrashButton:active{transform:scale(.96)}
+.app.overview-active .mainListTrashButton,.app.more-active .mainListTrashButton{display:none!important}
+</style></head>
 
 <body>
 <div id="loginScreen">
@@ -3227,6 +3231,9 @@ body.dark-theme .clearListStats{background:rgba(126,170,137,.12)}
 
   <div class="headerBar">
   <h1>Boodschappenlijst</h1>
+    <button type="button" id="mainListTrashButton" class="listOptionsButton mainListTrashButton" onclick="openClearListConfirm(event)" aria-label="Lijst wissen" title="Lijst wissen">
+      <i class="fa-solid fa-trash-can"></i>
+    </button>
     <button type="button" id="listOptionsButton" class="listOptionsButton" onclick="toggleListOptions(event)" aria-label="Lijstopties" aria-expanded="false">
       <i class="fa-solid fa-ellipsis-vertical"></i>
     </button>
@@ -7863,7 +7870,19 @@ window.confirmClearList=function(event){
 document.addEventListener("keydown",e=>{if(e.key==="Escape")window.closeClearListConfirm()});
 })();
 </script>
-</body>
+<script id="main-list-trash-visibility">
+(function(){
+  function syncMainTrash(){
+    var main=document.getElementById("mainListTrashButton");
+    if(!main) return;
+    var shared=(typeof activeListType!=="undefined" && activeListType==="shared");
+    main.style.display=shared ? "none" : "";
+  }
+  window.syncMainTrash=syncMainTrash;
+  document.addEventListener("DOMContentLoaded",syncMainTrash);
+  setInterval(syncMainTrash,500);
+})();
+</script></body>
 
 <style id="overview-dashboard-final">
 .overview-dashboard-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:15px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
