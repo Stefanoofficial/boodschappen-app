@@ -3399,7 +3399,7 @@ html, body { -webkit-tap-highlight-color: transparent; }
       <i class="fa-solid fa-paper-plane"></i>
       <span>Feedback delen</span>
     </button>
-    <div class="settingsMenuHint">Je kunt daarna zelf kiezen via welke app je de feedback wilt delen, bijvoorbeeld e-mail of WhatsApp.</div>
+    <div class="settingsMenuHint">Je feedback wordt rechtstreeks naar de ontwikkelaar gestuurd. Je hoeft geen e-mailapp te openen.</div>
   </div>
 
   <div id="aboutMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -3979,24 +3979,45 @@ async function shareFeedback(event) {
     return;
   }
 
-  const shareText = "Feedback voor Boodschappenlijst:\n\n" + text;
+  const button = event && event.currentTarget ? event.currentTarget : document.querySelector('.feedbackSendBtn');
+  const originalHTML = button ? button.innerHTML : '';
+  if (button) {
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Versturen...</span>';
+  }
+
   try {
-    if (navigator.share) {
-      await navigator.share({
-        title: "Feedback Boodschappenlijst",
-        text: shareText
-      });
-      return;
+    // Feedback wordt rechtstreeks naar de eigenaar van de app gestuurd via FormSubmit.
+    // De eerste verzending activeert een eenmalige bevestigingsmail voor het ingestelde adres.
+    const response = await fetch('https://formsubmit.co/ajax/info.stefanograanoogst@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        _subject: 'Nieuwe feedback — Boodschappenlijst',
+        message: text,
+        app: 'Boodschappenlijst',
+        version: '1.0'
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.success === false) {
+      throw new Error('Feedback kon niet worden verzonden');
     }
-    await navigator.clipboard.writeText(shareText);
-    await familyAlert("Feedback", "Je feedback is gekopieerd. Je kunt hem nu delen.", "fa-copy");
+
+    if (input) input.value = '';
+    await familyAlert('Feedback verzonden', 'Bedankt! Je feedback is rechtstreeks naar de ontwikkelaar gestuurd.', 'fa-circle-check');
   } catch (error) {
-    if (error && error.name === "AbortError") return;
-    try {
-      await navigator.clipboard.writeText(shareText);
-      await familyAlert("Feedback", "Je feedback is gekopieerd. Je kunt hem nu delen.", "fa-copy");
-    } catch (_) {
-      await familyAlert("Feedback", "Het delen van je feedback is niet gelukt.", "fa-triangle-exclamation");
+    await familyAlert('Feedback niet verzonden', 'Er ging iets mis bij het versturen. Controleer je internetverbinding en probeer het opnieuw.', 'fa-triangle-exclamation');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.style.opacity = '';
+      button.innerHTML = originalHTML;
     }
   }
 }
