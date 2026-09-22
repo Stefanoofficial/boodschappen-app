@@ -7866,7 +7866,7 @@ function openWeekCompleted(){
   background:#fff;
   color:#243128;
   z-index:110001;
-  transform:translate(105%, -50%);
+  transform:translate(calc(100% + 80px), -50%);
   transition:transform .28s cubic-bezier(.22,.8,.25,1);
   box-shadow:-14px 0 35px rgba(0,0,0,.16);
   border-radius:22px;
@@ -7892,13 +7892,13 @@ body.dark-theme .clearListHistoryNote{background:#2a352e;color:#d9e2dc}
 body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 @media(max-width:600px){
   .clearListSheet{
-    left:42px;
-    right:42px;
+    left:32px;
+    right:32px;
     width:auto;
     max-width:none;
     padding:22px;
     border-radius:22px;
-    transform:translate(105%,-50%);
+    transform:translate(calc(100% + 80px),-50%);
   }
   .clearListSheet.show{transform:translate(0,-50%)}
   .clearListActions{grid-template-columns:1fr 1fr}
