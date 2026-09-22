@@ -7832,10 +7832,15 @@ function openWeekCompleted(){
 
 <div id="clearListBackdrop" class="clearListBackdrop" onclick="closeClearListConfirm(event)"></div>
 <aside id="clearListSheet" class="clearListSheet" aria-hidden="true">
-<button class="clearListClose" type="button" onclick="closeClearListConfirm(event)" aria-label="Sluiten">×</button>
+
 <div class="clearListIcon"><i class="fa-solid fa-trash"></i></div>
 <h2>Boodschappenlijst wissen?</h2>
-<p>Je staat op het punt je huidige boodschappenlijst leeg te maken.</p>
+<p>Weet je zeker dat je je huidige boodschappenlijst wilt wissen?</p>
+<div class="clearListHistoryNote">
+  <i class="fa-solid fa-circle-check"></i>
+  <span>Afgevinkte producten worden bewaard in je boodschappenhistorie.<br>
+  Niet-afgevinkte producten worden verwijderd.</span>
+</div>
 <div id="clearListStats" class="clearListStats"></div>
 <div class="clearListActions">
 <button type="button" class="clearListCancel" onclick="closeClearListConfirm(event)">Annuleren</button>
