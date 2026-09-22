@@ -3124,7 +3124,18 @@ html, body { -webkit-tap-highlight-color: transparent; }
 .smartInsightsItem span{display:block;font-size:12px;opacity:.72;margin-top:3px}
 body.dark-theme .smartInsightsIntro,body.dark-theme .smartInsightsItem{background:rgba(126,170,137,.12)}
 </style>
-</head>
+<style id="smart-insights-readability-final">
+.smartInsightsIntro strong{color:#30453a!important}
+.smartInsightsIntro span{color:#6a756e!important;opacity:1!important}
+.smartInsightsItem strong{color:#3f5b45!important}
+.smartInsightsItem span{color:#718078!important;opacity:1!important}
+.smartInsightsItem .siIcon{color:#3d8060!important}
+body.dark-theme .smartInsightsIntro strong{color:#e2ebe5!important}
+body.dark-theme .smartInsightsIntro span{color:#aeb8b1!important}
+body.dark-theme .smartInsightsItem strong{color:#dce9df!important}
+body.dark-theme .smartInsightsItem span{color:#aeb8b1!important}
+body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
+</style></head>
 
 <body>
 <div id="loginScreen">
@@ -7860,7 +7871,7 @@ function openWeekCompleted(){
   </div>
 </aside>
 <style id="clear-list-clean-style">
-.clearListBackdrop{position:fixed;inset:0;background:rgba(255,255,255,.04);z-index:110000;opacity:0;pointer-events:none;transition:opacity .2s ease;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.clearListBackdrop{position:fixed;top:0;left:0;right:0;bottom:calc(82px + env(safe-area-inset-bottom));background:rgba(255,255,255,.04);z-index:8000;opacity:0;pointer-events:none;transition:opacity .2s ease;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .clearListBackdrop.show{opacity:1;pointer-events:auto}
 .clearListSheet{
   position:fixed;
