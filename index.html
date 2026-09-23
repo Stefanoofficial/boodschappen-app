@@ -7956,111 +7956,145 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 })();
 </script>
 
-<script id="lazy-barcode-camera">
-(function(){
-  let stream = null;
-  let video = null;
-  let detector = null;
-  let scanTimer = null;
-  let running = false;
 
-  function getVideo(){
-    return document.getElementById('barcodeVideo') ||
-           document.querySelector('video[data-barcode-video], video.barcodeVideo');
+<script id="isolated-barcode-camera">
+(function(){
+  "use strict";
+
+  let mediaStream = null;
+  let scanVideo = null;
+  let scanCanvas = null;
+  let scanCtx = null;
+  let running = false;
+  let busy = false;
+  let rafId = 0;
+  let decoder = null;
+  let decoderReady = false;
+
+  function status(text){
+    try { if (typeof setBarcodeStatus === "function") setBarcodeStatus(text); } catch(e){}
   }
 
-  async function openCameraOnlyOnDemand(){
-    if (running) return;
+  function videoEl(){
+    return document.getElementById("barcodeVideo") ||
+           document.querySelector("#barcodeOverlay video") ||
+           document.querySelector("video[data-barcode-video]");
+  }
+
+  function stop(){
+    running = false;
+    busy = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    if (mediaStream) {
+      try { mediaStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){}
+      mediaStream = null;
+    }
+    if (scanVideo) {
+      try { scanVideo.pause(); } catch(e){}
+      try { scanVideo.srcObject = null; } catch(e){}
+    }
+    decoder = null;
+    decoderReady = false;
+  }
+
+  async function open(){
+    if (running) return true;
+
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      if (typeof setBarcodeStatus === 'function') setBarcodeStatus('Camera wordt niet ondersteund. Voer de barcode handmatig in.');
-      return;
+      status("Camera wordt niet ondersteund. Voer de barcode handmatig in.");
+      return false;
     }
 
-    video = getVideo();
-    if (!video) {
-      if (typeof setBarcodeStatus === 'function') setBarcodeStatus('Cameraweergave niet beschikbaar. Voer de barcode handmatig in.');
-      return;
+    scanVideo = videoEl();
+    if (!scanVideo) {
+      status("Cameraweergave ontbreekt. Voer de barcode handmatig in.");
+      return false;
     }
 
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: 'environment' } }
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{
+          facingMode:{ideal:"environment"},
+          width:{ideal:1280},
+          height:{ideal:720}
+        }
       });
 
-      video.setAttribute('playsinline','');
-      video.setAttribute('webkit-playsinline','');
-      video.muted = true;
-      video.autoplay = true;
-      video.srcObject = stream;
-      await video.play();
+      scanVideo.setAttribute("playsinline","");
+      scanVideo.setAttribute("webkit-playsinline","");
+      scanVideo.autoplay = true;
+      scanVideo.muted = true;
+      scanVideo.srcObject = mediaStream;
+
+      await scanVideo.play();
+
       running = true;
-
-      if ('BarcodeDetector' in window) {
-        try {
-          detector = new BarcodeDetector({
-            formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']
-          });
-        } catch (_) {
-          detector = null;
-        }
-      }
-
-      if (typeof setBarcodeStatus === 'function') {
-        setBarcodeStatus(detector ? 'Richt de camera op een barcode.' : 'Camera actief. Voer de barcode handmatig in als automatisch scannen niet beschikbaar is.');
-      }
-
-      if (detector) scanLoop();
-    } catch (err) {
-      running = false;
-      if (typeof setBarcodeStatus === 'function') {
-        const msg = err && err.name === 'NotAllowedError'
-          ? 'Cameratoegang is geweigerd. Geef de browser toegang tot de camera.'
-          : 'Camera kon niet worden geopend. Voer de barcode handmatig in.';
-        setBarcodeStatus(msg);
-      }
+      status("Richt de camera op een barcode.");
+      await prepareDecoder();
+      frame();
+      return true;
+    } catch(err) {
+      stop();
+      if (err && err.name === "NotAllowedError")
+        status("Geef toegang tot de camera om een barcode te scannen.");
+      else
+        status("De camera kon niet worden geopend. Voer de barcode handmatig in.");
+      return false;
     }
   }
 
-  async function scanLoop(){
-    if (!running || !detector || !video) return;
-    try {
-      if (video.readyState >= 2) {
-        const results = await detector.detect(video);
-        if (results && results.length) {
-          const raw = results[0].rawValue || '';
-          const code = String(raw).replace(/\D/g,'');
-          if (code.length >= 8) {
-            stopCamera();
-            if (typeof handleBarcode === 'function') await handleBarcode(code);
+  async function prepareDecoder(){
+    // BarcodeDetector is only an optional accelerator. It is NOT required.
+    if ("BarcodeDetector" in window) {
+      try {
+        const formats = await BarcodeDetector.getSupportedFormats();
+        const wanted = ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","itf"];
+        const supported = wanted.filter(function(x){ return formats.indexOf(x) >= 0; });
+        if (supported.length) {
+          decoder = new BarcodeDetector({formats:supported});
+          decoderReady = true;
+          return;
+        }
+      } catch(e){}
+    }
+
+    // No external scanner library is loaded here.
+    // The camera remains usable and manual barcode entry remains available.
+    decoderReady = false;
+  }
+
+  async function frame(){
+    if (!running) return;
+
+    if (decoderReady && !busy && scanVideo && scanVideo.readyState >= 2) {
+      try {
+        const found = await decoder.detect(scanVideo);
+        if (found && found.length) {
+          const value = String(found[0].rawValue || "").replace(/\D/g,"");
+          if (value.length >= 8) {
+            busy = true;
+            stop();
+            if (typeof handleBarcode === "function") {
+              await handleBarcode(value);
+            } else if (typeof processBarcode === "function") {
+              await processBarcode(value);
+            }
             return;
           }
         }
-      }
-    } catch (_) {}
-    scanTimer = setTimeout(scanLoop, 250);
+      } catch(e){}
+    }
+
+    rafId = requestAnimationFrame(frame);
   }
 
-  function stopCamera(){
-    running = false;
-    detector = null;
-    if (scanTimer) { clearTimeout(scanTimer); scanTimer = null; }
-    if (stream) {
-      try { stream.getTracks().forEach(t => t.stop()); } catch (_) {}
-      stream = null;
-    }
-    if (video) {
-      try { video.pause(); } catch (_) {}
-      video.srcObject = null;
-    }
-  }
+  window.openBarcodeCamera = open;
+  window.stopBarcodeCamera = stop;
 
-  // Public hooks; camera is never touched until openBarcodeCamera() is called.
-  window.openBarcodeCamera = openCameraOnlyOnDemand;
-  window.stopBarcodeCamera = stopCamera;
-
-  document.addEventListener('visibilitychange', function(){
-    if (document.hidden) stopCamera();
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden) stop();
   });
 })();
 </script>
@@ -8068,22 +8102,35 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 
 <script id="modal-nav-guard">
 (function(){
-  function modalOpen(){
-    return !!document.querySelector(
-      '.modal.show, .modal.open, .overlay.show, .overlay.open, ' +
-      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay, #clearListBackdrop.show, #barcodeOverlay.open'
-    );
+  function openModal(){
+    const selectors = [
+      ".familyDialogOverlay",
+      "#clearListBackdrop.show",
+      "#clearListSheet.show",
+      "#barcodeOverlay.open",
+      ".modal.show",
+      ".modal.open",
+      ".overlay.show",
+      ".overlay.open",
+      '[role="dialog"][aria-hidden="false"]'
+    ];
+    return selectors.some(function(s){ return document.querySelector(s); });
   }
-  document.addEventListener('click', function(e){
-    if (!modalOpen()) return;
-    const nav = e.target.closest && e.target.closest('.bottomNav, .bottom-navigation, nav');
-    if (nav) { e.preventDefault(); e.stopImmediatePropagation(); }
-  }, true);
-  document.addEventListener('touchstart', function(e){
-    if (!modalOpen()) return;
-    const nav = e.target.closest && e.target.closest('.bottomNav, .bottom-navigation, nav');
-    if (nav) { e.preventDefault(); e.stopImmediatePropagation(); }
-  }, {capture:true, passive:false});
+
+  function block(e){
+    if (!openModal()) return;
+    const nav = e.target && e.target.closest ? e.target.closest(
+      ".bottomNav, .bottom-navigation, .bottom-nav, nav"
+    ) : null;
+    if (!nav) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
+  document.addEventListener("pointerdown", block, true);
+  document.addEventListener("touchstart", block, {capture:true, passive:false});
+  document.addEventListener("click", block, true);
 })();
 </script>
 
