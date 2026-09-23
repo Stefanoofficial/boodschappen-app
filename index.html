@@ -1092,6 +1092,8 @@ body.dark-theme .familyMenuPage {
 .bottomNavBtn i{font-size:25px;line-height:1}
 .bottomNavBtn.active{background:#E8F3EA;color:#3F5B45}
 .bottomNavBtn:active{transform:scale(.97)}
+body.modal-navigation-locked .bottomNav, body.modal-navigation-locked .bottomNav *{pointer-events:none!important}
+body.modal-navigation-locked .bottomNav{opacity:.92}
 .overviewView{display:none;margin-top:18px;padding-bottom:115px}
 .app.overview-active .overviewView{display:block}
 .app.overview-active > h2,.app.overview-active .input-row-wrap,.app.overview-active .searchBox,.app.overview-active #refresh,.app.overview-active .list,.app.overview-active .saveListMainBtn,.app.overview-active .buttons,.app.overview-active .status{display:none!important}
@@ -1148,6 +1150,19 @@ body.dark-theme .moreActionDelete{background:#442b2b;color:#f1b4b0;}
 
 body.dark-theme .overviewCard{background:#202620;border-color:rgba(255,255,255,.08)}body.dark-theme .overviewTitle{color:#bfe3c7}body.dark-theme .overviewStat{background:#28332b}body.dark-theme .overviewStat strong{color:#bfe3c7}body.dark-theme .overviewStat span,.overviewEmpty{color:#b8c0ba}body.dark-theme .overviewProgress{background:#303a32}
 @media(max-width:600px){.bottomNav{height:76px;padding-left:8px;padding-right:8px}.bottomNavBtn{border-radius:20px;font-size:12px}.bottomNavBtn i{font-size:23px}.app{padding-bottom:92px!important}.themeButton{bottom:92px!important}.themePicker{bottom:144px!important}}
+
+
+/* UX vereenvoudiging: geavanceerde inzichten blijven beschikbaar, maar zijn niet meer dominant. */
+.overview-more-insights-btn{
+  width:100%; border:0; background:transparent; padding:12px 4px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  color:var(--green,#4f8f5b); font-weight:700; font-size:14px; cursor:pointer;
+}
+.overview-more-insights-btn i{transition:none;}
+.overview-more-insights-btn[aria-expanded="true"] i{transform:none;}
+.overview-more-insights{padding-top:2px;}
+.useModeIntro{margin:0 0 14px; line-height:1.5; color:#667066;}
+body.dark-theme .useModeIntro{color:#b8c0ba;}
 
 </style>
 <style>
@@ -1876,6 +1891,40 @@ body.dark-theme .settingsToggle { background:#59635c; }
 .accountMenuEmail {
   padding:2px 8px 7px; color:#8b928d; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
+
+.moreMenuSectionLabel {
+  padding: 13px 10px 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: #7a867e;
+}
+.moreMenuSectionLabel:first-child { padding-top: 4px; }
+.moreMenuLogoutWrap {
+  margin: 14px 8px 4px;
+  padding-top: 10px;
+  border-top: 1px solid #edf1ed;
+}
+.moreMenuLogout {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 15px;
+  background: #FDE8E8;
+  color: #C62828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font: 700 15px/1 inherit;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(169,79,98,.05);
+}
+.moreMenuLogout i { font-size: 16px; }
+.moreMenuLogout:active { transform: scale(.985); background:#EDC0C0; }
+body.dark-theme .moreMenuSectionLabel { color:#9eaaa2; }
+body.dark-theme .moreMenuLogoutWrap { border-top-color: rgba(255,255,255,.10); }
+body.dark-theme .moreMenuLogout { background:#3b2d31; color:#f1a9b9; }
 body.dark-theme .accountMenuHint, body.dark-theme .aboutMenuHint, body.dark-theme .accountMenuEmail { color:#aab4ad; }
 body.dark-theme .familyDialogDanger { background:#b92e2e; }
 
@@ -3141,7 +3190,55 @@ body.dark-theme .smartInsightsIntro span{color:#aeb8b1!important}
 body.dark-theme .smartInsightsItem strong{color:#dce9df!important}
 body.dark-theme .smartInsightsItem span{color:#aeb8b1!important}
 body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
-</style></head>
+</style>
+
+
+
+
+<style id="overview-sheet-single-animation">
+#overviewActionOverlay{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 220ms ease;
+}
+#overviewActionOverlay .overviewActionSheet{
+  transform:translate3d(0,110%,0);
+  opacity:1;
+  transition:transform 340ms cubic-bezier(.22,1,.36,1);
+  will-change:transform;
+  backface-visibility:hidden;
+}
+#overviewActionOverlay.is-open{
+  opacity:1;
+  pointer-events:auto;
+}
+#overviewActionOverlay.is-open .overviewActionSheet{
+  transform:translate3d(0,0,0);
+}
+#overviewActionOverlay.is-closing{
+  opacity:0;
+  pointer-events:none;
+}
+#overviewActionOverlay.is-closing .overviewActionSheet{
+  transform:translate3d(0,110%,0);
+}
+#overviewActionOverlay .overviewActionSheet > *{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+}
+#overviewActionOverlay .overviewActionClose{
+  width:40px!important;height:40px!important;
+  min-width:40px!important;min-height:40px!important;
+  padding:0!important;margin:0!important;
+  display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+  line-height:1!important;
+}
+</style>
+
+</head>
 
 <body>
 <div id="loginScreen">
@@ -3215,14 +3312,15 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
 
 <div id="useModeModal" class="useModeModal" aria-hidden="true">
   <div class="useModeBox" role="dialog" aria-modal="true" aria-labelledby="useModeTitle">
-    <h2 id="useModeTitle">Hoe wil je Boodschappenlijst gebruiken?</h2>
+    <h2 id="useModeTitle">Samen boodschappen doen?</h2>
+    <p class="useModeIntro">Je kunt de app gewoon alleen gebruiken. Wil je later samen met anderen werken, dan kun je dat instellen via <strong>Meer → Mijn familie</strong>.</p>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('family')">
       <i class="fa-solid fa-house"></i><span>Nieuwe familie</span>
     </button>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('code')">
-      <i class="fa-solid fa-keyboard"></i><span>Familiecode invoeren</span>
+      <i class="fa-solid fa-keyboard"></i><span>Aansluiten met familiecode</span>
     </button>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('private')">
@@ -3256,6 +3354,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
     </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
+    <div class="moreMenuSectionLabel">SAMEN</div>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFamilySubmenu(event)">
       <i class="fa-solid fa-users"></i>
       <span>Mijn familie</span>
@@ -3263,14 +3362,18 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSharedListsSubmenu(event)">
       <i class="fa-solid fa-people-group"></i>
-      <span>Deellijst</span>
+      <span>Gedeelde lijsten</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+
+    <div class="moreMenuSectionLabel">MIJN LIJSTEN</div>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openSavedListsSubmenu(event)">
       <i class="fa-solid fa-folder-open"></i>
-      <span>Opgeslagen</span>
+      <span>Opgeslagen lijsten</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+
+    <div class="moreMenuSectionLabel">ACCOUNT &amp; APP</div>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAccountSubmenu(event)">
       <i class="fa-solid fa-user"></i>
       <span>Mijn account</span>
@@ -3281,9 +3384,16 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <span>Instellingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+
+    <div class="moreMenuSectionLabel">HULP</div>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFeedbackSubmenu(event)">
       <i class="fa-solid fa-comment-dots"></i>
       <span>Feedback</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="showAboutHelp(event)">
+      <i class="fa-solid fa-circle-question"></i>
+      <span>Help &amp; uitleg</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAboutSubmenu(event)">
@@ -3291,6 +3401,13 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <span>Over de app</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+
+    <div class="moreMenuLogoutWrap">
+      <button type="button" class="moreMenuLogout" onclick="logoutFromMenu()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Uitloggen</span>
+      </button>
+    </div>
   </div>
 
   <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
@@ -3332,7 +3449,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <span class="familyListBackCircle"><i class="fa-solid fa-chevron-left"></i></span>
       <span>Familielijst</span>
     </button>
-    <div class="familyMenuSubTitle">Deellijst</div>
+    <div class="familyMenuSubTitle">Gedeelde lijsten</div>
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="createSharedList()">
       <i class="fa-solid fa-plus"></i>
       <span>Nieuwe lijst</span>
@@ -3343,7 +3460,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
   </div>
 
   <div id="sharedListActiveMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
-    <div class="familyMenuSubTitle" id="sharedListActiveMenuTitle">Deellijst</div>
+    <div class="familyMenuSubTitle" id="sharedListActiveMenuTitle">Gedeelde lijst</div>
     <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
       <i class="fa-solid fa-user-group"></i>
       <span>Leden (<span id="sharedMemberCountActive">0</span>)</span>
@@ -3393,7 +3510,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <span>Lijst opslaan</span>
     </button>
     <div id="savedListsContainer" class="savedListsContainer"></div>
-    <div class="settingsMenuHint">Opgeslagen lijsten staan op dit apparaat. Je huidige boodschappenlijst blijft gewoon bestaan.</div>
+    <div class="settingsMenuHint">Opgeslagen lijsten worden aan je account gekoppeld. Ze blijven bewaard als je je browsergeschiedenis wist.</div>
   </div>
 
   <div id="accountMenuSub" class="familyMenuPage accountMenuPage" style="display:none;">
@@ -3411,10 +3528,6 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
     <button type="button" class="familyMenuItem" onclick="changeAccountPassword()">
       <i class="fa-solid fa-key"></i>
       <span>Wachtwoord</span>
-    </button>
-    <button type="button" class="familyMenuItem familyMenuDanger" onclick="logoutFromMenu()">
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span>Uitloggen</span>
     </button>
     <button type="button" class="familyMenuItem familyMenuDanger" onclick="deleteAccountFromMenu()">
       <i class="fa-solid fa-trash"></i>
@@ -3475,7 +3588,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
       <div class="aboutInfoLine"><i class="fa-solid fa-list-check"></i><span>Producten toevoegen met slimme productsuggesties.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-users"></i><span>Samenwerken met je familie.</span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Deellijsten maken voor vrienden, familie of een feestje.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
     </div>
@@ -3499,10 +3612,10 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
-      <p>Via Mijn familie kun je een nieuwe familie maken of met een familiecode aansluiten bij een bestaande familie.</p>
+      <p>Via Mijn familie kun je later een nieuwe familie maken of met een familiecode aansluiten bij een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Deellijsten</span></div>
+      <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
       <p>Maak een aparte lijst voor bijvoorbeeld een feestje. Je kunt deelnemers toevoegen en de lijst samen gebruiken.</p>
     </div>
     <div class="helpSection">
@@ -3571,6 +3684,10 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       </div>
     </button>
 
+    <button type="button" class="overview-more-insights-btn" onclick="toggleMoreInsights(this)" aria-expanded="false">
+      <span>Meer inzichten</span><i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div id="overviewMoreInsights" class="overview-more-insights" hidden>
     <section class="overview-dashboard-card smart-overview-card" aria-label="Slimme inzichten">
       <h3 class="overview-dashboard-heading"><i class="fa-solid fa-lightbulb"></i> Slimme inzichten</h3>
       <div class="smartInsightsIntro">
@@ -3604,6 +3721,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
         <button type="button" class="overview-dashboard-stat overview-stat-clickable" onclick="openWeekCompleted()" aria-label="Bekijk voltooide boodschappen van deze week"><strong id="overviewWeekCompleted">0</strong><span>Voltooid</span><i class="fa-solid fa-chevron-right"></i></button>
       </div>
     </section>
+    </div>
 
   </div>
   </div>
@@ -4238,6 +4356,7 @@ async function deleteAccountFromMenu() {
     selectedIndex = -1;
     __activeMainTab = 0;
     if (typeof __resetMoreNavigation === "function") __resetMoreNavigation();
+    if (typeof collapseMoreInsights === "function") collapseMoreInsights();
 
     const status = document.getElementById("status");
     if (status) status.innerText = "";
@@ -4314,21 +4433,93 @@ function getSavedListsKey() {
   const user = auth && auth.currentUser;
   return user ? "boodschappenSavedLists_" + user.uid : null;
 }
-function readSavedLists() {
+function readSavedListsLocal() {
   const key = getSavedListsKey();
   if (!key) return [];
   try { return JSON.parse(localStorage.getItem(key) || "[]") || []; }
   catch (_) { return []; }
 }
-function writeSavedLists(lists) {
+function writeSavedListsLocal(lists) {
   const key = getSavedListsKey();
   if (!key) return;
   localStorage.setItem(key, JSON.stringify(lists));
 }
-function renderSavedLists() {
+
+function makeSavedListId() {
+  return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 9);
+}
+
+// Opgeslagen lijsten horen bij het account, niet bij de browser.
+// Daardoor blijven ze bestaan wanneer browsergeschiedenis/sitegegevens worden gewist.
+async function readSavedLists() {
+  const user = auth && auth.currentUser;
+  if (!user || typeof database === "undefined") return readSavedListsLocal();
+
+  try {
+    const snap = await database.ref("users/" + user.uid + "/savedLists").once("value");
+    const raw = snap.val();
+    let cloudLists = [];
+
+    if (raw && typeof raw === "object") {
+      cloudLists = Object.keys(raw).map(id => ({
+        ...(raw[id] || {}),
+        id: String((raw[id] && raw[id].id) || id)
+      })).filter(x => Array.isArray(x.items));
+    }
+
+    // Eenmalige migratie van bestaande lokale opgeslagen lijsten naar het account.
+    if (!cloudLists.length) {
+      const localLists = readSavedListsLocal();
+      if (localLists.length) {
+        const migrated = localLists.map(item => ({
+          ...item,
+          id: item.id || makeSavedListId()
+        }));
+        const payload = {};
+        migrated.forEach(item => { payload[item.id] = item; });
+        await database.ref("users/" + user.uid + "/savedLists").set(payload);
+        cloudLists = migrated;
+      }
+    }
+
+    cloudLists.sort((a, b) => Number(b.savedAt || 0) - Number(a.savedAt || 0));
+    return cloudLists;
+  } catch (error) {
+    console.error("Opgeslagen lijsten uit account laden mislukt:", error);
+    return readSavedListsLocal();
+  }
+}
+
+async function writeSavedLists(lists) {
+  const user = auth && auth.currentUser;
+  if (!user || typeof database === "undefined") {
+    writeSavedListsLocal(lists);
+    return;
+  }
+
+  const normalized = (Array.isArray(lists) ? lists : []).map(item => ({
+    ...item,
+    id: item.id || makeSavedListId()
+  }));
+  const payload = {};
+  normalized.forEach(item => { payload[item.id] = item; });
+
+  try {
+    await database.ref("users/" + user.uid + "/savedLists").set(payload);
+    // Lokale kopie mag blijven bestaan als offline fallback, maar is niet de bron.
+    writeSavedListsLocal(normalized);
+  } catch (error) {
+    console.error("Opgeslagen lijsten naar account opslaan mislukt:", error);
+    // Offline fallback zodat een lijst niet direct verloren gaat.
+    writeSavedListsLocal(normalized);
+  }
+}
+
+async function renderSavedLists() {
   const box = document.getElementById("savedListsContainer");
   if (!box) return;
-  const lists = readSavedLists();
+  box.innerHTML = '<div class="savedListsEmpty">Opgeslagen lijsten laden…</div>';
+  const lists = await readSavedLists();
   box.innerHTML = "";
   if (!lists.length) {
     box.innerHTML = '<div class="savedListsEmpty">Je hebt nog geen opgeslagen lijsten.</div>';
@@ -4353,14 +4544,14 @@ function renderSavedLists() {
     deleteBtn.setAttribute("aria-label", "Verwijder " + (saved.name || "opgeslagen lijst"));
     deleteBtn.title = "Lijst verwijderen";
     deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    deleteBtn.addEventListener("click", (event) => {
+    deleteBtn.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const current = readSavedLists();
+      const current = await readSavedLists();
       if (!current[index]) return;
       current.splice(index, 1);
-      writeSavedLists(current);
-      renderSavedLists();
+      await writeSavedLists(current);
+      await renderSavedLists();
     });
 
     row.appendChild(openBtn);
@@ -4420,16 +4611,17 @@ function saveCurrentListAs() {
   const input = overlay.querySelector("#savedListNameInput");
   const finish = value => closeFamilyDialog(overlay, value);
   overlay.querySelector(".familyDialogCancel").addEventListener("click", () => finish(false));
-  overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => {
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click", async () => {
     const name = input.value.trim();
     if (!name) { input.focus(); return; }
-    const lists = readSavedLists();
+    const lists = await readSavedLists();
     const existing = lists.findIndex(x => String(x.name || "").toLowerCase() === name.toLowerCase());
     const record = { name, items: normalizeBoodschappen(boodschappen), savedAt: Date.now() };
     if (existing >= 0) lists[existing] = record; else lists.unshift(record);
-    writeSavedLists(lists);
+    await writeSavedLists(lists);
     finish(true);
     showSaveToast(name);
+    if(typeof updateOverviewDashboard==="function") await updateOverviewDashboard();
     setTimeout(() => {
       const menu = document.getElementById("familyMenu");
       if (menu) { menu.style.display = "block"; menu.classList.add("menu-open"); }
@@ -4441,7 +4633,7 @@ function saveCurrentListAs() {
   setTimeout(() => input && input.focus(), 30);
 }
 async function loadSavedList(index) {
-  const lists = readSavedLists();
+  const lists = await readSavedLists();
   const saved = lists[index];
   if (!saved) return;
   const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
@@ -4624,8 +4816,11 @@ async function loadList() {
     if (!currentHouseholdId) {
       const householdId = await getOrCreateHousehold();
       if (!householdId) {
-        openUseModeModal();
-        return false;
+        // Nieuwe gebruikers starten direct met een persoonlijke lijst.
+        // Samenwerken blijft beschikbaar via Meer → Mijn familie.
+        if (user) localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+        await loadPrivateList();
+        return true;
       }
     }
 
@@ -4646,6 +4841,7 @@ async function loadList() {
     selectedIndex = -1;
     showList();
     updateStatus();
+    if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
     await updateMemberCount();
     return true;
   } catch (error) {
@@ -4661,8 +4857,9 @@ async function loadList() {
           console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError);
         }
       }
-      openUseModeModal();
-      return false;
+      if (user) localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+      await loadPrivateList();
+      return true;
     }
 
     const status = document.getElementById("status");
@@ -5298,6 +5495,11 @@ function showList(animationType = "") {
   });
 
   updateListProgress();
+  // Keep the overview in sync with the actual list, even when the list was
+  // loaded before the user switched to Overzicht.
+  if (typeof updateOverviewDashboard === "function") {
+    try { updateOverviewDashboard(); } catch (_) {}
+  }
 }
 
 async function saveList() {
@@ -5307,6 +5509,7 @@ async function saveList() {
     try {
       await database.ref("sharedLists/" + currentSharedListId + "/boodschappen").set(boodschappen);
       updateStatus();
+      if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
       return true;
     } catch (error) {
       console.error("Gedeelde lijst opslaan mislukt:", error);
@@ -5323,10 +5526,9 @@ async function saveList() {
   if (!currentHouseholdId) {
     const householdId = await getOrCreateHousehold();
     if (!householdId) {
-      const status = document.getElementById("status");
-      if (status) status.innerText = "Kies eerst Nieuwe familie of Familiecode invoeren.";
-      openUseModeModal();
-      return false;
+      // Zonder familie is de gewone lijst een persoonlijke lijst.
+      await savePrivateList();
+      return true;
     }
   }
 
@@ -5336,6 +5538,7 @@ async function saveList() {
       .set(boodschappen);
 
     updateStatus();
+    if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
     return true;
   } catch (error) {
     console.error("Boodschappen opslaan mislukt:", error);
@@ -5380,6 +5583,7 @@ async function toggleItem(index) {
     // Render immediately in its new position; the item gets a subtle slide-down animation.
     showList("completed");
     await saveList();
+    if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
   } else {
     item.completed = false;
     item.completedBy = "";
@@ -5388,6 +5592,7 @@ async function toggleItem(index) {
 
     showList("uncompleted");
     await saveList();
+    if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
   }
 }
 
@@ -5400,8 +5605,8 @@ async function addProduct() {
   if (activeListType !== "shared" && !currentHouseholdId && !isPrivateMode()) {
     const householdId = await getOrCreateHousehold();
     if (!householdId) {
-      openUseModeModal();
-      return;
+      const user = auth.currentUser;
+      if (user) localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
     }
   }
 
@@ -6674,10 +6879,11 @@ async function showFamilyMembers() {
 
     boodschappen = [];
     selectedIndex = -1;
-    showList();
-    updatePrivateStatus();
+    const currentUser = auth.currentUser;
+    if (currentUser) localStorage.setItem("boodschappenUseMode_" + currentUser.uid, "private");
+    activeListType = "private";
+    await loadPrivateList();
     await updateMemberCount();
-    openUseModeModal();
   } catch (error) {
     console.error("Familie verlaten mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
@@ -6779,6 +6985,38 @@ function unlockPageScroll() {
   window.scrollTo(0, scrollY);
 }
 
+function collapseMoreInsights(){
+  const panel=document.getElementById("overviewMoreInsights");
+  const button=document.querySelector(".overview-more-insights-btn");
+  if(!panel || !button) return;
+  panel.hidden=true;
+  button.setAttribute("aria-expanded", "false");
+  const label=button.querySelector("span");
+  const icon=button.querySelector("i");
+  if(label) label.textContent="Meer inzichten";
+  if(icon){
+    icon.classList.add("fa-chevron-down");
+    icon.classList.remove("fa-chevron-up");
+  }
+}
+
+function toggleMoreInsights(button){
+  const panel=document.getElementById("overviewMoreInsights");
+  if(!panel || !button) return;
+  const expanded=button.getAttribute("aria-expanded")==="true";
+  const nextExpanded=!expanded;
+  button.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+  panel.hidden=!nextExpanded;
+
+  const label=button.querySelector("span");
+  const icon=button.querySelector("i");
+  if(label) label.textContent=nextExpanded ? "Minder inzichten" : "Meer inzichten";
+  if(icon){
+    icon.classList.toggle("fa-chevron-down", !nextExpanded);
+    icon.classList.toggle("fa-chevron-up", nextExpanded);
+  }
+}
+
 function openUseModeModal() {
   const modal = document.getElementById("useModeModal");
   if (!modal) return;
@@ -6853,6 +7091,7 @@ async function loadPrivateList() {
     selectedIndex = -1;
     showList();
     updatePrivateStatus();
+    if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
     updateMemberCount();
   } catch (error) {
     console.error("Privélijst laden mislukt:", error);
@@ -6881,6 +7120,7 @@ async function savePrivateList() {
     new Date().toISOString()
   );
   updatePrivateStatus();
+  if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
 }
 
 function updatePrivateStatus() {
@@ -7136,6 +7376,7 @@ function toggleRegisterPassword(fieldId, button) {
     if (freshLogin) {
       __activeMainTab = 0;
       if (typeof __resetMoreNavigation === "function") __resetMoreNavigation();
+      if (typeof collapseMoreInsights === "function") collapseMoreInsights();
       if (typeof showMainListView === "function") showMainListView();
       document.body.classList.remove("more-active", "overview-active");
     }
@@ -7155,20 +7396,25 @@ function toggleRegisterPassword(fieldId, button) {
         return;
       }
 
+      // Toon de persoonlijke lijst direct na een nieuwe login.
+      // Zo hoeft de gebruiker niet te wachten op de extra Firebase-controle
+      // voor een eventuele familie. Als er wél een familie is, schakelen we
+      // daarna automatisch over naar de familielijst.
+      if (freshLogin) {
+        localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+        activeListType = "private";
+        await loadPrivateList();
+      }
+
       const householdId = await getOrCreateHousehold();
       if (householdId) {
         activeListType = "family";
         await loadList();
         if (freshLogin && typeof showMainListView === "function") showMainListView();
-      } else {
-        const savedMode = localStorage.getItem("boodschappenUseMode_" + user.uid);
-        if (savedMode === "private") {
-          await loadPrivateList();
-        } else if (savedMode === "skip") {
-          openAppWithoutList();
-        } else {
-          openUseModeModal();
-        }
+      } else if (!freshLogin) {
+        // Herstelde sessie zonder familie: persoonlijke lijst laden.
+        localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+        await loadPrivateList();
       }
       await updateMemberCount();
       watchMemberCount();
@@ -7287,34 +7533,6 @@ function toggleRegisterPassword(fieldId, button) {
 })();
 
 
-function updateOverviewSavedLists(){
-  var box=document.getElementById('overviewSavedLists');
-  if(!box) return;
-  try{
-    var key = (typeof auth!=='undefined' && auth && auth.currentUser)
-      ? 'boodschappenSavedLists_'+auth.currentUser.uid : 'boodschappenSavedLists';
-    var lists = JSON.parse(localStorage.getItem(key) || '[]');
-    if(!Array.isArray(lists) || !lists.length){
-      box.className='overviewEmpty';
-      box.textContent='Je hebt nog geen opgeslagen lijsten.';
-      return;
-    }
-    box.className='';
-    box.innerHTML='';
-    lists.slice(0,3).forEach(function(item){
-      var row=document.createElement('div');
-      row.className='overviewSavedListLine';
-      row.innerHTML='<i class="fa-solid fa-list"></i><span></span><small></small>';
-      row.querySelector('span').textContent=item.name || 'Naamloze lijst';
-      row.querySelector('small').textContent=String((item.items||[]).length);
-      box.appendChild(row);
-    });
-  }catch(e){
-    box.className='overviewEmpty';
-    box.textContent='Je opgeslagen lijsten verschijnen hier.';
-  }
-}
-/* === Bottom navigation === */
 function setBottomNav(active){
   document.querySelectorAll('.bottomNavBtn').forEach(function(b){b.classList.remove('active');});
   var el=document.getElementById(active); if(el) el.classList.add('active');
@@ -7355,13 +7573,13 @@ function showMainListView(){
   var moreView=document.getElementById('moreView');
   if(moreView) moreView.scrollTop=0;
 }
-function showOverviewView(){
+async function showOverviewView(){
   __resetMoreNavigation();
   slideToTab(1);
   var app=document.querySelector('.app');
   if(app) app.classList.remove('more-active'), app.classList.add('overview-active');
   setBottomNav('navOverview');
-  updateOverviewView();
+  await updateOverviewView();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function showMoreView(){
@@ -7369,11 +7587,21 @@ function showMoreView(){
   var app=document.querySelector('.app');
   if(app) app.classList.remove('overview-active'), app.classList.add('more-active');
   setBottomNav('navMore');
-  __resetMoreNavigation();
+
   var menu=document.getElementById('familyMenu');
-  /* In Meer the family menu is the screen content, never a dropdown. */
-  if(menu){ menu.style.display='block'; menu.classList.remove('menu-open'); }
   var moreView=document.getElementById('moreView');
+  // In Meer the family menu is the screen content, never a dropdown.
+  // Re-attach it every time so it cannot disappear after a navigation/login
+  // transition or an old DOM move.
+  if(menu && moreView && menu.parentElement !== moreView){
+    moreView.appendChild(menu);
+  }
+  __resetMoreNavigation();
+  if(menu){
+    menu.style.display='block';
+    menu.classList.remove('menu-open');
+    __showOnlyMenuPage('familyMenuMain');
+  }
   if(moreView) moreView.scrollTop=0;
 }
 
@@ -7392,146 +7620,351 @@ document.addEventListener('DOMContentLoaded', function(){
   if(nav && nav.parentElement !== document.body){ document.body.appendChild(nav); }
 });
 
-function getOverviewHistoryKey(){
-  var user = (typeof auth !== 'undefined' && auth && auth.currentUser) ? auth.currentUser.uid : 'local';
-  return 'boodschappenHistory_' + user;
+
+
+
+/* ===== Overzicht interacties: snel toevoegen + boodschappenhistorie ===== */
+function __overviewAccountKey(suffix){
+  try{
+    var user=(typeof auth!=="undefined" && auth) ? auth.currentUser : null;
+    return user ? ("boodschappenOverview_"+suffix+"_"+user.uid) : ("boodschappenOverview_"+suffix);
+  }catch(_){ return "boodschappenOverview_"+suffix; }
 }
-function readOverviewHistory(){
-  try {
-    var value = JSON.parse(localStorage.getItem(getOverviewHistoryKey()) || '[]');
-    return Array.isArray(value) ? value : [];
-  } catch(e){ return []; }
-}
-function writeOverviewHistory(items){
-  try { localStorage.setItem(getOverviewHistoryKey(), JSON.stringify(items.slice(0,30))); } catch(e){}
-}
-function recordShoppingHistory(snapshot){
-  var items = normalizeBoodschappen(snapshot || []).map(function(item){
-    return {text:item.text, completed:!!item.completed};
-  }).filter(function(item){ return item.text; });
-  if(!items.length) return;
-  var history = readOverviewHistory();
-  history.unshift({savedAt:Date.now(), items:items});
-  writeOverviewHistory(history);
-}
-function getFrequentlyUsedProducts(){
-  var counts = {};
-  readOverviewHistory().forEach(function(trip){
-    (trip.items || []).forEach(function(item){
-      var name=String(item.text||'').trim();
-      var key=name.toLowerCase();
-      if(key) counts[key]=(counts[key]||0)+1;
-    });
-  });
-  // Also use the current list so the feature is useful immediately.
-  (typeof boodschappen !== 'undefined' ? boodschappen : []).forEach(function(item){
-    var name=String(item.text||'').trim(), key=name.toLowerCase();
-    if(key) counts[key]=(counts[key]||0)+1;
-  });
-  return Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a] || a.localeCompare(b); }).slice(0,5).map(function(key){
-    var label=key.charAt(0).toUpperCase()+key.slice(1);
-    return {name:label,count:counts[key]};
-  });
-}
-function renderOverviewQuickAdd(){
-  var box=document.getElementById('overviewQuickNew');
-  if(!box) return;
-  var products=getFrequentlyUsedProducts();
-  box.innerHTML='';
-  if(!products.length){
-    box.innerHTML='<div class="overview-new-muted">Je vaak gebruikte producten verschijnen hier.</div>';
-    return;
+
+async function recordShoppingHistory(items){
+  var normalized=normalizeBoodschappen(Array.isArray(items)?items:[]);
+  if(!normalized.length) return;
+  var record={id:Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7), savedAt:Date.now(), items:normalized};
+  var user=(typeof auth!=="undefined" && auth) ? auth.currentUser : null;
+
+  try{
+    if(user && typeof database!=="undefined"){
+      var ref=database.ref("users/"+user.uid+"/shoppingHistory");
+      var snap=await ref.once("value");
+      var raw=snap.val()||{};
+      var arr=Object.keys(raw).map(function(k){return raw[k];}).filter(Boolean);
+      arr.unshift(record);
+      arr=arr.slice(0,30);
+      var payload={};
+      arr.forEach(function(x){ payload[x.id || makeSavedListId()]=x; });
+      await ref.set(payload);
+    }else{
+      var key=__overviewAccountKey("history");
+      var arr=JSON.parse(localStorage.getItem(key)||"[]");
+      arr.unshift(record);
+      localStorage.setItem(key,JSON.stringify(arr.slice(0,30)));
+    }
+  }catch(e){
+    try{
+      var key=__overviewAccountKey("history");
+      var arr=JSON.parse(localStorage.getItem(key)||"[]");
+      arr.unshift(record);
+      localStorage.setItem(key,JSON.stringify(arr.slice(0,30)));
+    }catch(_){}
   }
-  products.forEach(function(product){
-    var btn=document.createElement('button');
-    btn.type='button'; btn.className='overviewQuickProduct';
-    btn.innerHTML='<span>'+product.name+'</span><i class="fa-solid fa-plus"></i>';
-    btn.addEventListener('click',function(e){ e.stopPropagation(); addProductFromOverview(product.name); });
-    box.appendChild(btn);
-  });
 }
-async function addProductFromOverview(name){
-  showMainListView();
-  setTimeout(async function(){
-    var input=document.getElementById('product');
-    if(!input) return;
-    input.value=name;
-    await addProduct();
-  },80);
-}
-function openQuickAddFromOverview(){
-  var products=getFrequentlyUsedProducts();
-  if(!products.length){ familyAlert('Snel opnieuw toevoegen','Er zijn nog geen vaak gebruikte producten. Voeg een paar boodschappen toe en bewaar daarna je volgende boodschappenlijst.','fa-bolt'); return; }
-  // The card itself opens the first quick product; individual product buttons remain available.
-  renderOverviewQuickAdd();
-}
-function openShoppingHistoryFromOverview(){
-  var history=readOverviewHistory();
-  if(!history.length){ familyAlert('Boodschappenhistorie','Je hebt nog geen eerdere boodschappen opgeslagen. Je eerste historie verschijnt zodra je een boodschappenlijst wist na het winkelen.','fa-clock-rotate-left'); return; }
-  var html=history.slice(0,10).map(function(trip){
-    var date=new Date(trip.savedAt).toLocaleString(localStorage.getItem('appLanguage')==='en'?'en-US':'nl-NL',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
-    var names=(trip.items||[]).map(function(x){return x.text;}).join(', ');
-    return '<div class="historyTrip"><strong>'+date+'</strong><div>'+names+'</div></div>';
-  }).join('');
-  familyAlert('Boodschappenhistorie',html,'fa-clock-rotate-left',true);
-}
-function updateOverviewDashboard(){
-  var total = Array.isArray(boodschappen) ? boodschappen.length : 0;
-  var completed = Array.isArray(boodschappen) ? boodschappen.filter(function(item){ return item && item.completed; }).length : 0;
-  var history = readOverviewHistory();
-  var lists = (typeof readSavedLists === "function") ? readSavedLists() : [];
 
-  var remainingEl=document.getElementById("smartInsightRemaining");
-  var completedInsightEl=document.getElementById("smartInsightCompleted");
-  var mainInsightEl=document.getElementById("smartInsightMain");
-  var subInsightEl=document.getElementById("smartInsightSub");
+async function readOverviewHistory(){
+  var user=(typeof auth!=="undefined" && auth) ? auth.currentUser : null;
+  try{
+    if(user && typeof database!=="undefined"){
+      var snap=await database.ref("users/"+user.uid+"/shoppingHistory").once("value");
+      var raw=snap.val()||{};
+      return Object.keys(raw).map(function(k){return raw[k];}).filter(function(x){return x && Array.isArray(x.items);})
+        .sort(function(a,b){return Number(b.savedAt||0)-Number(a.savedAt||0);});
+    }
+  }catch(e){}
+  try{
+    var arr=JSON.parse(localStorage.getItem(__overviewAccountKey("history"))||"[]");
+    return Array.isArray(arr)?arr:[];
+  }catch(_){ return []; }
+}
+
+function __overviewOverlay(title){
+  var old=document.getElementById("overviewActionOverlay");
+  if(old) old.remove();
+
+  var overlay=document.createElement("div");
+  overlay.id="overviewActionOverlay";
+  overlay.className="overviewActionOverlay";
+  overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><h3></h3><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
+  overlay.querySelector("h3").textContent=title;
+
+  var sheet=overlay.querySelector(".overviewActionSheet");
+
+  // Important: the sheet is inserted but NOT animated yet.
+  // Its complete contents are filled first; only then do we call open().
+  overlay.style.opacity="0";
+  overlay.style.pointerEvents="none";
+  sheet.style.transform="translate3d(0,110%,0)";
+  sheet.style.opacity="1";
+  sheet.style.transition="transform 340ms cubic-bezier(.22,1,.36,1)";
+  sheet.style.willChange="transform";
+
+  var closeSheet=function(){
+    if(overlay.dataset.closing==="1") return;
+    overlay.dataset.closing="1";
+    overlay.classList.remove("is-open");
+    overlay.classList.add("is-closing");
+    overlay.style.opacity="0";
+    overlay.style.pointerEvents="none";
+    sheet.style.transform="translate3d(0,110%,0)";
+    setTimeout(function(){ if(overlay.parentNode) overlay.remove(); },350);
+  };
+
+  var openSheet=function(){
+    if(overlay.dataset.closing==="1" || overlay.dataset.opened==="1") return;
+    overlay.dataset.opened="1";
+    overlay.style.pointerEvents="auto";
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        overlay.classList.add("is-open");
+        overlay.style.opacity="1";
+        sheet.style.transform="translate3d(0,0,0)";
+      });
+    });
+  };
+
+  overlay.querySelector(".overviewActionClose").addEventListener("click",closeSheet);
+  overlay.addEventListener("click",function(e){if(e.target===overlay) closeSheet();});
+
+  document.body.appendChild(overlay);
+  overlay.__openSheet=openSheet;
+  overlay.__closeSheet=closeSheet;
+  return overlay;
+}
+
+function __overviewOpenSheet(overlay){
+  if(overlay && typeof overlay.__openSheet==="function") overlay.__openSheet();
+}
+
+function __overviewAddProduct(product){
+  var text=String(product||"").trim();
+  if(!text) return;
+  var exists=boodschappen.some(function(x){return String(x.text||"").trim().toLowerCase()===text.toLowerCase() && !x.completed;});
+  if(!exists){
+    boodschappen.push({text:text,completed:false,completedBy:"",completedByUid:"",completedAt:null});
+    showList();
+    saveList();
+  }
+}
+
+async function openQuickAddFromOverview(){
+  var overlay=__overviewOverlay("Snel opnieuw toevoegen");
+  var body=overlay.querySelector(".overviewActionBody");
+  __overviewOpenSheet(overlay);
+
+  // Toon de sheet direct. Gebruik eerst lokaal beschikbare data zodat de animatie
+  // niet wacht op Firebase; ververs daarna op de achtergrond met de clouddata.
+  function renderQuick(sources){
+    var counts={};
+    sources.flat().forEach(function(item){
+      var text=typeof item==="string"?item:(item&&item.text);
+      if(!text) return;
+      text=String(text).trim();
+      var key=text.toLowerCase();
+      if(!counts[key]) counts[key]={text:text,count:0};
+      counts[key].count++;
+    });
+    var products=Object.keys(counts).map(function(k){return counts[k];})
+      .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
+    body.innerHTML="";
+    if(!products.length){
+      body.innerHTML='<div class="overviewActionMuted">Er zijn nog geen producten om opnieuw toe te voegen.</div>';
+      return;
+    }
+    var grid=document.createElement("div");
+    grid.className="overviewActionProductGrid";
+    products.forEach(function(p){
+      var btn=document.createElement("button");
+      btn.type="button"; btn.className="overviewActionProduct";
+      btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
+      btn.querySelector("span").textContent=p.text;
+      btn.addEventListener("click",function(){
+        __overviewAddProduct(p.text);
+        btn.classList.add("added");
+        btn.querySelector("i").className="fa-solid fa-check";
+        setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
+      });
+      grid.appendChild(btn);
+    });
+    body.appendChild(grid);
+  }
+
+  var localSaved=readSavedListsLocal();
+  var localHistory=[];
+  try{ localHistory=JSON.parse(localStorage.getItem(__overviewAccountKey("history"))||"[]")||[]; }catch(_){}
+  renderQuick([].concat(localSaved.map(function(x){return x.items||[];}), localHistory.map(function(x){return x.items||[];}), [Array.isArray(boodschappen)?boodschappen:[]]));
+
+  try{
+    var saved=await readSavedLists();
+    var history=await readOverviewHistory();
+    renderQuick([].concat(saved.map(function(x){return x.items||[];}), history.map(function(x){return x.items||[];}), [Array.isArray(boodschappen)?boodschappen:[]]));
+  }catch(_){}
+}
+
+
+async function openShoppingHistoryFromOverview(){
+  var overlay=__overviewOverlay("Boodschappenhistorie");
+  var body=overlay.querySelector(".overviewActionBody");
+  __overviewOpenSheet(overlay);
+
+  function renderHistory(entries){
+    body.innerHTML="";
+    if(!entries.length){
+      body.innerHTML='<div class="overviewActionMuted">Je hebt nog geen eerdere boodschappen.</div>';
+      return;
+    }
+    entries.slice(0,20).forEach(function(entry){
+      var card=document.createElement("div");
+      card.className="overviewHistoryCard";
+      var date=entry.savedAt?new Date(entry.savedAt).toLocaleDateString("nl-NL",{day:"numeric",month:"long",year:"numeric"}):"";
+      var items=(entry.items||[]).map(function(x){return typeof x==="string"?x:(x&&x.text)||"";}).filter(Boolean);
+      card.innerHTML='<div class="overviewHistoryCardTop"><strong></strong><small></small></div><div class="overviewHistoryItems"></div><button type="button" class="overviewHistoryUse">Opnieuw gebruiken</button>';
+      card.querySelector("strong").textContent=entry.name || (items.length+" product"+(items.length===1?"":"en"));
+      card.querySelector("small").textContent=date;
+      card.querySelector(".overviewHistoryItems").textContent=items.slice(0,6).join(" · ")+(items.length>6?" · …":"");
+      card.querySelector(".overviewHistoryUse").addEventListener("click",async function(){
+        boodschappen=normalizeBoodschappen(entry.items||[]);
+        currentListName=String(entry.name||"Boodschappenlijst");
+        selectedIndex=-1;
+        overlay.remove();
+        showMainListView();
+        showList();
+        await saveList();
+      });
+      body.appendChild(card);
+    });
+  }
+
+  var localHistory=[];
+  try{ localHistory=JSON.parse(localStorage.getItem(__overviewAccountKey("history"))||"[]")||[]; }catch(_){}
+  var localSaved=readSavedListsLocal();
+  var localEntries=localHistory.length ? localHistory : localSaved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
+  renderHistory(localEntries);
+
+  try{
+    var history=await readOverviewHistory();
+    var saved=await readSavedLists();
+    var entries=history.length ? history : saved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
+    renderHistory(entries);
+  }catch(_){}
+}
+
+/* Klikbare onderdelen in het overzicht gebruiken deze functies direct. */
+function __calendarWeekStartMs(nowMs){
+  var d=new Date(nowMs||Date.now());
+  d.setHours(0,0,0,0);
+  var day=d.getDay(); // zondag=0
+  var diff=(day===0?6:day-1);
+  d.setDate(d.getDate()-diff);
+  return d.getTime();
+}
+
+async function updateOverviewDashboard(){
+  var current=Array.isArray(boodschappen)?boodschappen.filter(function(item){return item&&item.text;}):[];
+  var total=current.length;
+  var completed=current.filter(function(item){return item.completed===true;}).length;
   var remaining=Math.max(0,total-completed);
-  var completionPct=total>0 ? Math.round((completed/total)*100) : 0;
-  if(remainingEl) remainingEl.textContent=String(remaining);
-  if(completedInsightEl) completedInsightEl.textContent=String(completionPct)+"%";
-  if(mainInsightEl) mainInsightEl.textContent = total===0 ? "Je lijst is klaar voor nieuwe boodschappen." : (completionPct===100 ? "Alles op je lijst is voltooid." : "Je bent "+completionPct+"% klaar met je lijst.");
-  if(subInsightEl) subInsightEl.textContent = total===0 ? "Voeg producten toe om je voortgang hier te zien." : (remaining===1 ? "Nog 1 product te gaan." : "Nog "+remaining+" producten te gaan.");
+  var completionPct=total>0?Math.round((completed/total)*100):0;
 
-  var now=Date.now(), weekStart=now-7*24*60*60*1000;
-  var weekTrips=Array.isArray(history) ? history.filter(function(trip){ return Number(trip.savedAt||0)>=weekStart; }) : [];
-  var weekInsightEl=document.getElementById("smartInsightWeek");
-  if(weekInsightEl) weekInsightEl.textContent=String(weekTrips.length);
-  var weekProducts=weekTrips.reduce(function(sum,trip){ return sum+((trip.items||[]).length); },0);
-  var weekCompleted=weekTrips.reduce(function(sum,trip){
-    return sum+(trip.items||[]).filter(function(item){return item && item.completed;}).length;
+  var remainingEl=document.getElementById('smartInsightRemaining');
+  var completedEl=document.getElementById('smartInsightCompleted');
+  var mainEl=document.getElementById('smartInsightMain');
+  var subEl=document.getElementById('smartInsightSub');
+  if(remainingEl) remainingEl.textContent=String(remaining);
+  if(completedEl) completedEl.textContent=String(completionPct)+'%';
+  if(mainEl){
+    mainEl.textContent=total===0
+      ? 'Je boodschappen in één oogopslag.'
+      : 'Je bent '+completionPct+'% klaar met je lijst.';
+  }
+  if(subEl){
+    subEl.textContent=total===0
+      ? 'Voeg producten toe om je voortgang hier te zien.'
+      : (remaining===1?'Nog 1 product te gaan.':(remaining>1?'Nog '+remaining+' producten te gaan.':'Alles op je lijst is voltooid.'));
+  }
+
+  var weekStart=__calendarWeekStartMs(Date.now());
+  var saved=[];
+  try{saved=await readSavedLists();}catch(_){saved=[];}
+  var weekLists=saved.filter(function(x){return Number(x.savedAt||0)>=weekStart;});
+  var weekProducts=weekLists.reduce(function(sum,x){return sum+((x.items||[]).length);},0);
+  var weekCompleted=weekLists.reduce(function(sum,x){
+    return sum+(x.items||[]).filter(function(item){return item&&item.completed;}).length;
   },0);
-  var weekListsEl=document.getElementById("overviewWeekLists");
-  var weekProductsEl=document.getElementById("overviewWeekProducts");
-  var weekCompletedEl=document.getElementById("overviewWeekCompleted");
-  if(weekListsEl) weekListsEl.textContent=String(weekTrips.length);
+  // Neem actuele voltooide producten mee wanneer ze deze kalenderweek zijn afgevinkt.
+  weekCompleted += current.filter(function(item){
+    return item&&item.completed&&item.completedAt&&Number(item.completedAt)>=weekStart;
+  }).length;
+
+  var history=await readOverviewHistory();
+  // Als er geen expliciet opgeslagen lijsten zijn, kan historie wel activiteit bevatten.
+  if(!weekLists.length && Array.isArray(history)){
+    weekProducts=history.filter(function(x){return Number(x.savedAt||0)>=weekStart;}).reduce(function(sum,x){return sum+((x.items||[]).length);},0);
+    weekCompleted += history.filter(function(x){return Number(x.savedAt||0)>=weekStart;}).reduce(function(sum,x){
+      return sum+(x.items||[]).filter(function(item){return item&&item.completed;}).length;
+    },0);
+  }
+
+  var weekInsightEl=document.getElementById('smartInsightWeek');
+  if(weekInsightEl) weekInsightEl.textContent=String(weekCompleted);
+
+  var weekListsEl=document.getElementById('overviewWeekLists');
+  var weekProductsEl=document.getElementById('overviewWeekProducts');
+  var weekCompletedEl=document.getElementById('overviewWeekCompleted');
+  if(weekListsEl) weekListsEl.textContent=String(weekLists.length);
   if(weekProductsEl) weekProductsEl.textContent=String(weekProducts);
   if(weekCompletedEl) weekCompletedEl.textContent=String(weekCompleted);
 
-  var activity=document.getElementById("overviewActivity");
+  var activity=document.getElementById('overviewActivity');
   if(activity){
-    activity.innerHTML="";
+    activity.innerHTML='';
     var entries=[];
-    if(Array.isArray(history)){
-      history.slice(0,3).forEach(function(trip){
-        var date=new Date(trip.savedAt);
-        entries.push({time:date,name:(trip.items||[]).length+" product"+((trip.items||[]).length===1?"":"en")+" opgeslagen"});
-      });
-    }
+    (Array.isArray(history)?history:[]).slice(0,3).forEach(function(trip){
+      var date=new Date(Number(trip.savedAt||Date.now()));
+      entries.push({time:date,name:(trip.items||[]).length+' product'+((trip.items||[]).length===1?'':'en')+' in historie'});
+    });
     if(!entries.length){
       activity.innerHTML='<div class="overview-dashboard-muted">Je laatste activiteiten verschijnen hier zodra je boodschappen gebruikt.</div>';
     }else{
       entries.forEach(function(entry){
-        var row=document.createElement("div");
-        row.className="overview-activity-row";
+        var row=document.createElement('div');
+        row.className='overview-activity-row';
         row.innerHTML='<i class="fa-solid fa-check"></i><span><b></b><small></small></span>';
-        row.querySelector("b").textContent=entry.name;
-        row.querySelector("small").textContent=entry.time.toLocaleString(localStorage.getItem('appLanguage')==='en'?'en-US':'nl-NL',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
+        row.querySelector('b').textContent=entry.name;
+        row.querySelector('small').textContent=entry.time.toLocaleString('nl-NL',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
         activity.appendChild(row);
       });
     }
   }
 }
 
+async function updateOverviewSavedLists(){
+  var box=document.getElementById('overviewSavedLists');
+  if(!box) return;
+  try{
+    var lists = (typeof readSavedLists === "function") ? await readSavedLists() : [];
+    if(!Array.isArray(lists) || !lists.length){
+      box.className='overviewEmpty';
+      box.textContent='Je hebt nog geen opgeslagen lijsten.';
+      return;
+    }
+    box.className='';
+    box.innerHTML='';
+    lists.slice(0,3).forEach(function(item){
+      var row=document.createElement('div');
+      row.className='overviewSavedListLine';
+      row.innerHTML='<i class="fa-solid fa-list"></i><span></span><small></small>';
+      row.querySelector('span').textContent=item.name || 'Naamloze lijst';
+      row.querySelector('small').textContent=String((item.items||[]).length);
+      box.appendChild(row);
+    });
+  }catch(e){
+    box.className='overviewEmpty';
+    box.textContent='Je opgeslagen lijsten verschijnen hier.';
+  }
+}
 
 var __overviewNameCacheUid = "";
 var __overviewNameCache = "";
@@ -7565,14 +7998,21 @@ async function refreshOverviewGreeting(){
   el.textContent = name ? greeting + ", " + name + " 👋" : greeting + " 👋";
 }
 
-function updateOverviewView(){
+async function updateOverviewView(){
   refreshOverviewGreeting();
-  renderOverviewQuickAdd();
-  var history=readOverviewHistory();
+  // Ensure the overview reads the same current list the user sees on Lijst.
+  // This also fixes a race where the dashboard could show 0 while the list
+  // itself had already been loaded asynchronously.
+  try {
+    if (auth && auth.currentUser && typeof loadList === "function" && (!Array.isArray(boodschappen) || boodschappen.length === 0)) {
+      await loadList();
+    }
+  } catch (_) {}
+  var history=await readOverviewHistory();
   var hs=document.getElementById("overviewHistorySummary");
   if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk je vorige boodschappen.";
-  if(typeof updateOverviewSavedLists==="function") updateOverviewSavedLists();
-  updateOverviewDashboard();
+  if(typeof updateOverviewSavedLists==="function") await updateOverviewSavedLists();
+  await updateOverviewDashboard();
 }
 
 </script>
@@ -7656,13 +8096,41 @@ function updateOverviewView(){
 
 
 
+
+<style id="overview-action-fix">
+.overviewActionOverlay{position:fixed;inset:0;z-index:120000;background:rgba(24,37,29,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:18px;box-sizing:border-box}
+.overviewActionSheet{width:min(520px,100%);max-height:min(78vh,720px);overflow:auto;background:#fff;border-radius:26px;padding:18px 16px 22px;box-shadow:0 20px 55px rgba(0,0,0,.2);color:#314338}
+.overviewActionHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.overviewActionHeader h3{margin:0;font-size:22px;font-weight:850}
+.overviewActionClose{width:40px;height:40px;border:0;border-radius:50%;background:#eef5ef;color:#405c48;position:relative;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;flex:0 0 40px}
+.overviewActionClose{font-size:0}
+.overviewActionClose::before,.overviewActionClose::after{content:"";position:absolute;left:50%;top:50%;width:21px;height:3.5px;border-radius:999px;background:#405c48;transform-origin:center}
+.overviewActionClose::before{transform:translate(-50%,-50%) rotate(45deg)}
+.overviewActionClose::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.overviewActionMuted{padding:22px 8px;text-align:center;color:#718078;font-size:15px}
+.overviewActionProductGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.overviewActionProduct{min-height:52px;border:0;border-radius:15px;background:#edf6ef;color:#3f5b45;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:inherit;font-weight:750;text-align:left;cursor:pointer}
+.overviewActionProduct span{min-width:0;overflow-wrap:anywhere}
+.overviewActionProduct i{flex:0 0 auto}
+.overviewActionProduct.added{background:#dfeee2}
+.overviewHistoryCard{border:1px solid rgba(63,91,69,.10);border-radius:17px;padding:13px;margin-bottom:10px;background:#f8fbf8}
+.overviewHistoryCardTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.overviewHistoryCardTop strong{font-size:15px}
+.overviewHistoryCardTop small{color:#7b887f;white-space:nowrap}
+.overviewHistoryItems{margin:7px 0 10px;color:#66736b;font-size:13px;line-height:1.4}
+.overviewHistoryUse{border:0;border-radius:12px;background:#e7f2e9;color:#3f5b45;padding:9px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+@media(max-width:430px){.overviewActionOverlay{padding:10px}.overviewActionSheet{border-radius:24px}.overviewActionProductGrid{grid-template-columns:1fr}}
+</style>
+
 <style id="overview-interactions-final">
 .overview-click-card{width:100%;display:block;text-align:left;font:inherit;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;background:#fff}
 .overview-click-card:active{transform:scale(.99)}
 .overview-click-card .overview-new-title{margin-bottom:10px}
 .overview-quick-content{display:flex;flex-wrap:wrap;gap:8px}
-.overviewQuickProduct{border:0;border-radius:12px;background:#eef6f0;color:#3F5B45;padding:9px 11px;display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:750;cursor:pointer}
-.overviewQuickProduct i{font-size:12px}
+.overviewQuickProduct{border:0;border-radius:12px;background:#eef6f0;color:#3F5B45;padding:9px 11px;display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;max-width:100%;text-align:left;vertical-align:top}
+.overviewQuickProduct span{flex:1 1 auto;min-width:0;line-height:1.25;overflow-wrap:normal;word-break:normal}
+.overviewQuickProduct i{font-size:12px;flex:0 0 auto;margin-left:auto}
+@media (max-width:420px){.overviewQuickProduct{font-size:13px;padding:10px 12px}.overviewQuickProduct span{line-height:1.3}}
 .historyTrip{padding:10px 0;border-bottom:1px solid rgba(63,91,69,.12);color:#405047}
 .historyTrip:last-child{border-bottom:0}
 .historyTrip strong{display:block;margin-bottom:3px;color:#3F5B45}
@@ -7956,183 +8424,516 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 })();
 </script>
 
+<script id="barcode-camera-system">
+/*
+ * Cross-platform barcode scanner without a third-party scanner library.
+ * Camera: native getUserMedia().
+ * Decoder: small local EAN-8/EAN-13 decoder for supermarket barcodes.
+ */
+let barcodeStream = null;
+let barcodeVideo = null;
+let barcodeCanvas = null;
+let barcodeCtx = null;
+let barcodeScanRunning = false;
+let barcodeScanBusy = false;
+let barcodeScanFrame = 0;
+let barcodeLastScan = 0;
+let barcodeBusy = false;
 
-<script id="isolated-barcode-camera">
-(function(){
-  "use strict";
+const EAN_L = {
+  0:[3,2,1,1], 1:[2,2,2,1], 2:[2,1,2,2], 3:[1,4,1,1], 4:[1,1,3,2],
+  5:[1,2,3,1], 6:[1,1,1,4], 7:[1,3,1,2], 8:[1,2,1,3], 9:[3,1,1,2]
+};
+const EAN_G = {
+  0:[1,1,2,3], 1:[1,2,2,2], 2:[2,2,1,2], 3:[1,1,4,1], 4:[2,3,1,1],
+  5:[1,3,2,1], 6:[4,1,1,1], 7:[2,1,3,1], 8:[3,1,2,1], 9:[2,1,1,3]
+};
+const EAN_R = EAN_L;
+const EAN_PARITY = {
+  'LLLLLL':'0','LLGLGG':'1','LLGGLG':'2','LLGGGL':'3','LGLLGG':'4',
+  'LGGLLG':'5','LGGGLL':'6','LGLGLG':'7','LGLGGL':'8','LGGLGL':'9'
+};
 
-  let mediaStream = null;
-  let scanVideo = null;
-  let scanCanvas = null;
-  let scanCtx = null;
-  let running = false;
-  let busy = false;
-  let rafId = 0;
-  let decoder = null;
-  let decoderReady = false;
+function setBarcodeStatus(text){
+  const el=document.getElementById('barcodeStatus');
+  if(el) el.textContent=text;
+}
 
-  function status(text){
-    try { if (typeof setBarcodeStatus === "function") setBarcodeStatus(text); } catch(e){}
+function stopBarcodeCamera(){
+  barcodeScanRunning=false;
+  barcodeScanBusy=false;
+  if(barcodeScanFrame){ cancelAnimationFrame(barcodeScanFrame); barcodeScanFrame=0; }
+  if(barcodeStream){
+    try{ barcodeStream.getTracks().forEach(t=>t.stop()); }catch(_){ }
+    barcodeStream=null;
   }
-
-  function videoEl(){
-    return document.getElementById("barcodeVideo") ||
-           document.querySelector("#barcodeOverlay video") ||
-           document.querySelector("video[data-barcode-video]");
+  if(barcodeVideo){
+    try{ barcodeVideo.pause(); }catch(_){ }
+    try{ barcodeVideo.srcObject=null; }catch(_){ }
   }
+}
 
-  function stop(){
-    running = false;
-    busy = false;
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = 0;
-    if (mediaStream) {
-      try { mediaStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){}
-      mediaStream = null;
-    }
-    if (scanVideo) {
-      try { scanVideo.pause(); } catch(e){}
-      try { scanVideo.srcObject = null; } catch(e){}
-    }
-    decoder = null;
-    decoderReady = false;
+function ensureBarcodeCanvas(){
+  if(!barcodeCanvas){
+    barcodeCanvas=document.createElement('canvas');
+    barcodeCanvas.width=640;
+    barcodeCanvas.height=480;
+    barcodeCanvas.style.display='none';
+    document.body.appendChild(barcodeCanvas);
+    barcodeCtx=barcodeCanvas.getContext('2d',{willReadFrequently:true});
   }
+}
 
-  async function open(){
-    if (running) return true;
+function checksumEAN(code){
+  const s=String(code||'').replace(/\D/g,'');
+  if(s.length===13){
+    let sum=0;
+    for(let i=0;i<12;i++) sum += Number(s[i]) * (i%2===0 ? 1 : 3);
+    return (10-(sum%10))%10 === Number(s[12]);
+  }
+  if(s.length===8){
+    let sum=0;
+    for(let i=0;i<7;i++) sum += Number(s[i]) * (i%2===0 ? 3 : 1);
+    return (10-(sum%10))%10 === Number(s[7]);
+  }
+  return false;
+}
 
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      status("Camera wordt niet ondersteund. Voer de barcode handmatig in.");
-      return false;
-    }
+function patternError(runs, pattern){
+  const total=runs.reduce((a,b)=>a+b,0);
+  const m=total/7;
+  let err=0;
+  for(let i=0;i<4;i++) err += Math.abs(runs[i] - pattern[i]*m)/m;
+  return err/4;
+}
 
-    scanVideo = videoEl();
-    if (!scanVideo) {
-      status("Cameraweergave ontbreekt. Voer de barcode handmatig in.");
-      return false;
-    }
+function decodeDigit(runs, side){
+  let best=null;
+  const table=side==='L'?EAN_L:side==='G'?EAN_G:EAN_R;
+  for(let d=0;d<=9;d++){
+    const err=patternError(runs,table[d]);
+    if(!best || err<best.err) best={digit:String(d),err};
+  }
+  return best && best.err<=0.48 ? best : null;
+}
 
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio:false,
-        video:{
-          facingMode:{ideal:"environment"},
-          width:{ideal:1280},
-          height:{ideal:720}
+function guardError(runs){
+  if(runs.length!==3) return 99;
+  const m=(runs[0]+runs[1]+runs[2])/3;
+  return (Math.abs(runs[0]-m)+Math.abs(runs[1]-m)+Math.abs(runs[2]-m))/m;
+}
+function centerGuardError(runs){
+  if(runs.length!==5) return 99;
+  const m=runs.reduce((a,b)=>a+b,0)/5;
+  return runs.reduce((e,r)=>e+Math.abs(r-m)/m,0)/5;
+}
+
+function decodeEANFromRuns(runs, startBlackIndex){
+  const n=runs.length;
+  const colorAt=(idx)=> ((startBlackIndex + idx)%2===0 ? 'black':'white');
+  for(let i=0;i<n;i++){
+    if(colorAt(i)!=='black') continue;
+
+    // EAN-13: 3 + 24 + 5 + 24 + 3 runs.
+    if(i+59<=n){
+      const start=runs.slice(i,i+3);
+      if(guardError(start)<1.0){
+        let pos=i+3, left='', parity='', ok=true;
+        for(let d=0;d<6;d++){
+          const rr=runs.slice(pos,pos+4); pos+=4;
+          const l=decodeDigit(rr,'L');
+          const g=decodeDigit(rr,'G');
+          if(!l && !g){ok=false;break;}
+          if(l && (!g || l.err<=g.err)){ left+=l.digit; parity+='L'; }
+          else { left+=g.digit; parity+='G'; }
         }
-      });
-
-      scanVideo.setAttribute("playsinline","");
-      scanVideo.setAttribute("webkit-playsinline","");
-      scanVideo.autoplay = true;
-      scanVideo.muted = true;
-      scanVideo.srcObject = mediaStream;
-
-      await scanVideo.play();
-
-      running = true;
-      status("Richt de camera op een barcode.");
-      await prepareDecoder();
-      frame();
-      return true;
-    } catch(err) {
-      stop();
-      if (err && err.name === "NotAllowedError")
-        status("Geef toegang tot de camera om een barcode te scannen.");
-      else
-        status("De camera kon niet worden geopend. Voer de barcode handmatig in.");
-      return false;
-    }
-  }
-
-  async function prepareDecoder(){
-    // BarcodeDetector is only an optional accelerator. It is NOT required.
-    if ("BarcodeDetector" in window) {
-      try {
-        const formats = await BarcodeDetector.getSupportedFormats();
-        const wanted = ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","itf"];
-        const supported = wanted.filter(function(x){ return formats.indexOf(x) >= 0; });
-        if (supported.length) {
-          decoder = new BarcodeDetector({formats:supported});
-          decoderReady = true;
-          return;
-        }
-      } catch(e){}
-    }
-
-    // No external scanner library is loaded here.
-    // The camera remains usable and manual barcode entry remains available.
-    decoderReady = false;
-  }
-
-  async function frame(){
-    if (!running) return;
-
-    if (decoderReady && !busy && scanVideo && scanVideo.readyState >= 2) {
-      try {
-        const found = await decoder.detect(scanVideo);
-        if (found && found.length) {
-          const value = String(found[0].rawValue || "").replace(/\D/g,"");
-          if (value.length >= 8) {
-            busy = true;
-            stop();
-            if (typeof handleBarcode === "function") {
-              await handleBarcode(value);
-            } else if (typeof processBarcode === "function") {
-              await processBarcode(value);
+        if(ok && pos+5+24+3<=n && centerGuardError(runs.slice(pos,pos+5))<1.0){
+          pos+=5;
+          let right='';
+          for(let d=0;d<6;d++){
+            const rr=runs.slice(pos,pos+4); pos+=4;
+            const r=decodeDigit(rr,'R');
+            if(!r){ok=false;break;}
+            right+=r.digit;
+          }
+          if(ok && guardError(runs.slice(pos,pos+3))<1.0){
+            const first=EAN_PARITY[parity];
+            if(first){
+              const code=first+left+right;
+              if(checksumEAN(code)) return code;
             }
-            return;
           }
         }
-      } catch(e){}
+      }
     }
 
-    rafId = requestAnimationFrame(frame);
+    // EAN-8: 3 + 16 + 5 + 16 + 3 runs.
+    if(i+43<=n){
+      if(guardError(runs.slice(i,i+3))<1.0){
+        let pos=i+3, left='', ok=true;
+        for(let d=0;d<4;d++){
+          const l=decodeDigit(runs.slice(pos,pos+4),'L'); pos+=4;
+          if(!l){ok=false;break;}
+          left+=l.digit;
+        }
+        if(ok && centerGuardError(runs.slice(pos,pos+5))<1.0){
+          pos+=5;
+          let right='';
+          for(let d=0;d<4;d++){
+            const r=decodeDigit(runs.slice(pos,pos+4),'R'); pos+=4;
+            if(!r){ok=false;break;}
+            right+=r.digit;
+          }
+          if(ok && guardError(runs.slice(pos,pos+3))<1.0){
+            const code=left+right;
+            if(checksumEAN(code)) return code;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function makeRunsFromBits(bits){
+  if(!bits.length) return null;
+  const runs=[];
+  let last=bits[0], count=1;
+  for(let i=1;i<bits.length;i++){
+    if(bits[i]===last) count++;
+    else { runs.push(count); last=bits[i]; count=1; }
+  }
+  runs.push(count);
+  // Remove single-pixel noise by merging tiny runs with the nearest neighbour.
+  for(let pass=0;pass<2;pass++){
+    for(let i=1;i<runs.length-1;i++){
+      if(runs[i]<=1){
+        runs[i-1]+=runs[i]+runs[i+1];
+        runs.splice(i,2);
+        i=Math.max(0,i-2);
+      }
+    }
+  }
+  return runs;
+}
+
+function sampleBarcodeRow(data,width,height,y,threshold){
+  const bits=[];
+  const startX=Math.floor(width*0.06), endX=Math.floor(width*0.94);
+  for(let x=startX;x<endX;x++){
+    const p=(y*width+x)*4;
+    const g=(data[p]*0.299 + data[p+1]*0.587 + data[p+2]*0.114);
+    bits.push(g<threshold);
+  }
+  return bits;
+}
+
+function tryDecodeCanvas(){
+  if(!barcodeCtx || !barcodeVideo || barcodeVideo.readyState<2 || !barcodeVideo.videoWidth) return null;
+  const vw=barcodeVideo.videoWidth, vh=barcodeVideo.videoHeight;
+  const maxW=720;
+  const w=Math.min(maxW,vw);
+  const h=Math.max(240,Math.round(vh*(w/vw)));
+  if(barcodeCanvas.width!==w || barcodeCanvas.height!==h){barcodeCanvas.width=w;barcodeCanvas.height=h;}
+  barcodeCtx.drawImage(barcodeVideo,0,0,w,h);
+
+  const ys=[0.30,0.36,0.42,0.48,0.50,0.52,0.58,0.64,0.70];
+  for(const ratio of ys){
+    const y=Math.min(h-1,Math.max(0,Math.round(h*ratio)));
+    const row=barcodeCtx.getImageData(0,y,w,1).data;
+    const vals=[];
+    for(let x=0;x<w;x+=2){
+      const p=x*4;
+      vals.push(row[p]*0.299 + row[p+1]*0.587 + row[p+2]*0.114);
+    }
+    if(!vals.length) continue;
+    const sorted=vals.slice().sort((a,b)=>a-b);
+    const p10=sorted[Math.floor(sorted.length*0.10)];
+    const p90=sorted[Math.floor(sorted.length*0.90)];
+    if(p90-p10<35) continue;
+    const threshold=(p10+p90)/2;
+    const bits=[];
+    const startX=Math.floor(w*0.06), endX=Math.floor(w*0.94);
+    for(let x=startX;x<endX;x++){
+      const p=x*4;
+      const g=row[p]*0.299 + row[p+1]*0.587 + row[p+2]*0.114;
+      bits.push(g<threshold);
+    }
+    const runs=makeRunsFromBits(bits);
+    if(!runs || runs.length<30 || runs.length>180) continue;
+    const startBlack = bits[0] ? 0 : 1;
+    const code=decodeEANFromRuns(runs,startBlack);
+    if(code) return code;
+  }
+  return null;
+}
+
+async function scheduleBarcodeScan(){
+  if(!barcodeScanRunning) return;
+  const now=performance.now();
+  if(!barcodeScanBusy && now-barcodeLastScan>180){
+    barcodeLastScan=now;
+    barcodeScanBusy=true;
+    try{
+      ensureBarcodeCanvas();
+      if(barcodeVideo && barcodeVideo.readyState>=2 && barcodeVideo.videoWidth){
+        const vw=barcodeVideo.videoWidth, vh=barcodeVideo.videoHeight;
+        const maxW=960;
+        const w=Math.min(maxW,vw);
+        const h=Math.max(240,Math.round(vh*(w/vw)));
+        if(barcodeCanvas.width!==w || barcodeCanvas.height!==h){
+          barcodeCanvas.width=w; barcodeCanvas.height=h;
+        }
+        barcodeCtx.drawImage(barcodeVideo,0,0,w,h);
+        const imageData=barcodeCtx.getImageData(0,0,w,h);
+
+        // The decoder reads a frame only. It never owns or stops the camera stream.
+        const code=window.decodeBarcodeFrameWasm
+          ? await window.decodeBarcodeFrameWasm(imageData)
+          : null;
+
+        if(code){
+          barcodeScanRunning=false;
+          stopBarcodeCamera();
+          await handleBarcode(code);
+          return;
+        }
+
+        // Keep the existing lightweight decoder as a local fallback.
+        const fallback=tryDecodeCanvas();
+        if(fallback){
+          barcodeScanRunning=false;
+          stopBarcodeCamera();
+          await handleBarcode(fallback);
+          return;
+        }
+      }
+    }catch(err){
+      console.warn('Barcode frame decode:',err);
+    }finally{
+      barcodeScanBusy=false;
+    }
+  }
+  if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
+}
+async function openBarcodeScanner(){
+  const overlay=document.getElementById('barcodeOverlay');
+  const video=document.getElementById('barcodeVideo');
+  const input=document.getElementById('barcodeManualInput');
+  if(!overlay || !video) return;
+
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  if(input) input.value='';
+  const result=document.getElementById('barcodeResult');
+  if(result) result.classList.remove('open');
+  setBarcodeStatus('Camera wordt gestart…');
+  stopBarcodeCamera();
+  barcodeBusy=false;
+
+  if(!window.isSecureContext){
+    setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.');
+    return;
   }
 
-  window.openBarcodeCamera = open;
-  window.stopBarcodeCamera = stop;
+  try{
+    barcodeVideo=video;
+    barcodeVideo.muted=true;
+    barcodeVideo.autoplay=true;
+    barcodeVideo.playsInline=true;
+    barcodeVideo.setAttribute('playsinline','');
+    barcodeVideo.setAttribute('webkit-playsinline','');
+    ensureBarcodeCanvas();
 
-  document.addEventListener("visibilitychange", function(){
-    if (document.hidden) stop();
+    let constraints={audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}};
+    try{
+      barcodeStream=await navigator.mediaDevices.getUserMedia(constraints);
+    }catch(firstErr){
+      // Some older Safari/Android implementations are happier with a simpler constraint.
+      barcodeStream=await navigator.mediaDevices.getUserMedia({audio:false,video:true});
+    }
+
+    barcodeVideo.srcObject=barcodeStream;
+    await new Promise((resolve)=>{
+      if(barcodeVideo.readyState>=1) return resolve();
+      barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
+      setTimeout(resolve,2000);
+    });
+    try{ await barcodeVideo.play(); }catch(playErr){
+      setBarcodeStatus('Tik op de camera om het beeld te starten.');
+      return;
+    }
+
+    barcodeScanRunning=true;
+    barcodeScanBusy=false;
+    barcodeLastScan=0;
+    setBarcodeStatus('Camera actief — richt een EAN-barcode binnen het kader.');
+    scheduleBarcodeScan();
+  }catch(err){
+    console.error('Camera:',err);
+    stopBarcodeCamera();
+    const name=err && err.name ? err.name : '';
+    if(name==='NotAllowedError' || name==='PermissionDeniedError'){
+      setBarcodeStatus('Cameratoegang is geweigerd. Geef Safari/Chrome toegang tot de camera en probeer opnieuw.');
+    }else if(name==='NotFoundError' || name==='DevicesNotFoundError'){
+      setBarcodeStatus('Geen camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
+    }else if(name==='NotReadableError' || name==='TrackStartError'){
+      setBarcodeStatus('De camera wordt door een andere functie gebruikt. Sluit die functie en probeer opnieuw.');
+    }else{
+      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder handmatig in.');
+    }
+  }
+}
+
+function closeBarcodeScanner(){
+  stopBarcodeCamera();
+  barcodeBusy=false;
+  const overlay=document.getElementById('barcodeOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
+}
+
+async function lookupManualBarcode(){
+  const input=document.getElementById('barcodeManualInput');
+  const code=(input?.value||'').replace(/\D/g,'');
+  if(code.length<8){setBarcodeStatus('Voer een geldige barcode in.');return;}
+  barcodeBusy=true;
+  await handleBarcode(code);
+}
+
+async function handleBarcode(code){
+  setBarcodeStatus('Product wordt opgezocht…');
+  try{
+    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=code,product_name,brands,image_front_small_url,image_front_url');
+    if(!response.ok) throw new Error('Netwerkfout');
+    const data=await response.json();
+    const p=data && data.product;
+    if(!p || data.status!==1 || !p.product_name){
+      const result=document.getElementById('barcodeResult');
+      result.textContent='Geen product gevonden voor deze barcode. Je kunt de barcode wel bewaren als je het product handmatig toevoegt.';
+      result.classList.add('open');
+      setBarcodeStatus('Geen product gevonden.');
+      barcodeBusy=false;
+      return;
+    }
+    const name=String(p.product_name).trim();
+    const brand=String(p.brands||'').split(',')[0].trim();
+    const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
+    await addScannedProduct({text:name,barcode:code,brand,imageUrl});
+    const result=document.getElementById('barcodeResult');
+    result.textContent=(brand?brand+' · ':'')+name+' is toegevoegd aan je lijst.';
+    result.classList.add('open');
+    setBarcodeStatus('Gevonden ✓');
+    setTimeout(closeBarcodeScanner,900);
+  }catch(err){
+    console.error('Product lookup:',err);
+    setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
+  }finally{
+    barcodeBusy=false;
+  }
+}
+
+async function addScannedProduct(product){
+  if(activeListType !== 'shared' && !currentHouseholdId && !isPrivateMode()){
+    const householdId=await getOrCreateHousehold();
+    if(!householdId){
+      const user=auth.currentUser;
+      if(user) localStorage.setItem("boodschappenUseMode_"+user.uid,"private");
+    }
+  }
+  boodschappen.push({
+    text:product.text,
+    completed:false,
+    completedBy:'',
+    completedByUid:'',
+    completedAt:null,
+    barcode:product.barcode || '',
+    imageUrl:product.imageUrl || '',
+    brand:product.brand || ''
   });
-})();
+  showList();
+  await saveList();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const overlay=document.getElementById('barcodeOverlay');
+    if(overlay && overlay.classList.contains('open')) closeBarcodeScanner();
+  }
+});
+
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden) stopBarcodeCamera();
+});
 </script>
 
 
 <script id="modal-nav-guard">
 (function(){
-  function openModal(){
-    const selectors = [
-      ".familyDialogOverlay",
-      "#clearListBackdrop.show",
-      "#clearListSheet.show",
-      "#barcodeOverlay.open",
-      ".modal.show",
-      ".modal.open",
-      ".overlay.show",
-      ".overlay.open",
-      '[role="dialog"][aria-hidden="false"]'
-    ];
-    return selectors.some(function(s){ return document.querySelector(s); });
+  function modalOpen(){
+    return !!document.querySelector(
+      '.modal.show, .modal.open, .overlay.show, .overlay.open, ' +
+      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay, #clearListBackdrop.show, #barcodeOverlay.open'
+    );
   }
-
-  function block(e){
-    if (!openModal()) return;
-    const nav = e.target && e.target.closest ? e.target.closest(
-      ".bottomNav, .bottom-navigation, .bottom-nav, nav"
-    ) : null;
-    if (!nav) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-  }
-
-  document.addEventListener("pointerdown", block, true);
-  document.addEventListener("touchstart", block, {capture:true, passive:false});
-  document.addEventListener("click", block, true);
+  function sync(){ document.body.classList.toggle('modal-navigation-locked', modalOpen()); }
+  document.addEventListener('click', function(e){
+    if(!modalOpen()) return;
+    const nav=e.target.closest && e.target.closest('.bottomNav, .bottom-navigation, nav');
+    if(nav){ e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+  document.addEventListener('touchstart', function(e){
+    if(!modalOpen()) return;
+    const nav=e.target.closest && e.target.closest('.bottomNav, .bottom-navigation, nav');
+    if(nav){ e.preventDefault(); e.stopImmediatePropagation(); }
+  }, {capture:true, passive:false});
+  new MutationObserver(sync).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+  document.addEventListener('DOMContentLoaded',sync);
+  setTimeout(sync,0);
 })();
 </script>
+
+
+<script id="wasm-barcode-decoder">
+(function(){
+  "use strict";
+  let readerPromise=null, reader=null;
+
+  async function getReader(){
+    if(reader) return reader;
+    if(!readerPromise){
+      readerPromise = import("https://esm.sh/zxing-wasm@3.1.4/reader")
+        .then(m => {
+          reader = m;
+          return m;
+        });
+    }
+    return readerPromise;
+  }
+
+  window.decodeBarcodeFrameWasm = async function(imageData){
+    try{
+      const m=await getReader();
+      const results=await m.readBarcodes(imageData,{
+        formats:["EAN13","EAN8","UPCA","UPCE"],
+        tryHarder:true,
+        maxNumberOfSymbols:1
+      });
+      if(results && results.length){
+        const value=String(results[0].text || results[0].rawValue || "").replace(/\D/g,"");
+        if(value.length>=8) return value;
+      }
+    }catch(e){
+      console.warn("WASM barcode decoder:",e);
+    }
+    return null;
+  };
+})();
+</script>
+
 
 </body>
 
@@ -8338,7 +9139,7 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 .barcodeHead h3{margin:0;font-size:22px;color:#30453a}
 .barcodeClose{width:42px;height:42px;border:0;border-radius:13px;background:#edf3ef;color:#40584b;font-size:20px;display:flex;align-items:center;justify-content:center}
 .barcodeVideoWrap{position:relative;overflow:hidden;border-radius:20px;background:#17221c;aspect-ratio:4/3}
-#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;background:#17221c;visibility:visible;opacity:1;transform:translateZ(0);-webkit-transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+#barcodeVideo{width:100%;height:100%;display:block;object-fit:cover;object-position:center;background:#17221c;visibility:visible;opacity:1;transform:translateZ(0);-webkit-transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .barcodeFrame{position:absolute;left:12%;right:12%;top:25%;bottom:25%;border:3px solid rgba(255,255,255,.92);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.12);pointer-events:none}
 .barcodeStatus{font-size:15px;color:#68766f;text-align:center;margin:12px 2px 8px;min-height:22px}
 .barcodeManual{display:flex;gap:8px;margin-top:8px}
@@ -8368,196 +9169,6 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   </div>
 </div>
 
-<script>
-/* Barcode scanner + Open Food Facts product lookup. Productfoto's blijven klein in de lijst. */
-let barcodeReader = null;
-let barcodeControls = null;
-let barcodeLibraryPromise = null;
-let barcodeBusy = false;
 
-function loadBarcodeLibrary(){
-  if (window.ZXingBrowser) return Promise.resolve();
-  if (barcodeLibraryPromise) return barcodeLibraryPromise;
-  barcodeLibraryPromise = new Promise((resolve,reject)=>{
-    const urls = [
-      'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js',
-      'https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js'
-    ];
-    let i = 0;
-    const tryNext = () => {
-      if (window.ZXingBrowser) return resolve();
-      if (i >= urls.length) return reject(new Error('Scannerbibliotheek niet geladen'));
-      const script = document.createElement('script');
-      script.src = urls[i++];
-      script.async = true;
-      script.onload = () => window.ZXingBrowser ? resolve() : tryNext();
-      script.onerror = () => tryNext();
-      document.head.appendChild(script);
-    };
-    tryNext();
-  });
-  return barcodeLibraryPromise;
-}
-function setBarcodeStatus(text){
-  const el=document.getElementById('barcodeStatus');
-  if(el) el.textContent=text;
-}
-
-function stopBarcodeCamera(){
-  try{ if(barcodeControls && typeof barcodeControls.stop==='function') barcodeControls.stop(); }catch(_){ }
-  barcodeControls=null;
-  barcodeReader=null;
-  const video=document.getElementById('barcodeVideo');
-  if(video && video.srcObject){
-    video.srcObject.getTracks().forEach(t=>t.stop());
-    video.srcObject=null;
-  }
-}
-
-function closeBarcodeScanner(){
-  stopBarcodeCamera();
-  barcodeBusy=false;
-  const overlay=document.getElementById('barcodeOverlay');
-  if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
-}
-
-async function openBarcodeScanner(){
-  const overlay=document.getElementById('barcodeOverlay');
-  const video=document.getElementById('barcodeVideo');
-  if(!overlay || !video) return;
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden','false');
-  document.getElementById('barcodeManualInput').value='';
-  document.getElementById('barcodeResult').classList.remove('open');
-  setBarcodeStatus('Camera wordt gestart…');
-  stopBarcodeCamera();
-
-  try{
-    if(!window.isSecureContext){
-      setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
-      return;
-    }
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder in.');
-      return;
-    }
-
-    // Laat ZXing zelf de camerastream beheren. Dit voorkomt dat iOS Safari
-    // de preview na enkele seconden zwart maakt door twee camera-koppelingen.
-    await loadBarcodeLibrary();
-    barcodeReader = new ZXingBrowser.BrowserMultiFormatReader();
-    video.muted = true;
-    video.autoplay = true;
-    video.playsInline = true;
-    video.setAttribute('playsinline','');
-    video.setAttribute('webkit-playsinline','');
-
-    const callback = async (result,error)=>{
-      if(result && !barcodeBusy){
-        const raw=result.getText ? result.getText() : String(result.text || result);
-        const code=raw.replace(/\D/g,'');
-        if(code.length>=8){
-          barcodeBusy=true;
-          await handleBarcode(code);
-        }
-      }
-    };
-
-    // Eerst de achterkant proberen. Als die constraint op een toestel niet
-    // wordt geaccepteerd, valt ZXing terug op de beschikbare camera.
-    try{
-      barcodeControls = await barcodeReader.decodeFromConstraints(
-        {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
-        video,
-        callback
-      );
-    }catch(firstErr){
-      console.warn('Environment camera niet beschikbaar:', firstErr);
-      barcodeControls = await barcodeReader.decodeFromVideoDevice(undefined, video, callback);
-    }
-
-    // Safari kan play() opnieuw nodig hebben nadat de stream is gekoppeld.
-    try{ await video.play(); }catch(_){ }
-    setBarcodeStatus('Camera actief — richt de barcode binnen het kader.');
-  }catch(err){
-    console.error('Barcode scanner:',err);
-    stopBarcodeCamera();
-    const name = err && err.name ? err.name : '';
-    if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
-      setBarcodeStatus('Cameratoegang is geweigerd. Sta camera-toegang toe in je browserinstellingen en probeer opnieuw.');
-    }else if(name === 'NotFoundError'){
-      setBarcodeStatus('Geen camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
-    }else{
-      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder in.');
-    }
-  }
-}
-async function lookupManualBarcode(){
-  const input=document.getElementById('barcodeManualInput');
-  const code=(input?.value||'').replace(/\D/g,'');
-  if(code.length<8){setBarcodeStatus('Voer een geldige barcode in.');return;}
-  barcodeBusy=true;
-  await handleBarcode(code);
-}
-
-async function handleBarcode(code){
-  setBarcodeStatus('Product wordt opgezocht…');
-  try{
-    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=code,product_name,brands,image_front_small_url,image_front_url');
-    if(!response.ok) throw new Error('Netwerkfout');
-    const data=await response.json();
-    const p=data && data.product;
-    if(!p || data.status!==1 || !p.product_name){
-      const result=document.getElementById('barcodeResult');
-      result.textContent='Geen product gevonden voor deze barcode. Je kunt de barcode wel bewaren als je het product handmatig toevoegt.';
-      result.classList.add('open');
-      setBarcodeStatus('Geen product gevonden.');
-      barcodeBusy=false;
-      return;
-    }
-
-    const name=String(p.product_name).trim();
-    const brand=String(p.brands||'').split(',')[0].trim();
-    const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
-    await addScannedProduct({text:name,barcode:code,brand,imageUrl});
-    const result=document.getElementById('barcodeResult');
-    result.textContent=(brand?brand+' · ':'')+name+' is toegevoegd aan je lijst.';
-    result.classList.add('open');
-    setBarcodeStatus('Gevonden ✓');
-    setTimeout(closeBarcodeScanner,900);
-  }catch(err){
-    console.error('Product lookup:',err);
-    setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
-  }finally{
-    barcodeBusy=false;
-  }
-}
-
-async function addScannedProduct(product){
-  if(activeListType !== 'shared' && !currentHouseholdId && !isPrivateMode()){
-    const householdId=await getOrCreateHousehold();
-    if(!householdId){openUseModeModal();return;}
-  }
-  boodschappen.push({
-    text:product.text,
-    completed:false,
-    completedBy:'',
-    completedByUid:'',
-    completedAt:null,
-    barcode:product.barcode || '',
-    imageUrl:product.imageUrl || '',
-    brand:product.brand || ''
-  });
-  showList();
-  await saveList();
-}
-
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){
-    const overlay=document.getElementById('barcodeOverlay');
-    if(overlay && overlay.classList.contains('open')) closeBarcodeScanner();
-  }
-});
-</script>
 
 </html>
