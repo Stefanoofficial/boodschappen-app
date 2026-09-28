@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2436,6 +2437,25 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 }
 </style>
 
+<style id="more-performance-final">
+/* Meer-menu: bewust direct en stabiel. Geen transform/opacity-animaties op het
+   volledige scherm of de menu-pagina's; dit voorkomt jank in Android WebView. */
+.app.more-active > #moreView,
+.app.more-active #familyMenu,
+.app.more-active .familyMenuPage {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+.app.more-active .familyMenuPage {
+  opacity: 1 !important;
+}
+.app.more-active #familyMenu {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+</style>
 <style id="final-scroll-nav-fix">
 /* Definitieve navigatie-/scrollfix:
    - de app zelf kan scrollen;
@@ -3044,6 +3064,21 @@ body.logged-in {
 #themePicker { display:none !important; visibility:hidden !important; }
 </style>
 
+<style id="shared-menu-smooth-final">
+/* Android/WebView: alleen opacity. Geen transform/reflow die de Meer-kaart
+   tijdens het wisselen van submenu kan laten haperen. */
+.app.more-active #familyMenu .familyMenuPage.sharedMenuSmoothEnter {
+  animation: sharedMenuSmoothEnter .16s ease-out both !important;
+}
+@keyframes sharedMenuSmoothEnter {
+  from { opacity: .01; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app.more-active #familyMenu .familyMenuPage.sharedMenuSmoothEnter { animation: none !important; }
+}
+</style>
+
 <style id="menu-slide-stability-final">
 /* === Laatste fix: stabiele horizontale submenu-slides in Meer ===
    In Meer mogen de pagina's tijdens een overgang nooit onder elkaar komen te staan.
@@ -3199,12 +3234,12 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
 #overviewActionOverlay{
   opacity:0;
   pointer-events:none;
-  transition:opacity 220ms ease;
+  transition:opacity 100ms ease;
 }
 #overviewActionOverlay .overviewActionSheet{
   transform:translate3d(0,110%,0);
   opacity:1;
-  transition:transform 340ms cubic-bezier(.22,1,.36,1);
+  transition:transform 140ms cubic-bezier(.22,1,.36,1);
   will-change:transform;
   backface-visibility:hidden;
 }
@@ -3236,6 +3271,32 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
   box-sizing:border-box!important;
   line-height:1!important;
 }
+</style>
+
+
+<style id="shared-lists-no-animation-final">
+/* Gedeelde lijsten: geen visuele overgang. De pagina wisselt direct. */
+.app.more-active #familyMenu #sharedListsMenuSub,
+.app.more-active #familyMenu #sharedListsMenuSub * {
+  animation: none !important;
+  transition: none !important;
+}
+.app.more-active #familyMenu #sharedListsMenuSub {
+  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+  contain: layout paint !important;
+}
+</style>
+
+<style id="silent-menu-refresh">
+.refreshableMenuTitle{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.silentRefreshBtn{width:32px;height:32px;flex:0 0 32px;border:0;border-radius:10px;background:#edf5ee;color:#4f7357;display:inline-flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.silentRefreshBtn:active{transform:scale(.94);}
+.silentRefreshBtn:disabled{opacity:.7;cursor:default;}
+.silentRefreshBtn.isRefreshing i{animation:silentRefreshSpin .55s linear infinite;}
+@keyframes silentRefreshSpin{to{transform:rotate(360deg)}}
+body.dark-theme .silentRefreshBtn{background:rgba(255,255,255,.08);color:#dff1e2;}
 </style>
 
 </head>
@@ -3454,29 +3515,27 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <i class="fa-solid fa-plus"></i>
       <span>Nieuwe lijst</span>
     </button>
-    <div class="familyMenuSubTitle">Mijn deellijsten</div>
+    <div class="familyMenuSubTitle refreshableMenuTitle"><span>Mijn deellijsten</span><button type="button" class="silentRefreshBtn" id="refreshSharedListsBtn" aria-label="Gedeelde lijsten verversen" title="Verversen" onclick="refreshSharedListsSilently(event)"><i class="fa-solid fa-rotate"></i></button></div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
-    <div class="settingsMenuHint">Maak een lijst voor vrienden, familie of een feestje. Iedereen met toegang kan samen producten toevoegen en afvinken.</div>
   </div>
 
   <div id="sharedListActiveMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
-    <div class="familyMenuSubTitle" id="sharedListActiveMenuTitle">Gedeelde lijst</div>
+    <button type="button" class="settingsMenuBack" onclick="__showOnlyMenuPage('sharedListsMenuSub')">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Gedeelde lijsten</span>
+    </button>
+    <div class="familyMenuSubTitle"><span id="sharedListActiveMenuTitle">Gedeelde lijst</span></div>
     <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
       <i class="fa-solid fa-user-group"></i>
-      <span>Leden (<span id="sharedMemberCountActive">0</span>)</span>
+      <span>Personen (<span id="sharedMemberCountActive">0</span>)</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="showSharedListCode()">
-      <i class="fa-solid fa-link"></i>
+      <i class="fa-solid fa-key"></i>
       <span>Deelcode</span>
     </button>
     <button type="button" class="familyMenuItem" onclick="joinSharedListByCode()">
       <i class="fa-solid fa-keyboard"></i>
       <span>Code invoeren</span>
-    </button>
-    <button type="button" class="familyMenuItem" onclick="returnToFamilyList(event)">
-      <i class="fa-solid fa-list"></i>
-      <span>Familielijst</span>
-      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
   </div>
 
@@ -3504,7 +3563,7 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
       <i class="fa-solid fa-chevron-left"></i>
       <span>Opgeslagen</span>
     </button>
-    <div class="familyMenuSubTitle">Opgeslagen</div>
+    <div class="familyMenuSubTitle refreshableMenuTitle"><span>Opgeslagen</span><button type="button" class="silentRefreshBtn" id="refreshSavedListsBtn" aria-label="Opgeslagen lijsten verversen" title="Verversen" onclick="refreshSavedListsSilently(event)"><i class="fa-solid fa-rotate"></i></button></div>
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="saveCurrentListAs()">
       <i class="fa-solid fa-floppy-disk"></i>
       <span>Lijst opslaan</span>
@@ -3962,10 +4021,111 @@ function closeSettingsSubmenu(event) { returnMenuToMain("settingsMenuSub", event
 
 function openSavedListsSubmenu(event) {
   if (event) event.stopPropagation();
+
+  // Opgeslagen lijsten: dezelfde directe Android/WebView-aanpak als
+  // Gedeelde lijsten. Eerst alleen de pagina wisselen; geen submenu-
+  // animatie, transform of Firebase-werk tijdens de eerste render-tick.
   switchMenuPage("savedListsMenuSub", event);
-  renderSavedLists();
+
+  const page = document.getElementById("savedListsMenuSub");
+  if (page) {
+    page.classList.remove("sharedMenuSmoothEnter", "menuSlideOutLeft", "menuSlideInRight", "menuSlideOutRight", "menuSlideInLeft");
+    page.style.animation = "none";
+    page.style.transition = "none";
+    page.style.transform = "none";
+    page.style.opacity = "1";
+  }
+
+  const box = document.getElementById("savedListsContainer");
+  if (box) box.innerHTML = '<div class="savedListsEmpty">Lijsten laden…</div>';
+
+  // Pas na de huidige render-tick de gegevens ophalen.
+  setTimeout(() => {
+    renderSavedLists();
+  }, 0);
 }
 function closeSavedListsSubmenu(event) { returnMenuToMain("savedListsMenuSub", event); }
+
+let __silentRefreshSavedBusy = false;
+let __silentRefreshSharedBusy = false;
+
+function __setSilentRefreshState(id, busy){
+  const btn=document.getElementById(id);
+  if(!btn) return;
+  btn.disabled=!!busy;
+  btn.classList.toggle("isRefreshing", !!busy);
+}
+
+async function refreshSavedListsSilently(event){
+  if(event){ event.preventDefault(); event.stopPropagation(); }
+  if(__silentRefreshSavedBusy) return;
+  __silentRefreshSavedBusy=true;
+  __setSilentRefreshState("refreshSavedListsBtn",true);
+  try{
+    await renderSavedLists();
+  }catch(e){ console.error("Opgeslagen lijsten stil verversen mislukt:",e); }
+  finally{
+    __silentRefreshSavedBusy=false;
+    __setSilentRefreshState("refreshSavedListsBtn",false);
+  }
+}
+
+async function refreshSharedListsSilently(event){
+  if(event){ event.preventDefault(); event.stopPropagation(); }
+  if(__silentRefreshSharedBusy) return;
+  __silentRefreshSharedBusy=true;
+  __setSilentRefreshState("refreshSharedListsBtn",true);
+  try{
+    await renderSharedLists();
+  }catch(e){ console.error("Gedeelde lijsten stil verversen mislukt:",e); }
+  finally{
+    __silentRefreshSharedBusy=false;
+    __setSilentRefreshState("refreshSharedListsBtn",false);
+  }
+}
+
+async function refreshActiveSharedListSilently(event){
+  if(event){ event.preventDefault(); event.stopPropagation(); }
+  if(__silentRefreshSharedBusy) return;
+  const id=currentSharedListId;
+  const user=auth.currentUser;
+  if(!id || activeListType!=="shared" || !user) return;
+  __silentRefreshSharedBusy=true;
+  __setSilentRefreshState("refreshActiveSharedListBtn",true);
+  try{
+    const snap=await database.ref("sharedLists/" + id).once("value");
+    const data=snap.val();
+    if(!data || !data.members || data.members[user.uid]!==true){
+      activeListType="family";
+      currentSharedListId=null;
+      if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
+      await loadList();
+      return;
+    }
+    boodschappen=normalizeBoodschappen(data.boodschappen||[]);
+    currentListName=String(data.name||"Deellijst");
+    try{ localStorage.setItem("activeSharedListName:" + id,currentListName); }catch(_){}
+    currentSharedListInviteCode=data.inviteCode||currentSharedListInviteCode||null;
+    const h=document.querySelector(".headerBar h1");
+    if(h) h.textContent=currentListName;
+    const activeTitle=document.getElementById("sharedListActiveMenuTitle");
+    if(activeTitle) activeTitle.textContent=currentListName;
+    showList();
+    updateSharedMemberCount(data);
+    const activeCount=document.getElementById("sharedMemberCountActive");
+    if(activeCount){
+      const members=data.members||{};
+      activeCount.textContent=String(Object.keys(members).filter(uid=>members[uid]===true).length);
+    }
+    updateSharedDeleteButton(data.owner===user.uid);
+  }catch(e){
+    console.error("Actieve gedeelde lijst stil verversen mislukt:",e);
+  }finally{
+    __silentRefreshSharedBusy=false;
+    __setSilentRefreshState("refreshActiveSharedListBtn",false);
+  }
+}
+
 
 function __measureMorePageHeight(menu, page) {
   if (!menu || !page) return 0;
@@ -4093,8 +4253,7 @@ function switchMenuPage(pageId, event) {
   const menu = document.getElementById("familyMenu");
   if (!page || !menu) return;
 
-  // Stabiele Meer-navigatie: één pagina tegelijk, zonder slide-animatie,
-  // requestAnimationFrame of dynamische height-meting.
+  // Stabiele Meer-navigatie: één pagina tegelijk.
   __cancelMenuTransition();
   menu.style.display = "block";
   __showOnlyMenuPage(pageId);
@@ -4536,7 +4695,12 @@ async function renderSavedLists() {
     openBtn.innerHTML = '<i class="fa-solid fa-list"></i><span></span><small class="savedListCount"></small><i class="fa-solid fa-chevron-right savedListArrow"></i>';
     openBtn.querySelector("span").textContent = saved.name || "Naamloze lijst";
     openBtn.querySelector(".savedListCount").textContent = String((saved.items || []).length);
-    openBtn.addEventListener("click", () => loadSavedList(index));
+    openBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      void loadSavedListById(String(saved.id || index));
+    });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
@@ -4632,22 +4796,52 @@ function saveCurrentListAs() {
   });
   setTimeout(() => input && input.focus(), 30);
 }
+async function loadSavedListById(savedId) {
+  const lists = await readSavedLists();
+  const saved = lists.find((item, idx) => String(item.id || idx) === String(savedId));
+  if (!saved) return;
+  await loadSavedListRecord(saved);
+}
+
+async function loadSavedListRecord(saved) {
+  const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
+  if (!proceed) return;
+
+  mainListLoadGeneration++;
+  if (currentSharedListUnsubscribe) {
+    currentSharedListUnsubscribe();
+    currentSharedListUnsubscribe = null;
+  }
+  currentSharedListId = null;
+  currentSharedListInviteCode = null;
+
+  const user = auth.currentUser;
+  const savedId = saved.id || null;
+  const savedName = String(saved.name || "Boodschappenlijst");
+  setActiveListState("saved", savedId, savedName);
+  currentListName = savedName;
+  boodschappen = normalizeBoodschappen(saved.items || []);
+  selectedIndex = -1;
+
+  // Opgeslagen lijsten zijn alleen een sessiekeuze; na opnieuw openen blijft
+  // de gewone Boodschappenlijst de basis.
+  if (user) {
+    try { localStorage.removeItem("boodschappenActiveSavedList_" + user.uid); } catch (_) {}
+  }
+
+  closeFamilyMenu();
+  showMainListView();
+  setBottomNav("navList");
+  showList();
+  updateStatus();
+  if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
+}
+
 async function loadSavedList(index) {
   const lists = await readSavedLists();
   const saved = lists[index];
   if (!saved) return;
-  const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
-  if (!proceed) return;
-  boodschappen = normalizeBoodschappen(saved.items || []);
-  currentListName = String(saved.name || "Boodschappenlijst");
-  selectedIndex = -1;
-
-  // Na het laden van een opgeslagen lijst meteen naar het hoofdscherm gaan.
-  // Zo blijft de gebruiker niet in het menu "Opgeslagen lijsten" staan.
-  showMainListView();
-  closeFamilyMenu();
-  showList();
-  await saveList();
+  await loadSavedListRecord(saved);
 }
 
 function toggleFamilyMenu() {
@@ -4791,22 +4985,21 @@ function clearSearch() {
 }
 
 async function loadList() {
+  const myLoadGeneration = mainListLoadGeneration;
   try {
-    // Een late async callback mag na uitloggen niets meer in de lijst tonen.
     if (!auth.currentUser || explicitLogoutInProgress) return false;
+    if (myLoadGeneration !== mainListLoadGeneration) return true;
+    if (activeListState.type === "shared" && activeListState.id) return true;
+    if (activeListState.type === "saved" && activeListState.id) return true;
 
-    // Een actieve Deellijst mag nooit door deze familielijst-loader worden overschreven.
-    if (activeListType === "shared" && currentSharedListId) return true;
-    activeListType = isPrivateMode() ? "private" : "family";
+    setActiveListState(isPrivateMode() ? "private" : "family", null, "Boodschappenlijst");
     currentListName = "Boodschappenlijst";
 
-    // Een privé-lijst wordt lokaal opgeslagen en hoeft dus niet via Firebase geladen te worden.
     if (isPrivateMode()) {
       await loadPrivateList();
       return true;
     }
 
-    // Ook de keuze "Overslaan" moet bij vernieuwen behouden blijven.
     const user = auth.currentUser;
     if (!currentHouseholdId && user && localStorage.getItem("boodschappenUseMode_" + user.uid) === "skip") {
       openAppWithoutList();
@@ -4815,30 +5008,24 @@ async function loadList() {
 
     if (!currentHouseholdId) {
       const householdId = await getOrCreateHousehold();
+      if (myLoadGeneration !== mainListLoadGeneration) return true;
       if (!householdId) {
-        // Nieuwe gebruikers starten direct met een persoonlijke lijst.
-        // Samenwerken blijft beschikbaar via Meer → Mijn familie.
         if (user) localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
         await loadPrivateList();
         return true;
       }
     }
 
-    const snapshot = await database
-      .ref("households/" + currentHouseholdId + "/boodschappen")
-      .once("value");
+    const snapshot = await database.ref("households/" + currentHouseholdId + "/boodschappen").once("value");
+    if (myLoadGeneration !== mainListLoadGeneration || activeListState.type !== "family") return true;
 
     const data = snapshot.val();
-
-    if (Array.isArray(data)) {
-      boodschappen = normalizeBoodschappen(data);
-    } else if (data && typeof data === "object") {
-      boodschappen = normalizeBoodschappen(Object.values(data));
-    } else {
-      boodschappen = [];
-    }
+    if (Array.isArray(data)) boodschappen = normalizeBoodschappen(data);
+    else if (data && typeof data === "object") boodschappen = normalizeBoodschappen(Object.values(data));
+    else boodschappen = [];
 
     selectedIndex = -1;
+    currentListName = "Boodschappenlijst";
     showList();
     updateStatus();
     if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
@@ -4846,28 +5033,23 @@ async function loadList() {
     return true;
   } catch (error) {
     console.error("Lijst laden mislukt:", error);
-
     if (error && (error.code === "PERMISSION_DENIED" || error.code === "permission-denied")) {
       currentHouseholdId = null;
       const user = auth.currentUser;
       if (user) {
-        try {
-          await database.ref("users/" + user.uid + "/householdId").remove();
-        } catch (cleanupError) {
-          console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError);
-        }
+        try { await database.ref("users/" + user.uid + "/householdId").remove(); }
+        catch (cleanupError) { console.error("Oude familie-koppeling verwijderen mislukt:", cleanupError); }
       }
       if (user) localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+      if (myLoadGeneration !== mainListLoadGeneration) return true;
       await loadPrivateList();
       return true;
     }
-
     const status = document.getElementById("status");
     if (status) status.innerHTML = '<i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> De familielijst kon niet worden geladen. Probeer opnieuw.';
     return false;
   }
 }
-
 
 function normalizeBoodschappen(data) {
   if (!Array.isArray(data)) return [];
@@ -5773,6 +5955,32 @@ let currentSharedListUnsubscribe = null;
 // Houd de gewone familielijst en een Deellijst strikt gescheiden.
 let activeListType = "family"; // "family" | "shared" | "private"
 
+// Centrale bron voor welke lijst werkelijk actief is. Opgeslagen en gedeelde
+// lijsten hebben ieder hun eigen id en kunnen elkaar nooit meer overschrijven.
+let activeListState = { type: "family", id: null, name: "Boodschappenlijst" };
+function setActiveListState(type, id, name) {
+  activeListState = { type: type || "family", id: id || null, name: String(name || "Boodschappenlijst") };
+  activeListType = activeListState.type;
+  if (activeListState.type === "shared" && activeListState.id) {
+    try {
+      const uid = auth && auth.currentUser && auth.currentUser.uid;
+      if (uid) localStorage.setItem("activeSharedListId", String(activeListState.id));
+      if (uid) localStorage.removeItem("boodschappenActiveSavedList_" + uid);
+    } catch (_) {}
+  } else if (activeListState.type === "saved") {
+    try {
+      const uid = auth && auth.currentUser && auth.currentUser.uid;
+      if (uid) localStorage.removeItem("activeSharedListId");
+    } catch (_) {}
+  }
+}
+function isCurrentList(type, id) {
+  return activeListState.type === type && (!id || activeListState.id === id);
+}
+// Beschermt tegen late async laadacties die na het openen van een andere lijst
+// nog oude inhoud terug op het hoofdscherm kunnen zetten.
+let mainListLoadGeneration = 0;
+
 async function getOrCreateHousehold() {
   const user = auth.currentUser;
 
@@ -5819,24 +6027,43 @@ async function getOrCreateHousehold() {
   }
 }
 
-async function openSharedListsSubmenu(event) {
-  if (event) event.stopPropagation();
+function openSharedListsSubmenu(event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  __sharedListsRenderGeneration++;
+  __sharedListOpeningId = null;
+
+  // Gedeelde lijsten: bewust GEEN animatie en GEEN wachttijd.
+  // Android/WebView krijgt eerst alleen de paginawissel te verwerken.
   switchMenuPage("sharedListsMenuSub", event);
-  const countEl=document.getElementById("sharedMemberCount");
-  if(countEl){
-    if(activeListType==="shared" && currentSharedListId){
-      try{
-        const snap=await database.ref("sharedLists/" + currentSharedListId + "/members").once("value");
-        const members=snap.val()||{};
-        countEl.textContent=String(Object.keys(members).filter(uid=>members[uid]===true).length);
-      }catch(_){
-        countEl.textContent="0";
-      }
-    }else{
-      countEl.textContent="—";
-    }
+
+  const page = document.getElementById("sharedListsMenuSub");
+  if (page) {
+    page.classList.remove("sharedMenuSmoothEnter", "menuSlideOutLeft", "menuSlideInRight", "menuSlideOutRight", "menuSlideInLeft");
+    page.style.animation = "none";
+    page.style.transition = "none";
+    page.style.transform = "none";
+    page.style.opacity = "1";
   }
-  await renderSharedLists();
+
+  const countEl = document.getElementById("sharedMemberCount");
+  if (countEl) countEl.textContent = (activeListType === "shared" && currentSharedListId) ? "…" : "—";
+
+  const box = document.getElementById("sharedListsContainer");
+  if (box) box.innerHTML = '<div class="sharedListEmpty">Lijsten laden…</div>';
+
+  // Start pas na de huidige render-tick. Geen 160/260/300 ms kunstmatige vertraging.
+  setTimeout(() => {
+    renderSharedLists();
+
+    if (countEl && activeListType === "shared" && currentSharedListId) {
+      database.ref("sharedLists/" + currentSharedListId + "/members").once("value")
+        .then(snap => {
+          const members = snap.val() || {};
+          countEl.textContent = String(Object.keys(members).filter(uid => members[uid] === true).length);
+        })
+        .catch(() => { countEl.textContent = "0"; });
+    }
+  }, 0);
 }
 function closeSharedListsSubmenu(event) {
   if (event) event.stopPropagation();
@@ -5853,13 +6080,15 @@ function closeSharedListsSubmenu(event) {
     closeFamilyMenu();
   }
 
-  activeListType = "family";
+  mainListLoadGeneration++;
+  setActiveListState("family", null, "Boodschappenlijst");
   if (currentSharedListUnsubscribe) {
     currentSharedListUnsubscribe();
     currentSharedListUnsubscribe = null;
   }
   currentSharedListId = null;
   currentSharedListInviteCode = null;
+  try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
 
   const h = document.querySelector(".headerBar h1");
   if (h) h.textContent = "Boodschappenlijst";
@@ -5901,7 +6130,7 @@ async function createSharedList(){
         owner:user.uid,
         inviteCode:candidate,
         members:{[user.uid]:true},
-        memberNames:{[user.uid]: (user.displayName || user.email || "Gebruiker")},
+        memberNames:{[user.uid]: "Naam niet ingesteld"},
         createdAt:Date.now(),
         boodschappen:[]
       };
@@ -5944,11 +6173,13 @@ async function joinSharedListByCode(){
 
     const updates={};
     updates["sharedLists/" + id + "/members/" + user.uid]=true;
-    let memberName = user.displayName || user.email || "Gebruiker";
+    let memberName = "";
     try {
       const nameSnap = await database.ref("users/" + user.uid + "/name").once("value");
-      memberName = nameSnap.val() || memberName;
+      memberName = String(nameSnap.val() || "").trim();
     } catch (_) {}
+    if(!memberName) memberName = String(user.displayName || "").trim();
+    if(!memberName) memberName = "Naam niet ingesteld";
     updates["sharedLists/" + id + "/memberNames/" + user.uid]=memberName;
     updates["userSharedLists/" + user.uid + "/" + id]=true;
     await database.ref().update(updates);
@@ -5959,53 +6190,81 @@ async function joinSharedListByCode(){
   }
 }
 
+let __sharedListsRenderGeneration = 0;
+let __sharedListOpeningId = null;
+
 async function renderSharedLists(){
+  const renderGeneration = ++__sharedListsRenderGeneration;
   const box=document.getElementById("sharedListsContainer"); if(!box) return;
   const user=auth.currentUser;
   if(!user){ box.innerHTML='<div class="sharedListEmpty">Log eerst in.</div>'; return; }
-
   try{
     const indexSnap=await database.ref("userSharedLists/" + user.uid).once("value");
+    if(renderGeneration !== __sharedListsRenderGeneration) return;
     const index=indexSnap.val()||{};
     const ids=Object.keys(index).filter(id=>index[id]===true);
-
     if(!ids.length){
       box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
       return;
     }
-
     const results=await Promise.all(ids.map(async id=>{
       try{
         const snap=await database.ref("sharedLists/" + id).once("value");
         return snap.exists() ? [id,snap.val()] : null;
       }catch(e){ return null; }
     }));
-
+    if(renderGeneration !== __sharedListsRenderGeneration) return;
     const mine=results.filter(Boolean).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
     box.innerHTML="";
     if(!mine.length){
       box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
       return;
     }
-
     mine.forEach(([id,v])=>{
+      if(renderGeneration !== __sharedListsRenderGeneration) return;
       const btn=document.createElement("button");
       btn.type="button";
       btn.className="savedListRow";
       btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
       btn.querySelector("span").textContent=v.name||"Deellijst";
-      btn.addEventListener("click",async()=>{
-        // Open the selected Deellijst directly in the main list screen.
-        // The previous version opened the secondary menu instead, which
-        // made it look like the Kerst list did not open.
-        await openSharedList(id,false);
-        if(activeListType==="shared" && currentSharedListId===id){
-          closeFamilyMenu();
+      btn.dataset.sharedListId = id;
+      btn.onclick = async function(){
+        const selectedId=this.dataset.sharedListId;
+        const user=auth.currentUser;
+        if(!selectedId || !user) return;
+
+        try{
+          const snap=await database.ref("sharedLists/" + selectedId).once("value");
+          const data=snap.val();
+          if(!data || !data.members || data.members[user.uid]!==true){
+            await familyAlert("Gedeelde lijst","Je hebt geen toegang tot deze lijst.","fa-lock");
+            return;
+          }
+
+          // Alleen het beheer van deze gedeelde lijst wordt actief.
+          // De boodschappenlijst zelf wordt hier NIET geopend.
+          currentSharedListId=selectedId;
+          currentSharedListInviteCode=data.inviteCode || null;
+          currentListName=String(data.name || "Deellijst");
+          const members=data.members || {};
+          const count=Object.keys(members).filter(uid=>members[uid]===true).length;
+
+          const title=document.getElementById("sharedListActiveMenuTitle");
+          const countEl=document.getElementById("sharedMemberCountActive");
+          if(title) title.textContent=currentListName;
+          if(countEl) countEl.textContent=String(count);
+
+          __cancelMenuTransition();
+          __showOnlyMenuPage("sharedListActiveMenuSub");
+        }catch(error){
+          console.error("Gedeelde-lijstmenu openen mislukt:",error);
+          await familyAlert("Gedeelde lijst","De gedeelde lijst kon niet worden geopend.","fa-triangle-exclamation");
         }
-      });
+      };
       box.appendChild(btn);
     });
   }catch(e){
+    if(renderGeneration !== __sharedListsRenderGeneration) return;
     console.error("Mijn deellijsten laden mislukt:",e);
     box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>';
   }
@@ -6021,7 +6280,7 @@ async function getCurrentSharedListSnapshot(){
 
 async function showSharedListCode(){
   const user=auth.currentUser;
-  if(!user || activeListType!=="shared" || !currentSharedListId) return;
+  if(!user || !currentSharedListId) return;
 
   let list=null;
   try{
@@ -6041,13 +6300,11 @@ async function showSharedListCode(){
   try{ localStorage.setItem("sharedListInviteCode:"+currentSharedListId,code); }catch(_){}
 
   const link=makeSharedListLink(code);
-  const safeName=String(list.name || "Deellijst").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
 
   const overlay=familyDialogBase(
     "fa-link",
     "Deelcode",
-    `<div class="familyDialogText">Deel “${safeName}” met anderen.</div>
-     <div class="sharedListInviteBox">
+    `<div class="sharedListInviteBox">
        <div class="sharedListLinkLabel">Deelcode</div>
        <div class="sharedListInviteCode" id="sharedCodeDisplay">${code}</div>
        <div class="sharedListActionRow">
@@ -6106,14 +6363,14 @@ async function showSharedListCode(){
 }
 async function showSharedListMembers(){
   const user=auth.currentUser;
-  if(!user || activeListType!=="shared" || !currentSharedListId) return;
+  if(!user || !currentSharedListId) return;
 
   try{
     const snap=await database.ref("sharedLists/" + currentSharedListId).once("value");
     const list=snap.val();
 
     if(!list || !list.members){
-      await familyAlert("Leden","De leden van deze deellijst konden niet worden geladen.","fa-users");
+      await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen.","fa-users");
       return;
     }
 
@@ -6123,16 +6380,24 @@ async function showSharedListMembers(){
 
     const rows=[];
     for(const uid of memberIds){
-      let name=memberNames[uid] || "";
+      // Never show an e-mail address. The account name is stored in users/{uid}/name.
+      let name=String(memberNames[uid] || "").trim();
+      if(name.includes("@")) name="";
 
       if(!name){
         try{
           const ns=await database.ref("users/" + uid + "/name").once("value");
-          name=ns.val() || "";
+          name=String(ns.val() || "").trim();
         }catch(_){}
       }
 
-      if(!name) name=uid===user.uid ? (user.displayName || user.email || "Gebruiker") : "Lid";
+      // Only for the current user, use Firebase displayName as a secondary
+      // name source. Never fall back to user.email.
+      if(!name && uid===user.uid){
+        name=String(user.displayName || "").trim();
+      }
+
+      if(!name) name="Naam niet ingesteld";
 
       const row=document.createElement("div");
       row.className="familyDialogMember";
@@ -6162,7 +6427,7 @@ async function showSharedListMembers(){
 
     const overlay=familyDialogBase(
       "fa-user-group",
-      "Leden",
+      "Personen",
       "",
       '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>'
     );
@@ -6175,9 +6440,9 @@ async function showSharedListMembers(){
     if(closeBtn) closeBtn.addEventListener("click",close);
     overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
   }catch(error){
-    console.error("Deellijstleden konden niet worden geladen:",error);
+    console.error("Personen van deellijst konden niet worden geladen:",error);
     const detail=error && error.code ? "\n\nFoutcode: " + error.code : "";
-    await familyAlert("Leden","De leden van deze deellijst konden niet worden geladen." + detail,"fa-triangle-exclamation");
+    await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen." + detail,"fa-triangle-exclamation");
   }
 }
 
@@ -6192,18 +6457,19 @@ async function openSharedList(id, showInvite){
   const user=auth.currentUser;
   if(!user) return;
 
-  // Open een Deellijst altijd direct in het hoofdscherm "Lijst".
-  // Dit is vooral belangrijk wanneer de gebruiker vanuit Meer/Deellijst komt:
-  // de geselecteerde deellijst moet meteen zichtbaar zijn, zonder eerst
-  // handmatig onderaan op "Lijst" te hoeven drukken.
-  showMainListView();
-  closeFamilyMenu();
-
-  // De Deellijst krijgt een eigen modus. Hierdoor kan een gelijktijdige
-  // familielijst-load de inhoud van de Deellijst niet meer overschrijven.
+  // Invalideer alle lopende/late hoofdscherm-loads VOORDAT we naar de
+  // lijstweergave gaan. Anders kan een eerder gestarte loadList() na deze
+  // klik alsnog "Opgeslagen Week" of "Boodschappenlijst" terugzetten.
+  mainListLoadGeneration++;
   const previousSharedId = currentSharedListId;
-  activeListType = "shared";
+  setActiveListState("shared", id, "Deellijst");
   currentSharedListId = id;
+  try { if (user) localStorage.removeItem("boodschappenActiveSavedList_" + user.uid); } catch (_) {}
+
+  // Sluit Meer eerst en schakel daarna éénmalig naar Lijst.
+  closeFamilyMenu();
+  showMainListView();
+  setBottomNav("navList");
   currentSharedListInviteCode = null;
 
   if(currentSharedListUnsubscribe){
@@ -6216,10 +6482,12 @@ async function openSharedList(id, showInvite){
   showList();
 
   try {
+    const openGeneration = mainListLoadGeneration;
     const snap=await database.ref("sharedLists/" + id).once("value");
+    if (openGeneration !== mainListLoadGeneration || activeListType !== "shared" || currentSharedListId !== id) return;
     const v=snap.val();
     if(!v || !v.members || v.members[user.uid]!==true){
-      activeListType = "family";
+      setActiveListState("family", null, "Boodschappenlijst");
       currentSharedListId = previousSharedId || null;
       if (!currentSharedListId) await loadList();
       await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
@@ -6232,7 +6500,11 @@ async function openSharedList(id, showInvite){
       try{ localStorage.setItem("sharedListInviteCode:"+id,String(currentSharedListInviteCode)); }catch(_){}
     }
     showList();
-    const h=document.querySelector(".headerBar h1"); if(h) h.textContent=v.name||"Deellijst";
+    const sharedName = String(v.name || "Deellijst");
+     currentListName = sharedName;
+     setActiveListState("shared", id, sharedName);
+     try { localStorage.setItem("activeSharedListName:" + id, sharedName); } catch (_) {}
+     const h=document.querySelector(".headerBar h1"); if(h) h.textContent=sharedName;
     updateSharedDeleteButton(v.owner === user.uid);
     setTimeout(()=>updateSharedDeleteButton(v.owner === user.uid), 0);
     updateSharedMemberCount(v);
@@ -6244,8 +6516,10 @@ async function openSharedList(id, showInvite){
     const activeTitle=document.getElementById("sharedListActiveMenuTitle");
     if(activeTitle) activeTitle.textContent=v.name||"Deellijst";
     if (!v.memberNames || !v.memberNames[user.uid]) {
-      let ownName = user.displayName || user.email || "Gebruiker";
-      try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = ownNameSnap.val() || ownName; } catch (_) {}
+      let ownName = "";
+      try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = String(ownNameSnap.val() || "").trim(); } catch (_) {}
+      if(!ownName) ownName = String(user.displayName || "").trim();
+      if(!ownName) ownName = "Naam niet ingesteld";
       try { await database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(ownName); } catch (_) {}
     }
 
@@ -6255,8 +6529,11 @@ async function openSharedList(id, showInvite){
       if(!data.members || data.members[user.uid]!==true){
         currentSharedListId=null;
         if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
-        activeListType="family";
-        loadList();
+        if (activeListType === "shared" && currentSharedListId === id) {
+          mainListLoadGeneration++;
+          setActiveListState("family", null, "Boodschappenlijst");
+          loadList();
+        }
         return;
       }
       boodschappen=normalizeBoodschappen(data.boodschappen||[]);
@@ -6274,7 +6551,7 @@ async function openSharedList(id, showInvite){
     }
   } catch(error) {
     console.error("Deellijst openen mislukt:", error);
-    activeListType = "family";
+    setActiveListState("family", null, "Boodschappenlijst");
     currentSharedListId = previousSharedId || null;
     currentSharedListInviteCode = null;
     if (!currentSharedListId) await loadList();
@@ -6284,32 +6561,26 @@ async function openSharedList(id, showInvite){
 
 
 function updateSharedDeleteButton(isOwner){
-  const header=document.querySelector(".headerBar");
-  if(!header) return;
+  const btn = document.getElementById("mainListTrashButton");
+  if(!btn) return;
 
-  const old=document.getElementById("deleteSharedListBtn");
-  if(old) old.remove();
-
-  // Alleen tonen wanneer er daadwerkelijk een Deellijst geopend is.
-  // De knop gebruikt bewust dezelfde prullenbakknop als de rest van de app.
-  if(activeListType!=="shared" || !currentSharedListId) return;
-
-  const btn=document.createElement("button");
-  btn.type="button";
-  btn.id="deleteSharedListBtn";
-  btn.className="familyButton sharedDeleteIconButton";
-  btn.setAttribute("aria-label","Deellijst verwijderen");
-  btn.setAttribute("title","Deellijst verwijderen");
-  btn.innerHTML='<i class="fa-solid fa-trash"></i>';
-  btn.onclick=deleteCurrentSharedList;
-
-  // Plaats de knop direct vóór de bestaande drie-puntjesknop.
-  const options=document.getElementById("listOptionsButton");
-  if(options && options.parentElement===header){
-    header.insertBefore(btn, options);
-  }else{
-    header.appendChild(btn);
+  if(activeListType === "shared" && currentSharedListId){
+    // Gebruik exact dezelfde prullenbakknop als op de gewone boodschappenlijst.
+    // Zo ontstaat er geen tweede prullenbak in de header.
+    btn.style.display = "inline-flex";
+    btn.classList.add("sharedModeTrashButton");
+    btn.setAttribute("aria-label", "Deellijst verwijderen");
+    btn.setAttribute("title", "Deellijst verwijderen");
+    btn.onclick = deleteCurrentSharedList;
+  } else {
+    btn.classList.remove("sharedModeTrashButton");
+    btn.setAttribute("aria-label", "Lijst wissen");
+    btn.setAttribute("title", "Lijst wissen");
+    btn.onclick = openClearListConfirm;
   }
+
+  const old = document.getElementById("deleteSharedListBtn");
+  if(old) old.remove();
 }
 
 async function deleteCurrentSharedList(){
@@ -6374,6 +6645,7 @@ async function deleteCurrentSharedList(){
   activeListType="family";
   currentSharedListId=null;
   currentSharedListInviteCode=null;
+  try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
   const delBtn=document.getElementById("deleteSharedListBtn");
   if(delBtn) delBtn.remove();
 
@@ -7408,8 +7680,27 @@ function toggleRegisterPassword(fieldId, button) {
 
       const householdId = await getOrCreateHousehold();
       if (householdId) {
-        activeListType = "family";
-        await loadList();
+        const rememberedSharedId = !freshLogin ? localStorage.getItem("activeSharedListId") : null;
+        if (rememberedSharedId) {
+          try {
+            const sharedSnap = await database.ref("sharedLists/" + rememberedSharedId).once("value");
+            const sharedData = sharedSnap.val();
+            if (sharedData && sharedData.members && sharedData.members[user.uid] === true) {
+              await openSharedList(rememberedSharedId, false);
+            } else {
+              localStorage.removeItem("activeSharedListId");
+              activeListType = "family";
+              await loadList();
+            }
+          } catch (restoreSharedError) {
+            console.warn("Gedeelde lijst na vernieuwen herstellen mislukt:", restoreSharedError);
+            activeListType = "family";
+            await loadList();
+          }
+        } else {
+          activeListType = "family";
+          await loadList();
+        }
         if (freshLogin && typeof showMainListView === "function") showMainListView();
       } else if (!freshLogin) {
         // Herstelde sessie zonder familie: persoonlijke lijst laden.
@@ -7490,7 +7781,7 @@ function toggleRegisterPassword(fieldId, button) {
           const ns = await database.ref('users/' + uid + '/name').once('value');
           name = ns.val() || '';
         } catch (_) {}
-        if (!name) name = user.displayName || user.email || 'Gebruiker';
+        if (!name) name = user.displayName || 'Naam niet ingesteld';
         const updates = {};
         updates['sharedLists/' + listId + '/members/' + uid] = true;
         updates['sharedLists/' + listId + '/memberNames/' + uid] = name;
@@ -7583,25 +7874,51 @@ async function showOverviewView(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function showMoreView(){
-  slideToTab(2);
+  // Meer opent direct zonder extra hoofdscherm-animatie.
+  __activeMainTab = 2;
   var app=document.querySelector('.app');
   if(app) app.classList.remove('overview-active'), app.classList.add('more-active');
   setBottomNav('navMore');
 
   var menu=document.getElementById('familyMenu');
   var moreView=document.getElementById('moreView');
-  // In Meer the family menu is the screen content, never a dropdown.
-  // Re-attach it every time so it cannot disappear after a navigation/login
-  // transition or an old DOM move.
+  // In Meer is het family menu de inhoud van het scherm.
   if(menu && moreView && menu.parentElement !== moreView){
     moreView.appendChild(menu);
   }
-  __resetMoreNavigation();
+
+  __cancelMenuTransition();
   if(menu){
     menu.style.display='block';
     menu.classList.remove('menu-open');
+  }
+
+  // Is er een gedeelde lijst actief? Toon dan direct het bestaande
+  // gedeelde-lijstmenu met Personen, Deelcode en Code invoeren.
+  if (currentSharedListId) {
+    __showOnlyMenuPage('sharedListActiveMenuSub');
+
+    const title = document.getElementById('sharedListActiveMenuTitle');
+    if (title && typeof currentListName !== 'undefined') {
+      title.textContent = currentListName || 'Gedeelde lijst';
+    }
+
+    const count = document.getElementById('sharedMemberCountActive');
+    if (count && typeof database !== 'undefined') {
+      try {
+        database.ref('sharedLists/' + currentSharedListId).once('value').then(function(s){
+          const data=s.val() || {};
+          const members=data.members || {};
+          count.textContent=String(Object.keys(members).filter(function(uid){
+            return members[uid] === true;
+          }).length);
+        }).catch(function(){});
+      } catch (_) {}
+    }
+  } else {
     __showOnlyMenuPage('familyMenuMain');
   }
+
   if(moreView) moreView.scrollTop=0;
 }
 
@@ -7698,7 +8015,7 @@ function __overviewOverlay(title){
   overlay.style.pointerEvents="none";
   sheet.style.transform="translate3d(0,110%,0)";
   sheet.style.opacity="1";
-  sheet.style.transition="transform 340ms cubic-bezier(.22,1,.36,1)";
+  sheet.style.transition="transform 140ms cubic-bezier(.22,1,.36,1)";
   sheet.style.willChange="transform";
 
   var closeSheet=function(){
@@ -7709,7 +8026,7 @@ function __overviewOverlay(title){
     overlay.style.opacity="0";
     overlay.style.pointerEvents="none";
     sheet.style.transform="translate3d(0,110%,0)";
-    setTimeout(function(){ if(overlay.parentNode) overlay.remove(); },350);
+    setTimeout(function(){ if(overlay.parentNode) overlay.remove(); },150);
   };
 
   var openSheet=function(){
@@ -7717,11 +8034,9 @@ function __overviewOverlay(title){
     overlay.dataset.opened="1";
     overlay.style.pointerEvents="auto";
     requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        overlay.classList.add("is-open");
-        overlay.style.opacity="1";
-        sheet.style.transform="translate3d(0,0,0)";
-      });
+      overlay.classList.add("is-open");
+      overlay.style.opacity="1";
+      sheet.style.transform="translate3d(0,0,0)";
     });
   };
 
@@ -7752,103 +8067,90 @@ function __overviewAddProduct(product){
 async function openQuickAddFromOverview(){
   var overlay=__overviewOverlay("Snel opnieuw toevoegen");
   var body=overlay.querySelector(".overviewActionBody");
-  __overviewOpenSheet(overlay);
 
-  // Toon de sheet direct. Gebruik eerst lokaal beschikbare data zodat de animatie
-  // niet wacht op Firebase; ververs daarna op de achtergrond met de clouddata.
-  function renderQuick(sources){
-    var counts={};
-    sources.flat().forEach(function(item){
-      var text=typeof item==="string"?item:(item&&item.text);
-      if(!text) return;
-      text=String(text).trim();
-      var key=text.toLowerCase();
-      if(!counts[key]) counts[key]={text:text,count:0};
-      counts[key].count++;
-    });
-    var products=Object.keys(counts).map(function(k){return counts[k];})
-      .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
-    body.innerHTML="";
-    if(!products.length){
-      body.innerHTML='<div class="overviewActionMuted">Er zijn nog geen producten om opnieuw toe te voegen.</div>';
-      return;
-    }
-    var grid=document.createElement("div");
-    grid.className="overviewActionProductGrid";
-    products.forEach(function(p){
-      var btn=document.createElement("button");
-      btn.type="button"; btn.className="overviewActionProduct";
-      btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
-      btn.querySelector("span").textContent=p.text;
-      btn.addEventListener("click",function(){
-        __overviewAddProduct(p.text);
-        btn.classList.add("added");
-        btn.querySelector("i").className="fa-solid fa-check";
-        setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
-      });
-      grid.appendChild(btn);
-    });
-    body.appendChild(grid);
-  }
-
-  var localSaved=readSavedListsLocal();
-  var localHistory=[];
-  try{ localHistory=JSON.parse(localStorage.getItem(__overviewAccountKey("history"))||"[]")||[]; }catch(_){}
-  renderQuick([].concat(localSaved.map(function(x){return x.items||[];}), localHistory.map(function(x){return x.items||[];}), [Array.isArray(boodschappen)?boodschappen:[]]));
-
+  var sources=[];
   try{
     var saved=await readSavedLists();
-    var history=await readOverviewHistory();
-    renderQuick([].concat(saved.map(function(x){return x.items||[];}), history.map(function(x){return x.items||[];}), [Array.isArray(boodschappen)?boodschappen:[]]));
+    sources=sources.concat(saved.map(function(x){return x.items||[];}));
   }catch(_){}
-}
+  try{
+    var history=await readOverviewHistory();
+    sources=sources.concat(history.map(function(x){return x.items||[];}));
+  }catch(_){}
+  sources.push(Array.isArray(boodschappen)?boodschappen:[]);
 
+  var counts={};
+  sources.flat().forEach(function(item){
+    var text=typeof item==="string"?item:(item&&item.text);
+    if(!text) return;
+    text=String(text).trim();
+    var key=text.toLowerCase();
+    if(!counts[key]) counts[key]={text:text,count:0};
+    counts[key].count++;
+  });
+  var products=Object.keys(counts).map(function(k){return counts[k];})
+    .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
+
+  body.innerHTML="";
+  if(!products.length){
+    body.innerHTML='<div class="overviewActionMuted">Er zijn nog geen producten om opnieuw toe te voegen.</div>';
+    __overviewOpenSheet(overlay);
+    return;
+  }
+  var grid=document.createElement("div");
+  grid.className="overviewActionProductGrid";
+  products.forEach(function(p){
+    var btn=document.createElement("button");
+    btn.type="button"; btn.className="overviewActionProduct";
+    btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
+    btn.querySelector("span").textContent=p.text;
+    btn.addEventListener("click",function(){
+      __overviewAddProduct(p.text);
+      btn.classList.add("added");
+      btn.querySelector("i").className="fa-solid fa-check";
+      setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
+    });
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+  __overviewOpenSheet(overlay);
+}
 
 async function openShoppingHistoryFromOverview(){
   var overlay=__overviewOverlay("Boodschappenhistorie");
   var body=overlay.querySelector(".overviewActionBody");
-  __overviewOpenSheet(overlay);
+  var history=await readOverviewHistory();
+  var saved=[];
+  try{saved=await readSavedLists();}catch(_){}
 
-  function renderHistory(entries){
-    body.innerHTML="";
-    if(!entries.length){
-      body.innerHTML='<div class="overviewActionMuted">Je hebt nog geen eerdere boodschappen.</div>';
-      return;
-    }
-    entries.slice(0,20).forEach(function(entry){
-      var card=document.createElement("div");
-      card.className="overviewHistoryCard";
-      var date=entry.savedAt?new Date(entry.savedAt).toLocaleDateString("nl-NL",{day:"numeric",month:"long",year:"numeric"}):"";
-      var items=(entry.items||[]).map(function(x){return typeof x==="string"?x:(x&&x.text)||"";}).filter(Boolean);
-      card.innerHTML='<div class="overviewHistoryCardTop"><strong></strong><small></small></div><div class="overviewHistoryItems"></div><button type="button" class="overviewHistoryUse">Opnieuw gebruiken</button>';
-      card.querySelector("strong").textContent=entry.name || (items.length+" product"+(items.length===1?"":"en"));
-      card.querySelector("small").textContent=date;
-      card.querySelector(".overviewHistoryItems").textContent=items.slice(0,6).join(" · ")+(items.length>6?" · …":"");
-      card.querySelector(".overviewHistoryUse").addEventListener("click",async function(){
-        boodschappen=normalizeBoodschappen(entry.items||[]);
-        currentListName=String(entry.name||"Boodschappenlijst");
-        selectedIndex=-1;
-        overlay.remove();
-        showMainListView();
-        showList();
-        await saveList();
-      });
-      body.appendChild(card);
-    });
+  var entries=history.length ? history : saved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
+  body.innerHTML="";
+  if(!entries.length){
+    body.innerHTML='<div class="overviewActionMuted">Je hebt nog geen eerdere boodschappen.</div>';
+    __overviewOpenSheet(overlay);
+    return;
   }
-
-  var localHistory=[];
-  try{ localHistory=JSON.parse(localStorage.getItem(__overviewAccountKey("history"))||"[]")||[]; }catch(_){}
-  var localSaved=readSavedListsLocal();
-  var localEntries=localHistory.length ? localHistory : localSaved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
-  renderHistory(localEntries);
-
-  try{
-    var history=await readOverviewHistory();
-    var saved=await readSavedLists();
-    var entries=history.length ? history : saved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
-    renderHistory(entries);
-  }catch(_){}
+  entries.slice(0,20).forEach(function(entry){
+    var card=document.createElement("div");
+    card.className="overviewHistoryCard";
+    var date=entry.savedAt?new Date(entry.savedAt).toLocaleDateString("nl-NL",{day:"numeric",month:"long",year:"numeric"}):"";
+    var items=(entry.items||[]).map(function(x){return typeof x==="string"?x:(x&&x.text)||"";}).filter(Boolean);
+    card.innerHTML='<div class="overviewHistoryCardTop"><strong></strong><small></small></div><div class="overviewHistoryItems"></div><button type="button" class="overviewHistoryUse">Opnieuw gebruiken</button>';
+    card.querySelector("strong").textContent=entry.name || (items.length+" product"+(items.length===1?"":"en"));
+    card.querySelector("small").textContent=date;
+    card.querySelector(".overviewHistoryItems").textContent=items.slice(0,6).join(" · ")+(items.length>6?" · …":"");
+    card.querySelector(".overviewHistoryUse").addEventListener("click",async function(){
+      boodschappen=normalizeBoodschappen(entry.items||[]);
+      currentListName=String(entry.name||"Boodschappenlijst");
+      selectedIndex=-1;
+      overlay.remove();
+      showMainListView();
+      showList();
+      await saveList();
+    });
+    body.appendChild(card);
+  });
+  __overviewOpenSheet(overlay);
 }
 
 /* Klikbare onderdelen in het overzicht gebruiken deze functies direct. */
@@ -7971,7 +8273,7 @@ var __overviewNameCache = "";
 
 async function refreshOverviewGreeting(){
   var h = new Date().getHours();
-  var greeting = h>=5 && h<12 ? "Goedemorgen" : (h>=12 && h<18 ? "Goedemiddag" : "Goedenavond");
+  var greeting = h < 5 ? "Goedenacht" : (h<12 ? "Goedemorgen" : (h<18 ? "Goedemiddag" : "Goedenavond"));
   var el = document.getElementById("overviewGreetingNew");
   if (!el) return;
 
@@ -7997,6 +8299,9 @@ async function refreshOverviewGreeting(){
 
   el.textContent = name ? greeting + ", " + name + " 👋" : greeting + " 👋";
 }
+
+// Keep the greeting current when the app remains open across a time change.
+setInterval(function(){ refreshOverviewGreeting(); }, 30000);
 
 async function updateOverviewView(){
   refreshOverviewGreeting();
@@ -8257,7 +8562,7 @@ body.dark-theme .overviewSavedListLine{color:#c2ccc5;border-bottom-color:rgba(25
       '.boodschap-item, .list-item, .grocery-item'
     );
     rows.forEach(function(row){
-      if(row.querySelector('.article-trash,.product-trash,.shopping-item-trash')) return;
+      if(row.querySelector('.article-trash,.product-trash,.shopping-item-trash,.product-row-trash-can')) return;
       var button=document.createElement('button');
       button.type='button';
       button.className='article-trash';
