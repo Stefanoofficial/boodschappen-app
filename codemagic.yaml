@@ -10,9 +10,9 @@ workflows:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
       - name: Build Android APK
-  script: |
-    cd android
-    gradle assembleRelease
+        script: |
+          cd android
+          ./gradlew assembleRelease
 
     artifacts:
       - android/app/build/outputs/**/*.apk
