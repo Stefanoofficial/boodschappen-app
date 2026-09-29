@@ -3577,6 +3577,11 @@ body.dark-theme .silentRefreshBtn{background:rgba(255,255,255,.08);color:#dff1e2
       <span>Lijstopties</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+     <button type="button" class="familyMenuItem settingsMenuItem" onclick="openScannerSettings(event)">
+       <i class="fa-solid fa-barcode"></i>
+       <span>Scannen</span>
+       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+     </button>
     <div class="settingsMenuHint">Meer instellingen kunnen hier later worden toegevoegd.</div>
   </div>
 
@@ -4920,6 +4925,28 @@ function openListOptionsSettings() {
   });
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
+
+
+function openScannerSettings(event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  closeFamilyMenuForDialog();
+  const enabled = localStorage.getItem("boodschappenScannerEnabled") !== "false";
+  const overlay = familyDialogBase(
+    "fa-barcode", "Scannen",
+    '<div class="familyDialogText">Schakel het scannen van productbarcodes in of uit.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Barcode scannen</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Barcode scannen"></button></div>',
+    '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
+  );
+  const toggle = overlay.querySelector(".settingsToggle");
+  toggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !toggle.classList.contains("on");
+    toggle.classList.toggle("on", next);
+    localStorage.setItem("boodschappenScannerEnabled", next ? "true" : "false");
+    syncBarcodeScannerSetting();
+  });
+  overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
+}
+
 
   async function updateMemberCount() {
   const subCountEl = document.getElementById("memberCountSub");
@@ -8769,6 +8796,16 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 })();
 </script>
 
+<script id="barcode-setting-sync">
+function syncBarcodeScannerSetting(){
+  const enabled = localStorage.getItem("boodschappenScannerEnabled") !== "false";
+  document.querySelectorAll(".barcode-search-btn").forEach(btn => {
+    btn.classList.toggle("scanning-disabled", !enabled);
+    btn.setAttribute("aria-hidden", enabled ? "false" : "true");
+  });
+}
+document.addEventListener("DOMContentLoaded", syncBarcodeScannerSetting);
+</script>
 <script id="barcode-camera-system">
 /*
  * Cross-platform barcode scanner without a third-party scanner library.
@@ -9062,6 +9099,9 @@ async function scheduleBarcodeScan(){
   if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
 }
 async function openBarcodeScanner(){
+  if(localStorage.getItem("boodschappenScannerEnabled") === "false"){
+    return;
+  }
   const overlay=document.getElementById('barcodeOverlay');
   const video=document.getElementById('barcodeVideo');
   const input=document.getElementById('barcodeManualInput');
@@ -9475,7 +9515,7 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 
 <style id="barcode-scanner-system">
 .barcode-search-btn{background:none!important;border:0!important;color:#607069!important;font-size:20px!important;padding:0 8px!important;width:38px!important;height:38px!important;display:inline-flex!important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 38px!important}
-.barcode-search-btn:active{transform:scale(.94)}
+.barcode-search-btn:active{transform:scale(.94)} .barcode-search-btn.scanning-disabled{display:none!important}
 .productBarcodeImage{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;border-radius:6px!important;display:block!important}
 .barcodeOverlay{position:fixed;inset:0;z-index:15000;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(31,49,39,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .barcodeOverlay.open{display:flex}
