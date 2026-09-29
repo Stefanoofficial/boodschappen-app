@@ -6,7 +6,6 @@
         android:allowBackup="true"
         android:label="Mijn Boodschappen"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
 
         <activity
