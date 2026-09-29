@@ -1229,6 +1229,28 @@ body.dark-theme .useModeIntro{color:#b8c0ba;}
   min-width: 0;
 }
 
+.productInfo {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.productBrand {
+  display: block;
+  min-width: 0;
+  color: #3F5B45;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 .productIcon {
   width: 34px;
   min-width: 34px;
@@ -5604,14 +5626,32 @@ function showList(animationType = "") {
       checkMark.innerHTML = '<i class="fa-solid fa-check"></i>';
     }
 
+    const productInfo = document.createElement("div");
+    productInfo.className = "productInfo";
+
+    const brandText = String(item.brand || "").trim();
+    const showBrand = brandText && brandText.toLowerCase() !== productText.trim().toLowerCase();
+
+    if (showBrand) {
+      const brandSpan = document.createElement("span");
+      brandSpan.className = "productBrand";
+      brandSpan.textContent = brandText;
+      if (item.completed) {
+        brandSpan.style.textDecoration = "line-through";
+      }
+      productInfo.appendChild(brandSpan);
+    }
+
     const productSpan = document.createElement("span");
     productSpan.className = "productName";
     productSpan.textContent = productText;
     if (item.completed) {
       productSpan.style.textDecoration = "line-through";
     }
+    productInfo.appendChild(productSpan);
+
     productWrap.appendChild(checkMark);
-    productWrap.appendChild(productSpan);
+    productWrap.appendChild(productInfo);
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
