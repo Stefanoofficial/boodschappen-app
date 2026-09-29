@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Gradle wrapper bootstrap for Codemagic.
+# The official Gradle 8.7 wrapper JAR is fetched only when missing.
+#
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P) || exit 1
+WRAPPER_JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+  mkdir -p "$(dirname "$WRAPPER_JAR")" || exit 1
+  curl -fsSL \
+    "https://raw.githubusercontent.com/gradle/gradle/v8.7.0/gradle/wrapper/gradle-wrapper.jar" \
+    -o "$WRAPPER_JAR" || {
+      echo "Could not download the Gradle 8.7 wrapper JAR." >&2
+      exit 1
+    }
+fi
+
+JAVACMD="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+exec "$JAVACMD" -classpath "$WRAPPER_JAR" org.gradle.wrapper.GradleWrapperMain "$@"
