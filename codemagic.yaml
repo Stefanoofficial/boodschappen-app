@@ -10,9 +10,18 @@ workflows:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
       - name: Check Android resources
-        script: |
-          echo "=== ANDROID RESOURCES ==="
-          find android/app/src/main/res -type f | sort
+  script: |
+    echo "=== RES FOLDER ==="
+    ls -la android/app/src/main/res
+
+    echo "=== DRAWABLE ==="
+    ls -la android/app/src/main/res/drawable
+
+    echo "=== LAUNCHER FILE ==="
+    ls -la android/app/src/main/res/drawable/ic_launcher.png
+
+    echo "=== FILE TYPE ==="
+    file android/app/src/main/res/drawable/ic_launcher.png
 
       - name: Build Android APK
         script: |
