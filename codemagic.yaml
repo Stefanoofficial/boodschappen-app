@@ -9,30 +9,33 @@ workflows:
         script: |
           set -e
 
-          echo "=== CREATE ANDROID RESOURCE DIRECTORIES ==="
+          echo "=== BUILD DIRECTORY ==="
+          pwd
+
+          echo "=== ROOT FILES ==="
+          ls -la "$CM_BUILD_DIR"
 
           mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
-          echo "=== CHECK ICON ==="
+          echo "=== FIND ICON ==="
 
-          if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
-            echo "ERROR: $CM_BUILD_DIR/icon-512-maskable.png not found"
+          ICON=$(find "$CM_BUILD_DIR" -maxdepth 2 -name "icon-512-maskable.png" -type f | head -1)
+
+          if [ -z "$ICON" ]; then
+            echo "ERROR: icon-512-maskable.png not found"
+            echo "Searching for all PNG files:"
+            find "$CM_BUILD_DIR" -maxdepth 3 -name "*.png" -type f -print
             exit 1
           fi
 
-          echo "Icon found:"
-          ls -lh "$CM_BUILD_DIR/icon-512-maskable.png"
+          echo "Found icon:"
+          echo "$ICON"
 
-          echo "=== INSTALL APP ICON ==="
+          cp "$ICON" \
+            "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
-             "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
-
-          echo "=== VERIFY ANDROID ICON ==="
-
+          echo "=== INSTALLED ICON ==="
           ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
-
-          echo "=== ANDROID RESOURCES READY ==="
 
 
       - name: Set Android SDK location
@@ -40,21 +43,14 @@ workflows:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
 
-      - name: Verify Android Manifest
+      - name: Verify Android resources
         script: |
           set -e
 
-          echo "=== ANDROID MANIFEST ==="
-          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+          test -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-          echo "=== CHECK LAUNCHER ICON ==="
-
-          if [ ! -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png" ]; then
-            echo "ERROR: ic_launcher.png was not created"
-            exit 1
-          fi
-
-          echo "Launcher icon OK"
+          echo "=== ANDROID ICON OK ==="
+          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
 
       - name: Build Android APK
