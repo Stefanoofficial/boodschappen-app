@@ -3321,6 +3321,103 @@ body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
 body.dark-theme .silentRefreshBtn{background:rgba(255,255,255,.08);color:#dff1e2;}
 </style>
 
+
+<style id="final-android-responsive-fix">
+/* ===== Android / small-screen layout =====
+   The app itself is the scroll container. This keeps the bottom navigation
+   fixed while allowing long screens such as "Meer" to scroll naturally. */
+html, body {
+  width: 100%;
+  min-width: 0;
+}
+
+body.logged-in {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior-y: auto !important;
+}
+
+.app {
+  width: 100%;
+  max-width: 600px;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 auto;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+}
+
+/* "Meer" is a full page, never a clipped dropdown. */
+.app.more-active {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Do not show the old list header on the Meer page. */
+.app.more-active .headerBar {
+  display: none !important;
+}
+
+/* The Meer content must be allowed to grow beyond the viewport. */
+.app.more-active .moreView {
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding: 18px 0 calc(120px + env(safe-area-inset-bottom)) !important;
+}
+
+.app.more-active #familyMenu {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+  transform: none !important;
+}
+
+.app.more-active #familyMenu .familyMenuPage {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Android WebView should hand vertical swipes to the app scroll container. */
+.app.more-active .familyMenuItem,
+.app.more-active .familyMenuPage,
+.app.more-active #familyMenu {
+  touch-action: pan-y !important;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+}
+</style>
+
 </head>
 
 <body>
