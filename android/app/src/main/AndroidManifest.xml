@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -8,9 +9,9 @@
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:label="Mijn Boodschappen"
-        android:theme="@style/AppTheme.NoActionBar"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="false"
+        android:theme="@style/AppTheme.NoActionBar">
 
         <activity
             android:name=".MainActivity"
@@ -23,6 +24,7 @@
             </intent-filter>
 
         </activity>
+
     </application>
 
 </manifest>
