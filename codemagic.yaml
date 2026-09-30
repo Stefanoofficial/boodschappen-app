@@ -3,33 +3,40 @@ workflows:
     name: Android APK
     instance_type: mac_mini_m2
 
-    environment:
-      android_signing:
-        - keystore_reference
-
     scripts:
-      - name: Prepare Android resources
+      - name: Prepare Android app
         script: |
+          set -e
+
           echo "=== BUILD DIRECTORY ==="
           pwd
+
           echo "=== ROOT FILES ==="
           ls -la
 
-          echo "=== CHECK ICON ==="
-          if [ ! -f "icon-512-maskable.png" ]; then
-            echo "ERROR: icon-512-maskable.png not found"
-            exit 1
-          fi
+          echo "=== CHECK INDEX ==="
+          test -f index.html
 
+          echo "=== CHECK ICON ==="
+          test -f icon-512-maskable.png
+
+          echo "=== PREPARE WEB ASSET ==="
+          mkdir -p android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
+
+          echo "=== PREPARE ICON ==="
           mkdir -p android/app/src/main/res/drawable
           cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "=== ICON READY ==="
+          echo "=== CHECK PREPARED FILES ==="
+          ls -l android/app/src/main/assets/index.html
           ls -l android/app/src/main/res/drawable/ic_launcher.png
 
       - name: Build Android APK
         script: |
+          set -e
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
     artifacts:
