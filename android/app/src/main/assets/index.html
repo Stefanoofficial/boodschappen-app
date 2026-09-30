@@ -3472,6 +3472,35 @@ body.logged-in {
 }
 </style>
 
+<style id="final-focus-and-login-keyboard-fix">
+/* Exact same subtle blue focus as the search field (#7fa8e8). */
+.input-row #product {
+  border: 2px solid transparent !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: none;
+}
+.input-row #product:focus,
+.input-row #product:focus-visible {
+  border-color: #7fa8e8 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px rgba(127,168,232,0.10) !important;
+}
+.searchBox:focus-within {
+  border-color: #7fa8e8 !important;
+  box-shadow: 0 0 0 1px rgba(127,168,232,0.10) !important;
+}
+#loginScreen {
+  overflow: hidden !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+#loginScreen input,
+#loginScreen button {
+  -webkit-tap-highlight-color: transparent;
+}
+</style>
 </head>
 
 <body>
