@@ -1,68 +1,72 @@
 workflows:
-  android-apk:
-    name: Boodschappen App APK
-    max_build_duration: 60
+  android-workflow:
+    name: Android APK
     instance_type: mac_mini_m2
 
     scripts:
+
       - name: Prepare Android resources
         script: |
           set -e
 
-          echo "=== CURRENT DIRECTORY ==="
-          pwd
-
-          echo "=== ROOT FILES ==="
-          ls -la
-
-          echo "=== ANDROID PROJECT ==="
-          ls -la android
-          ls -la android/app
-
           echo "=== CREATE ANDROID RESOURCE DIRECTORIES ==="
-          mkdir -p android/app/src/main/res/drawable
+
+          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
           echo "=== CHECK ICON ==="
-          if [ -f "icon-512-maskable.png" ]; then
-            echo "Found icon-512-maskable.png"
-          else
-            echo "ERROR: icon-512-maskable.png not found"
+
+          if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
+            echo "ERROR: $CM_BUILD_DIR/icon-512-maskable.png not found"
             exit 1
           fi
 
-          echo "=== INSTALL LAUNCHER ICON ==="
-          cp icon-512-maskable.png \
-            android/app/src/main/res/drawable/ic_launcher.png
+          echo "Icon found:"
+          ls -lh "$CM_BUILD_DIR/icon-512-maskable.png"
 
-          cp icon-512-maskable.png \
-            android/app/src/main/res/drawable/ic_launcher_round.png
+          echo "=== INSTALL APP ICON ==="
 
-          echo "=== ANDROID RESOURCES ==="
-          find android/app/src/main/res -type f -print
+          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
+             "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+
+          echo "=== VERIFY ANDROID ICON ==="
+
+          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+
+          echo "=== ANDROID RESOURCES READY ==="
+
 
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+
 
       - name: Verify Android Manifest
         script: |
           set -e
 
           echo "=== ANDROID MANIFEST ==="
-          cat android/app/src/main/AndroidManifest.xml
+          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
-          echo "=== LAUNCHER ICONS ==="
-          ls -lh android/app/src/main/res/drawable/
+          echo "=== CHECK LAUNCHER ICON ==="
+
+          if [ ! -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png" ]; then
+            echo "ERROR: ic_launcher.png was not created"
+            exit 1
+          fi
+
+          echo "Launcher icon OK"
+
 
       - name: Build Android APK
         script: |
           set -e
 
-          cd android
+          cd "$CM_BUILD_DIR/android"
 
-          chmod +x gradlew
+          chmod +x ./gradlew
 
           ./gradlew assembleDebug
 
+
     artifacts:
-      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/apk/debug/*.apk
