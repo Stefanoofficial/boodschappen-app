@@ -5,23 +5,26 @@ workflows:
     instance_type: mac_mini_m2
 
     scripts:
-      - name: Set Android SDK location
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-
-      - name: Check Android resources
+      - name: Check project files
         script: |
           echo "=== CURRENT DIRECTORY ==="
           pwd
 
-          echo "=== ANDROID RESOURCES ==="
-          find "$CM_BUILD_DIR/android/app/src/main/res" -type f -print
+          echo "=== ROOT FILES ==="
+          ls -la
 
-          echo "=== DRAWABLE ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/drawable"
+          echo "=== ALL DIRECTORIES ==="
+          find "$CM_BUILD_DIR" -maxdepth 3 -type d -print
 
-          echo "=== LAUNCHER FILES ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/drawable"/ic_launcher*
+          echo "=== GIT STATUS ==="
+          git status --short
+
+          echo "=== ANDROID IN GIT ==="
+          git ls-tree -r HEAD --name-only | grep '^android/' || true
+
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
       - name: Build Android APK
         script: |
