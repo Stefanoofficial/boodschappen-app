@@ -3,66 +3,104 @@ workflows:
     name: Android APK
     instance_type: mac_mini_m2
 
+    environment:
+      vars:
+        PACKAGE_NAME: "com.mijnboodschappen.app"
+      android_signing:
+        - keystore_reference
+
     scripts:
+
+      - name: Check project files
+        script: |
+          set -e
+
+          echo "=== CURRENT DIRECTORY ==="
+          pwd
+
+          echo "=== ROOT FILES ==="
+          ls -la
+
+          echo "=== ANDROID PROJECT ==="
+          ls -la android
+          ls -la android/app
+
+          echo "=== CHECK ICON ==="
+          if [ ! -f "./icon-512-maskable.png" ]; then
+            echo "ERROR: ./icon-512-maskable.png not found"
+            echo "PNG FILES:"
+            find . -maxdepth 2 -type f -name "*.png" -print
+            exit 1
+          fi
+
+          echo "ICON FOUND:"
+          ls -lh "./icon-512-maskable.png"
 
       - name: Prepare Android resources
         script: |
           set -e
 
-          echo "=== BUILD DIRECTORY ==="
-          pwd
+          echo "=== CREATE ANDROID RESOURCE DIRECTORIES ==="
 
-          echo "=== ROOT FILES ==="
-          ls -la "$CM_BUILD_DIR"
+          mkdir -p android/app/src/main/res/drawable
 
-          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
+          echo "=== COPY APP ICON ==="
 
-          echo "=== FIND ICON ==="
+          cp "./icon-512-maskable.png" \
+             "android/app/src/main/res/drawable/ic_launcher.png"
 
-          ICON=$(find "$CM_BUILD_DIR" -maxdepth 2 -name "icon-512-maskable.png" -type f | head -1)
+          echo "=== VERIFY ICON ==="
 
-          if [ -z "$ICON" ]; then
-            echo "ERROR: icon-512-maskable.png not found"
-            echo "Searching for all PNG files:"
-            find "$CM_BUILD_DIR" -maxdepth 3 -name "*.png" -type f -print
-            exit 1
-          fi
+          ls -lh android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "Found icon:"
-          echo "$ICON"
-
-          cp "$ICON" \
-            "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
-
-          echo "=== INSTALLED ICON ==="
-          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
-
+          file android/app/src/main/res/drawable/ic_launcher.png
 
       - name: Set Android SDK location
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          set -e
 
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
 
-      - name: Verify Android resources
+          echo "=== ANDROID SDK ==="
+          cat android/local.properties
+
+      - name: Verify Android Manifest
         script: |
           set -e
 
-          test -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+          echo "=== ANDROID MANIFEST ==="
+          cat android/app/src/main/AndroidManifest.xml
 
-          echo "=== ANDROID ICON OK ==="
-          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+          echo "=== VERIFY LAUNCHER ICON ==="
 
+          if grep -q 'drawable/ic_launcher' android/app/src/main/AndroidManifest.xml; then
+            echo "Launcher icon reference found."
+          else
+            echo "WARNING: drawable/ic_launcher reference not found in manifest."
+          fi
+
+          echo "=== VERIFY ICON FILE ==="
+
+          test -f android/app/src/main/res/drawable/ic_launcher.png
+
+          echo "Launcher icon exists."
 
       - name: Build Android APK
         script: |
           set -e
 
-          cd "$CM_BUILD_DIR/android"
+          cd android
 
-          chmod +x ./gradlew
+          chmod +x gradlew
 
-          ./gradlew assembleDebug
+          echo "=== GRADLE VERSION ==="
+          ./gradlew --version
 
+          echo "=== BUILD DEBUG APK ==="
+          ./gradlew assembleDebug --stacktrace
+
+          echo "=== APK FILES ==="
+          find app/build/outputs/apk -type f -name "*.apk" -print
 
     artifacts:
-      - android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/**/*.apk
