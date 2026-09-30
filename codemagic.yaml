@@ -13,31 +13,98 @@ workflows:
           pwd
 
           echo "=== ROOT FILES ==="
-          ls -lab
+          ls -la
 
-          echo "=== FIND ICON ==="
+          echo "=== CREATE ANDROID RESOURCE DIRECTORIES ==="
+          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
+          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/values"
 
-          ICON_FILE="$(find "$CM_BUILD_DIR" -maxdepth 1 -type f -name '*icon-512-maskable.png' -print -quit)"
+          echo "=== CHECK APP ICON ==="
 
-          if [ -z "$ICON_FILE" ]; then
-            echo "ERROR: icon-512-maskable.png could not be found"
-            echo "Available PNG files:"
-            find "$CM_BUILD_DIR" -maxdepth 1 -type f -name '*.png' -print
+          if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
+            echo "ERROR: icon-512-maskable.png not found"
+            find "$CM_BUILD_DIR" -maxdepth 2 -type f -name "*.png" -print
             exit 1
           fi
 
-          echo "ICON FOUND:"
-          printf '%s\n' "$ICON_FILE"
+          echo "Icon found:"
+          ls -lh "$CM_BUILD_DIR/icon-512-maskable.png"
 
-          echo "=== CREATE RESOURCE DIRECTORY ==="
-          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
+          echo "=== INSTALL APP ICON ==="
 
-          echo "=== COPY ICON ==="
-          cp "$ICON_FILE" \
+          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
              "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+
+          echo "=== CHECK THEME FILE ==="
+
+          if [ ! -f "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml" ]; then
+            echo "styles.xml does not exist, creating it..."
+
+            cat > "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml" <<'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme.NoActionBar"
+        parent="@android:style/Theme.Material.Light.NoActionBar">
+
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">#4f7658</item>
+        <item name="android:navigationBarColor">#eef8f1</item>
+        <item name="android:statusBarColor">#eef8f1</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+
+    </style>
+</resources>
+EOF
+          fi
+
+          echo "=== VERIFY THEME FILE ==="
+          cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
           echo "=== VERIFY ICON ==="
           ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+
+          echo "=== ANDROID RESOURCES READY ==="
+
+
+      - name: Set Android SDK location
+        script: |
+          set -e
+
+          echo "sdk.dir=$ANDROID_SDK_ROOT" \
+            > "$CM_BUILD_DIR/android/local.properties"
+
+          cat "$CM_BUILD_DIR/android/local.properties"
+
+
+      - name: Verify Android Manifest
+        script: |
+          set -e
+
+          echo "=== ANDROID MANIFEST ==="
+
+          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+
+          echo "=== VERIFY THEME REFERENCE ==="
+
+          grep 'android:theme="@style/AppTheme.NoActionBar"' \
+            "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+
+          echo "=== VERIFY THEME RESOURCE ==="
+
+          grep 'name="AppTheme.NoActionBar"' \
+            "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+
+          echo "=== VERIFY ICON ==="
+
+          test -f \
+            "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+
+          echo "All Android resources verified."
+
+
       - name: Build Android APK
         script: |
           set -e
@@ -46,10 +113,18 @@ workflows:
 
           chmod +x gradlew
 
-          ./gradlew assembleDebug
+          echo "=== GRADLE VERSION ==="
+          ./gradlew --version
 
-          echo "=== APK ==="
-          find app/build/outputs/apk -type f -name "*.apk" -print
+          echo "=== BUILD DEBUG APK ==="
+          ./gradlew assembleDebug --stacktrace
+
+          echo "=== GENERATED APK ==="
+          find app/build/outputs/apk/debug \
+            -type f \
+            -name "*.apk" \
+            -print
+
 
     artifacts:
-      - android/app/build/outputs/apk/**/*.apk
+      - android/app/build/outputs/apk/debug/*.apk
