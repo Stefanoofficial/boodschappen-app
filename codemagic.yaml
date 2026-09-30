@@ -1,5 +1,5 @@
 workflows:
-  android-workflow:
+  android-apk:
     name: Android APK
     instance_type: mac_mini_m2
 
