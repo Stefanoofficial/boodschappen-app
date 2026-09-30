@@ -1,0 +1,16 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.mijnboodschappen.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.mijnboodschappen.app'
+        minSdk 23
+        targetSdk 34
+        versionCode 3
+        versionName '1.2'
+    }
+}
