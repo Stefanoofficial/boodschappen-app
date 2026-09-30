@@ -9,6 +9,11 @@ workflows:
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
+      - name: Check Android resources
+        script: |
+          echo "=== ANDROID RESOURCES ==="
+          find android/app/src/main/res -type f | sort
+
       - name: Build Android APK
         script: |
           cd android
