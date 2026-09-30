@@ -1933,7 +1933,7 @@ body.dark-theme .settingsToggle { background:#59635c; }
   min-height: 50px;
   border: 0;
   border-radius: 15px;
-  background: #FDE8E8;
+  background: #F8D8D5;
   color: #C62828;
   display: flex;
   align-items: center;
@@ -1944,10 +1944,10 @@ body.dark-theme .settingsToggle { background:#59635c; }
   box-shadow: 0 1px 0 rgba(169,79,98,.05);
 }
 .moreMenuLogout i { font-size: 16px; }
-.moreMenuLogout:active { transform: scale(.985); background:#EDC0C0; }
+.moreMenuLogout:active { transform: scale(.985); background:#F8D8D5; }
 body.dark-theme .moreMenuSectionLabel { color:#9eaaa2; }
 body.dark-theme .moreMenuLogoutWrap { border-top-color: rgba(255,255,255,.10); }
-body.dark-theme .moreMenuLogout { background:#3b2d31; color:#f1a9b9; }
+body.dark-theme .moreMenuLogout { background:#F8D8D5; color:#f1a9b9; }
 body.dark-theme .accountMenuHint, body.dark-theme .aboutMenuHint, body.dark-theme .accountMenuEmail { color:#aab4ad; }
 body.dark-theme .familyDialogDanger { background:#b92e2e; }
 
@@ -3414,6 +3414,60 @@ body.logged-in {
   .app {
     padding-left: 9px;
     padding-right: 9px;
+  }
+}
+</style>
+
+
+<style id="final-user-layout-fix-2026-10">
+/* Definitieve mobiele lijstweergave:
+   - op het hoofdscherm blijft de pagina zelf stil;
+   - alleen het productvak #list kan verticaal scrollen;
+   - Meer en Overzicht behouden hun eigen scrollgedrag. */
+.app:not(.more-active):not(.overview-active) {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  touch-action: manipulation;
+  overscroll-behavior: none !important;
+}
+.app:not(.more-active):not(.overview-active) #list {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  scrollbar-width: thin;
+  height: min(420px, max(180px, calc(100dvh - 500px))) !important;
+  max-height: min(420px, max(180px, calc(100dvh - 500px))) !important;
+}
+/* Laat het invoerveld exact dezelfde blauwe focusrand gebruiken als zoeken. */
+.input-row input {
+  outline: none !important;
+  border: 2px solid transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.input-row input:focus,
+.input-row input:focus-visible {
+  outline: none !important;
+  border-color: #3978d8 !important;
+  box-shadow: 0 0 0 2px rgba(57,120,216,.14) !important;
+}
+.searchBox input:focus,
+.searchBox input:focus-visible {
+  outline: none !important;
+}
+/* Android WebView: voorkom dat focus/keyboard de hoofd-pagina laat verschuiven. */
+body.logged-in {
+  overflow: hidden !important;
+  height: 100dvh !important;
+  overscroll-behavior: none !important;
+}
+@media (max-height: 700px) {
+  .app:not(.more-active):not(.overview-active) #list {
+    height: min(330px, max(160px, calc(100dvh - 470px))) !important;
+    max-height: min(330px, max(160px, calc(100dvh - 470px))) !important;
   }
 }
 </style>
