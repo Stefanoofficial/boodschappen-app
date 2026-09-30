@@ -2,9 +2,9 @@ package com.mijnboodschappen.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.graphics.Color;
 import android.view.Window;
 import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -17,13 +17,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-
-        // Laat de WebView niet onder de Android-systeembalken vallen.
-        window.setStatusBarColor(0xFF3F5B45);
-        window.setNavigationBarColor(0xFF000000);
+        window.setStatusBarColor(Color.rgb(238, 248, 241));
+        window.setNavigationBarColor(Color.rgb(238, 248, 241));
+        window.getDecorView().setSystemUiVisibility(
+                android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR |
+                android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        );
 
         webView = new WebView(this);
-
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -31,16 +32,8 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
 
-        // Mobiele weergave zoals op de iPhone.
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(false);
-        settings.setBuiltInZoomControls(false);
-        settings.setDisplayZoomControls(false);
-
         webView.setWebViewClient(new WebViewClient());
-        webView.setVerticalScrollBarEnabled(false);
-        webView.setHorizontalScrollBarEnabled(false);
-
+        webView.setBackgroundColor(Color.rgb(238, 248, 241));
         webView.loadUrl("file:///android_asset/index.html");
 
         setContentView(webView);
@@ -55,3 +48,4 @@ public class MainActivity extends Activity {
         }
     }
 }
+
