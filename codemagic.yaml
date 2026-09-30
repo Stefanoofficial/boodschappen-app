@@ -11,21 +11,21 @@ workflows:
 
       - name: Check Android resources
         script: |
-          echo "=== ANDROID RESOURCES ==="
-          find android/app/src/main/res -type f -print
+          echo "=== CURRENT DIRECTORY ==="
+          pwd
 
-          echo "=== RES FOLDER ==="
-          ls -la android/app/src/main/res
+          echo "=== ANDROID RESOURCES ==="
+          find "$CM_BUILD_DIR/android/app/src/main/res" -type f -print
 
           echo "=== DRAWABLE ==="
-          ls -la android/app/src/main/res/drawable
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
           echo "=== LAUNCHER FILES ==="
-          ls -la android/app/src/main/res/drawable/ic_launcher*
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/drawable"/ic_launcher*
 
       - name: Build Android APK
         script: |
-          cd android
+          cd "$CM_BUILD_DIR/android"
           chmod +x gradlew
           ./gradlew assembleDebug
 
