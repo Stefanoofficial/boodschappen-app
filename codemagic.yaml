@@ -5,31 +5,63 @@ workflows:
     instance_type: mac_mini_m2
 
     scripts:
-      - name: Check project files
+      - name: Prepare Android resources
         script: |
+          set -e
+
           echo "=== CURRENT DIRECTORY ==="
           pwd
 
           echo "=== ROOT FILES ==="
           ls -la
 
-          echo "=== ALL DIRECTORIES ==="
-          find "$CM_BUILD_DIR" -maxdepth 3 -type d -print
+          echo "=== ANDROID PROJECT ==="
+          ls -la android
+          ls -la android/app
 
-          echo "=== GIT STATUS ==="
-          git status --short
+          echo "=== CREATE ANDROID RESOURCE DIRECTORIES ==="
+          mkdir -p android/app/src/main/res/drawable
 
-          echo "=== ANDROID IN GIT ==="
-          git ls-tree -r HEAD --name-only | grep '^android/' || true
+          echo "=== CHECK ICON ==="
+          if [ -f "icon-512-maskable.png" ]; then
+            echo "Found icon-512-maskable.png"
+          else
+            echo "ERROR: icon-512-maskable.png not found"
+            exit 1
+          fi
+
+          echo "=== INSTALL LAUNCHER ICON ==="
+          cp icon-512-maskable.png \
+            android/app/src/main/res/drawable/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/drawable/ic_launcher_round.png
+
+          echo "=== ANDROID RESOURCES ==="
+          find android/app/src/main/res -type f -print
 
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
+      - name: Verify Android Manifest
+        script: |
+          set -e
+
+          echo "=== ANDROID MANIFEST ==="
+          cat android/app/src/main/AndroidManifest.xml
+
+          echo "=== LAUNCHER ICONS ==="
+          ls -lh android/app/src/main/res/drawable/
+
       - name: Build Android APK
         script: |
-          cd "$CM_BUILD_DIR/android"
+          set -e
+
+          cd android
+
           chmod +x gradlew
+
           ./gradlew assembleDebug
 
     artifacts:
