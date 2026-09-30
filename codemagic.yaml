@@ -13,27 +13,31 @@ workflows:
           pwd
 
           echo "=== ROOT FILES ==="
-          ls -la
+          ls -lab
 
-          echo "=== CHECK ICON ==="
-          test -f "$CM_BUILD_DIR/icon-512-maskable.png"
+          echo "=== FIND ICON ==="
+
+          ICON_FILE="$(find "$CM_BUILD_DIR" -maxdepth 1 -type f -name '*icon-512-maskable.png' -print -quit)"
+
+          if [ -z "$ICON_FILE" ]; then
+            echo "ERROR: icon-512-maskable.png could not be found"
+            echo "Available PNG files:"
+            find "$CM_BUILD_DIR" -maxdepth 1 -type f -name '*.png' -print
+            exit 1
+          fi
+
+          echo "ICON FOUND:"
+          printf '%s\n' "$ICON_FILE"
 
           echo "=== CREATE RESOURCE DIRECTORY ==="
           mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
           echo "=== COPY ICON ==="
-          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
+          cp "$ICON_FILE" \
              "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
           echo "=== VERIFY ICON ==="
           ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
-
-      - name: Set Android SDK location
-        script: |
-          set -e
-
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-
       - name: Build Android APK
         script: |
           set -e
