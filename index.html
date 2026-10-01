@@ -1371,158 +1371,78 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
 }
 
 
-/* Meer-menu: consistente zachte groen/witte pop-ups */
-.meer-modal,
-.more-modal,
-.modal.meer-modal,
-.modal.more-modal,
-.help-modal,
-.info-modal,
-.privacy-modal,
-.terms-modal,
-.about-modal {
+
+/* Alleen de inhoudsschermen van Meer: het hoofdmenu zelf blijft wit. */
+#familyMenuSub,
+#sharedListsMenuSub,
+#sharedListActiveMenuSub,
+#settingsMenuSub,
+#savedListsMenuSub,
+#accountMenuSub,
+#feedbackMenuSub,
+#appInfoMenuSub,
+#helpMenuSub,
+#legalMenuSub,
+#privacyMenuSub,
+#termsMenuSub {
   background: #eef8f1 !important;
 }
 
-.meer-modal .modal-content,
-.more-modal .modal-content,
-.modal.meer-modal .modal-content,
-.modal.more-modal .modal-content,
-.help-modal .modal-content,
-.info-modal .modal-content,
-.privacy-modal .modal-content,
-.terms-modal .modal-content,
-.about-modal .modal-content {
-  background: #eef8f1 !important;
-  border: 1px solid rgba(79, 118, 88, 0.14) !important;
-  box-shadow: 0 12px 32px rgba(50, 85, 62, 0.14) !important;
-}
-
-.meer-modal .modal-header,
-.more-modal .modal-header,
-.modal.meer-modal .modal-header,
-.modal.more-modal .modal-header,
-.help-modal .modal-header,
-.info-modal .modal-header,
-.privacy-modal .modal-header,
-.terms-modal .modal-header,
-.about-modal .modal-header {
-  background: #eef8f1 !important;
-}
-
-.meer-modal .modal-body,
-.more-modal .modal-body,
-.modal.meer-modal .modal-body,
-.modal.more-modal .modal-body,
-.help-modal .modal-body,
-.info-modal .modal-body,
-.privacy-modal .modal-body,
-.terms-modal .modal-body,
-.about-modal .modal-body {
-  background: #eef8f1 !important;
-}
-
-
-/* Scanner: toon de camera pas wanneer de videomaten stabiel zijn.
-   Zo voorkomt de eerste iOS/WebView-frame zwarte zijbalken. */
-.barcodeVideoWrap {
-  aspect-ratio: 4 / 3;
-  background: #17221c;
-}
-#barcodeVideo {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  display: block !important;
-  background: #17221c !important;
-}
-#barcodeVideo.barcode-video-loading {
-  opacity: 0 !important;
-}
-#barcodeVideo.barcode-video-ready {
-  opacity: 1 !important;
-}
-
-
-/* Definitieve stijl voor Meer: ook de submenu's en dialogs gebruiken
-   dezelfde zachte groenachtige app-achtergrond, niet puur wit. */
-.app.more-active #familyMenu {
-  background: #eef8f1 !important;
-  border-color: rgba(63,91,69,.12) !important;
-  box-shadow: 0 10px 28px rgba(63,91,69,.10) !important;
-}
-.app.more-active #familyMenu .familyMenuPage {
-  background: #eef8f1 !important;
-}
-.app.more-active #familyMenu .familyMenuItem,
-.app.more-active #familyMenu .familyMenuPrimary {
-  background: transparent !important;
-}
-.app.more-active #familyMenu .familyMenuItem:hover,
-.app.more-active #familyMenu .familyMenuPrimary:hover {
-  background: #e3f1e6 !important;
-}
-.app.more-active #familyMenu .familyMenuSub,
-.app.more-active #familyMenu .accountMenuPage,
-.app.more-active #familyMenu .aboutMenuPage {
-  background: #eef8f1 !important;
-}
-.familyDialog {
-  background: #eef8f1 !important;
-  border-color: rgba(63,91,69,.12) !important;
-  color: #29322c !important;
-}
-.familyDialogMember {
+#familyMenuSub .familyMenuItem,
+#sharedListsMenuSub .familyMenuItem,
+#sharedListActiveMenuSub .familyMenuItem,
+#settingsMenuSub .familyMenuItem,
+#savedListsMenuSub .familyMenuItem,
+#accountMenuSub .familyMenuItem,
+#feedbackMenuSub .familyMenuItem,
+#appInfoMenuSub .familyMenuItem,
+#helpMenuSub .familyMenuItem,
+#legalMenuSub .familyMenuItem,
+#privacyMenuSub .familyMenuItem,
+#termsMenuSub .familyMenuItem {
   background: rgba(255,255,255,.62) !important;
 }
-.familyDialogInput {
-  background: rgba(255,255,255,.78) !important;
-}
-body.dark-theme .app.more-active #familyMenu,
-body.dark-theme .app.more-active #familyMenu .familyMenuPage,
-body.dark-theme .app.more-active #familyMenu .familyMenuSub,
-body.dark-theme .app.more-active #familyMenu .accountMenuPage,
-body.dark-theme .app.more-active #familyMenu .aboutMenuPage {
-  background: #202a23 !important;
-}
-body.dark-theme .app.more-active #familyMenu .familyMenuItem:hover,
-body.dark-theme .app.more-active #familyMenu .familyMenuPrimary:hover {
-  background: #2b3a30 !important;
-}
-body.dark-theme .familyDialog {
-  background: #202a23 !important;
-  color: #e6eee8 !important;
-}
-body.dark-theme .familyDialogMember {
-  background: rgba(255,255,255,.06) !important;
-}
-body.dark-theme .familyDialogInput {
-  background: rgba(255,255,255,.07) !important;
-  color: #e6eee8 !important;
+
+#familyMenuSub .familyMenuItem:hover,
+#sharedListsMenuSub .familyMenuItem:hover,
+#sharedListActiveMenuSub .familyMenuItem:hover,
+#settingsMenuSub .familyMenuItem:hover,
+#savedListsMenuSub .familyMenuItem:hover,
+#accountMenuSub .familyMenuItem:hover,
+#feedbackMenuSub .familyMenuItem:hover,
+#appInfoMenuSub .familyMenuItem:hover,
+#helpMenuSub .familyMenuItem:hover,
+#legalMenuSub .familyMenuItem:hover,
+#privacyMenuSub .familyMenuItem:hover,
+#termsMenuSub .familyMenuItem:hover {
+  background: #e3f1e6 !important;
 }
 
-/* Scanner: verberg de preview volledig totdat de cameramaten stabiel zijn.
-   Hierdoor zie je geen eerste zwart frame en geen tijdelijke zwarte zijbalken. */
-.barcodeVideoWrap.scanner-loading {
+/* De bovenliggende Meer-lijst blijft bewust wit. */
+#familyMenu {
+  background: #ffffff !important;
+}
+
+/* Scanner: geen zwarte achtergrondflits als de camera nog initialiseert. */
+.barcodeVideoWrap {
+  position: relative !important;
+  overflow: hidden !important;
   background: #eef8f1 !important;
 }
-.barcodeVideoWrap.scanner-loading #barcodeVideo,
-.barcodeVideoWrap.scanner-loading .barcodeFrame {
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-.barcodeVideoWrap.scanner-ready #barcodeVideo {
-  opacity: 1 !important;
-  visibility: visible !important;
+
+#barcodeVideo {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  display: block !important;
   object-fit: cover !important;
   object-position: center center !important;
-}
-.barcodeVideoWrap.scanner-ready .barcodeFrame {
-  opacity: 1 !important;
-  visibility: visible !important;
+  background: #eef8f1 !important;
+  transform: translateZ(0) scale(1.12) !important;
+  transform-origin: center center !important;
+  -webkit-transform: translateZ(0) scale(1.12) !important;
+  -webkit-transform-origin: center center !important;
 }
 
 </style>
@@ -10152,66 +10072,17 @@ async function scheduleBarcodeScan(){
   }
   if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
 }
-
-
-function prepareBarcodeVideoForDisplay(video, wrap){
-  if(!video || !wrap) return;
-
-  wrap.classList.remove('scanner-ready');
-  wrap.classList.add('scanner-loading');
-
-  let checks = 0;
-  let lastW = 0;
-  let lastH = 0;
-  let stable = 0;
-
-  const reveal = () => {
-    const w = video.videoWidth || 0;
-    const h = video.videoHeight || 0;
-
-    if(w > 0 && h > 0){
-      if(w === lastW && h === lastH) stable++;
-      else stable = 0;
-      lastW = w;
-      lastH = h;
-    }
-
-    checks++;
-
-    // Eerst meerdere frames met dezelfde afmetingen afwachten.
-    // Pas daarna wordt de video zichtbaar.
-    if(w > 0 && h > 0 && stable >= 3){
-      requestAnimationFrame(() => {
-        wrap.classList.remove('scanner-loading');
-        wrap.classList.add('scanner-ready');
-      });
-      return;
-    }
-
-    if(checks < 60){
-      requestAnimationFrame(reveal);
-    } else if(w > 0 && h > 0){
-      wrap.classList.remove('scanner-loading');
-      wrap.classList.add('scanner-ready');
-    }
-  };
-
-  requestAnimationFrame(reveal);
-}
-
 async function openBarcodeScanner(){
   if(localStorage.getItem("boodschappenScannerEnabled") === "false"){
     return;
   }
   const overlay=document.getElementById('barcodeOverlay');
   const video=document.getElementById('barcodeVideo');
-  const videoWrap=document.querySelector('.barcodeVideoWrap');
   const input=document.getElementById('barcodeManualInput');
   if(!overlay || !video) return;
 
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden','false');
-  if(videoWrap){ videoWrap.classList.remove('scanner-ready'); videoWrap.classList.add('scanner-loading'); }
   if(input) input.value='';
   const result=document.getElementById('barcodeResult');
   if(result) result.classList.remove('open');
@@ -10256,8 +10127,6 @@ async function openBarcodeScanner(){
       return;
     }
 
-    prepareBarcodeVideoForDisplay(barcodeVideo, videoWrap);
-
     barcodeScanRunning=true;
     barcodeScanBusy=false;
     barcodeLastScan=0;
@@ -10281,8 +10150,6 @@ async function openBarcodeScanner(){
 
 function closeBarcodeScanner(){
   stopBarcodeCamera();
-  const wrap=document.querySelector('.barcodeVideoWrap');
-  if(wrap){ wrap.classList.remove('scanner-ready'); wrap.classList.add('scanner-loading'); }
   barcodeBusy=false;
   const overlay=document.getElementById('barcodeOverlay');
   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
