@@ -341,6 +341,69 @@ overflow-x: hidden;
   font-size: 21px;
   line-height: 1;
 }
+
+.productQuantity {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 88px;
+  height: 38px;
+  padding: 3px;
+  border-radius: 13px;
+  background: #eef7f0;
+  border: 1px solid #dceade;
+  box-sizing: border-box;
+}
+
+.quantityButton {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: #dff1e3;
+  color: #356746;
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex: 0 0 32px;
+}
+
+.quantityButton:active { transform: scale(.94); }
+
+.quantityValue {
+  min-width: 18px;
+  text-align: center;
+  color: #30483a;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+body.dark-theme .productQuantity {
+  background: #29372f;
+  border-color: #3b4b42;
+}
+
+body.dark-theme .quantityButton {
+  background: #34473b;
+  color: #d9eee0;
+}
+
+body.dark-theme .quantityValue { color: #e7f0ea; }
+
+@media (max-width: 430px) {
+  .itemProductContent { gap: 8px; }
+  .productQuantity { min-width: 82px; gap: 5px; }
+  .quantityButton { width: 29px; height: 29px; flex-basis: 29px; border-radius: 9px; font-size: 19px; }
+  .quantityValue { font-size: 17px; }
+}
 .chipsBagIcon {
   width: 28px;
   height: 28px;
@@ -930,6 +993,22 @@ overflow-x: hidden;
 }
 
 
+
+/* Privacy & voorwaarden */
+.legalTextPage .legalCard{
+  margin:12px 2px 24px; padding:18px; border-radius:18px;
+  background:rgba(255,255,255,.62); box-shadow:0 4px 16px rgba(40,70,50,.07);
+  color:#2e3a32; line-height:1.55; font-size:14px;
+}
+.legalTextPage .legalCard h3{margin:0 0 8px; color:#3F5B45; font-size:20px;}
+.legalTextPage .legalCard h4{margin:18px 0 6px; color:#3F5B45; font-size:15px;}
+.legalTextPage .legalCard p{margin:7px 0;}
+.legalTextPage .legalCard ul{margin:7px 0 0; padding-left:20px;}
+.legalTextPage .legalCard li{margin:6px 0;}
+.legalSmall{font-size:12px; opacity:.72;}
+body.dark-theme .legalTextPage .legalCard{background:#252b27; color:#e9eee9; box-shadow:0 4px 16px rgba(0,0,0,.28);}
+body.dark-theme .legalTextPage .legalCard h3, body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
+
 /* Thema's: licht (standaard) en donker */
 body { transition: background-color .2s ease, color .2s ease; }
 body.dark-theme { background-color: #121612; background-blend-mode: multiply; color: #f3f5f3; }
@@ -1224,6 +1303,7 @@ body.dark-theme .useModeIntro{color:#b8c0ba;}
   align-items: center;
 }
 
+.itemProductContent .productInfo { flex: 1 1 auto; min-width: 0; }
 .itemProductContent .productName {
   flex: 1 1 auto;
   min-width: 0;
@@ -3664,6 +3744,11 @@ body.logged-in {
       <span>Over de app</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openLegalSubmenu(event)">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Privacy &amp; voorwaarden</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
 
     <div class="moreMenuLogoutWrap">
       <button type="button" class="moreMenuLogout" onclick="logoutFromMenu()">
@@ -3860,6 +3945,88 @@ body.logged-in {
     </div>
     <div class="aboutMenuHint">Producticonen: lokaal getekend · geen externe productfoto’s nodig</div>
     <div class="aboutMenuHint">© 2026 Boodschappenlijst</div>
+  </div>
+
+  <div id="legalMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeLegalSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Privacy &amp; voorwaarden</span>
+    </button>
+    <div class="familyMenuSubTitle">PRIVACY &amp; VOORWAARDEN</div>
+    <button type="button" class="familyMenuItem" onclick="showPrivacyPolicy(event)">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Privacybeleid</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem" onclick="showTerms(event)">
+      <i class="fa-solid fa-file-contract"></i>
+      <span>Algemene voorwaarden</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <div class="settingsMenuHint">Lees deze informatie voordat je de app gebruikt of een account aanmaakt.</div>
+  </div>
+
+  <div id="privacyMenuSub" class="familyMenuPage aboutMenuPage legalTextPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closePrivacySubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Privacybeleid</span>
+    </button>
+    <div class="familyMenuSubTitle">PRIVACYBELEID</div>
+    <div class="legalCard">
+      <h3>Privacybeleid – Mijn Boodschappen</h3>
+      <p><strong>Versie:</strong> 1 oktober 2026</p>
+      <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
+      <h4>Welke gegevens verwerken we?</h4>
+      <ul>
+        <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
+        <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
+        <li><strong>Familiegegevens:</strong> familie-/deellijstcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
+        <li><strong>Lokale instellingen:</strong> bijvoorbeeld thema- en bepaalde appvoorkeuren die op je apparaat worden opgeslagen.</li>
+        <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcode-scanner opent. De app gebruikt camerabeelden om een barcode te herkennen en bewaart de camerabeelden niet als onderdeel van je boodschappenlijst.</li>
+      </ul>
+      <h4>Waarvoor gebruiken we deze gegevens?</h4>
+      <p>Om je aan te melden, je boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
+      <h4>Externe dienstverlener</h4>
+      <p>Voor accountbeheer en online opslag gebruikt de app <strong>Google Firebase</strong>. Daardoor worden gegevens die nodig zijn voor deze functies verwerkt via de Firebase-diensten die de app gebruikt. Raadpleeg ook de privacyinformatie van Google voor de verwerking door deze dienst.</p>
+      <h4>Delen met anderen</h4>
+      <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Deel daarom geen informatie die je niet met deze personen wilt delen.</p>
+      <h4>Bewaren en verwijderen</h4>
+      <p>Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen. De app verwijdert daarbij de accountgegevens en de persoonlijke gegevens die zij volgens haar verwijderingsproces beheert. Gegevens die in gedeelde lijsten door andere deelnemers worden gebruikt, kunnen afhankelijk zijn van de structuur van die gedeelde lijst en de toepasselijke Firebase-opslag.</p>
+      <h4>Jouw rechten</h4>
+      <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens. Gebruik hiervoor de feedbackfunctie in de app of het contactadres van de app-eigenaar.</p>
+      <h4>Contact</h4>
+      <p><strong>Verantwoordelijke:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
+      <p class="legalSmall">Laatst bijgewerkt: 1 oktober 2026.</p>
+    </div>
+  </div>
+
+  <div id="termsMenuSub" class="familyMenuPage aboutMenuPage legalTextPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeTermsSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Algemene voorwaarden</span>
+    </button>
+    <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
+    <div class="legalCard">
+      <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
+      <p><strong>Versie:</strong> 1 oktober 2026</p>
+      <h4>1. Gebruik van de app</h4>
+      <p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
+      <h4>2. Account</h4>
+      <p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
+      <h4>3. Gedeelde lijsten</h4>
+      <p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is. Deel geen gevoelige informatie via een gedeelde lijst.</p>
+      <h4>4. Barcode-scanner</h4>
+      <p>De barcode-scanner is een hulpmiddel om producten sneller te herkennen. Een barcodeherkenning kan onjuist of onvolledig zijn. Controleer daarom altijd of het juiste product en aantal op je lijst staan.</p>
+      <h4>5. Beschikbaarheid</h4>
+      <p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid, foutloze werking of ononderbroken toegang tot online diensten garanderen.</p>
+      <h4>6. Wijzigingen</h4>
+      <p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld. Bij belangrijke wijzigingen wordt de informatie in de app bijgewerkt.</p>
+      <h4>7. Account verwijderen</h4>
+      <p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
+      <h4>8. Contact</h4>
+      <p><strong>Aanbieder/eigenaar:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
+      <p class="legalSmall">Laatst bijgewerkt: 1 oktober 2026.</p>
+    </div>
   </div>
 
   <div id="helpMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -5296,7 +5463,8 @@ function normalizeBoodschappen(data) {
         completedAt: null,
         barcode: "",
         imageUrl: "",
-        brand: ""
+        brand: "",
+        quantity: 1
       };
     }
 
@@ -5309,7 +5477,8 @@ function normalizeBoodschappen(data) {
         completedAt: item.completedAt ? Number(item.completedAt) : null,
         barcode: item.barcode ? String(item.barcode) : "",
         imageUrl: item.imageUrl ? String(item.imageUrl) : "",
-        brand: item.brand ? String(item.brand) : ""
+        brand: item.brand ? String(item.brand) : "",
+        quantity: Math.max(1, Number(item.quantity) || 1)
       };
     }
 
@@ -5318,7 +5487,8 @@ function normalizeBoodschappen(data) {
       completed: false,
       completedBy: "",
       completedByUid: "",
-      completedAt: null
+      completedAt: null,
+      quantity: 1
     };
   }).filter(item => item.text);
 }
@@ -5795,6 +5965,71 @@ function updateListProgress() {
   progress.style.setProperty("--progress", percentage + "%");
 }
 
+async function changeProductQuantity(index, delta) {
+  const item = boodschappen[index];
+  if (!item) return;
+
+  const current = Math.max(1, Number(item.quantity) || 1);
+  const next = Math.max(1, current + Number(delta || 0));
+  if (next === current) return;
+
+  item.quantity = next;
+  showList();
+  await saveList();
+}
+
+function normalizeScannedName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function scannedNamesMatch(listName, scannedName) {
+  const a = normalizeScannedName(listName);
+  const b = normalizeScannedName(scannedName);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const words = a.split(" ").filter(Boolean);
+  if (words.length === 1 && words[0].length < 4) return false;
+  if (words.every(word => b.split(" ").includes(word))) return true;
+  return (a.length >= 5 && (b.includes(a) || a.includes(b)));
+}
+
+function findScannedListItem(code, productName, includeCompleted = false) {
+  const barcode = String(code || "").trim();
+  const candidates = boodschappen.map((item, index) => ({ item, index })).filter(x => x.item && (includeCompleted || !x.item.completed));
+
+  let found = candidates.find(x => barcode && String(x.item.barcode || "").trim() === barcode);
+  if (found) return found.index;
+
+  found = candidates.find(x => scannedNamesMatch(x.item.text, productName));
+  return found ? found.index : -1;
+}
+
+async function completeScannedProduct(product) {
+  const index = findScannedListItem(product.barcode, product.text);
+  if (index < 0) return false;
+
+  const item = boodschappen[index];
+  item.completed = true;
+  item.completedBy = "";
+  item.completedByUid = auth.currentUser ? auth.currentUser.uid : "";
+  item.completedAt = Date.now();
+  if (product.barcode) item.barcode = product.barcode;
+  if (product.imageUrl && !item.imageUrl) item.imageUrl = product.imageUrl;
+  if (product.brand && !item.brand) item.brand = product.brand;
+
+  selectedIndex = index;
+  showList("completed");
+  await saveList();
+  if (typeof updateOverviewDashboard === "function") updateOverviewDashboard();
+  return true;
+}
+
 function showList(animationType = "") {
   const list = document.getElementById("list");
   if (!list) return;
@@ -5881,6 +6116,43 @@ function showList(animationType = "") {
       if (!iconValue) icon.style.visibility = "hidden";
     }
     productWrap.appendChild(icon);
+
+    const quantityWrap = document.createElement("div");
+    quantityWrap.className = "productQuantity";
+    quantityWrap.setAttribute("aria-label", "Aantal");
+
+    const minusButton = document.createElement("button");
+    minusButton.type = "button";
+    minusButton.className = "quantityButton";
+    minusButton.textContent = "−";
+    minusButton.setAttribute("aria-label", "Aantal verlagen");
+    minusButton.title = "Aantal verlagen";
+    minusButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      await changeProductQuantity(index, -1);
+    });
+
+    const quantityValue = document.createElement("span");
+    quantityValue.className = "quantityValue";
+    quantityValue.textContent = String(Math.max(1, Number(item.quantity) || 1));
+
+    const plusButton = document.createElement("button");
+    plusButton.type = "button";
+    plusButton.className = "quantityButton";
+    plusButton.textContent = "+";
+    plusButton.setAttribute("aria-label", "Aantal verhogen");
+    plusButton.title = "Aantal verhogen";
+    plusButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      await changeProductQuantity(index, 1);
+    });
+
+    quantityWrap.appendChild(minusButton);
+    quantityWrap.appendChild(quantityValue);
+    quantityWrap.appendChild(plusButton);
+    productWrap.appendChild(quantityWrap);
 
     const trashButton = document.createElement("button");
     trashButton.type = "button";
@@ -6043,7 +6315,8 @@ async function addProduct() {
     text: text,
     completed: false,
     completedBy: "",
-    completedAt: null
+    completedAt: null,
+    quantity: 1
   });
   input.value = "";
   showList();
@@ -6145,6 +6418,8 @@ if (appScroll) {
 document.getElementById("list").addEventListener("click", function(e) {
   const item = e.target.closest(".item");
   if (!item) return;
+
+  if (e.target.closest("button")) return;
 
   const index = Number(item.dataset.index);
 
@@ -8305,7 +8580,7 @@ function __overviewAddProduct(product){
   if(!text) return;
   var exists=boodschappen.some(function(x){return String(x.text||"").trim().toLowerCase()===text.toLowerCase() && !x.completed;});
   if(!exists){
-    boodschappen.push({text:text,completed:false,completedBy:"",completedByUid:"",completedAt:null});
+    boodschappen.push({text:text,completed:false,completedBy:"",completedByUid:"",completedAt:null,quantity:1});
     showList();
     saveList();
   }
@@ -8977,6 +9252,22 @@ body.dark-theme .clearListCancel{background:#303a33;color:#e5ece7}
 </script>
 
 <script id="barcode-setting-sync">
+function openLegalSubmenu(event){
+  if(event) event.stopPropagation();
+  switchMenuPage("legalMenuSub", event);
+}
+function closeLegalSubmenu(event){ returnMenuToMain("legalMenuSub", event); }
+function showPrivacyPolicy(event){
+  if(event) event.stopPropagation();
+  switchMenuPage("privacyMenuSub", event);
+}
+function closePrivacySubmenu(event){ returnMenuToPage("privacyMenuSub", "legalMenuSub", event); }
+function showTerms(event){
+  if(event) event.stopPropagation();
+  switchMenuPage("termsMenuSub", event);
+}
+function closeTermsSubmenu(event){ returnMenuToPage("termsMenuSub", "legalMenuSub", event); }
+
 function syncBarcodeScannerSetting(){
   const enabled = localStorage.getItem("boodschappenScannerEnabled") !== "false";
   document.querySelectorAll(".barcode-search-btn").forEach(btn => {
@@ -9387,11 +9678,27 @@ async function handleBarcode(code){
     const name=String(p.product_name).trim();
     const brand=String(p.brands||'').split(',')[0].trim();
     const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
-    await addScannedProduct({text:name,barcode:code,brand,imageUrl});
+    const scannedProduct={text:name,barcode:code,brand,imageUrl};
+    const completedExisting=await completeScannedProduct(scannedProduct);
     const result=document.getElementById('barcodeResult');
-    result.textContent=(brand?brand+' · ':'')+name+' is toegevoegd aan je lijst.';
-    result.classList.add('open');
-    setBarcodeStatus('Gevonden ✓');
+
+    if(completedExisting){
+      result.textContent=(brand?brand+' · ':'')+name+' is afgevinkt ✓';
+      result.classList.add('open');
+      setBarcodeStatus('Product afgevinkt ✓');
+    }else{
+      const alreadyCompletedIndex=findScannedListItem(scannedProduct.barcode, scannedProduct.text, true);
+      if(alreadyCompletedIndex >= 0){
+        result.textContent=(brand?brand+' · ':'')+name+' staat al als gekocht op je lijst.';
+        result.classList.add('open');
+        setBarcodeStatus('Al afgevinkt ✓');
+      }else{
+        await addScannedProduct(scannedProduct);
+        result.textContent=(brand?brand+' · ':'')+name+' stond nog niet op je lijst en is toegevoegd.';
+        result.classList.add('open');
+        setBarcodeStatus('Product toegevoegd');
+      }
+    }
     setTimeout(closeBarcodeScanner,900);
   }catch(err){
     console.error('Product lookup:',err);
@@ -9417,7 +9724,8 @@ async function addScannedProduct(product){
     completedAt:null,
     barcode:product.barcode || '',
     imageUrl:product.imageUrl || '',
-    brand:product.brand || ''
+    brand:product.brand || '',
+    quantity:1
   });
   showList();
   await saveList();
