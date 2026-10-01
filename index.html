@@ -4300,6 +4300,11 @@ body.logged-in {
       <p>Tik op het rondje naast een product om het af te vinken. Zo zie je direct wat al in je winkelwagen zit.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-barcode"></i><span>Barcode scannen</span></div>
+      <p>Staat een product al op je boodschappenlijst? Scan dan de barcode van het product. Als de barcode overeenkomt, wordt het bestaande product automatisch als <strong>voltooid</strong> gemarkeerd. Zo hoef je het niet handmatig af te vinken.</p>
+      <p>Staat het product nog niet op je lijst? Dan kan de scan het product aan je lijst toevoegen wanneer de productinformatie beschikbaar is.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
       <p>Via Mijn familie kun je later een nieuwe familie maken of met een familiecode aansluiten bij een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
@@ -11112,6 +11117,20 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
     padding-right:0 !important;
     grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
     column-gap:5px !important;
+  }
+}
+
+
+/* Alleen de rode prullenbak iets verder naar rechts,
+   zodat er meer ruimte zit tussen teller en prullenbak. */
+.itemProductContent .product-row-trash-can{
+  transform:translateX(6px) !important;
+  -webkit-transform:translateX(6px) !important;
+}
+@media(max-width:430px){
+  .itemProductContent .product-row-trash-can{
+    transform:translateX(6px) !important;
+    -webkit-transform:translateX(6px) !important;
   }
 }
 
