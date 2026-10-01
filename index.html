@@ -3735,8 +3735,6 @@ body.logged-in {
       <i class="fa-solid fa-user-plus"></i>
       <span>Account aanmaken</span>
     </button>
-    <div class="version">Versie 1.2</div>
-    <div class="copyright">© 2026 Boodschappenlijst</div>
   </div>
 </div>
 
@@ -5984,6 +5982,43 @@ function escapeHtmlSafe(value) {
     .replace(/'/g, "&#039;");
 }
 
+function toDutchProductName(value) {
+  let text = String(value || "").trim();
+  if (!text) return text;
+
+  // Keep brand names intact, but translate common English food/product words
+  // so the suggestion shown to the user is Dutch.
+  const replacements = [
+    [/\\bapples?\\b/gi, "appel"], [/\\bpears?\\b/gi, "peer"],
+    [/\\bbananas?\\b/gi, "banaan"], [/\\boranges?\\b/gi, "sinaasappel"],
+    [/\\bmandarins?\\b/gi, "mandarijn"], [/\\bclementines?\\b/gi, "clementine"],
+    [/\\blemons?\\b/gi, "citroen"], [/\\blimes?\\b/gi, "limoen"],
+    [/\\bgrapes?\\b/gi, "druiven"], [/\\bstrawberries\\b/gi, "aardbeien"], [/\\bstrawberry\\b/gi, "aardbei"],
+    [/\\bwatermelons?\\b/gi, "watermeloen"], [/\\bmelons?\\b/gi, "meloen"],
+    [/\\bpineapples?\\b/gi, "ananas"], [/\\bavocados?\\b/gi, "avocado"],
+    [/\\bcucumbers?\\b/gi, "komkommer"], [/\\btomatoes\\b/gi, "tomaten"], [/\\btomato\\b/gi, "tomaat"],
+    [/\\bbell peppers?\\b/gi, "paprika"], [/\\bsweet peppers?\\b/gi, "paprika"], [/\\bpeppers?\\b/gi, "paprika"],
+    [/\\bcarrots?\\b/gi, "wortel"], [/\\bonions?\\b/gi, "uien"], [/\\bgarlic\\b/gi, "knoflook"],
+    [/\\bleeks?\\b/gi, "prei"], [/\\blettuce\\b/gi, "sla"], [/\\bspinach\\b/gi, "spinazie"],
+    [/\\bbroccoli\\b/gi, "broccoli"], [/\\bcauliflowers?\\b/gi, "bloemkool"], [/\\bzucchini\\b/gi, "courgette"],
+    [/\\beggplants?\\b/gi, "aubergine"], [/\\bmushrooms?\\b/gi, "champignons"], [/\\bmushroom\\b/gi, "champignon"],
+    [/\\bgreen beans\\b/gi, "sperziebonen"], [/\\bbeans\\b/gi, "bonen"], [/\\bcorn\\b/gi, "maïs"],
+    [/\\bpeas\\b/gi, "doperwten"], [/\\bbeetroots?\\b/gi, "biet"], [/\\bpotatoes\\b/gi, "aardappelen"], [/\\bpotato\\b/gi, "aardappel"],
+    [/\\bsweet potatoes\\b/gi, "zoete aardappelen"], [/\\bbread\\b/gi, "brood"], [/\\bbrown bread\\b/gi, "bruin brood"],
+    [/\\bwhite bread\\b/gi, "wit brood"], [/\\bbaguettes?\\b/gi, "stokbrood"], [/\\bbread rolls\\b/gi, "broodjes"],
+    [/\\bsoft drinks?\\b/gi, "frisdrank"], [/\\bsoda\\b/gi, "frisdrank"], [/\\bmilk\\b/gi, "melk"],
+    [/\\bcheese\\b/gi, "kaas"], [/\\bchocolate milk\\b/gi, "chocolademelk"], [/\\bchocolate\\b/gi, "chocolade"],
+    [/\\byogurt\\b/gi, "yoghurt"], [/\\bbutter\\b/gi, "boter"], [/\\beggs?\\b/gi, "eieren"], [/\\begg\\b/gi, "ei"],
+    [/\\bchicken\\b/gi, "kip"], [/\\brice\\b/gi, "rijst"], [/\\bmeat\\b/gi, "vlees"], [/\\bminced meat\\b/gi, "gehakt"],
+    [/\\bfish\\b/gi, "vis"], [/\\bsalmon\\b/gi, "zalm"], [/\\btuna\\b/gi, "tonijn"], [/\\bsausages?\\b/gi, "worst"],
+    [/\\bpeanut butter\\b/gi, "pindakaas"], [/\\bcoffee\\b/gi, "koffie"], [/\\btea\\b/gi, "thee"], [/\\bjuice\\b/gi, "sap"],
+    [/\\bwater\\b/gi, "water"], [/\\bcrisps\\b/gi, "chips"], [/\\bcookies?\\b/gi, "koekjes"], [/\\bbiscuits?\\b/gi, "koekjes"],
+    [/\\bice cream\\b/gi, "ijs"], [/\\bjam\\b/gi, "jam"]
+  ];
+  for (const [pattern, replacement] of replacements) text = text.replace(pattern, replacement);
+  return text.replace(/\\s{2,}/g, " ").trim();
+}
+
 async function fetchOnlineProductSuggestions(query) {
   const clean = String(query || "").trim();
   if (clean.length < 2) return [];
@@ -6121,7 +6156,7 @@ async function fetchOnlineProductSuggestions(query) {
         const categoryText = Array.isArray(p.categories_tags_en) ? p.categories_tags_en.join(" ") : String(p.categories || "");
         const keyName = normalizeProductLookup(name);
         if (!keyName || seen.has(keyName) || !imageUrl) continue;
-        const product = { name, brand, imageUrl, barcode, categories: categoryText };
+        const product = { name: toDutchProductName(name), brand, imageUrl, barcode, categories: categoryText };
         if (strictProduce && !isRelevantProduce(product)) continue;
         const score = scoreProduct(product);
         if (score < 120) continue;
