@@ -1370,6 +1370,80 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   font-size: 14px;
 }
 
+
+/* Meer-menu: consistente zachte groen/witte pop-ups */
+.meer-modal,
+.more-modal,
+.modal.meer-modal,
+.modal.more-modal,
+.help-modal,
+.info-modal,
+.privacy-modal,
+.terms-modal,
+.about-modal {
+  background: #eef8f1 !important;
+}
+
+.meer-modal .modal-content,
+.more-modal .modal-content,
+.modal.meer-modal .modal-content,
+.modal.more-modal .modal-content,
+.help-modal .modal-content,
+.info-modal .modal-content,
+.privacy-modal .modal-content,
+.terms-modal .modal-content,
+.about-modal .modal-content {
+  background: #eef8f1 !important;
+  border: 1px solid rgba(79, 118, 88, 0.14) !important;
+  box-shadow: 0 12px 32px rgba(50, 85, 62, 0.14) !important;
+}
+
+.meer-modal .modal-header,
+.more-modal .modal-header,
+.modal.meer-modal .modal-header,
+.modal.more-modal .modal-header,
+.help-modal .modal-header,
+.info-modal .modal-header,
+.privacy-modal .modal-header,
+.terms-modal .modal-header,
+.about-modal .modal-header {
+  background: #eef8f1 !important;
+}
+
+.meer-modal .modal-body,
+.more-modal .modal-body,
+.modal.meer-modal .modal-body,
+.modal.more-modal .modal-body,
+.help-modal .modal-body,
+.info-modal .modal-body,
+.privacy-modal .modal-body,
+.terms-modal .modal-body,
+.about-modal .modal-body {
+  background: #eef8f1 !important;
+}
+
+
+/* Scanner: toon de camera pas wanneer de videomaten stabiel zijn.
+   Zo voorkomt de eerste iOS/WebView-frame zwarte zijbalken. */
+.barcodeVideoWrap {
+  aspect-ratio: 4 / 3;
+  background: #17221c;
+}
+#barcodeVideo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+  background: #17221c !important;
+}
+#barcodeVideo.barcode-video-loading {
+  opacity: 0 !important;
+}
+#barcodeVideo.barcode-video-ready {
+  opacity: 1 !important;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -9997,17 +10071,65 @@ async function scheduleBarcodeScan(){
   }
   if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
 }
+
+function prepareBarcodeVideoForDisplay(video, wrap){
+  if(!video || !wrap) return;
+  video.classList.add('barcode-video-loading');
+  video.classList.remove('barcode-video-ready');
+
+  const revealWhenStable = () => {
+    let checks = 0;
+    let lastW = 0, lastH = 0, stable = 0;
+
+    const check = () => {
+      if(!barcodeScanRunning && video.srcObject == null) return;
+      const w = video.videoWidth || 0;
+      const h = video.videoHeight || 0;
+
+      if(w > 0 && h > 0){
+        if(w === lastW && h === lastH) stable++;
+        else stable = 0;
+        lastW = w; lastH = h;
+      }
+
+      checks++;
+      // Wait for the browser to settle orientation/dimensions before revealing
+      // the preview. This prevents the temporary portrait frame with black sides.
+      if(w > 0 && h > 0 && stable >= 2){
+        requestAnimationFrame(() => {
+          video.classList.remove('barcode-video-loading');
+          video.classList.add('barcode-video-ready');
+        });
+        return;
+      }
+
+      if(checks < 20) requestAnimationFrame(check);
+      else {
+        video.classList.remove('barcode-video-loading');
+        video.classList.add('barcode-video-ready');
+      }
+    };
+
+    requestAnimationFrame(check);
+  };
+
+  if(video.readyState >= 1) revealWhenStable();
+  else video.addEventListener('loadedmetadata', revealWhenStable, {once:true});
+}
+
 async function openBarcodeScanner(){
   if(localStorage.getItem("boodschappenScannerEnabled") === "false"){
     return;
   }
   const overlay=document.getElementById('barcodeOverlay');
   const video=document.getElementById('barcodeVideo');
+  const videoWrap=document.querySelector('.barcodeVideoWrap');
   const input=document.getElementById('barcodeManualInput');
   if(!overlay || !video) return;
 
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden','false');
+  prepareBarcodeVideoForDisplay(video, videoWrap);
   if(input) input.value='';
   const result=document.getElementById('barcodeResult');
   if(result) result.classList.remove('open');
