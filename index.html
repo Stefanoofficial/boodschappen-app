@@ -6005,73 +6005,68 @@ function escapeHtmlSafe(value) {
 
 async function fetchOnlineProductSuggestions(query) {
   const clean = String(query || "").trim();
-  if (clean.length < 2) return [];
+  if (clean.length < 3) return [];
   const key = clean.toLowerCase();
   if (productSuggestionCache.has(key)) return productSuggestionCache.get(key);
 
-  // Open Food Facts v2 is used for text search. The older /cgi/search.pl
-  // endpoint is less reliable for browser-based suggestions.
-  const terms = [clean];
   const normalized = normalizeProductLookup(clean);
+  const aliases = {
+    "appel":["apple","apples"],"appels":["apple","apples"],"app":["apple"],
+    "brood":["bread"],"bro":["bread"],"frisdrank":["soft drink","soft drinks","soda"],"fri":["soft drink","soda"],
+    "melk":["milk"],"kaas":["cheese"],"chocomelk":["chocolate milk"],"chocolademelk":["chocolate milk"],"chocolade":["chocolate"],
+    "yoghurt":["yogurt"],"boter":["butter"],"eieren":["eggs","egg"],"ei":["egg","eggs"],"kip":["chicken"],
+    "rijst":["rice"],"pasta":["pasta"],"aardappel":["potato","potatoes"],"aardappelen":["potato","potatoes"],
+    "tomaat":["tomato","tomatoes"],"komkommer":["cucumber"],"banaan":["banana","bananas"],"sinaasappel":["orange","oranges"],
+    "cola":["cola"],"sap":["juice"],"water":["water"],"chips":["chips","crisps"],"koek":["cookie","cookies","biscuits"],
+    "koekjes":["cookies","biscuits"],"ijs":["ice cream"],"vlees":["meat"],"gehakt":["minced meat"],"vis":["fish"],
+    "worst":["sausage"],"ham":["ham"],"pindakaas":["peanut butter"],"jam":["jam","jams"],"koffie":["coffee"],"thee":["tea"]
+  };
+  const terms=[clean];
+  (aliases[normalized]||[]).forEach(t=>{if(!terms.includes(t))terms.push(t);});
+  const results=[]; const seen=new Set();
 
-  // Dutch users commonly type "kaas"; also try the English equivalent if
-  // the Dutch search returns nothing.
-  if (normalized === "kaas") terms.push("cheese");
-  if (normalized === "chocomelk" || normalized === "chocolademelk") {
-    terms.push("chocolate milk");
-  }
+  const scoreProduct=(product,term)=>{
+    const name=normalizeProductLookup(product.name), brand=normalizeProductLookup(product.brand), categories=normalizeProductLookup(product.categories), q=normalizeProductLookup(term);
+    if(!name&&!brand&&!categories)return -1;
+    let score=0;
+    if(name===q)score+=160; if(name.startsWith(q))score+=110; if(name.includes(q))score+=90;
+    if(brand.includes(q))score+=45; if(categories.includes(q))score+=35;
+    const words=q.split(/\s+/).filter(Boolean);
+    if(words.length>1&&words.every(w=>name.includes(w)))score+=55;
+    if(words.length>1&&words.every(w=>(name+" "+brand+" "+categories).includes(w)))score+=35;
+    if(product.imageUrl)score+=15;
+    return score;
+  };
 
-  const results = [];
-  const seen = new Set();
-
-  for (const term of terms) {
-    const url =
-      "https://world.openfoodfacts.org/api/v2/search?search_terms=" +
-      encodeURIComponent(term) +
-      "&page_size=20&fields=product_name,brands,image_front_small_url,image_front_url,code";
-
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-        cache: "no-store"
-      });
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      const products = Array.isArray(data.products) ? data.products : [];
-
-      for (const p of products) {
-        const name = String(p.product_name || "").trim();
-        const brand = String(p.brands || "").split(",")[0].trim();
-        const imageUrl = String(
-          p.image_front_small_url || p.image_front_url || ""
-        ).trim();
-        const barcode = String(p.code || "").trim();
-
-        const keyName = normalizeProductLookup(name);
-        if (!keyName || seen.has(keyName)) continue;
-
-        // For suggestions we prefer products that actually have a package
-        // photo, because that is what the user expects from a real product.
-        if (!imageUrl) continue;
-
-        seen.add(keyName);
-        results.push({ name, brand, imageUrl, barcode });
-
-        if (results.length >= 8) break;
+  for(const term of terms){
+    const url="https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(term)+
+      "&search_simple=1&action=process&json=1&page_size=50&sort_by=unique_scans_n&lc=nl&cc=nl"+
+      "&fields=product_name,brands,categories_tags_en,categories,image_front_small_url,image_front_url,code";
+    try{
+      const response=await fetch(url,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
+      if(!response.ok)continue;
+      const data=await response.json(); const products=Array.isArray(data.products)?data.products:[];
+      for(const p of products){
+        const name=String(p.product_name||"").trim();
+        const brand=String(p.brands||"").split(",")[0].trim();
+        const imageUrl=String(p.image_front_small_url||p.image_front_url||"").trim();
+        const barcode=String(p.code||"").trim();
+        const categoryText=Array.isArray(p.categories_tags_en)?p.categories_tags_en.join(" "):String(p.categories||"");
+        const keyName=normalizeProductLookup(name);
+        if(!keyName||seen.has(keyName)||!imageUrl)continue;
+        const product={name,brand,imageUrl,barcode,categories:categoryText};
+        const directScore=scoreProduct(product,clean);
+        const aliasScore=(aliases[normalized]||[]).reduce((best,alias)=>Math.max(best,scoreProduct(product,alias)),0);
+        const score=Math.max(directScore,aliasScore);
+        if(score<45)continue;
+        seen.add(keyName); results.push({...product,_score:score});
       }
-    } catch (error) {
-      console.warn("Online productsuggestie zoekpoging mislukt:", term, error);
-    }
-
-    if (results.length >= 8) break;
+    }catch(error){console.warn("Online productsuggestie zoekpoging mislukt:",term,error);}
+    if(results.length>=8)break;
   }
-
-  // If an online search is temporarily unavailable, let the existing local
-  // suggestion system take over instead of showing a broken empty state.
-  productSuggestionCache.set(key, results.slice(0, 5));
-  return results.slice(0, 5);
+  results.sort((a,b)=>b._score-a._score);
+  const finalResults=results.slice(0,5).map(({_score,categories,...product})=>product);
+  productSuggestionCache.set(key,finalResults); return finalResults;
 }
 
 function renderOnlineProductSuggestion(button, product) {
@@ -6177,7 +6172,7 @@ function initProductSuggestions() {
   input.addEventListener("input", () => {
     selectedProductSuggestion = null;
     clearTimeout(productSuggestionTimer);
-    productSuggestionTimer = setTimeout(() => updateProductSuggestions(), 180);
+    productSuggestionTimer = setTimeout(() => updateProductSuggestions(), 450);
   });
   input.addEventListener("focus", () => {
     clearTimeout(productSuggestionTimer);
