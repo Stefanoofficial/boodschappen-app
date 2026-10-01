@@ -3648,12 +3648,23 @@ body.logged-in {
 .itemProductContent .productName,
 .itemProductContent .productBrand {
   max-width: 100% !important;
-  overflow-wrap: anywhere !important;
-  word-break: break-word !important;
+  overflow: hidden !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
 }
 
 .itemProductContent .productName {
   display: block !important;
+  font-size: 19px !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
+}
+
+.itemProductContent .productBrand {
+  font-size: 14px !important;
+  line-height: 1.15 !important;
 }
 
 @media (max-width: 430px) {
@@ -3712,6 +3723,53 @@ body.logged-in {
 }
 </style>
 
+<style id="standalone-more-submenu-final">
+/* Meer-submenu's openen als een echt apart scherm binnen Meer. */
+.moreView {
+  position: relative !important;
+}
+.moreView.more-sub-open {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.moreView.more-sub-open .moreViewTitle {
+  display: none !important;
+}
+.moreView.more-sub-open #familyMenu {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  min-height: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+.moreView.more-sub-open #familyMenu .familyMenuPage {
+  min-height: 100% !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  border-radius: 0 !important;
+  padding: 20px 22px 120px !important;
+  box-sizing: border-box !important;
+}
+.moreView.more-sub-open #familyMenu .familyMenuPage[style*="display:none"] {
+  display: none !important;
+}
+body.dark-theme .moreView.more-sub-open #familyMenu,
+body.dark-theme .moreView.more-sub-open #familyMenu .familyMenuPage {
+  background: #252b27 !important;
+}
+@media (max-width: 430px) {
+  .moreView.more-sub-open #familyMenu .familyMenuPage {
+    padding: 16px 16px 115px !important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -4476,6 +4534,8 @@ function __resetMoreNavigation(){
   __cancelMenuTransition();
   __showOnlyMenuPage("familyMenuMain");
   const menu = document.getElementById("familyMenu");
+  const moreView = document.getElementById("moreView");
+  if (moreView) moreView.classList.remove("more-sub-open");
   if (menu) {
     menu.classList.remove("menu-open");
     menu.style.display = "block";
@@ -4489,6 +4549,8 @@ function closeFamilyMenu() {
 
   menu.classList.remove("menu-open");
   menu.style.display = "none";
+  const moreView = document.getElementById("moreView");
+  if (moreView) moreView.classList.remove("more-sub-open");
 
   // Reset onmiddellijk. Zo kan een oude submenu-frame nooit achter
   // een nieuwe Meer-pagina blijven hangen.
@@ -4759,12 +4821,15 @@ function switchMenuPage(pageId, event) {
 
   const page = __getMenuPage(pageId);
   const menu = document.getElementById("familyMenu");
+  const moreView = document.getElementById("moreView");
   if (!page || !menu) return;
 
-  // Stabiele Meer-navigatie: één pagina tegelijk.
+  // Elk submenu is een zelfstandig Meer-scherm. De hoofdkaart verdwijnt
+  // volledig uit beeld zodat de vorige pagina niet onder het submenu blijft staan.
   __cancelMenuTransition();
   menu.style.display = "block";
   __showOnlyMenuPage(pageId);
+  if (moreView && pageId !== "familyMenuMain") moreView.classList.add("more-sub-open");
   page.scrollTop = 0;
 }
 
@@ -4777,11 +4842,13 @@ function returnMenuToPage(pageId, targetId, event) {
 
   const target = __getMenuPage(targetId);
   const menu = document.getElementById("familyMenu");
+  const moreView = document.getElementById("moreView");
   if (!target || !menu) return;
 
   __cancelMenuTransition();
   menu.style.display = "block";
   __showOnlyMenuPage(targetId);
+  if (moreView) moreView.classList.toggle("more-sub-open", targetId !== "familyMenuMain");
   target.scrollTop = 0;
 }
 
