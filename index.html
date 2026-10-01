@@ -1324,6 +1324,52 @@ body.dark-theme .useModeIntro{color:#b8c0ba;}
   text-align: center !important;
 }
 
+
+/* Real product photos in autocomplete suggestions */
+.productSuggestionContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.productSuggestionPhoto {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f4f7f4;
+}
+.productSuggestionText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+}
+.productSuggestionName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.productSuggestionBrand {
+  margin-top: 3px;
+  color: #718078;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.dark-theme .productSuggestionPhoto { background: #2b322c; }
+body.dark-theme .productSuggestionBrand { color: #aab5ad; }
+.productSuggestionLoading {
+  padding: 12px 14px;
+  color: #718078;
+  font-size: 14px;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -5941,25 +5987,123 @@ function getProductIcon(text) {
   return contains ? contains[1] : "";
 }
 
-function updateProductSuggestions() {
+
+/* ===== Online productsuggesties met echte productfoto's ===== */
+let selectedProductSuggestion = null;
+let productSuggestionRequestId = 0;
+let productSuggestionTimer = null;
+const productSuggestionCache = new Map();
+
+function escapeHtmlSafe(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function fetchOnlineProductSuggestions(query) {
+  const clean = String(query || "").trim();
+  if (clean.length < 2) return [];
+  const key = clean.toLowerCase();
+  if (productSuggestionCache.has(key)) return productSuggestionCache.get(key);
+
+  const url =
+    "https://world.openfoodfacts.org/cgi/search.pl?search_terms=" +
+    encodeURIComponent(clean) +
+    "&search_simple=1&action=process&json=1&page_size=8" +
+    "&fields=product_name,brands,image_front_small_url,image_front_url,code";
+
+  try {
+    const response = await fetch(url, { headers: { "Accept": "application/json" } });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    const products = Array.isArray(data.products) ? data.products : [];
+
+    const seen = new Set();
+    const results = products
+      .map(p => ({
+        name: String(p.product_name || "").trim(),
+        brand: String(p.brands || "").split(",")[0].trim(),
+        imageUrl: String(p.image_front_small_url || p.image_front_url || "").trim(),
+        barcode: String(p.code || "").trim()
+      }))
+      .filter(p => {
+        const keyName = normalizeProductLookup(p.name);
+        if (!keyName || seen.has(keyName)) return false;
+        seen.add(keyName);
+        return true;
+      })
+      .slice(0, 5);
+
+    productSuggestionCache.set(key, results);
+    return results;
+  } catch (error) {
+    console.warn("Online productsuggesties konden niet worden geladen:", error);
+    return [];
+  }
+}
+
+function renderOnlineProductSuggestion(button, product) {
+  const photo = product.imageUrl
+    ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    : `<span class="productSuggestionIcon">${productIconMarkup(getProductIcon(product.name))}</span>`;
+
+  button.innerHTML =
+    `<span class="productSuggestionContent">` +
+      photo +
+      `<span class="productSuggestionText">` +
+        `<span class="productSuggestionName">${escapeHtmlSafe(product.name.charAt(0).toUpperCase() + product.name.slice(1))}</span>` +
+        (product.brand ? `<span class="productSuggestionBrand">${escapeHtmlSafe(product.brand)}</span>` : "") +
+      `</span>` +
+    `</span>` +
+    `<span class="productSuggestionIcon"><i class="fa-solid fa-chevron-right"></i></span>`;
+}
+
+async function updateProductSuggestions() {
   const input = document.getElementById("product");
   const box = document.getElementById("productSuggestions");
   if (!input || !box) return;
 
   const query = normalizeProductName(input.value);
+  selectedProductSuggestion = null;
   box.innerHTML = "";
-  if (localStorage.getItem("boodschappenSuggestionsEnabled") === "false") {
-    box.classList.remove("open");
-    return;
-  }
-  if (!query) {
+
+  if (localStorage.getItem("boodschappenSuggestionsEnabled") === "false" || !query) {
     box.classList.remove("open");
     return;
   }
 
+  const requestId = ++productSuggestionRequestId;
+
+  if (query.length >= 2) {
+    box.innerHTML = '<div class="productSuggestionLoading">Producten zoeken…</div>';
+    box.classList.add("open");
+
+    const online = await fetchOnlineProductSuggestions(query);
+    if (requestId !== productSuggestionRequestId) return;
+
+    if (online.length) {
+      online.forEach(product => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "productSuggestion";
+        renderOnlineProductSuggestion(button, product);
+        button.addEventListener("click", () => {
+          selectedProductSuggestion = product;
+          input.value = product.name;
+          box.classList.remove("open");
+        });
+        box.appendChild(button);
+      });
+      box.classList.add("open");
+      return;
+    }
+  }
+
+  /* Fallback naar de bestaande lokale suggesties als er geen online resultaat is. */
   let suggestionResults = getProductSuggestions(query);
-
-  // Extra useful choices for ambiguous product names.
   if (query === "aardbei" || query === "aardbeien") {
     suggestionResults = [
       {name: "aardbei", icon: "apple"},
@@ -5975,35 +6119,41 @@ function updateProductSuggestions() {
     ];
   }
 
-  const matches = suggestionResults
-    .slice(0, 5)
-    .map(({name, icon}) => [name, icon || getProductIcon(name)]);
-
-  if (!matches.length) {
-    box.classList.remove("open");
-    return;
-  }
-
+  const matches = suggestionResults.slice(0, 5).map(({name, icon}) => [name, icon || getProductIcon(name)]);
+  box.innerHTML = "";
   matches.forEach(([name, icon]) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "productSuggestion";
-    button.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="productSuggestionIcon">${productIconMarkup(icon)}</span>`;
+    button.innerHTML =
+      `<span class="productSuggestionContent">` +
+        `<span class="productSuggestionText"><span class="productSuggestionName">${escapeHtmlSafe(name.charAt(0).toUpperCase() + name.slice(1))}</span></span>` +
+      `</span>` +
+      `<span class="productSuggestionIcon">${productIconMarkup(icon)}</span>`;
     button.addEventListener("click", () => {
       input.value = name.charAt(0).toUpperCase() + name.slice(1);
+      selectedProductSuggestion = null;
       box.classList.remove("open");
       input.focus();
     });
     box.appendChild(button);
   });
-  box.classList.add("open");
+  if (matches.length) box.classList.add("open");
+  else box.classList.remove("open");
 }
 
 function initProductSuggestions() {
   const input = document.getElementById("product");
   if (!input) return;
-  input.addEventListener("input", updateProductSuggestions);
-  input.addEventListener("focus", updateProductSuggestions);
+  input.addEventListener("input", () => {
+    selectedProductSuggestion = null;
+    clearTimeout(productSuggestionTimer);
+    productSuggestionTimer = setTimeout(() => updateProductSuggestions(), 180);
+  });
+  input.addEventListener("focus", () => {
+    clearTimeout(productSuggestionTimer);
+    updateProductSuggestions();
+  });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       const box = document.getElementById("productSuggestions");
@@ -6399,14 +6549,19 @@ async function addProduct() {
     }
   }
 
+  const selected = selectedProductSuggestion;
   boodschappen.push({
     text: text,
     completed: false,
     completedBy: "",
     completedAt: null,
-    quantity: 1
+    quantity: 1,
+    barcode: selected && selected.barcode ? selected.barcode : "",
+    imageUrl: selected && selected.imageUrl ? selected.imageUrl : "",
+    brand: selected && selected.brand ? selected.brand : ""
   });
   input.value = "";
+  selectedProductSuggestion = null;
   showList();
   await saveList();
 }
