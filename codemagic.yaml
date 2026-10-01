@@ -6,34 +6,41 @@ workflows:
     scripts:
 
       - name: Verify repository files
-        script: |
-          set -e
+  script: |
+    set -e
 
-          echo "=== CURRENT COMMIT ==="
-          git rev-parse HEAD || true
+    echo "=== CURRENT COMMIT ==="
+    git rev-parse HEAD
 
-          echo "=== CURRENT BRANCH ==="
-          git branch --show-current || true
+    echo "=== CURRENT BRANCH ==="
+    git branch --show-current
 
-          echo "=== CHECK VALUES ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values"
-          echo "--- styles.xml ---"
-          cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+    echo "=== GIT FILE CHECK ==="
+    echo "--- styles.xml in HEAD ---"
+    git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/styles.xml$'
 
-          echo "=== CHECK VALUES-V31 ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31"
-          echo "--- styles.xml ---"
-          cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
+    echo "--- values directory in HEAD ---"
+    git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/'
 
-          echo "=== CHECK MIPMAP ==="
-          find "$CM_BUILD_DIR/android/app/src/main/res" \
-            -maxdepth 3 \
-            -type f \
-            | sort
+    echo "--- physical file ---"
+    ls -la "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
-          echo "=== CHECK MANIFEST ==="
-          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+    echo "--- styles.xml content ---"
+    cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
+    echo "=== VALUES-V31 ==="
+    ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31/"
+    echo "--- styles.xml ---"
+    cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
+
+    echo "=== ANDROID RESOURCES ==="
+    find "$CM_BUILD_DIR/android/app/src/main/res" \
+      -maxdepth 3 \
+      -type f \
+      | sort
+
+    echo "=== MANIFEST ==="
+    cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
       - name: Prepare Android resources
         script: |
