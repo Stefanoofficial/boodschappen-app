@@ -1444,6 +1444,133 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   opacity: 1 !important;
 }
 
+
+/* Alleen de Meer-submenu-pop-ups/dialogen krijgen de appkleur.
+   Het Meer-hoofdmenu en de gewone submenu-pagina blijven ongewijzigd. */
+.familyDialog {
+  background: #eef8f1 !important;
+  color: #29322c !important;
+  border-color: rgba(255,255,255,.85) !important;
+}
+
+.familyDialogHeader {
+  background: transparent !important;
+}
+
+.familyDialogText {
+  color: #59615b !important;
+}
+
+.familyDialogMember {
+  background: rgba(255,255,255,.72) !important;
+  border-color: rgba(63,91,69,.10) !important;
+}
+
+.familyDialogInput,
+.familyDialog textarea,
+.familyDialog input {
+  background: rgba(255,255,255,.78) !important;
+}
+
+.familyDialog .familyDialogClose,
+.familyDialog .familyDialogCancel {
+  background: rgba(255,255,255,.78) !important;
+}
+
+body.dark-theme .familyDialog {
+  background: #202a23 !important;
+  color: #e6eee8 !important;
+}
+
+body.dark-theme .familyDialogText {
+  color: #c5cec7 !important;
+}
+
+body.dark-theme .familyDialogMember {
+  background: rgba(255,255,255,.07) !important;
+}
+
+body.dark-theme .familyDialogInput,
+body.dark-theme .familyDialog textarea,
+body.dark-theme .familyDialog input {
+  background: rgba(255,255,255,.08) !important;
+  color: #e6eee8 !important;
+}
+
+
+/* Productregels: de naam mag horizontaal bewegen zonder de bediening
+   (hoeveelheid en verwijderen) te verplaatsen. */
+.product-row,
+.shopping-item,
+.list-item {
+  overflow: hidden;
+}
+
+.product-row .product-info,
+.shopping-item .product-info,
+.list-item .product-info {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.product-row .product-name,
+.shopping-item .product-name,
+.list-item .product-name {
+  min-width: 0;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  flex: 1 1 auto;
+}
+
+.product-row .product-name::-webkit-scrollbar,
+.shopping-item .product-name::-webkit-scrollbar,
+.list-item .product-name::-webkit-scrollbar {
+  display: none;
+}
+
+/* De hoeveelheid krijgt genoeg vaste ruimte voor 1, 2 én 3 cijfers. */
+.product-row .quantity,
+.shopping-item .quantity,
+.list-item .quantity,
+.product-row .quantity-control,
+.shopping-item .quantity-control,
+.list-item .quantity-control {
+  flex: 0 0 auto;
+}
+
+.product-row .quantity-value,
+.shopping-item .quantity-value,
+.list-item .quantity-value,
+.product-row .qty-value,
+.shopping-item .qty-value,
+.list-item .qty-value {
+  min-width: 2.6em !important;
+  width: 2.6em !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  flex: 0 0 2.6em !important;
+}
+
+/* Zorg dat mintekens, plus en prullenbak nooit door de productnaam worden
+   weggedrukt. */
+.product-row .quantity button,
+.shopping-item .quantity button,
+.list-item .quantity button,
+.product-row .delete,
+.shopping-item .delete,
+.list-item .delete,
+.product-row .delete-button,
+.shopping-item .delete-button,
+.list-item .delete-button {
+  flex: 0 0 auto;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
