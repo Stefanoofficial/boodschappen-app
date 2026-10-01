@@ -1423,152 +1423,109 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
 }
 
 
-/* Scanner: toon de camera pas wanneer de videomaten stabiel zijn.
-   Zo voorkomt de eerste iOS/WebView-frame zwarte zijbalken. */
-.barcodeVideoWrap {
-  aspect-ratio: 4 / 3;
-  background: #17221c;
-}
-#barcodeVideo {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  display: block !important;
-  background: #17221c !important;
-}
-#barcodeVideo.barcode-video-loading {
-  opacity: 0 !important;
-}
-#barcodeVideo.barcode-video-ready {
-  opacity: 1 !important;
-}
 
-
-/* Alleen de Meer-submenu-pop-ups/dialogen krijgen de appkleur.
-   Het Meer-hoofdmenu en de gewone submenu-pagina blijven ongewijzigd. */
-.familyDialog {
-  background: #eef8f1 !important;
-  color: #29322c !important;
-  border-color: rgba(255,255,255,.85) !important;
+/* ===== Productteller: genoeg ruimte voor 1, 2 en 3 cijfers ===== */
+.itemProductContent .productQuantity{
+  width: 90px !important;
+  min-width: 90px !important;
+  height: 40px !important;
+  gap: 6px !important;
+  flex: 0 0 90px !important;
 }
-
-.familyDialogHeader {
-  background: transparent !important;
+.itemProductContent .quantityButton{
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  flex: 0 0 32px !important;
 }
-
-.familyDialogText {
-  color: #59615b !important;
-}
-
-.familyDialogMember {
-  background: rgba(255,255,255,.72) !important;
-  border-color: rgba(63,91,69,.10) !important;
-}
-
-.familyDialogInput,
-.familyDialog textarea,
-.familyDialog input {
-  background: rgba(255,255,255,.78) !important;
-}
-
-.familyDialog .familyDialogClose,
-.familyDialog .familyDialogCancel {
-  background: rgba(255,255,255,.78) !important;
-}
-
-body.dark-theme .familyDialog {
-  background: #202a23 !important;
-  color: #e6eee8 !important;
-}
-
-body.dark-theme .familyDialogText {
-  color: #c5cec7 !important;
-}
-
-body.dark-theme .familyDialogMember {
-  background: rgba(255,255,255,.07) !important;
-}
-
-body.dark-theme .familyDialogInput,
-body.dark-theme .familyDialog textarea,
-body.dark-theme .familyDialog input {
-  background: rgba(255,255,255,.08) !important;
-  color: #e6eee8 !important;
-}
-
-
-/* Productregels: de naam mag horizontaal bewegen zonder de bediening
-   (hoeveelheid en verwijderen) te verplaatsen. */
-.product-row,
-.shopping-item,
-.list-item {
-  overflow: hidden;
-}
-
-.product-row .product-info,
-.shopping-item .product-info,
-.list-item .product-info {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.product-row .product-name,
-.shopping-item .product-name,
-.list-item .product-name {
-  min-width: 0;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  white-space: nowrap !important;
-  text-overflow: clip !important;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  touch-action: pan-x;
-  overscroll-behavior-x: contain;
-  flex: 1 1 auto;
-}
-
-.product-row .product-name::-webkit-scrollbar,
-.shopping-item .product-name::-webkit-scrollbar,
-.list-item .product-name::-webkit-scrollbar {
-  display: none;
-}
-
-/* De hoeveelheid krijgt genoeg vaste ruimte voor 1, 2 én 3 cijfers. */
-.product-row .quantity,
-.shopping-item .quantity,
-.list-item .quantity,
-.product-row .quantity-control,
-.shopping-item .quantity-control,
-.list-item .quantity-control {
-  flex: 0 0 auto;
-}
-
-.product-row .quantity-value,
-.shopping-item .quantity-value,
-.list-item .quantity-value,
-.product-row .qty-value,
-.shopping-item .qty-value,
-.list-item .qty-value {
-  min-width: 2.6em !important;
-  width: 2.6em !important;
+.itemProductContent .quantityValue{
+  width: 30px !important;
+  min-width: 30px !important;
+  flex: 0 0 30px !important;
   text-align: center !important;
   white-space: nowrap !important;
-  flex: 0 0 2.6em !important;
 }
 
-/* Zorg dat mintekens, plus en prullenbak nooit door de productnaam worden
-   weggedrukt. */
-.product-row .quantity button,
-.shopping-item .quantity button,
-.list-item .quantity button,
-.product-row .delete,
-.shopping-item .delete,
-.list-item .delete,
-.product-row .delete-button,
-.shopping-item .delete-button,
-.list-item .delete-button {
-  flex: 0 0 auto;
+/* Mobiel: de teller blijft breed genoeg voor bijvoorbeeld 15 en 100. */
+@media (max-width:430px){
+  .itemProductContent{
+    grid-template-columns:19px minmax(0,1fr) 30px 90px 32px !important;
+    column-gap:5px !important;
+  }
+  .itemProductContent .productQuantity{
+    width:90px !important;
+    min-width:90px !important;
+    flex-basis:90px !important;
+    gap:5px !important;
+  }
+  .itemProductContent .quantityButton{
+    width:30px !important;
+    min-width:30px !important;
+    height:30px !important;
+    flex-basis:30px !important;
+  }
+  .itemProductContent .quantityValue{
+    width:34px !important;
+    min-width:34px !important;
+    flex-basis:34px !important;
+  }
+}
+
+/* ===== Lange productnamen: alleen de naam is horizontaal schuifbaar ===== */
+.itemProductContent .productInfo{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.itemProductContent .productName{
+  display:block !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:clip !important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x;
+  overscroll-behavior-x:contain;
+  cursor:grab;
+}
+.itemProductContent .productName:active{
+  cursor:grabbing;
+}
+.itemProductContent .productName::-webkit-scrollbar{
+  display:none !important;
+}
+
+/* ===== Scanner: geen zwarte opstartflits ===== */
+.barcodeVideoWrap{
+  position:relative !important;
+  overflow:hidden !important;
+  background:#eef8f1 !important;
+  aspect-ratio:4/3 !important;
+}
+#barcodeVideo{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  background:#eef8f1 !important;
+  transform:translateZ(0) scale(1.08) !important;
+  -webkit-transform:translateZ(0) scale(1.08) !important;
+  transform-origin:center center !important;
+  -webkit-transform-origin:center center !important;
+  -webkit-backface-visibility:hidden !important;
+  backface-visibility:hidden !important;
+}
+.barcodeVideoWrap.scanner-preparing #barcodeVideo{
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+.barcodeVideoWrap.scanner-live #barcodeVideo{
+  visibility:visible !important;
+  opacity:1 !important;
 }
 
 </style>
@@ -10199,50 +10156,6 @@ async function scheduleBarcodeScan(){
   if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
 }
 
-function prepareBarcodeVideoForDisplay(video, wrap){
-  if(!video || !wrap) return;
-  video.classList.add('barcode-video-loading');
-  video.classList.remove('barcode-video-ready');
-
-  const revealWhenStable = () => {
-    let checks = 0;
-    let lastW = 0, lastH = 0, stable = 0;
-
-    const check = () => {
-      if(!barcodeScanRunning && video.srcObject == null) return;
-      const w = video.videoWidth || 0;
-      const h = video.videoHeight || 0;
-
-      if(w > 0 && h > 0){
-        if(w === lastW && h === lastH) stable++;
-        else stable = 0;
-        lastW = w; lastH = h;
-      }
-
-      checks++;
-      // Wait for the browser to settle orientation/dimensions before revealing
-      // the preview. This prevents the temporary portrait frame with black sides.
-      if(w > 0 && h > 0 && stable >= 2){
-        requestAnimationFrame(() => {
-          video.classList.remove('barcode-video-loading');
-          video.classList.add('barcode-video-ready');
-        });
-        return;
-      }
-
-      if(checks < 20) requestAnimationFrame(check);
-      else {
-        video.classList.remove('barcode-video-loading');
-        video.classList.add('barcode-video-ready');
-      }
-    };
-
-    requestAnimationFrame(check);
-  };
-
-  if(video.readyState >= 1) revealWhenStable();
-  else video.addEventListener('loadedmetadata', revealWhenStable, {once:true});
-}
 
 async function openBarcodeScanner(){
   if(localStorage.getItem("boodschappenScannerEnabled") === "false"){
@@ -10254,14 +10167,18 @@ async function openBarcodeScanner(){
   const input=document.getElementById('barcodeManualInput');
   if(!overlay || !video) return;
 
+  stopBarcodeCamera();
+  if(videoWrap){
+    videoWrap.classList.remove('scanner-live');
+    videoWrap.classList.add('scanner-preparing');
+  }
+
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden','false');
-  prepareBarcodeVideoForDisplay(video, videoWrap);
   if(input) input.value='';
   const result=document.getElementById('barcodeResult');
   if(result) result.classList.remove('open');
   setBarcodeStatus('Camera wordt gestart…');
-  stopBarcodeCamera();
   barcodeBusy=false;
 
   if(!window.isSecureContext){
@@ -10301,6 +10218,14 @@ async function openBarcodeScanner(){
       return;
     }
 
+    if(videoWrap){
+      await new Promise(resolve => requestAnimationFrame(() =>
+        requestAnimationFrame(resolve)
+      ));
+      videoWrap.classList.remove('scanner-preparing');
+      videoWrap.classList.add('scanner-live');
+    }
+
     barcodeScanRunning=true;
     barcodeScanBusy=false;
     barcodeLastScan=0;
@@ -10324,6 +10249,11 @@ async function openBarcodeScanner(){
 
 function closeBarcodeScanner(){
   stopBarcodeCamera();
+  const wrap=document.querySelector('.barcodeVideoWrap');
+  if(wrap){
+    wrap.classList.remove('scanner-live');
+    wrap.classList.remove('scanner-preparing');
+  }
   barcodeBusy=false;
   const overlay=document.getElementById('barcodeOverlay');
   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
