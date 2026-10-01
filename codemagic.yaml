@@ -4,39 +4,40 @@ workflows:
     instance_type: mac_mini_m2
 
     scripts:
-      - name: Prepare Android app
+      - name: Prepare Android resources
         script: |
           set -e
+          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
-          echo "=== BUILD DIRECTORY ==="
-          pwd
+          if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
+            echo "ERROR: $CM_BUILD_DIR/icon-512-maskable.png not found"
+            exit 1
+          fi
 
-          echo "=== ROOT FILES ==="
-          ls -la
+          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
+             "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-          echo "=== CHECK INDEX ==="
-          test -f index.html
+          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-          echo "=== CHECK ICON ==="
-          test -f icon-512-maskable.png
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
-          echo "=== PREPARE WEB ASSET ==="
-          mkdir -p android/app/src/main/assets
-          cp index.html android/app/src/main/assets/index.html
+      - name: Verify Android Manifest
+        script: |
+          set -e
+          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
-          echo "=== PREPARE ICON ==="
-          mkdir -p android/app/src/main/res/drawable
-          cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
-
-          echo "=== CHECK PREPARED FILES ==="
-          ls -l android/app/src/main/assets/index.html
-          ls -l android/app/src/main/res/drawable/ic_launcher.png
+          if [ ! -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png" ]; then
+            echo "ERROR: ic_launcher.png was not created"
+            exit 1
+          fi
 
       - name: Build Android APK
         script: |
           set -e
-          cd android
-          chmod +x gradlew
+          cd "$CM_BUILD_DIR/android"
+          chmod +x ./gradlew
           ./gradlew assembleDebug
 
     artifacts:
