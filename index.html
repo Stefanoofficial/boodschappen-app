@@ -4300,11 +4300,6 @@ body.logged-in {
       <p>Tik op het rondje naast een product om het af te vinken. Zo zie je direct wat al in je winkelwagen zit.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-barcode"></i><span>Barcode scannen</span></div>
-      <p>Staat een product al op je boodschappenlijst? Scan dan de barcode van het product. Als de barcode overeenkomt, wordt het bestaande product automatisch als <strong>voltooid</strong> gemarkeerd. Zo hoef je het niet handmatig af te vinken.</p>
-      <p>Staat het product nog niet op je lijst? Dan kan de scan het product aan je lijst toevoegen wanneer de productinformatie beschikbaar is.</p>
-    </div>
-    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
       <p>Via Mijn familie kun je later een nieuwe familie maken of met een familiecode aansluiten bij een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
@@ -10694,12 +10689,18 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
     var open=p ? !p.classList.contains('open') : false;
     setPanel('sortOptionsPanel', false);
     setPanel('listOptionsPanel', open);
+    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
+      window.AndroidApp.setMenuDimmed(open);
+    }
     var b=panel('listOptionsButton');
     if(b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
   };
 
   window.closeListOptions=function(){
     setPanel('listOptionsPanel', false);
+    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
+      window.AndroidApp.setMenuDimmed(false);
+    }
     var b=panel('listOptionsButton');
     if(b) b.setAttribute('aria-expanded','false');
   };
@@ -10712,15 +10713,27 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
     } catch(err) { console.error('List wissen mislukt', err); }
   };
 
+  window.addEventListener('pagehide', function(){
+    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
+      window.AndroidApp.setMenuDimmed(false);
+    }
+  });
+
   window.openSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('listOptionsPanel', false);
     setPanel('sortOptionsPanel', true);
+    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
+      window.AndroidApp.setMenuDimmed(true);
+    }
   };
 
   window.closeSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('sortOptionsPanel', false);
+    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
+      window.AndroidApp.setMenuDimmed(false);
+    }
   };
 
   window.sortCurrentList=function(mode,e){
@@ -10781,7 +10794,9 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
 <style id="compact-list-options-final">
 /* Klein pop-over menu: geen schermhoge zijbalk. */
 .listOptionsPanel{
-  position:fixed !important; inset:0 !important; width:100vw !important; height:100dvh !important;
+  position:fixed !important;
+  top:0 !important; left:0 !important; right:0 !important; bottom:0 !important;
+  width:auto !important; height:auto !important; min-height:0 !important;
   background:rgba(38,52,43,.16) !important; backdrop-filter:blur(1.5px); -webkit-backdrop-filter:blur(1.5px);
   z-index:12000 !important; pointer-events:none !important; opacity:0 !important;
   transition:opacity .18s ease !important;
