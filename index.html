@@ -1444,6 +1444,87 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   opacity: 1 !important;
 }
 
+
+/* Definitieve stijl voor Meer: ook de submenu's en dialogs gebruiken
+   dezelfde zachte groenachtige app-achtergrond, niet puur wit. */
+.app.more-active #familyMenu {
+  background: #eef8f1 !important;
+  border-color: rgba(63,91,69,.12) !important;
+  box-shadow: 0 10px 28px rgba(63,91,69,.10) !important;
+}
+.app.more-active #familyMenu .familyMenuPage {
+  background: #eef8f1 !important;
+}
+.app.more-active #familyMenu .familyMenuItem,
+.app.more-active #familyMenu .familyMenuPrimary {
+  background: transparent !important;
+}
+.app.more-active #familyMenu .familyMenuItem:hover,
+.app.more-active #familyMenu .familyMenuPrimary:hover {
+  background: #e3f1e6 !important;
+}
+.app.more-active #familyMenu .familyMenuSub,
+.app.more-active #familyMenu .accountMenuPage,
+.app.more-active #familyMenu .aboutMenuPage {
+  background: #eef8f1 !important;
+}
+.familyDialog {
+  background: #eef8f1 !important;
+  border-color: rgba(63,91,69,.12) !important;
+  color: #29322c !important;
+}
+.familyDialogMember {
+  background: rgba(255,255,255,.62) !important;
+}
+.familyDialogInput {
+  background: rgba(255,255,255,.78) !important;
+}
+body.dark-theme .app.more-active #familyMenu,
+body.dark-theme .app.more-active #familyMenu .familyMenuPage,
+body.dark-theme .app.more-active #familyMenu .familyMenuSub,
+body.dark-theme .app.more-active #familyMenu .accountMenuPage,
+body.dark-theme .app.more-active #familyMenu .aboutMenuPage {
+  background: #202a23 !important;
+}
+body.dark-theme .app.more-active #familyMenu .familyMenuItem:hover,
+body.dark-theme .app.more-active #familyMenu .familyMenuPrimary:hover {
+  background: #2b3a30 !important;
+}
+body.dark-theme .familyDialog {
+  background: #202a23 !important;
+  color: #e6eee8 !important;
+}
+body.dark-theme .familyDialogMember {
+  background: rgba(255,255,255,.06) !important;
+}
+body.dark-theme .familyDialogInput {
+  background: rgba(255,255,255,.07) !important;
+  color: #e6eee8 !important;
+}
+
+/* Scanner: verberg de preview volledig totdat de cameramaten stabiel zijn.
+   Hierdoor zie je geen eerste zwart frame en geen tijdelijke zwarte zijbalken. */
+.barcodeVideoWrap.scanner-loading {
+  background: #eef8f1 !important;
+}
+.barcodeVideoWrap.scanner-loading #barcodeVideo,
+.barcodeVideoWrap.scanner-loading .barcodeFrame {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+.barcodeVideoWrap.scanner-ready #barcodeVideo {
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+.barcodeVideoWrap.scanner-ready .barcodeFrame {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -10072,49 +10153,50 @@ async function scheduleBarcodeScan(){
   if(barcodeScanRunning) barcodeScanFrame=requestAnimationFrame(scheduleBarcodeScan);
 }
 
+
 function prepareBarcodeVideoForDisplay(video, wrap){
   if(!video || !wrap) return;
-  video.classList.add('barcode-video-loading');
-  video.classList.remove('barcode-video-ready');
 
-  const revealWhenStable = () => {
-    let checks = 0;
-    let lastW = 0, lastH = 0, stable = 0;
+  wrap.classList.remove('scanner-ready');
+  wrap.classList.add('scanner-loading');
 
-    const check = () => {
-      if(!barcodeScanRunning && video.srcObject == null) return;
-      const w = video.videoWidth || 0;
-      const h = video.videoHeight || 0;
+  let checks = 0;
+  let lastW = 0;
+  let lastH = 0;
+  let stable = 0;
 
-      if(w > 0 && h > 0){
-        if(w === lastW && h === lastH) stable++;
-        else stable = 0;
-        lastW = w; lastH = h;
-      }
+  const reveal = () => {
+    const w = video.videoWidth || 0;
+    const h = video.videoHeight || 0;
 
-      checks++;
-      // Wait for the browser to settle orientation/dimensions before revealing
-      // the preview. This prevents the temporary portrait frame with black sides.
-      if(w > 0 && h > 0 && stable >= 2){
-        requestAnimationFrame(() => {
-          video.classList.remove('barcode-video-loading');
-          video.classList.add('barcode-video-ready');
-        });
-        return;
-      }
+    if(w > 0 && h > 0){
+      if(w === lastW && h === lastH) stable++;
+      else stable = 0;
+      lastW = w;
+      lastH = h;
+    }
 
-      if(checks < 20) requestAnimationFrame(check);
-      else {
-        video.classList.remove('barcode-video-loading');
-        video.classList.add('barcode-video-ready');
-      }
-    };
+    checks++;
 
-    requestAnimationFrame(check);
+    // Eerst meerdere frames met dezelfde afmetingen afwachten.
+    // Pas daarna wordt de video zichtbaar.
+    if(w > 0 && h > 0 && stable >= 3){
+      requestAnimationFrame(() => {
+        wrap.classList.remove('scanner-loading');
+        wrap.classList.add('scanner-ready');
+      });
+      return;
+    }
+
+    if(checks < 60){
+      requestAnimationFrame(reveal);
+    } else if(w > 0 && h > 0){
+      wrap.classList.remove('scanner-loading');
+      wrap.classList.add('scanner-ready');
+    }
   };
 
-  if(video.readyState >= 1) revealWhenStable();
-  else video.addEventListener('loadedmetadata', revealWhenStable, {once:true});
+  requestAnimationFrame(reveal);
 }
 
 async function openBarcodeScanner(){
@@ -10129,7 +10211,7 @@ async function openBarcodeScanner(){
 
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden','false');
-  prepareBarcodeVideoForDisplay(video, videoWrap);
+  if(videoWrap){ videoWrap.classList.remove('scanner-ready'); videoWrap.classList.add('scanner-loading'); }
   if(input) input.value='';
   const result=document.getElementById('barcodeResult');
   if(result) result.classList.remove('open');
@@ -10174,6 +10256,8 @@ async function openBarcodeScanner(){
       return;
     }
 
+    prepareBarcodeVideoForDisplay(barcodeVideo, videoWrap);
+
     barcodeScanRunning=true;
     barcodeScanBusy=false;
     barcodeLastScan=0;
@@ -10197,6 +10281,8 @@ async function openBarcodeScanner(){
 
 function closeBarcodeScanner(){
   stopBarcodeCamera();
+  const wrap=document.querySelector('.barcodeVideoWrap');
+  if(wrap){ wrap.classList.remove('scanner-ready'); wrap.classList.add('scanner-loading'); }
   barcodeBusy=false;
   const overlay=document.getElementById('barcodeOverlay');
   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
