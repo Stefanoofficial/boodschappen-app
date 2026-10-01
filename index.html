@@ -10219,11 +10219,26 @@ async function openBarcodeScanner(){
     }
 
     if(videoWrap){
-      // Wait for the camera dimensions to settle, then choose a small
-      // portrait crop only when the device actually delivers portrait video.
+      // Wait until iOS/WebView has committed the actual camera dimensions.
       await new Promise(resolve => requestAnimationFrame(() =>
         requestAnimationFrame(resolve)
       ));
+      const vw = Number(barcodeVideo.videoWidth || 0);
+      const vh = Number(barcodeVideo.videoHeight || 0);
+      videoWrap.classList.remove('video-portrait','video-landscape','video-normal');
+      if(vw && vh){
+        if(vh > vw * 1.12){
+          // Some subsequent camera opens return a portrait stream.
+          // Make the video element wider than the frame so no side bars show.
+          videoWrap.classList.add('video-portrait');
+        }else if(vw > vh * 1.12){
+          videoWrap.classList.add('video-landscape');
+        }else{
+          videoWrap.classList.add('video-normal');
+        }
+      }else{
+        videoWrap.classList.add('video-normal');
+      }
       videoWrap.classList.remove('scanner-preparing');
       videoWrap.classList.add('scanner-live');
     }
@@ -10255,6 +10270,7 @@ function closeBarcodeScanner(){
   if(wrap){
     wrap.classList.remove('scanner-live');
     wrap.classList.remove('scanner-preparing');
+    wrap.classList.remove('video-portrait','video-landscape','video-normal');
   }
   barcodeBusy=false;
   const overlay=document.getElementById('barcodeOverlay');
@@ -11047,6 +11063,35 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
     max-width:40px !important;
     margin-left:3px !important;
   }
+}
+
+
+/* ===== Productbediening iets naar links voor meer lucht bij de rechterrand ===== */
+.itemProductContent{
+  padding-right:10px !important;
+  box-sizing:border-box !important;
+}
+@media(max-width:430px){
+  .itemProductContent{
+    padding-right:10px !important;
+  }
+}
+
+/* ===== Scanner: ook bij een tweede/volgende keer openen volledig vullen ===== */
+.barcodeVideoWrap #barcodeVideo{
+  object-fit:cover !important;
+  object-position:center center !important;
+}
+.barcodeVideoWrap.video-portrait #barcodeVideo{
+  width:133.34% !important;
+  max-width:none !important;
+  left:-16.67% !important;
+  right:auto !important;
+}
+.barcodeVideoWrap.video-landscape #barcodeVideo,
+.barcodeVideoWrap.video-normal #barcodeVideo{
+  width:100% !important;
+  left:0 !important;
 }
 
 </style>
