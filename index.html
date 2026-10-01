@@ -3735,7 +3735,7 @@ body.logged-in {
       <i class="fa-solid fa-user-plus"></i>
       <span>Account aanmaken</span>
     </button>
-    <div class="version">Versie 1.0</div>
+    <div class="version">Versie 1.2</div>
     <div class="copyright">© 2026 Boodschappenlijst</div>
   </div>
 </div>
@@ -3864,7 +3864,7 @@ body.logged-in {
       <span>Help &amp; uitleg</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
-    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openAboutSubmenu(event)">
+    <button type="button" class="familyMenuItem familyMenuPrimary" onclick="showAboutApp(event)">
       <i class="fa-solid fa-circle-info"></i>
       <span>Over de app</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
@@ -4032,23 +4032,6 @@ body.logged-in {
     <div class="settingsMenuHint">Je feedback wordt rechtstreeks naar de ontwikkelaar gestuurd. Je hoeft geen e-mailapp te openen.</div>
   </div>
 
-  <div id="aboutMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
-    <button type="button" class="settingsMenuBack" onclick="closeAboutSubmenu(event)">
-      <i class="fa-solid fa-chevron-left"></i>
-      <span>Over de app</span>
-    </button>
-    <div class="familyMenuSubTitle">Over de app</div>
-    <button type="button" class="familyMenuItem" onclick="showAboutApp()">
-      <i class="fa-solid fa-circle-info"></i>
-      <span>App-informatie</span>
-    </button>
-    <button type="button" class="familyMenuItem" onclick="showAboutHelp()">
-      <i class="fa-solid fa-circle-question"></i>
-      <span>Help &amp; uitleg</span>
-    </button>
-    <div class="aboutMenuHint">Boodschappenlijst · versie 1.0</div>
-  </div>
-
   <div id="appInfoMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
     <button type="button" class="settingsMenuBack" onclick="closeAppInfoSubmenu(event)">
       <i class="fa-solid fa-chevron-left"></i>
@@ -4057,8 +4040,8 @@ body.logged-in {
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Boodschappenlijst</div>
-      <div class="aboutInfoVersion">Versie 1.0</div>
-      <p>Een eenvoudige boodschappenlijst om producten snel toe te voegen, af te vinken en je lijst overzichtelijk te houden. De herkenbare producticonen worden lokaal getoond.</p>
+      <div class="aboutInfoVersion">Versie 1.2</div>
+      <p>Een eenvoudige boodschappenlijst om producten snel toe te voegen, af te vinken en je lijst overzichtelijk te houden. De app gebruikt slimme productsuggesties met echte productinformatie en productfoto’s wanneer die beschikbaar zijn. Je kunt ook producten scannen met de barcode-scanner.</p>
     </div>
     <div class="aboutInfoSection">
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
@@ -4068,7 +4051,7 @@ body.logged-in {
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
     </div>
-    <div class="aboutMenuHint">Producticonen: lokaal getekend · geen externe productfoto’s nodig</div>
+    <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
     <div class="aboutMenuHint">© 2026 Boodschappenlijst</div>
   </div>
 
@@ -4838,8 +4821,6 @@ async function shareFeedback(event) {
     }
   }
 }
-function openAboutSubmenu(event) { switchMenuPage("aboutMenuSub", event); }
-function closeAboutSubmenu(event) { returnMenuToMain("aboutMenuSub", event); }
 async function showAccountName() {
   const user = auth && auth.currentUser;
   if (!user) return;
@@ -5075,11 +5056,11 @@ async function logoutFromMenu() {
 function showAboutApp(event) {
   switchMenuPage("appInfoMenuSub", event);
 }
-function closeAppInfoSubmenu(event) { returnMenuToPage("appInfoMenuSub", "aboutMenuSub", event); }
+function closeAppInfoSubmenu(event) { returnMenuToMain("appInfoMenuSub", event); }
 function showAboutHelp(event) {
   switchMenuPage("helpMenuSub", event);
 }
-function closeHelpSubmenu(event) { returnMenuToPage("helpMenuSub", "aboutMenuSub", event); }
+function closeHelpSubmenu(event) { returnMenuToMain("helpMenuSub", event); }
 /* De algemene returnMenuToPage hierboven wordt ook gebruikt voor Over de app/Help. */
 
 function getSavedListsKey() {
@@ -6022,129 +6003,135 @@ async function fetchOnlineProductSuggestions(query) {
     "aardbei":["strawberry","strawberries"], "aardbeien":["strawberry","strawberries"],
     "meloen":["melon","melons"], "watermeloen":["watermelon"],
     "ananas":["pineapple"], "kiwi":["kiwi"], "mango":["mango"], "avocado":["avocado"],
-
-    "groente":["vegetables","cucumber","tomato","bell pepper","carrot","lettuce","broccoli"],
-    "groenten":["vegetables","cucumber","tomato","bell pepper","carrot","lettuce","broccoli"],
+    "groente":["vegetable","vegetables"], "groenten":["vegetable","vegetables"],
     "komkommer":["cucumber","cucumbers"], "komkommers":["cucumber","cucumbers"],
     "tomaat":["tomato","tomatoes"], "tomaten":["tomato","tomatoes"],
     "paprika":["bell pepper","sweet pepper","paprika"], "paprikas":["bell pepper","sweet pepper","paprika"],
     "wortel":["carrot","carrots"], "wortels":["carrot","carrots"],
     "ui":["onion","onions"], "uien":["onion","onions"],
-    "knoflook":["garlic"], "prei":["leek","leeks"],
-    "sla":["lettuce","salad"], "spinazie":["spinach"],
+    "knoflook":["garlic"], "prei":["leek","leeks"], "sla":["lettuce"], "spinazie":["spinach"],
     "broccoli":["broccoli"], "bloemkool":["cauliflower"], "courgette":["zucchini","courgette"],
     "aubergine":["eggplant","aubergine"], "champignon":["mushroom","mushrooms"], "champignons":["mushroom","mushrooms"],
     "boon":["green beans","beans"], "bonen":["green beans","beans"],
     "mais":["corn","sweet corn"], "doperwt":["peas","green peas"], "doperwten":["peas","green peas"],
     "biet":["beetroot","beet"], "bietjes":["beetroot","beet"],
-
-    "aardappel":["potato","potatoes"], "aardappelen":["potato","potatoes"],
-    "zoete aardappel":["sweet potato","sweet potatoes"],
-    "brood":["bread"], "bruin brood":["brown bread"], "wit brood":["white bread"],
-    "stokbrood":["baguette"], "bolletjes":["bread rolls"],
+    "aardappel":["potato","potatoes"], "aardappelen":["potato","potatoes"], "zoete aardappel":["sweet potato","sweet potatoes"],
+    "brood":["bread"], "bruin brood":["brown bread"], "wit brood":["white bread"], "stokbrood":["baguette"], "bolletjes":["bread rolls"],
     "frisdrank":["soft drink","soft drinks","soda"], "fris":["soft drink","soda"],
-    "cola":["cola","coca-cola"], "sinas":["orange soda","sinas"], "fanta":["fanta"], "sprite":["sprite"],
+    "cola":["cola","coca cola","coca-cola"], "sinas":["orange soda","sinas"], "fanta":["fanta"], "sprite":["sprite"],
     "melk":["milk"], "kaas":["cheese"], "chocomelk":["chocolate milk"], "chocolademelk":["chocolate milk"],
-    "chocolade":["chocolate"], "yoghurt":["yogurt"], "boter":["butter"],
-    "eieren":["eggs","egg"], "ei":["egg","eggs"], "kip":["chicken"],
-    "rijst":["rice"], "pasta":["pasta"], "vlees":["meat"], "gehakt":["minced meat"], "vis":["fish"],
-    "zalm":["salmon"], "tonijn":["tuna"], "worst":["sausage"], "ham":["ham"],
-    "pindakaas":["peanut butter"], "jam":["jam","fruit spread"], "koffie":["coffee"], "thee":["tea"],
-    "sap":["juice"], "water":["water"], "chips":["chips","crisps"], "koek":["cookie","cookies","biscuits"],
-    "koekjes":["cookies","biscuits"], "ijs":["ice cream"]
+    "chocolade":["chocolate"], "yoghurt":["yogurt"], "boter":["butter"], "eieren":["eggs","egg"], "ei":["egg","eggs"],
+    "kip":["chicken"], "rijst":["rice"], "pasta":["pasta"], "vlees":["meat"], "gehakt":["minced meat"], "vis":["fish"],
+    "zalm":["salmon"], "tonijn":["tuna"], "worst":["sausage"], "ham":["ham"], "pindakaas":["peanut butter"],
+    "jam":["jam","fruit spread"], "koffie":["coffee"], "thee":["tea"], "sap":["juice"], "water":["water"],
+    "chips":["chips","crisps"], "koek":["cookie","cookies","biscuits"], "koekjes":["cookies","biscuits"], "ijs":["ice cream"]
   };
 
-  const terms = [clean];
-  (aliases[normalized] || []).forEach(term => {
-    if (!terms.includes(term)) terms.push(term);
-  });
+  // If the user types only the beginning of a common Dutch product name,
+  // use that known product as an additional search intent. This makes e.g.
+  // "ap" naturally lead to apple products instead of arbitrary "ap" matches.
+  const aliasKey = Object.keys(aliases)
+    .filter(k => k.length >= 3 && k.startsWith(normalized))
+    .sort((a, b) => a.length - b.length)[0];
+  const intentKey = aliases[normalized] ? normalized : (aliasKey || normalized);
+  const intentAliases = aliases[intentKey] || [];
 
-  // For a broad category such as "groenten", collect several common Dutch
-  // vegetables so the user gets real products with package photos instead of
-  // unrelated results from a generic category search.
+  const terms = [clean, intentKey, ...intentAliases];
+  const uniqueTerms = [...new Set(terms.filter(Boolean))];
+
   const broadCategoryTerms = {
     "groente": ["cucumber", "tomato", "bell pepper", "carrot", "lettuce", "broccoli", "cauliflower"],
     "groenten": ["cucumber", "tomato", "bell pepper", "carrot", "lettuce", "broccoli", "cauliflower"],
     "fruit": ["apple", "banana", "orange", "pear", "strawberry", "grape"],
     "fruiten": ["apple", "banana", "orange", "pear", "strawberry", "grape"]
   };
-  (broadCategoryTerms[normalized] || []).forEach(term => {
-    if (!terms.includes(term)) terms.push(term);
-  });
+  (broadCategoryTerms[normalized] || []).forEach(term => uniqueTerms.push(term));
 
+  const categoryQuery = new Set(["groente","groenten","fruit","fruiten"]);
   const results = [];
   const seen = new Set();
 
-  const scoreProduct = (product, term) => {
-    const name = normalizeProductLookup(product.name);
-    const brand = normalizeProductLookup(product.brand);
-    const categories = normalizeProductLookup(product.categories);
-    const q = normalizeProductLookup(term);
-    if (!name && !brand && !categories) return -1;
+  const cleanText = value => normalizeProductLookup(value).replace(/-/g, " ").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 
-    let score = 0;
-    if (name === q) score += 180;
-    if (name.startsWith(q)) score += 125;
-    if (name.includes(q)) score += 95;
-    if (brand.includes(q)) score += 45;
-    if (categories.includes(q)) score += 35;
-    if (product.imageUrl) score += 20;
+  const scoreProduct = (product) => {
+    const name = cleanText(product.name);
+    const brand = cleanText(product.brand);
+    const categories = cleanText(product.categories);
+    if (!name) return -1;
 
-    const words = q.split(/\s+/).filter(Boolean);
-    if (words.length > 1 && words.every(w => name.includes(w))) score += 55;
-    if (words.length > 1 && words.every(w => (name + " " + brand + " " + categories).includes(w))) score += 35;
-    return score;
+    let best = -1;
+    const intents = [normalized, intentKey, ...intentAliases].filter(Boolean);
+    for (const rawIntent of intents) {
+      const q = cleanText(rawIntent);
+      if (!q) continue;
+      let score = 0;
+      if (name === q) score = 300;
+      else if (name.startsWith(q + " ")) score = 245;
+      else if (name.startsWith(q)) score = 225;
+      else if (name.includes(" " + q + " ") || name.endsWith(" " + q)) score = 210;
+      else if (name.includes(q)) score = 170;
+      else if (brand === q || brand.startsWith(q + " ") || brand.includes(q)) score = 70;
+      else if (categories.includes(q)) score = 45;
+      if (score > best) best = score;
+    }
+
+    // Short free-text searches must still be present in the product name.
+    // Brand/category-only matches are deliberately not enough.
+    if (normalized.length <= 3 && best < 170) return -1;
+    if (best < 120 && !categoryQuery.has(normalized)) return -1;
+    if (product.imageUrl) best += 20;
+    return best;
   };
 
-  for (const term of terms) {
+  const produceKeys = new Set([
+    "appel","appels","peer","peren","banaan","bananen","sinaasappel","sinaasappels","mandarijn","mandarijnen",
+    "citroen","citroenen","limoen","limoenen","druif","druiven","aardbei","aardbeien","meloen","watermeloen",
+    "ananas","kiwi","mango","avocado","komkommer","komkommers","tomaat","tomaten","paprika","paprikas","wortel","wortels",
+    "ui","uien","knoflook","prei","sla","spinazie","broccoli","bloemkool","courgette","aubergine","champignon","champignons",
+    "boon","bonen","mais","doperwt","doperwten","biet","bietjes","aardappel","aardappelen","zoete aardappel"
+  ]);
+  const strictProduce = produceKeys.has(intentKey) || produceKeys.has(normalized);
+  const produceExclusions = ["mayonnaise","mayonaise","sauce","salsa","dressing","drink","beverage","water","juice","milk","yogurt","cream","shampoo","conditioner","mask","face","skin","soap","gel","lotion","supplement","protein","powder","snack","chips","cracker","cookie","cake","pizza","soup"];
+
+  const isRelevantProduce = (product) => {
+    const name = cleanText(product.name);
+    const combined = name + " " + cleanText(product.brand) + " " + cleanText(product.categories);
+    if (produceExclusions.some(word => combined.includes(cleanText(word)))) return false;
+    const wanted = [intentKey, ...intentAliases].filter(Boolean).map(cleanText);
+    if (!wanted.some(q => name === q || name.startsWith(q + " ") || name.startsWith(q + "-") || name.includes(" " + q + " ") || name.endsWith(" " + q) || name.includes(q + " "))) return false;
+    const categories = cleanText(product.categories);
+    if (categories && !categories.includes("vegetables") && !categories.includes("fruits") && !categories.includes("fresh") && !categories.includes("plant based")) return false;
+    return true;
+  };
+
+  for (const term of uniqueTerms) {
     const url = "https://world.openfoodfacts.org/cgi/search.pl?search_terms=" + encodeURIComponent(term) +
       "&search_simple=1&action=process&json=1&page_size=50&sort_by=unique_scans_n&lc=nl&cc=nl" +
       "&fields=product_name,brands,categories_tags_en,categories,image_front_small_url,image_front_url,code";
-
     try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-        cache: "no-store"
-      });
+      const response = await fetch(url, { method: "GET", headers: { "Accept": "application/json" }, cache: "no-store" });
       if (!response.ok) continue;
-
       const data = await response.json();
       const products = Array.isArray(data.products) ? data.products : [];
-
       for (const p of products) {
         const name = String(p.product_name || "").trim();
         const brand = String(p.brands || "").split(",")[0].trim();
         const imageUrl = String(p.image_front_small_url || p.image_front_url || "").trim();
         const barcode = String(p.code || "").trim();
-        const categoryText = Array.isArray(p.categories_tags_en)
-          ? p.categories_tags_en.join(" ")
-          : String(p.categories || "");
-
+        const categoryText = Array.isArray(p.categories_tags_en) ? p.categories_tags_en.join(" ") : String(p.categories || "");
         const keyName = normalizeProductLookup(name);
         if (!keyName || seen.has(keyName) || !imageUrl) continue;
-
         const product = { name, brand, imageUrl, barcode, categories: categoryText };
-        const directScore = scoreProduct(product, clean);
-        const aliasScore = (aliases[normalized] || []).reduce(
-          (best, alias) => Math.max(best, scoreProduct(product, alias)), 0
-        );
-        const categoryScore = (broadCategoryTerms[normalized] || []).reduce(
-          (best, alias) => Math.max(best, scoreProduct(product, alias)), 0
-        );
-        const score = Math.max(directScore, aliasScore, categoryScore);
-
-        if (score < 45) continue;
+        if (strictProduce && !isRelevantProduce(product)) continue;
+        const score = scoreProduct(product);
+        if (score < 120) continue;
         seen.add(keyName);
         results.push({ ...product, _score: score });
       }
     } catch (error) {
       console.warn("Online productsuggestie zoekpoging mislukt:", term, error);
     }
-
-    // Keep searching broad vegetable/fruit aliases until we have enough
-    // relevant real products. For normal searches, stop once we have 8.
-    if (results.length >= 8 && !broadCategoryTerms[normalized]) break;
+    if (results.length >= 20 && !categoryQuery.has(normalized)) break;
   }
 
   results.sort((a, b) => b._score - a._score);
