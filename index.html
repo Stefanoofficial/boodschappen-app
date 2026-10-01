@@ -9880,6 +9880,149 @@ document.addEventListener('visibilitychange',function(){
 </script>
 
 
+
+<style id="quantity-compact-final">
+/* Compacte aantallen: productnaam krijgt meer ruimte, bediening blijft goed aantikbaar. */
+.itemProductContent{
+  grid-template-columns:20px minmax(0,1fr) 32px 72px 32px !important;
+  column-gap:6px !important;
+}
+.itemProductContent .productQuantity{
+  width:72px !important;
+  min-width:72px !important;
+  height:36px !important;
+  gap:4px !important;
+  padding:2px !important;
+}
+.itemProductContent .quantityButton{
+  width:29px !important;
+  height:29px !important;
+  flex:0 0 29px !important;
+  border-radius:9px !important;
+  font-size:19px !important;
+}
+.itemProductContent .quantityValue{
+  min-width:12px !important;
+  font-size:17px !important;
+}
+@media (max-width:430px){
+  .itemProductContent{
+    grid-template-columns:19px minmax(0,1fr) 29px 70px 31px !important;
+    column-gap:5px !important;
+  }
+  .itemProductContent .productQuantity{
+    width:70px !important;
+    min-width:70px !important;
+    height:35px !important;
+    gap:3px !important;
+  }
+  .itemProductContent .quantityButton{
+    width:28px !important;
+    height:28px !important;
+    flex-basis:28px !important;
+    font-size:18px !important;
+  }
+  .itemProductContent .quantityValue{
+    font-size:17px !important;
+    min-width:11px !important;
+  }
+}
+</style>
+
+
+<script id="robust-legal-navigation-fix">
+(function(){
+  function forceMenuPage(pageId){
+    var menu=document.getElementById("familyMenu");
+    var more=document.getElementById("moreView");
+    if(!menu) return false;
+
+    if(more && menu.parentElement!==more){
+      more.appendChild(menu);
+    }
+    if(more){
+      more.style.display="block";
+      more.style.visibility="visible";
+      more.style.opacity="1";
+      more.scrollTop=0;
+    }
+
+    var pages=menu.querySelectorAll(".familyMenuPage");
+    pages.forEach(function(p){
+      p.classList.remove("menuSlideOutLeft","menuSlideInRight","menuSlideOutRight","menuSlideInLeft");
+      p.style.setProperty("display","none","important");
+      p.style.setProperty("pointer-events","none","important");
+      p.style.setProperty("opacity","1","important");
+      p.style.setProperty("transform","none","important");
+    });
+
+    var page=document.getElementById(pageId);
+    if(!page) return false;
+
+    menu.style.setProperty("display","block","important");
+    menu.style.setProperty("visibility","visible","important");
+    menu.style.setProperty("opacity","1","important");
+    page.style.setProperty("display","block","important");
+    page.style.setProperty("pointer-events","auto","important");
+    page.style.setProperty("opacity","1","important");
+    page.style.setProperty("transform","none","important");
+    page.scrollTop=0;
+    return true;
+  }
+
+  window.openLegalSubmenu=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("legalMenuSub");
+    return false;
+  };
+
+  window.closeLegalSubmenu=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("familyMenuMain");
+    return false;
+  };
+
+  window.showPrivacyPolicy=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("privacyMenuSub");
+    return false;
+  };
+
+  window.closePrivacySubmenu=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("legalMenuSub");
+    return false;
+  };
+
+  window.showTerms=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("termsMenuSub");
+    return false;
+  };
+
+  window.closeTermsSubmenu=function(event){
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+    forceMenuPage("legalMenuSub");
+    return false;
+  };
+
+  document.addEventListener("DOMContentLoaded",function(){
+    var legalBtn=document.querySelector('#familyMenuMain button[onclick*="openLegalSubmenu"]');
+    if(legalBtn){
+      legalBtn.onclick=function(e){ return window.openLegalSubmenu(e); };
+    }
+    var privacyBtn=document.querySelector('#legalMenuSub button[onclick*="showPrivacyPolicy"]');
+    if(privacyBtn){
+      privacyBtn.onclick=function(e){ return window.showPrivacyPolicy(e); };
+    }
+    var termsBtn=document.querySelector('#legalMenuSub button[onclick*="showTerms"]');
+    if(termsBtn){
+      termsBtn.onclick=function(e){ return window.showTerms(e); };
+    }
+  });
+})();
+</script>
+
 </body>
 
 <style id="overview-dashboard-final">
