@@ -11094,6 +11094,27 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   left:0 !important;
 }
 
+
+/* Productteller en prullenbak iets meer naar rechts */
+.itemProductContent{
+  padding-right:0 !important;
+  grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
+  column-gap:5px !important;
+}
+.itemProductContent .productQuantity{
+  margin-right:0 !important;
+}
+.itemProductContent .product-row-trash-can{
+  margin-left:0 !important;
+}
+@media(max-width:430px){
+  .itemProductContent{
+    padding-right:0 !important;
+    grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
+    column-gap:5px !important;
+  }
+}
+
 </style>
 
 <div id="barcodeOverlay" class="barcodeOverlay" aria-hidden="true">
