@@ -3581,6 +3581,137 @@ body.logged-in {
   -webkit-tap-highlight-color: transparent;
 }
 </style>
+
+<style id="final-ui-layout-fix-2026-10-01">
+/* ===== Definitieve fix: Meer-menu + productregels op smalle schermen ===== */
+
+/* Meer: de menupagina moet altijd zichtbaar zijn wanneer Meer actief is. */
+.app.more-active #familyMenuMain {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* De Meer-kaart mag zijn inhoud volledig tonen. */
+.app.more-active #familyMenu {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+}
+
+/* Productregel: vaste bediening rechts, tekst krijgt de resterende ruimte. */
+.itemProductContent {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) 32px auto 34px !important;
+  align-items: center !important;
+  column-gap: 7px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.itemProductContent .itemCheck {
+  grid-column: 1;
+}
+
+.itemProductContent .productInfo {
+  grid-column: 2;
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.itemProductContent .productIcon {
+  grid-column: 3;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+}
+
+.itemProductContent .productQuantity {
+  grid-column: 4;
+  min-width: 78px !important;
+  width: 78px !important;
+  gap: 4px !important;
+  justify-self: end !important;
+}
+
+.itemProductContent .product-row-trash-can {
+  grid-column: 5;
+  justify-self: end !important;
+}
+
+.itemProductContent .productName,
+.itemProductContent .productBrand {
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+.itemProductContent .productName {
+  display: block !important;
+}
+
+@media (max-width: 430px) {
+  .item {
+    padding: 10px 9px !important;
+  }
+
+  .itemProductContent {
+    grid-template-columns: 19px minmax(0, 1fr) 30px 74px 32px !important;
+    column-gap: 5px !important;
+  }
+
+  .itemProductContent .itemCheck {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
+  .itemProductContent .productIcon,
+  .itemProductContent .productIconImage,
+  .itemProductContent .productRealImage {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    max-height: 30px !important;
+  }
+
+  .itemProductContent .productQuantity {
+    width: 74px !important;
+    min-width: 74px !important;
+    height: 36px !important;
+  }
+
+  .itemProductContent .quantityButton {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+
+  .itemProductContent .quantityValue {
+    font-size: 17px !important;
+    min-width: 14px !important;
+  }
+
+  .itemProductContent .product-row-trash-can {
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 34px !important;
+  }
+}
+
+/* Lange productnamen blijven binnen hun eigen kolom. */
+.itemProductContent .productInfo > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -4290,6 +4421,9 @@ const __menuPageIds = [
   "feedbackMenuSub",
   "aboutMenuSub",
   "appInfoMenuSub",
+  "legalMenuSub",
+  "privacyMenuSub",
+  "termsMenuSub",
   "helpMenuSub"
 ];
 
