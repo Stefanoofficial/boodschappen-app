@@ -4,34 +4,56 @@ workflows:
     instance_type: mac_mini_m2
 
     scripts:
+
+      - name: Verify repository files
+        script: |
+          set -e
+
+          echo "=== CURRENT COMMIT ==="
+          git rev-parse HEAD || true
+
+          echo "=== CURRENT BRANCH ==="
+          git branch --show-current || true
+
+          echo "=== CHECK VALUES ==="
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values"
+          echo "--- styles.xml ---"
+          cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+
+          echo "=== CHECK VALUES-V31 ==="
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31"
+          echo "--- styles.xml ---"
+          cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
+
+          echo "=== CHECK MIPMAP ==="
+          find "$CM_BUILD_DIR/android/app/src/main/res" \
+            -maxdepth 3 \
+            -type f \
+            | sort
+
+          echo "=== CHECK MANIFEST ==="
+          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+
+
       - name: Prepare Android resources
         script: |
           set -e
+
           mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
 
           if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
-            echo "ERROR: $CM_BUILD_DIR/icon-512-maskable.png not found"
+            echo "ERROR: icon-512-maskable.png not found"
             exit 1
           fi
 
           cp "$CM_BUILD_DIR/icon-512-maskable.png" \
              "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-          ls -lh "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
-      - name: Verify Android Manifest
-        script: |
-          set -e
-          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
-
-          if [ ! -f "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png" ]; then
-            echo "ERROR: ic_launcher.png was not created"
-            exit 1
-          fi
 
       - name: Build Android APK
         script: |
@@ -39,6 +61,7 @@ workflows:
           cd "$CM_BUILD_DIR/android"
           chmod +x ./gradlew
           ./gradlew assembleDebug
+
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
