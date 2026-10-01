@@ -5986,194 +5986,252 @@ function toDutchProductName(value) {
   let text = String(value || "").trim();
   if (!text) return text;
 
-  // Keep brand names intact, but translate common English food/product words
-  // so the suggestion shown to the user is Dutch.
   const replacements = [
-    [/\\bapples?\\b/gi, "appel"], [/\\bpears?\\b/gi, "peer"],
-    [/\\bbananas?\\b/gi, "banaan"], [/\\boranges?\\b/gi, "sinaasappel"],
-    [/\\bmandarins?\\b/gi, "mandarijn"], [/\\bclementines?\\b/gi, "clementine"],
-    [/\\blemons?\\b/gi, "citroen"], [/\\blimes?\\b/gi, "limoen"],
-    [/\\bgrapes?\\b/gi, "druiven"], [/\\bstrawberries\\b/gi, "aardbeien"], [/\\bstrawberry\\b/gi, "aardbei"],
-    [/\\bwatermelons?\\b/gi, "watermeloen"], [/\\bmelons?\\b/gi, "meloen"],
-    [/\\bpineapples?\\b/gi, "ananas"], [/\\bavocados?\\b/gi, "avocado"],
-    [/\\bcucumbers?\\b/gi, "komkommer"], [/\\btomatoes\\b/gi, "tomaten"], [/\\btomato\\b/gi, "tomaat"],
-    [/\\bbell peppers?\\b/gi, "paprika"], [/\\bsweet peppers?\\b/gi, "paprika"], [/\\bpeppers?\\b/gi, "paprika"],
-    [/\\bcarrots?\\b/gi, "wortel"], [/\\bonions?\\b/gi, "uien"], [/\\bgarlic\\b/gi, "knoflook"],
-    [/\\bleeks?\\b/gi, "prei"], [/\\blettuce\\b/gi, "sla"], [/\\bspinach\\b/gi, "spinazie"],
-    [/\\bbroccoli\\b/gi, "broccoli"], [/\\bcauliflowers?\\b/gi, "bloemkool"], [/\\bzucchini\\b/gi, "courgette"],
-    [/\\beggplants?\\b/gi, "aubergine"], [/\\bmushrooms?\\b/gi, "champignons"], [/\\bmushroom\\b/gi, "champignon"],
-    [/\\bgreen beans\\b/gi, "sperziebonen"], [/\\bbeans\\b/gi, "bonen"], [/\\bcorn\\b/gi, "maïs"],
-    [/\\bpeas\\b/gi, "doperwten"], [/\\bbeetroots?\\b/gi, "biet"], [/\\bpotatoes\\b/gi, "aardappelen"], [/\\bpotato\\b/gi, "aardappel"],
-    [/\\bsweet potatoes\\b/gi, "zoete aardappelen"], [/\\bbread\\b/gi, "brood"], [/\\bbrown bread\\b/gi, "bruin brood"],
-    [/\\bwhite bread\\b/gi, "wit brood"], [/\\bbaguettes?\\b/gi, "stokbrood"], [/\\bbread rolls\\b/gi, "broodjes"],
-    [/\\bsoft drinks?\\b/gi, "frisdrank"], [/\\bsoda\\b/gi, "frisdrank"], [/\\bmilk\\b/gi, "melk"],
-    [/\\bcheese\\b/gi, "kaas"], [/\\bchocolate milk\\b/gi, "chocolademelk"], [/\\bchocolate\\b/gi, "chocolade"],
-    [/\\byogurt\\b/gi, "yoghurt"], [/\\bbutter\\b/gi, "boter"], [/\\beggs?\\b/gi, "eieren"], [/\\begg\\b/gi, "ei"],
-    [/\\bchicken\\b/gi, "kip"], [/\\brice\\b/gi, "rijst"], [/\\bmeat\\b/gi, "vlees"], [/\\bminced meat\\b/gi, "gehakt"],
-    [/\\bfish\\b/gi, "vis"], [/\\bsalmon\\b/gi, "zalm"], [/\\btuna\\b/gi, "tonijn"], [/\\bsausages?\\b/gi, "worst"],
-    [/\\bpeanut butter\\b/gi, "pindakaas"], [/\\bcoffee\\b/gi, "koffie"], [/\\btea\\b/gi, "thee"], [/\\bjuice\\b/gi, "sap"],
-    [/\\bwater\\b/gi, "water"], [/\\bcrisps\\b/gi, "chips"], [/\\bcookies?\\b/gi, "koekjes"], [/\\bbiscuits?\\b/gi, "koekjes"],
-    [/\\bice cream\\b/gi, "ijs"], [/\\bjam\\b/gi, "jam"]
+    [/\bapples?\b/gi, "appel"], [/\bpears?\b/gi, "peer"],
+    [/\bbananas?\b/gi, "banaan"], [/\boranges?\b/gi, "sinaasappel"],
+    [/\bmandarins?\b/gi, "mandarijn"], [/\bclementines?\b/gi, "clementine"],
+    [/\blemons?\b/gi, "citroen"], [/\blimes?\b/gi, "limoen"],
+    [/\bgrapes?\b/gi, "druif"], [/\bstrawberries\b/gi, "aardbeien"], [/\bstrawberry\b/gi, "aardbei"],
+    [/\bwatermelons?\b/gi, "watermeloen"], [/\bmelons?\b/gi, "meloen"],
+    [/\bpineapples?\b/gi, "ananas"], [/\bavocados?\b/gi, "avocado"],
+    [/\bkiwis?\b/gi, "kiwi"],
+    [/\bcucumbers?\b/gi, "komkommer"], [/\btomatoes?\b/gi, "tomaat"],
+    [/\bbell peppers?\b/gi, "paprika"], [/\bsweet peppers?\b/gi, "paprika"], [/\bpeppers?\b/gi, "paprika"],
+    [/\bcarrots?\b/gi, "wortel"], [/\bonions?\b/gi, "ui"], [/\bgarlic\b/gi, "knoflook"],
+    [/\bleeks?\b/gi, "prei"], [/\blettuce\b/gi, "sla"], [/\bspinach\b/gi, "spinazie"],
+    [/\bbroccoli\b/gi, "broccoli"], [/\bcauliflowers?\b/gi, "bloemkool"],
+    [/\bzucchini\b/gi, "courgette"], [/\bcourgettes?\b/gi, "courgette"],
+    [/\beggplants?\b/gi, "aubergine"], [/\bmushrooms?\b/gi, "champignon"],
+    [/\bgreen beans\b/gi, "sperziebonen"], [/\bbeans\b/gi, "bonen"],
+    [/\bsweet corn\b/gi, "zoete maïs"], [/\bcorn\b/gi, "maïs"], [/\bpeas\b/gi, "doperwten"],
+    [/\bbeetroots?\b/gi, "biet"], [/\bpotatoes\b/gi, "aardappelen"], [/\bpotato\b/gi, "aardappel"],
+    [/\bsweet potatoes\b/gi, "zoete aardappelen"],
+    [/\bbrown bread\b/gi, "bruin brood"], [/\bwhite bread\b/gi, "wit brood"],
+    [/\bbread rolls?\b/gi, "broodjes"], [/\bbaguettes?\b/gi, "stokbrood"], [/\bbread\b/gi, "brood"],
+    [/\bsoft drinks?\b/gi, "frisdrank"], [/\bsoda\b/gi, "frisdrank"],
+    [/\bchocolate milk\b/gi, "chocolademelk"], [/\bmilk\b/gi, "melk"],
+    [/\bcheese\b/gi, "kaas"], [/\byogurt\b/gi, "yoghurt"], [/\bbutter\b/gi, "boter"],
+    [/\beggs?\b/gi, "ei"], [/\bchicken\b/gi, "kip"], [/\brice\b/gi, "rijst"], [/\bpasta\b/gi, "pasta"],
+    [/\bminced meat\b/gi, "gehakt"], [/\bground beef\b/gi, "rundergehakt"],
+    [/\bmeat\b/gi, "vlees"], [/\bfish\b/gi, "vis"], [/\bsalmon\b/gi, "zalm"], [/\btuna\b/gi, "tonijn"],
+    [/\bsausages?\b/gi, "worst"], [/\bham\b/gi, "ham"], [/\bpeanut butter\b/gi, "pindakaas"],
+    [/\bcoffee\b/gi, "koffie"], [/\btea\b/gi, "thee"], [/\bjuice\b/gi, "sap"],
+    [/\bcrisps\b/gi, "chips"], [/\bcookies?\b/gi, "koekjes"], [/\bbiscuits?\b/gi, "koekjes"],
+    [/\bice cream\b/gi, "ijs"], [/\bjam\b/gi, "jam"],
+    [/\bwater\b/gi, "water"]
   ];
-  for (const [pattern, replacement] of replacements) text = text.replace(pattern, replacement);
-  return text.replace(/\\s{2,}/g, " ").trim();
+
+  for (const [pattern, replacement] of replacements) {
+    text = text.replace(pattern, replacement);
+  }
+  return text.replace(/\s{2,}/g, " ").trim();
 }
 
 async function fetchOnlineProductSuggestions(query) {
   const clean = String(query || "").trim();
   if (clean.length < 2) return [];
+
   const key = clean.toLowerCase();
-  if (productSuggestionCache.has(key)) return productSuggestionCache.get(key);
+  if (productSuggestionCache.has(key)) {
+    return productSuggestionCache.get(key);
+  }
 
   const normalized = normalizeProductLookup(clean);
+
+  // Nederlandse productintentie. De Engelse varianten zijn alleen zoektermen
+  // voor de databases; de gebruiker krijgt altijd de Nederlandse naam terug.
   const aliases = {
-    "app":["apple","apples"], "appel":["apple","apples"], "appels":["apple","apples"],
+    "appel":["apple","apples"], "appels":["apple","apples"],
+    "appelsap":["apple juice","applesauce","apple juice drink"],
     "peer":["pear","pears"], "peren":["pear","pears"],
     "banaan":["banana","bananas"], "bananen":["banana","bananas"],
     "sinaasappel":["orange","oranges"], "sinaasappels":["orange","oranges"],
-    "mandarijn":["mandarin","mandarins","clementine"], "mandarijnen":["mandarin","mandarins","clementine"],
+    "mandarijn":["mandarin","mandarins","clementine","clementines"],
+    "mandarijnen":["mandarin","mandarins","clementine","clementines"],
     "citroen":["lemon","lemons"], "citroenen":["lemon","lemons"],
-    "limoen":["lime","limes"], "limoenen":["lime","limes"],
-    "druif":["grape","grapes"], "druiven":["grape","grapes"],
+    "limoen":["lime","limes"], "druif":["grape","grapes"], "druiven":["grape","grapes"],
     "aardbei":["strawberry","strawberries"], "aardbeien":["strawberry","strawberries"],
-    "meloen":["melon","melons"], "watermeloen":["watermelon"],
-    "ananas":["pineapple"], "kiwi":["kiwi"], "mango":["mango"], "avocado":["avocado"],
-    "groente":["vegetable","vegetables"], "groenten":["vegetable","vegetables"],
+    "ananas":["pineapple","pineapples"], "kiwi":["kiwi"], "mango":["mango"], "avocado":["avocado"],
     "komkommer":["cucumber","cucumbers"], "komkommers":["cucumber","cucumbers"],
     "tomaat":["tomato","tomatoes"], "tomaten":["tomato","tomatoes"],
     "paprika":["bell pepper","sweet pepper","paprika"], "paprikas":["bell pepper","sweet pepper","paprika"],
     "wortel":["carrot","carrots"], "wortels":["carrot","carrots"],
-    "ui":["onion","onions"], "uien":["onion","onions"],
-    "knoflook":["garlic"], "prei":["leek","leeks"], "sla":["lettuce"], "spinazie":["spinach"],
-    "broccoli":["broccoli"], "bloemkool":["cauliflower"], "courgette":["zucchini","courgette"],
-    "aubergine":["eggplant","aubergine"], "champignon":["mushroom","mushrooms"], "champignons":["mushroom","mushrooms"],
-    "boon":["green beans","beans"], "bonen":["green beans","beans"],
-    "mais":["corn","sweet corn"], "doperwt":["peas","green peas"], "doperwten":["peas","green peas"],
-    "biet":["beetroot","beet"], "bietjes":["beetroot","beet"],
-    "aardappel":["potato","potatoes"], "aardappelen":["potato","potatoes"], "zoete aardappel":["sweet potato","sweet potatoes"],
-    "brood":["bread"], "bruin brood":["brown bread"], "wit brood":["white bread"], "stokbrood":["baguette"], "bolletjes":["bread rolls"],
-    "frisdrank":["soft drink","soft drinks","soda"], "fris":["soft drink","soda"],
-    "cola":["cola","coca cola","coca-cola"], "sinas":["orange soda","sinas"], "fanta":["fanta"], "sprite":["sprite"],
-    "melk":["milk"], "kaas":["cheese"], "chocomelk":["chocolate milk"], "chocolademelk":["chocolate milk"],
-    "chocolade":["chocolate"], "yoghurt":["yogurt"], "boter":["butter"], "eieren":["eggs","egg"], "ei":["egg","eggs"],
-    "kip":["chicken"], "rijst":["rice"], "pasta":["pasta"], "vlees":["meat"], "gehakt":["minced meat"], "vis":["fish"],
-    "zalm":["salmon"], "tonijn":["tuna"], "worst":["sausage"], "ham":["ham"], "pindakaas":["peanut butter"],
-    "jam":["jam","fruit spread"], "koffie":["coffee"], "thee":["tea"], "sap":["juice"], "water":["water"],
-    "chips":["chips","crisps"], "koek":["cookie","cookies","biscuits"], "koekjes":["cookies","biscuits"], "ijs":["ice cream"]
+    "ui":["onion","onions"], "uien":["onion","onions"], "knoflook":["garlic"],
+    "prei":["leek","leeks"], "sla":["lettuce"], "spinazie":["spinach"],
+    "broccoli":["broccoli"], "bloemkool":["cauliflower","cauliflowers"],
+    "courgette":["zucchini","courgette","courgettes"], "aubergine":["eggplant","aubergine"],
+    "champignon":["mushroom","mushrooms"], "champignons":["mushroom","mushrooms"],
+    "sperziebonen":["green beans"], "bonen":["beans"], "mais":["corn","sweet corn"], "maïs":["corn","sweet corn"],
+    "doperwten":["peas","green peas"], "aardappel":["potato","potatoes"],
+    "aardappelen":["potato","potatoes"], "zoete aardappel":["sweet potato","sweet potatoes"],
+    "brood":["bread"], "stokbrood":["baguette"], "broodjes":["bread rolls"],
+    "kaas":["cheese"], "jonge kaas":["young cheese"], "oude kaas":["aged cheese"],
+    "melk":["milk"], "chocomelk":["chocolate milk"], "chocolademelk":["chocolate milk"],
+    "yoghurt":["yogurt"], "boter":["butter"], "ei":["egg","eggs"], "eieren":["egg","eggs"],
+    "kip":["chicken"], "rijst":["rice"], "pasta":["pasta"], "vlees":["meat"],
+    "gehakt":["minced meat","ground meat"], "vis":["fish"], "zalm":["salmon"], "tonijn":["tuna"],
+    "worst":["sausage"], "ham":["ham"], "pindakaas":["peanut butter"],
+    "koffie":["coffee"], "thee":["tea"], "sap":["juice"], "water":["water"],
+    "chips":["chips","crisps"], "koek":["cookie","cookies","biscuit","biscuits"],
+    "koekjes":["cookie","cookies","biscuit","biscuits"], "ijs":["ice cream"],
+    "frisdrank":["soft drink","soft drinks","soda"], "cola":["cola","coca cola","coca-cola"],
+    "fanta":["fanta"], "sprite":["sprite"]
   };
 
-  // If the user types only the beginning of a common Dutch product name,
-  // use that known product as an additional search intent. This makes e.g.
-  // "ap" naturally lead to apple products instead of arbitrary "ap" matches.
-  const aliasKey = Object.keys(aliases)
-    .filter(k => k.length >= 3 && k.startsWith(normalized))
-    .sort((a, b) => a.length - b.length)[0];
-  const intentKey = aliases[normalized] ? normalized : (aliasKey || normalized);
-  const intentAliases = aliases[intentKey] || [];
+  const aliasesFor = aliases[normalized] || [];
+  const terms = [...new Set([clean, normalized, ...aliasesFor].filter(Boolean))];
 
-  const terms = [clean, intentKey, ...intentAliases];
-  const uniqueTerms = [...new Set(terms.filter(Boolean))];
+  const cleanText = value => normalizeProductLookup(value)
+    .replace(/-/g, " ")
+    .replace(/[^a-z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  const broadCategoryTerms = {
-    "groente": ["cucumber", "tomato", "bell pepper", "carrot", "lettuce", "broccoli", "cauliflower"],
-    "groenten": ["cucumber", "tomato", "bell pepper", "carrot", "lettuce", "broccoli", "cauliflower"],
-    "fruit": ["apple", "banana", "orange", "pear", "strawberry", "grape"],
-    "fruiten": ["apple", "banana", "orange", "pear", "strawberry", "grape"]
+  const words = text => cleanText(text).split(" ").filter(Boolean);
+
+  const matchesIntent = (name, intent) => {
+    const n = cleanText(name);
+    const q = cleanText(intent);
+    if (!n || !q) return false;
+    if (n === q || n.startsWith(q + " ") || n.includes(" " + q + " ") || n.endsWith(" " + q)) return true;
+
+    // Enkelvoud/meervoud: appel <-> appels, tomaat <-> tomaten, enz.
+    if (q.endsWith("s") && n === q.slice(0, -1)) return true;
+    if (n.endsWith("s") && n.slice(0, -1) === q) return true;
+
+    const qw = words(q);
+    const nw = words(n);
+    return qw.length > 1
+      ? qw.every(w => nw.includes(w))
+      : false;
   };
-  (broadCategoryTerms[normalized] || []).forEach(term => uniqueTerms.push(term));
 
-  const categoryQuery = new Set(["groente","groenten","fruit","fruiten"]);
+  const sourceDefinitions = [
+    // Voeding: grootste en belangrijkste bron.
+    { name:"Open Food Facts", base:"https://world.openfoodfacts.org" },
+    // Producten buiten voeding/huishouden: tweede Open Facts-database.
+    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" },
+    // Extra dekking voor persoonlijke verzorging als iemand daarnaar zoekt.
+    { name:"Open Beauty Facts", base:"https://world.openbeautyfacts.org" }
+  ];
+
   const results = [];
   const seen = new Set();
 
-  const cleanText = value => normalizeProductLookup(value).replace(/-/g, " ").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const requests = [];
+  for (const source of sourceDefinitions) {
+    for (const term of terms) {
+      const url =
+        source.base + "/cgi/search.pl?search_terms=" +
+        encodeURIComponent(term) +
+        "&search_simple=1&action=process&json=1&page_size=60" +
+        "&sort_by=unique_scans_n&lc=nl&cc=nl" +
+        "&fields=code,product_name,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,categories,categories_tags_en,countries_tags";
 
-  const scoreProduct = (product) => {
-    const name = cleanText(product.name);
-    const brand = cleanText(product.brand);
-    const categories = cleanText(product.categories);
-    if (!name) return -1;
-
-    let best = -1;
-    const intents = [normalized, intentKey, ...intentAliases].filter(Boolean);
-    for (const rawIntent of intents) {
-      const q = cleanText(rawIntent);
-      if (!q) continue;
-      let score = 0;
-      if (name === q) score = 300;
-      else if (name.startsWith(q + " ")) score = 245;
-      else if (name.startsWith(q)) score = 225;
-      else if (name.includes(" " + q + " ") || name.endsWith(" " + q)) score = 210;
-      else if (name.includes(q)) score = 170;
-      else if (brand === q || brand.startsWith(q + " ") || brand.includes(q)) score = 70;
-      else if (categories.includes(q)) score = 45;
-      if (score > best) best = score;
+      requests.push(
+        fetch(url, {
+          method:"GET",
+          headers:{"Accept":"application/json"},
+          cache:"no-store"
+        }).then(async response => {
+          if (!response.ok) return {source, products:[]};
+          const data = await response.json();
+          return {source, products:Array.isArray(data.products) ? data.products : []};
+        }).catch(() => ({source, products:[]}))
+      );
     }
-
-    // Short free-text searches must still be present in the product name.
-    // Brand/category-only matches are deliberately not enough.
-    if (normalized.length <= 3 && best < 170) return -1;
-    if (best < 120 && !categoryQuery.has(normalized)) return -1;
-    if (product.imageUrl) best += 20;
-    return best;
-  };
-
-  const produceKeys = new Set([
-    "appel","appels","peer","peren","banaan","bananen","sinaasappel","sinaasappels","mandarijn","mandarijnen",
-    "citroen","citroenen","limoen","limoenen","druif","druiven","aardbei","aardbeien","meloen","watermeloen",
-    "ananas","kiwi","mango","avocado","komkommer","komkommers","tomaat","tomaten","paprika","paprikas","wortel","wortels",
-    "ui","uien","knoflook","prei","sla","spinazie","broccoli","bloemkool","courgette","aubergine","champignon","champignons",
-    "boon","bonen","mais","doperwt","doperwten","biet","bietjes","aardappel","aardappelen","zoete aardappel"
-  ]);
-  const strictProduce = produceKeys.has(intentKey) || produceKeys.has(normalized);
-  const produceExclusions = ["mayonnaise","mayonaise","sauce","salsa","dressing","drink","beverage","water","juice","milk","yogurt","cream","shampoo","conditioner","mask","face","skin","soap","gel","lotion","supplement","protein","powder","snack","chips","cracker","cookie","cake","pizza","soup"];
-
-  const isRelevantProduce = (product) => {
-    const name = cleanText(product.name);
-    const combined = name + " " + cleanText(product.brand) + " " + cleanText(product.categories);
-    if (produceExclusions.some(word => combined.includes(cleanText(word)))) return false;
-    const wanted = [intentKey, ...intentAliases].filter(Boolean).map(cleanText);
-    if (!wanted.some(q => name === q || name.startsWith(q + " ") || name.startsWith(q + "-") || name.includes(" " + q + " ") || name.endsWith(" " + q) || name.includes(q + " "))) return false;
-    const categories = cleanText(product.categories);
-    if (categories && !categories.includes("vegetables") && !categories.includes("fruits") && !categories.includes("fresh") && !categories.includes("plant based")) return false;
-    return true;
-  };
-
-  for (const term of uniqueTerms) {
-    const url = "https://world.openfoodfacts.org/cgi/search.pl?search_terms=" + encodeURIComponent(term) +
-      "&search_simple=1&action=process&json=1&page_size=50&sort_by=unique_scans_n&lc=nl&cc=nl" +
-      "&fields=product_name,brands,categories_tags_en,categories,image_front_small_url,image_front_url,code";
-    try {
-      const response = await fetch(url, { method: "GET", headers: { "Accept": "application/json" }, cache: "no-store" });
-      if (!response.ok) continue;
-      const data = await response.json();
-      const products = Array.isArray(data.products) ? data.products : [];
-      for (const p of products) {
-        const name = String(p.product_name || "").trim();
-        const brand = String(p.brands || "").split(",")[0].trim();
-        const imageUrl = String(p.image_front_small_url || p.image_front_url || "").trim();
-        const barcode = String(p.code || "").trim();
-        const categoryText = Array.isArray(p.categories_tags_en) ? p.categories_tags_en.join(" ") : String(p.categories || "");
-        const keyName = normalizeProductLookup(name);
-        if (!keyName || seen.has(keyName) || !imageUrl) continue;
-        const product = { name: toDutchProductName(name), brand, imageUrl, barcode, categories: categoryText };
-        if (strictProduce && !isRelevantProduce(product)) continue;
-        const score = scoreProduct(product);
-        if (score < 120) continue;
-        seen.add(keyName);
-        results.push({ ...product, _score: score });
-      }
-    } catch (error) {
-      console.warn("Online productsuggestie zoekpoging mislukt:", term, error);
-    }
-    if (results.length >= 20 && !categoryQuery.has(normalized)) break;
   }
 
-  results.sort((a, b) => b._score - a._score);
-  const finalResults = results.slice(0, 5).map(({ _score, categories, ...product }) => product);
+  const batches = await Promise.all(requests);
+
+  const produceIntents = new Set([
+    "appel","appels","peer","peren","banaan","bananen","sinaasappel","sinaasappels",
+    "mandarijn","mandarijnen","citroen","citroenen","limoen","druif","druiven",
+    "aardbei","aardbeien","ananas","kiwi","mango","avocado","komkommer","komkommers",
+    "tomaat","tomaten","paprika","paprikas","wortel","wortels","ui","uien","knoflook",
+    "prei","sla","spinazie","broccoli","bloemkool","courgette","aubergine",
+    "champignon","champignons","sperziebonen","bonen","mais","maïs","doperwten",
+    "aardappel","aardappelen","zoete aardappel"
+  ]);
+
+  for (const batch of batches) {
+    for (const p of batch.products) {
+      const rawName = String(p.product_name || "").trim();
+      const dutchName = String(p.product_name_nl || "").trim();
+      const englishName = String(p.product_name_en || "").trim();
+      const brand = String(p.brands || "").split(",")[0].trim();
+      const imageUrl = String(p.image_front_small_url || p.image_front_url || "").trim();
+      const barcode = String(p.code || "").trim();
+      const categories = Array.isArray(p.categories_tags_en)
+        ? p.categories_tags_en.join(" ")
+        : String(p.categories || "");
+
+      // Geen nepafbeeldingen: online suggesties alleen met echte databasefoto.
+      if (!rawName || !imageUrl) continue;
+
+      const shownName = dutchName || toDutchProductName(rawName);
+      const allNames = [shownName, rawName, englishName].filter(Boolean);
+
+      // Harde inhoudelijke match. Merk/categorie mag nooit op zichzelf
+      // een product relevant maken.
+      const direct = allNames.some(name => matchesIntent(name, normalized));
+      const aliasMatch = aliasesFor.some(alias =>
+        allNames.some(name => matchesIntent(name, alias))
+      );
+
+      if (!direct && !aliasMatch) continue;
+
+      // Verse groente/fruit: uitgesloten als het eigenlijk saus, drank,
+      // cosmetica of een ander afgeleid product is.
+      if (produceIntents.has(normalized)) {
+        const all = cleanText(rawName + " " + dutchName + " " + brand + " " + categories);
+        const forbidden = [
+          "mayonnaise","mayonaise","sauce","saus","dressing","salsa","drink","beverage",
+          "water","juice","sap","milk","melk","yogurt","yoghurt","cream","shampoo",
+          "conditioner","mask","face","skin","soap","gel","lotion","supplement",
+          "powder","protein","snack","chips","cracker","cookie","cake","pizza","soup"
+        ];
+        if (forbidden.some(x => all.includes(cleanText(x)))) continue;
+      }
+
+      const dedupeKey = normalizeProductLookup((brand ? brand + " " : "") + shownName);
+      if (!dedupeKey || seen.has(dedupeKey)) continue;
+
+      let score = 0;
+      const shown = cleanText(shownName);
+      const q = cleanText(normalized);
+
+      if (shown === q) score += 1500;
+      else if (shown.startsWith(q + " ")) score += 1250;
+      else if (shown.startsWith(q)) score += 1150;
+      else if (matchesIntent(shownName, normalized)) score += 1000;
+      else if (aliasMatch) score += 700;
+
+      if (dutchName) score += 180;
+      if (p.countries_tags && Array.isArray(p.countries_tags) &&
+          p.countries_tags.some(x => String(x).toLowerCase().includes("netherlands") || String(x).toLowerCase().includes("nederland"))) {
+        score += 120;
+      }
+      if (batch.source.name === "Open Food Facts") score += 30;
+
+      seen.add(dedupeKey);
+      results.push({
+        name: shownName,
+        brand,
+        imageUrl,
+        barcode,
+        _score: score
+      });
+    }
+  }
+
+  results.sort((a,b) => b._score - a._score);
+
+  const finalResults = results.slice(0, 5).map(({_score, ...product}) => product);
   productSuggestionCache.set(key, finalResults);
   return finalResults;
 }
+
 function renderOnlineProductSuggestion(button, product) {
   const photo = product.imageUrl
     ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
@@ -10032,23 +10090,63 @@ async function lookupManualBarcode(){
 
 async function handleBarcode(code){
   setBarcodeStatus('Product wordt opgezocht…');
+
+  const barcodeSources = [
+    'https://world.openfoodfacts.org/api/v3/product/' + encodeURIComponent(code) + '.json?product_type=all&lc=nl&cc=nl&fields=code,product_name,product_name_nl,brands,image_front_small_url,image_front_url',
+    'https://world.openproductsfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?product_type=all&lc=nl&cc=nl&fields=code,product_name,product_name_nl,brands,image_front_small_url,image_front_url',
+    'https://world.openbeautyfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?product_type=all&lc=nl&cc=nl&fields=code,product_name,product_name_nl,brands,image_front_small_url,image_front_url'
+  ];
+
   try{
-    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=code,product_name,brands,image_front_small_url,image_front_url');
-    if(!response.ok) throw new Error('Netwerkfout');
-    const data=await response.json();
-    const p=data && data.product;
-    if(!p || data.status!==1 || !p.product_name){
+    let found = null;
+
+    for(const url of barcodeSources){
+      try{
+        const response = await fetch(url, {
+          method:'GET',
+          headers:{'Accept':'application/json'},
+          cache:'no-store'
+        });
+        if(!response.ok) continue;
+
+        const data = await response.json();
+        const p = data && data.product;
+
+        if(p && (data.status === 1 || p.product_name || p.product_name_nl)){
+          const imageUrl = String(p.image_front_small_url || p.image_front_url || '').trim();
+          const rawName = String(p.product_name || '').trim();
+          const dutchName = String(p.product_name_nl || '').trim();
+          const name = dutchName || toDutchProductName(rawName);
+
+          // Voor de scanner accepteren we het exacte barcodeproduct ook
+          // wanneer er geen foto is; de scanner moet het product kunnen vinden.
+          if(name){
+            found = {
+              text:name,
+              barcode:code,
+              brand:String(p.brands||'').split(',')[0].trim(),
+              imageUrl
+            };
+            break;
+          }
+        }
+      }catch(sourceError){
+        console.warn('Barcodebron mislukt:', sourceError);
+      }
+    }
+
+    if(!found){
       const result=document.getElementById('barcodeResult');
-      result.textContent='Geen product gevonden voor deze barcode. Je kunt de barcode wel bewaren als je het product handmatig toevoegt.';
+      result.textContent='Geen product gevonden voor deze barcode. Je kunt het product handmatig toevoegen.';
       result.classList.add('open');
       setBarcodeStatus('Geen product gevonden.');
       barcodeBusy=false;
       return;
     }
-    const name=String(p.product_name).trim();
-    const brand=String(p.brands||'').split(',')[0].trim();
-    const imageUrl=String(p.image_front_small_url || p.image_front_url || '').trim();
-    const scannedProduct={text:name,barcode:code,brand,imageUrl};
+
+    const scannedProduct=found;
+    const name=scannedProduct.text;
+    const brand=scannedProduct.brand || '';
     const completedExisting=await completeScannedProduct(scannedProduct);
     const result=document.getElementById('barcodeResult');
 
