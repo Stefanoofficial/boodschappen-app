@@ -1304,6 +1304,26 @@ body.dark-theme .overviewCard{background:#202620;border-color:rgba(255,255,255,.
 .useModeIntro{margin:0 0 14px; line-height:1.5; color:#667066;}
 body.dark-theme .useModeIntro{color:#b8c0ba;}
 
+
+/* Compact product quantity controls */
+.quantity-controls {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+.quantity-controls .quantity-btn {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+}
+.quantity-controls .quantity {
+  width: 28px !important;
+  min-width: 28px !important;
+  text-align: center !important;
+}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -4341,7 +4361,10 @@ const __menuPageIds = [
   "feedbackMenuSub",
   "aboutMenuSub",
   "appInfoMenuSub",
-  "helpMenuSub"
+  "helpMenuSub",
+  "legalMenuSub",
+  "privacyMenuSub",
+  "termsMenuSub"
 ];
 
 function __resetMenuPageClasses(el){
