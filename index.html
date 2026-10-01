@@ -10199,7 +10199,7 @@ async function openBarcodeScanner(){
     barcodeVideo.setAttribute('webkit-playsinline','');
     ensureBarcodeCanvas();
 
-    let constraints={audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}};
+    let constraints={audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960},aspectRatio:{ideal:4/3}}};
     try{
       barcodeStream=await navigator.mediaDevices.getUserMedia(constraints);
     }catch(firstErr){
@@ -10219,9 +10219,25 @@ async function openBarcodeScanner(){
     }
 
     if(videoWrap){
+      // Wait for the camera dimensions to settle, then choose a small
+      // portrait crop only when the device actually delivers portrait video.
       await new Promise(resolve => requestAnimationFrame(() =>
         requestAnimationFrame(resolve)
       ));
+      const vw = Number(barcodeVideo.videoWidth || 0);
+      const vh = Number(barcodeVideo.videoHeight || 0);
+      if(vw && vh){
+        if(vh > vw * 1.2){
+          barcodeVideo.style.transform = 'translateZ(0) scale(1.68)';
+          barcodeVideo.style.webkitTransform = 'translateZ(0) scale(1.68)';
+        }else if(vw > vh * 1.35){
+          barcodeVideo.style.transform = 'translateZ(0) scale(1.08)';
+          barcodeVideo.style.webkitTransform = 'translateZ(0) scale(1.08)';
+        }else{
+          barcodeVideo.style.transform = 'translateZ(0) scale(1.22)';
+          barcodeVideo.style.webkitTransform = 'translateZ(0) scale(1.22)';
+        }
+      }
       videoWrap.classList.remove('scanner-preparing');
       videoWrap.classList.add('scanner-live');
     }
@@ -10811,6 +10827,163 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 .barcodeResult{display:none;margin-top:10px;padding:12px;border-radius:14px;background:#eef5f0;color:#40584b;font-size:14px}
 .barcodeResult.open{display:block}
 body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barcodeHead h3{color:#e5eee8}.dark-theme .barcodeClose{background:#2d3b32;color:#e5eee8}.dark-theme .barcodeStatus{color:#b7c4bc}.dark-theme .barcodeManual input{background:#29342e!important;color:#f2f5f3!important;border-color:#3b4b42!important}.dark-theme .barcodeResult{background:#2b3a31;color:#dce9e1}
+
+/* ===== Definitieve productregel-layout ===== */
+.itemProductContent{
+  display:grid !important;
+  grid-template-columns:19px minmax(0,1fr) 34px 90px 32px !important;
+  align-items:center !important;
+  column-gap:5px !important;
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+.itemProductContent .itemCheck{
+  grid-column:1 !important;
+}
+.itemProductContent .productInfo{
+  grid-column:2 !important;
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+.itemProductContent .productIcon{
+  grid-column:3 !important;
+  width:34px !important;
+  min-width:34px !important;
+  max-width:34px !important;
+  height:34px !important;
+  overflow:hidden !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.itemProductContent .productIcon img,
+.itemProductContent .productRealImage,
+.itemProductContent .productBarcodeImage{
+  width:30px !important;
+  min-width:30px !important;
+  max-width:30px !important;
+  height:30px !important;
+  min-height:30px !important;
+  max-height:30px !important;
+  object-fit:contain !important;
+  display:block !important;
+  flex:0 0 30px !important;
+}
+.itemProductContent .productQuantity{
+  grid-column:4 !important;
+  width:90px !important;
+  min-width:90px !important;
+  max-width:90px !important;
+  height:38px !important;
+  flex:0 0 90px !important;
+  justify-self:end !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:5px !important;
+  box-sizing:border-box !important;
+}
+.itemProductContent .quantityButton{
+  width:30px !important;
+  min-width:30px !important;
+  max-width:30px !important;
+  height:30px !important;
+  min-height:30px !important;
+  flex:0 0 30px !important;
+}
+.itemProductContent .quantityValue{
+  width:30px !important;
+  min-width:30px !important;
+  max-width:30px !important;
+  flex:0 0 30px !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+.itemProductContent .product-row-trash-can{
+  grid-column:5 !important;
+  width:32px !important;
+  min-width:32px !important;
+  max-width:32px !important;
+  justify-self:end !important;
+}
+
+/* Alleen de productnaam is horizontaal schuifbaar. */
+.itemProductContent .productName{
+  display:block !important;
+  width:max-content !important;
+  min-width:100% !important;
+  max-width:none !important;
+  overflow:visible !important;
+  white-space:nowrap !important;
+  text-overflow:clip !important;
+  -webkit-user-select:text;
+  user-select:text;
+}
+.itemProductContent .productInfo{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  scrollbar-width:none !important;
+  touch-action:pan-x !important;
+  overscroll-behavior-x:contain !important;
+}
+.itemProductContent .productInfo::-webkit-scrollbar{
+  display:none !important;
+}
+
+@media(max-width:430px){
+  .itemProductContent{
+    grid-template-columns:19px minmax(0,1fr) 32px 90px 32px !important;
+    column-gap:5px !important;
+  }
+  .itemProductContent .productIcon{
+    width:32px !important;
+    min-width:32px !important;
+    max-width:32px !important;
+    height:32px !important;
+  }
+  .itemProductContent .productIcon img,
+  .itemProductContent .productRealImage,
+  .itemProductContent .productBarcodeImage{
+    width:30px !important;
+    min-width:30px !important;
+    max-width:30px !important;
+    height:30px !important;
+    min-height:30px !important;
+    max-height:30px !important;
+  }
+  .itemProductContent .productQuantity{
+    width:90px !important;
+    min-width:90px !important;
+    max-width:90px !important;
+    flex-basis:90px !important;
+    height:36px !important;
+  }
+}
+
+/* ===== Barcodecamera: 4:3 stream + echte beeldvulling ===== */
+.barcodeVideoWrap{
+  position:relative !important;
+  overflow:hidden !important;
+  background:#eef8f1 !important;
+  aspect-ratio:4/3 !important;
+}
+#barcodeVideo{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  background:#eef8f1 !important;
+  transform:translateZ(0) !important;
+  -webkit-transform:translateZ(0) !important;
+  transform-origin:center center !important;
+  -webkit-transform-origin:center center !important;
+}
+
 </style>
 
 <div id="barcodeOverlay" class="barcodeOverlay" aria-hidden="true">
