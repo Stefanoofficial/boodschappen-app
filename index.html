@@ -6089,8 +6089,22 @@ async function completeScannedProduct(product) {
   if (index < 0) return false;
 
   const item = boodschappen[index];
+
+  // Gebruik bij scannen dezelfde "afgestreept door"-registratie als bij handmatig afstrepen.
+  let completedBy = "";
+  if (auth.currentUser) {
+    try {
+      const snap = await database
+        .ref("users/" + auth.currentUser.uid + "/name")
+        .once("value");
+      completedBy = snap.val() || auth.currentUser.email || "Gebruiker";
+    } catch (_) {
+      completedBy = auth.currentUser.email || "Gebruiker";
+    }
+  }
+
   item.completed = true;
-  item.completedBy = "";
+  item.completedBy = completedBy;
   item.completedByUid = auth.currentUser ? auth.currentUser.uid : "";
   item.completedAt = Date.now();
   if (product.barcode) item.barcode = product.barcode;
