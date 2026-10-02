@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         icon.setImageResource(R.drawable.splash_icon);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        int iconSize = dp(184);
+        int iconSize = dp(150);
         FrameLayout.LayoutParams iconParams =
                 new FrameLayout.LayoutParams(iconSize, iconSize);
         iconParams.gravity = android.view.Gravity.CENTER;
