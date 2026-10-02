@@ -34,14 +34,8 @@ workflows:
           cp icon-512-maskable.png \
              android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "=== GET LATEST MAIN ==="
-          git fetch origin main
-
-          echo "=== RESTORE SPLASH ICON FROM LATEST MAIN ==="
-          git show origin/main:android/app/src/main/res/drawable/splash_icon.png \
-            > android/app/src/main/res/drawable/splash_icon.png
-
           echo "=== CHECK SPLASH ICON ==="
+          test -f android/app/src/main/res/drawable/splash_icon.png
           ls -l android/app/src/main/res/drawable/splash_icon.png
 
           echo "=== PREPARE VALUES DIRECTORY ==="
