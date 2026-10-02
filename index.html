@@ -3995,6 +3995,84 @@ body.logged-in {
   -webkit-tap-highlight-color: transparent;
 }
 </style>
+
+<style id="popup-soft-color">
+/* ===== Zachte pop-up kleur =====
+   De pop-ups krijgen dezelfde zachte, bijna-witte tint als het keuzevenster.
+   Bestaande layout, knoppen en functionaliteit blijven ongewijzigd. */
+:root{
+  --popup-soft:#f9fbfa;
+  --popup-soft-border:#dfe9e3;
+}
+
+/* Productsuggesties */
+.productSuggestions{
+  background:var(--popup-soft) !important;
+  border-color:var(--popup-soft-border) !important;
+}
+.productSuggestion:active,
+.productSuggestion:hover{
+  background:#eef5f0 !important;
+}
+
+/* Lijstopties en sorteeropties */
+.listOptionsPanelInner{
+  background:var(--popup-soft) !important;
+  border-left:1px solid var(--popup-soft-border);
+}
+.listOptionItem:hover,
+.listOptionBack:hover{
+  background:#eef5f0 !important;
+}
+
+/* Scanner */
+.barcodeCard{
+  background:var(--popup-soft) !important;
+  border:1px solid var(--popup-soft-border) !important;
+}
+.barcodeClose{
+  background:#eef5f0 !important;
+}
+
+/* Algemene keuze-/informatiepop-ups die dezelfde zachte uitstraling
+   gebruiken, zonder de inhoud of afmetingen te wijzigen. */
+.meer-modal .modal-content,
+.more-modal .modal-content,
+.modal.meer-modal .modal-content,
+.modal.more-modal .modal-content,
+.help-modal .modal-content,
+.info-modal .modal-content,
+.privacy-modal .modal-content,
+.terms-modal .modal-content,
+.about-modal .modal-content{
+  background:var(--popup-soft) !important;
+}
+
+.meer-modal .modal-header,
+.more-modal .modal-header,
+.modal.meer-modal .modal-header,
+.modal.more-modal .modal-header,
+.help-modal .modal-header,
+.info-modal .modal-header,
+.privacy-modal .modal-header,
+.terms-modal .modal-header,
+.about-modal .modal-header{
+  background:var(--popup-soft) !important;
+}
+
+.meer-modal .modal-body,
+.more-modal .modal-body,
+.modal.meer-modal .modal-body,
+.modal.more-modal .modal-body,
+.help-modal .modal-body,
+.info-modal .modal-body,
+.privacy-modal .modal-body,
+.terms-modal .modal-body,
+.about-modal .modal-body{
+  background:var(--popup-soft) !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -4408,15 +4486,6 @@ body.logged-in {
         <p style="margin-top:7px;">De herinnering werkt lokaal op je Android-telefoon. Je hebt hiervoor geen extra account of aparte server nodig. Je kunt de functie altijd weer uitzetten en ook een testmelding sturen.</p>
       </div>
     </div>
-    <div class="aboutInfoSection">
-      <div class="aboutInfoSectionTitle">Zo werkt de app</div>
-      <div class="aboutInfoCard aboutInfoFeatureCard">
-        <p><strong>1. Lijst:</strong> voeg je boodschappen toe en beheer aantallen.</p>
-        <p><strong>2. Scannen:</strong> gebruik de barcode-scanner om producten sneller te herkennen.</p>
-        <p><strong>3. Overzicht:</strong> bekijk je voortgang en je boodschappen in één overzicht.</p>
-        <p><strong>4. Meer:</strong> open instellingen, opgeslagen/gedeelde lijsten, help, privacy en app-informatie.</p>
-      </div>
-    </div>
     <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
@@ -4524,6 +4593,11 @@ body.logged-in {
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
       <p>Gebruik de lijstopties om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
+      <p>Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je kunt daar ook een testmelding sturen.</p>
+      <p>De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
     </div>
   </div>
 </div>
