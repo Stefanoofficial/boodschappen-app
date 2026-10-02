@@ -5,7 +5,7 @@ workflows:
 
     scripts:
 
-      - name: Prepare web assets and Android resources
+      - name: Prepare Android app
         script: |
           #!/usr/bin/env bash
 
@@ -31,9 +31,39 @@ workflows:
           mkdir -p android/app/src/main/res/drawable
           cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
 
+          echo "=== PREPARE VALUES DIRECTORY ==="
+          mkdir -p android/app/src/main/res/values
+
+          echo "=== CREATE STYLES.XML ==="
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+
+              <style name="AppTheme.NoActionBar"
+                  parent="@android:style/Theme.Material.Light.NoActionBar">
+
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:windowActionModeOverlay">true</item>
+                  <item name="android:windowNoTitle">true</item>
+                  <item name="android:windowBackground">#eef8f1</item>
+                  <item name="android:colorAccent">#4f7658</item>
+                  <item name="android:statusBarColor">#eef8f1</item>
+                  <item name="android:navigationBarColor">#eef8f1</item>
+                  <item name="android:windowLightStatusBar">true</item>
+                  <item name="android:windowLightNavigationBar">true</item>
+
+              </style>
+
+          </resources>
+          EOF
+
           echo "=== CHECK PREPARED FILES ==="
           ls -l android/app/src/main/assets/index.html
           ls -l android/app/src/main/res/drawable/ic_launcher.png
+          ls -l android/app/src/main/res/values/styles.xml
+
+          echo "=== SHOW STYLES.XML ==="
+          cat android/app/src/main/res/values/styles.xml
 
 
       - name: Set Android SDK location
