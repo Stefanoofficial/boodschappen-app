@@ -15,17 +15,20 @@ workflows:
           echo "=== CURRENT BRANCH ==="
           git branch --show-current
 
-          echo "=== GIT FILE CHECK ==="
-          echo "--- styles.xml in HEAD ---"
-          git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/styles.xml$'
+          echo "=== GIT TREE ==="
+          git ls-tree -r HEAD --name-only
 
-          echo "--- values directory in HEAD ---"
-          git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/'
+          echo "=== CHECK STYLES.XML WITH GIT ==="
+          git cat-file -e HEAD:android/app/src/main/res/values/styles.xml
+          echo "Git confirms styles.xml exists in HEAD."
 
-          echo "--- physical file ---"
+          echo "=== READ STYLES.XML FROM GIT ==="
+          git show HEAD:android/app/src/main/res/values/styles.xml
+
+          echo "=== PHYSICAL FILE ==="
           ls -la "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
-          echo "--- styles.xml content ---"
+          echo "=== PHYSICAL STYLES.XML ==="
           cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
           echo "=== VALUES-V31 ==="
@@ -42,6 +45,7 @@ workflows:
           echo "=== MANIFEST ==="
           cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
+
       - name: Prepare Android resources
         script: |
           set -e
@@ -56,16 +60,22 @@ workflows:
           cp "$CM_BUILD_DIR/icon-512-maskable.png" \
              "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
+
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
+
       - name: Build Android APK
         script: |
           set -e
+
           cd "$CM_BUILD_DIR/android"
+
           chmod +x ./gradlew
+
           ./gradlew assembleDebug
+
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
