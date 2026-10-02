@@ -23,6 +23,9 @@ workflows:
           echo "=== CHECK APP ICON ==="
           test -f icon-512-maskable.png
 
+          echo "=== CHECK SPLASH ICON ==="
+          test -f splash_icon.png
+
           echo "=== PREPARE WEB ASSET ==="
           mkdir -p android/app/src/main/assets
           cp index.html android/app/src/main/assets/index.html
@@ -34,12 +37,11 @@ workflows:
           cp icon-512-maskable.png \
              android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "=== PREPARE SPLASH ICON ==="
-          cp icon-512-maskable.png \
+          echo "=== COPY SPLASH ICON ==="
+          cp splash_icon.png \
              android/app/src/main/res/drawable/splash_icon.png
 
           echo "=== CHECK SPLASH ICON ==="
-          test -f android/app/src/main/res/drawable/splash_icon.png
           ls -lh android/app/src/main/res/drawable/splash_icon.png
 
           echo "=== PREPARE VALUES DIRECTORY ==="
