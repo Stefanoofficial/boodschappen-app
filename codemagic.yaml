@@ -6,41 +6,41 @@ workflows:
     scripts:
 
       - name: Verify repository files
-  script: |
-    set -e
+        script: |
+          set -e
 
-    echo "=== CURRENT COMMIT ==="
-    git rev-parse HEAD
+          echo "=== CURRENT COMMIT ==="
+          git rev-parse HEAD
 
-    echo "=== CURRENT BRANCH ==="
-    git branch --show-current
+          echo "=== CURRENT BRANCH ==="
+          git branch --show-current
 
-    echo "=== GIT FILE CHECK ==="
-    echo "--- styles.xml in HEAD ---"
-    git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/styles.xml$'
+          echo "=== GIT FILE CHECK ==="
+          echo "--- styles.xml in HEAD ---"
+          git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/styles.xml$'
 
-    echo "--- values directory in HEAD ---"
-    git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/'
+          echo "--- values directory in HEAD ---"
+          git ls-tree -r HEAD --name-only | grep '^android/app/src/main/res/values/'
 
-    echo "--- physical file ---"
-    ls -la "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+          echo "--- physical file ---"
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
-    echo "--- styles.xml content ---"
-    cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+          echo "--- styles.xml content ---"
+          cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
-    echo "=== VALUES-V31 ==="
-    ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31/"
-    echo "--- styles.xml ---"
-    cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
+          echo "=== VALUES-V31 ==="
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31/"
+          echo "--- styles.xml ---"
+          cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
 
-    echo "=== ANDROID RESOURCES ==="
-    find "$CM_BUILD_DIR/android/app/src/main/res" \
-      -maxdepth 3 \
-      -type f \
-      | sort
+          echo "=== ANDROID RESOURCES ==="
+          find "$CM_BUILD_DIR/android/app/src/main/res" \
+            -maxdepth 3 \
+            -type f \
+            | sort
 
-    echo "=== MANIFEST ==="
-    cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
+          echo "=== MANIFEST ==="
+          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
       - name: Prepare Android resources
         script: |
@@ -56,11 +56,9 @@ workflows:
           cp "$CM_BUILD_DIR/icon-512-maskable.png" \
              "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
 
-
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-
 
       - name: Build Android APK
         script: |
@@ -68,7 +66,6 @@ workflows:
           cd "$CM_BUILD_DIR/android"
           chmod +x ./gradlew
           ./gradlew assembleDebug
-
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
