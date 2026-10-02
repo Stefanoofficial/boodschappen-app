@@ -34,9 +34,14 @@ workflows:
           cp icon-512-maskable.png \
              android/app/src/main/res/drawable/ic_launcher.png
 
+          echo "=== DOWNLOAD SPLASH ICON ==="
+          curl -L --fail --silent --show-error \
+            "https://raw.githubusercontent.com/Stefanoofficial/boodschappen-app/main/android/app/src/main/res/drawable/splash_icon.png" \
+            -o android/app/src/main/res/drawable/splash_icon.png
+
           echo "=== CHECK SPLASH ICON ==="
           test -f android/app/src/main/res/drawable/splash_icon.png
-          ls -l android/app/src/main/res/drawable/splash_icon.png
+          ls -lh android/app/src/main/res/drawable/splash_icon.png
 
           echo "=== PREPARE VALUES DIRECTORY ==="
           mkdir -p android/app/src/main/res/values
