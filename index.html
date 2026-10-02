@@ -3304,6 +3304,10 @@ body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:
   padding:12px 13px;
   margin:0 0 9px;
 }
+.aboutInfoFeatureCard{margin:0;background:#fff;border:1px solid rgba(63,91,69,.08);box-shadow:none;}
+.aboutInfoFeatureCard p{font-size:12px;line-height:1.5;}
+body.dark-theme .aboutInfoFeatureCard{background:#202821;border-color:rgba(255,255,255,.08);}
+
 .aboutInfoTitle{font-size:15px;font-weight:800;color:#3F5B45;display:flex;align-items:center;gap:9px;}
 .aboutInfoTitle i{width:30px;height:30px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;}
 .aboutInfoVersion{font-size:11px;color:#87928B;margin:5px 0 7px 39px;}
@@ -4385,8 +4389,8 @@ body.logged-in {
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Boodschappenlijst</div>
-      <div class="aboutInfoVersion">Versie 1.2</div>
-      <p>Een eenvoudige boodschappenlijst om producten snel toe te voegen, af te vinken en je lijst overzichtelijk te houden. De app gebruikt slimme productsuggesties met echte productinformatie en productfoto’s wanneer die beschikbaar zijn. Je kunt ook producten scannen met de barcode-scanner.</p>
+      <div class="aboutInfoVersion">Versie 1.3</div>
+      <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
@@ -4395,9 +4399,26 @@ body.logged-in {
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-bell"></i><span>Een wekelijkse boodschappenherinnering instellen op je Android-telefoon.</span></div>
+    </div>
+    <div class="aboutInfoSection">
+      <div class="aboutInfoSectionTitle">Nieuw: boodschappenherinnering</div>
+      <div class="aboutInfoCard aboutInfoFeatureCard">
+        <p>Via <strong>Meer → Instellingen → Meldingen</strong> kun je een vaste dag en tijd instellen waarop je telefoon je eraan herinnert om je boodschappenlijst te bekijken.</p>
+        <p style="margin-top:7px;">De herinnering werkt lokaal op je Android-telefoon. Je hebt hiervoor geen extra account of aparte server nodig. Je kunt de functie altijd weer uitzetten en ook een testmelding sturen.</p>
+      </div>
+    </div>
+    <div class="aboutInfoSection">
+      <div class="aboutInfoSectionTitle">Zo werkt de app</div>
+      <div class="aboutInfoCard aboutInfoFeatureCard">
+        <p><strong>1. Lijst:</strong> voeg je boodschappen toe en beheer aantallen.</p>
+        <p><strong>2. Scannen:</strong> gebruik de barcode-scanner om producten sneller te herkennen.</p>
+        <p><strong>3. Overzicht:</strong> bekijk je voortgang en je boodschappen in één overzicht.</p>
+        <p><strong>4. Meer:</strong> open instellingen, opgeslagen/gedeelde lijsten, help, privacy en app-informatie.</p>
+      </div>
     </div>
     <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
-    <div class="aboutMenuHint">© 2026 Boodschappenlijst</div>
+    <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
   <div id="legalMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -4730,6 +4751,7 @@ const __menuPageIds = [
   "sharedListsMenuSub",
   "sharedListActiveMenuSub",
   "settingsMenuSub",
+  "notificationSettingsMenuSub",
   "savedListsMenuSub",
   "accountMenuSub",
   "feedbackMenuSub",
