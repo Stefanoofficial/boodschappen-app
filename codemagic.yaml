@@ -9,40 +9,82 @@ workflows:
         script: |
           set -e
 
-          echo "=== CURRENT COMMIT ==="
+          echo "========================================"
+          echo "CURRENT COMMIT"
+          echo "========================================"
           git rev-parse HEAD
 
-          echo "=== CURRENT BRANCH ==="
+          echo "========================================"
+          echo "CURRENT BRANCH"
+          echo "========================================"
           git branch --show-current
 
-          echo "=== GIT TREE ==="
-          git ls-tree -r HEAD --name-only
+          echo "========================================"
+          echo "GIT ROOT"
+          echo "========================================"
+          git rev-parse --show-toplevel
 
-          echo "=== CHECK STYLES.XML WITH GIT ==="
-          git cat-file -e HEAD:android/app/src/main/res/values/styles.xml
-          echo "Git confirms styles.xml exists in HEAD."
+          echo "========================================"
+          echo "GIT TREE - VALUES DIRECTORY"
+          echo "========================================"
+          git ls-tree HEAD android/app/src/main/res/values
 
-          echo "=== READ STYLES.XML FROM GIT ==="
+          echo "========================================"
+          echo "GIT TREE - VALUES-V31 DIRECTORY"
+          echo "========================================"
+          git ls-tree HEAD android/app/src/main/res/values-v31
+
+          echo "========================================"
+          echo "GIT TREE - STYLES.XML"
+          echo "========================================"
+          git ls-tree -r HEAD | grep 'android/app/src/main/res/values/styles.xml' || true
+
+          echo "========================================"
+          echo "GIT TREE - VALUES-V31/STYLES.XML"
+          echo "========================================"
+          git ls-tree -r HEAD | grep 'android/app/src/main/res/values-v31/styles.xml' || true
+
+          echo "========================================"
+          echo "DIRECT GIT OBJECT CHECK"
+          echo "========================================"
+          git rev-parse HEAD:android/app/src/main/res/values/styles.xml
+
+          echo "========================================"
+          echo "READ STYLES.XML DIRECTLY FROM GIT"
+          echo "========================================"
           git show HEAD:android/app/src/main/res/values/styles.xml
 
-          echo "=== PHYSICAL FILE ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
+          echo "========================================"
+          echo "PHYSICAL VALUES DIRECTORY"
+          echo "========================================"
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values"
 
-          echo "=== PHYSICAL STYLES.XML ==="
+          echo "========================================"
+          echo "PHYSICAL STYLES.XML"
+          echo "========================================"
           cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
 
-          echo "=== VALUES-V31 ==="
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31/"
-          echo "--- styles.xml ---"
+          echo "========================================"
+          echo "PHYSICAL VALUES-V31 DIRECTORY"
+          echo "========================================"
+          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31"
+
+          echo "========================================"
+          echo "PHYSICAL VALUES-V31/STYLES.XML"
+          echo "========================================"
           cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
 
-          echo "=== ANDROID RESOURCES ==="
+          echo "========================================"
+          echo "ANDROID RESOURCES"
+          echo "========================================"
           find "$CM_BUILD_DIR/android/app/src/main/res" \
             -maxdepth 3 \
             -type f \
             | sort
 
-          echo "=== MANIFEST ==="
+          echo "========================================"
+          echo "MANIFEST"
+          echo "========================================"
           cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
 
 
