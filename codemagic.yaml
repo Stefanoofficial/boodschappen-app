@@ -5,102 +5,35 @@ workflows:
 
     scripts:
 
-      - name: Verify repository files
+      - name: Prepare web assets and Android resources
         script: |
+          #!/usr/bin/env bash
+
           set -e
 
-          echo "========================================"
-          echo "CURRENT COMMIT"
-          echo "========================================"
-          git rev-parse HEAD
+          echo "=== BUILD DIRECTORY ==="
+          pwd
 
-          echo "========================================"
-          echo "CURRENT BRANCH"
-          echo "========================================"
-          git branch --show-current
+          echo "=== ROOT FILES ==="
+          ls -la
 
-          echo "========================================"
-          echo "GIT ROOT"
-          echo "========================================"
-          git rev-parse --show-toplevel
+          echo "=== CHECK INDEX ==="
+          test -f index.html
 
-          echo "========================================"
-          echo "GIT TREE - VALUES DIRECTORY"
-          echo "========================================"
-          git ls-tree HEAD android/app/src/main/res/values
+          echo "=== CHECK ICON ==="
+          test -f icon-512-maskable.png
 
-          echo "========================================"
-          echo "GIT TREE - VALUES-V31 DIRECTORY"
-          echo "========================================"
-          git ls-tree HEAD android/app/src/main/res/values-v31
+          echo "=== PREPARE WEB ASSET ==="
+          mkdir -p android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
 
-          echo "========================================"
-          echo "GIT TREE - STYLES.XML"
-          echo "========================================"
-          git ls-tree -r HEAD | grep 'android/app/src/main/res/values/styles.xml' || true
+          echo "=== PREPARE ICON ==="
+          mkdir -p android/app/src/main/res/drawable
+          cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "========================================"
-          echo "GIT TREE - VALUES-V31/STYLES.XML"
-          echo "========================================"
-          git ls-tree -r HEAD | grep 'android/app/src/main/res/values-v31/styles.xml' || true
-
-          echo "========================================"
-          echo "DIRECT GIT OBJECT CHECK"
-          echo "========================================"
-          git rev-parse HEAD:android/app/src/main/res/values/styles.xml
-
-          echo "========================================"
-          echo "READ STYLES.XML DIRECTLY FROM GIT"
-          echo "========================================"
-          git show HEAD:android/app/src/main/res/values/styles.xml
-
-          echo "========================================"
-          echo "PHYSICAL VALUES DIRECTORY"
-          echo "========================================"
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values"
-
-          echo "========================================"
-          echo "PHYSICAL STYLES.XML"
-          echo "========================================"
-          cat "$CM_BUILD_DIR/android/app/src/main/res/values/styles.xml"
-
-          echo "========================================"
-          echo "PHYSICAL VALUES-V31 DIRECTORY"
-          echo "========================================"
-          ls -la "$CM_BUILD_DIR/android/app/src/main/res/values-v31"
-
-          echo "========================================"
-          echo "PHYSICAL VALUES-V31/STYLES.XML"
-          echo "========================================"
-          cat "$CM_BUILD_DIR/android/app/src/main/res/values-v31/styles.xml"
-
-          echo "========================================"
-          echo "ANDROID RESOURCES"
-          echo "========================================"
-          find "$CM_BUILD_DIR/android/app/src/main/res" \
-            -maxdepth 3 \
-            -type f \
-            | sort
-
-          echo "========================================"
-          echo "MANIFEST"
-          echo "========================================"
-          cat "$CM_BUILD_DIR/android/app/src/main/AndroidManifest.xml"
-
-
-      - name: Prepare Android resources
-        script: |
-          set -e
-
-          mkdir -p "$CM_BUILD_DIR/android/app/src/main/res/drawable"
-
-          if [ ! -f "$CM_BUILD_DIR/icon-512-maskable.png" ]; then
-            echo "ERROR: icon-512-maskable.png not found"
-            exit 1
-          fi
-
-          cp "$CM_BUILD_DIR/icon-512-maskable.png" \
-             "$CM_BUILD_DIR/android/app/src/main/res/drawable/ic_launcher.png"
+          echo "=== CHECK PREPARED FILES ==="
+          ls -l android/app/src/main/assets/index.html
+          ls -l android/app/src/main/res/drawable/ic_launcher.png
 
 
       - name: Set Android SDK location
