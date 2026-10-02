@@ -88,6 +88,7 @@ public class MainActivity extends Activity {
         icon.setAlpha(0f);
         icon.setScaleX(0.92f);
         icon.setScaleY(0.92f);
+
         icon.animate()
                 .alpha(1f)
                 .scaleX(1f)
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
             public void run() {
                 splash.animate()
                         .alpha(0f)
-                        .setDuration(220)
+                        .setDuration(250)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
@@ -112,7 +113,7 @@ public class MainActivity extends Activity {
                         })
                         .start();
             }
-        }, 520);
+        }, 1100);
     }
 
     private int dp(int value) {
@@ -136,11 +137,12 @@ public class MainActivity extends Activity {
 
         void start() {
             animator = ValueAnimator.ofFloat(0f, 360f);
-            animator.setDuration(900);
+            animator.setDuration(1800);
             animator.setRepeatCount(ValueAnimator.INFINITE);
             animator.setInterpolator(
                     new android.view.animation.LinearInterpolator()
             );
+
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -148,15 +150,30 @@ public class MainActivity extends Activity {
                     invalidate();
                 }
             });
+
             animator.start();
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
+
             float inset = paint.getStrokeWidth() * 2.2f;
-            oval.set(inset, inset, getWidth() - inset, getHeight() - inset);
-            canvas.drawArc(oval, start, sweep, false, paint);
+
+            oval.set(
+                    inset,
+                    inset,
+                    getWidth() - inset,
+                    getHeight() - inset
+            );
+
+            canvas.drawArc(
+                    oval,
+                    start,
+                    sweep,
+                    false,
+                    paint
+            );
         }
     }
 
@@ -167,6 +184,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     Window window = getWindow();
+
                     if (dimmed) {
                         window.setStatusBarColor(Color.rgb(200, 211, 204));
                     } else {
