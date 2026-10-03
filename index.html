@@ -4165,41 +4165,120 @@ body.logged-in {
 </style>
 
 
-<style id="android-time-dialog-compact">
-/* Alleen de tijdkiezer compacter maken; dagkiezer en de rest van de app blijven gelijk. */
-.androidTimeDialogCard{
-  width:min(330px,100%);
-  max-height:min(72vh,570px);
-  padding:18px 16px 12px;
-  border-radius:26px;
+<style id="android-time-dialog-family-style">
+/* Tijdkiezer: dezelfde rustige dialoogstijl als Lijstopties.
+   Alleen deze popup wordt aangepast; de rest van de app blijft ongemoeid. */
+.androidTimeDialogCard.familyDialog{
+  width:min(360px,calc(100vw - 36px));
+  max-height:min(78vh,560px);
+  overflow:auto;
+  box-sizing:border-box;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:22px;
+  box-shadow:0 18px 45px rgba(0,0,0,.24);
+  padding:18px;
 }
-.androidTimeDialogCard .androidReminderDialogTitle{
-  font-size:20px;
-  margin:0 2px 12px;
+.androidTimeDialogCard .familyDialogHeader{
+  margin-bottom:14px;
+}
+.androidTimeDialogCard .familyDialogIcon{
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:50%;
+  background:#dff5df;
+  color:#3F5B45;
+  font-size:18px;
+}
+.androidTimeDialogCard .familyDialogTitle{
+  font-size:19px;
+  font-weight:750;
+  line-height:1.15;
+}
+.androidTimeDialogCard .familyDialogBody{
+  color:#29322c;
 }
 .androidTimePreview{
-  margin:2px 0 12px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
+  margin:2px 0 14px;
   font-size:34px;
+  font-weight:800;
+  color:#3F5B45;
+  letter-spacing:.02em;
 }
 .androidTimePreview span:not(.androidTimeColon){
-  min-width:58px;
-  padding:6px 5px;
-  border-radius:12px;
+  min-width:auto;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+}
+.androidTimeColon{
+  font-weight:500;
+  color:#718077;
 }
 .androidTimeLabel{
-  margin:6px 2px 4px;
-  font-size:11px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#718077;
+  margin:8px 2px 6px;
 }
 .androidTimeGrid,.androidMinuteGrid{
-  gap:4px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:5px;
 }
 .androidTimeGrid button,.androidMinuteGrid button{
-  min-height:34px;
-  border-radius:10px;
-  font-size:13px;
+  min-height:38px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#344239;
+  font:inherit;
+  font-size:14px;
+  cursor:pointer;
 }
-.androidTimeDialogCard .androidReminderDialogActions{
-  margin-top:10px;
+.androidTimeGrid button.selected,.androidMinuteGrid button.selected{
+  background:#dff5df;
+  color:#2f6840;
+  font-weight:700;
+}
+.androidTimeGrid button:active,.androidMinuteGrid button:active{
+  background:#eef5f0;
+}
+.androidTimeDialogCard .familyDialogActions{
+  margin-top:17px;
+}
+.androidTimeDialogCard .androidDialogTextButton{
+  background:rgba(63,91,69,.08);
+  color:#3F5B45;
+}
+.androidTimeDialogCard .androidDialogPrimaryButton{
+  background:#3F5B45;
+  color:#fff;
+  box-shadow:none;
+}
+body.dark-theme .androidTimeDialogCard.familyDialog{
+  background:#202923;
+  color:#e5ece7;
+  border-color:rgba(255,255,255,.08);
+}
+body.dark-theme .androidTimeDialogCard .familyDialogIcon{
+  background:#2f4c37;
+  color:#b9e1c3;
+}
+body.dark-theme .androidTimeDialogCard .familyDialogTitle,
+body.dark-theme .androidTimeDialogCard .androidTimePreview{
+  color:#b9e1c3;
+}
+body.dark-theme .androidTimeDialogCard .androidTimeGrid button,
+body.dark-theme .androidTimeDialogCard .androidMinuteGrid button{
+  color:#e5ece7;
 }
 </style>
 </head>
@@ -4542,16 +4621,21 @@ body.logged-in {
       </div>
 
       <div id="reminderTimeDialog" class="androidReminderDialog" hidden aria-hidden="true">
-        <div class="androidReminderDialogCard androidTimeDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderTimeDialogTitle">
-          <div class="androidReminderDialogTitle" id="reminderTimeDialogTitle">Tijd kiezen</div>
-          <div class="androidTimePreview"><span id="androidTimeHour">18</span><span class="androidTimeColon">:</span><span id="androidTimeMinute">00</span></div>
-          <div class="androidTimeLabel">Uur</div>
-          <div class="androidTimeGrid" id="androidHourGrid"></div>
-          <div class="androidTimeLabel">Minuten</div>
-          <div class="androidMinuteGrid" id="androidMinuteGrid"></div>
-          <div class="androidReminderDialogActions">
-            <button type="button" class="androidDialogTextButton" onclick="closeReminderTimePicker()">Annuleren</button>
-            <button type="button" class="androidDialogPrimaryButton" onclick="confirmReminderTimePicker()">OK</button>
+        <div class="androidReminderDialogCard androidTimeDialogCard familyDialog" role="dialog" aria-modal="true" aria-labelledby="reminderTimeDialogTitle">
+          <div class="familyDialogHeader">
+            <div class="familyDialogIcon"><i class="fa-regular fa-clock"></i></div>
+            <div class="familyDialogTitle" id="reminderTimeDialogTitle">Tijd kiezen</div>
+          </div>
+          <div class="familyDialogBody">
+            <div class="androidTimePreview"><span id="androidTimeHour">18</span><span class="androidTimeColon">:</span><span id="androidTimeMinute">00</span></div>
+            <div class="androidTimeLabel">Uur</div>
+            <div class="androidTimeGrid" id="androidHourGrid"></div>
+            <div class="androidTimeLabel">Minuten</div>
+            <div class="androidMinuteGrid" id="androidMinuteGrid"></div>
+          </div>
+          <div class="familyDialogActions androidReminderDialogActions">
+            <button type="button" class="familyDialogBtn familyDialogCancel androidDialogTextButton" onclick="closeReminderTimePicker()">Annuleren</button>
+            <button type="button" class="familyDialogBtn familyDialogPrimary androidDialogPrimaryButton" onclick="confirmReminderTimePicker()">OK</button>
           </div>
         </div>
       </div>
