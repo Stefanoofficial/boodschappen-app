@@ -6,8 +6,8 @@
     <application
         android:allowBackup="true"
         android:theme="@style/AppTheme.NoActionBar"
-        android:icon="@drawable/ic_launcher"
-        android:roundIcon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Mijn Boodschappen"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false">
