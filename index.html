@@ -1655,6 +1655,97 @@ body.dark-theme .notificationField select,
 body.dark-theme .notificationField input[type="time"]{background:#1f2421;color:#e9eee9;border-color:#3a443d;}
 body.dark-theme .notificationInfo{background:#202722;}
 
+/* Android/Material-keuzevensters alleen voor de boodschappenherinnering */
+.notificationPickerButton{
+  width:100%;
+  min-height:44px;
+  box-sizing:border-box;
+  border:1px solid #d9e6dc;
+  border-radius:12px;
+  padding:0 13px;
+  background:#fff;
+  color:#263229;
+  font:inherit;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+  cursor:pointer;
+}
+.notificationPickerButton i{color:#5d7563;font-size:14px;}
+.notificationPickerButton:active{background:#f1f7f3;}
+body.dark-theme .notificationPickerButton{background:#1f2421;color:#e9eee9;border-color:#3a443d;}
+
+.androidReminderDialog[hidden]{display:none;}
+.androidReminderDialog{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(20,28,23,.28);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.androidReminderDialogCard{
+  width:min(360px,100%);
+  max-height:min(78vh,620px);
+  overflow:auto;
+  box-sizing:border-box;
+  padding:22px 20px 14px;
+  border-radius:28px;
+  background:#f8fbf8;
+  color:#263229;
+  box-shadow:0 18px 48px rgba(25,45,32,.24);
+  border:1px solid rgba(79,118,88,.10);
+  animation:androidReminderDialogIn .16s ease-out;
+}
+@keyframes androidReminderDialogIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.androidReminderDialogTitle{font-size:21px;font-weight:700;color:#2f4736;margin:0 2px 16px;}
+.androidDayOptions{display:flex;flex-direction:column;gap:4px;}
+.androidDayOptions button{
+  width:100%;
+  min-height:48px;
+  padding:0 14px;
+  border:0;
+  border-radius:14px;
+  background:transparent;
+  color:#29352e;
+  font:inherit;
+  font-size:16px;
+  text-align:left;
+  cursor:pointer;
+}
+.androidDayOptions button.selected{background:#dfeee3;color:#2f6840;font-weight:700;}
+.androidDayOptions button:active{background:#e9f3eb;}
+.androidReminderDialogActions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:14px;}
+.androidDialogTextButton,.androidDialogPrimaryButton{
+  min-height:42px;padding:0 18px;border-radius:22px;font:inherit;font-weight:700;cursor:pointer;
+}
+.androidDialogTextButton{border:0;background:transparent;color:#4f7658;}
+.androidDialogPrimaryButton{border:0;background:#4f7658;color:#fff;box-shadow:0 2px 6px rgba(79,118,88,.20);}
+.androidDialogTextButton:active{background:#e9f3eb;}
+.androidDialogPrimaryButton:active{transform:scale(.98);}
+.androidTimeDialogCard{max-height:min(82vh,680px);}
+.androidTimePreview{display:flex;justify-content:center;align-items:center;gap:4px;margin:4px 0 16px;font-size:40px;font-weight:700;color:#31543b;letter-spacing:1px;}
+.androidTimePreview span:not(.androidTimeColon){min-width:68px;text-align:center;padding:8px 6px;border-radius:14px;background:#e7f1e9;}
+.androidTimeColon{font-weight:500;color:#607065;}
+.androidTimeLabel{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#718077;margin:8px 2px 6px;}
+.androidTimeGrid,.androidMinuteGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.androidTimeGrid button,.androidMinuteGrid button{
+  min-height:40px;border:0;border-radius:12px;background:transparent;color:#344239;font:inherit;font-size:14px;cursor:pointer;
+}
+.androidTimeGrid button.selected,.androidMinuteGrid button.selected{background:#dfeee3;color:#2f6840;font-weight:700;}
+.androidTimeGrid button:active,.androidMinuteGrid button:active{background:#e9f3eb;}
+body.dark-theme .androidReminderDialog{background:rgba(0,0,0,.45);}
+body.dark-theme .androidReminderDialogCard{background:#202722;color:#e9eee9;border-color:#3a443d;}
+body.dark-theme .androidReminderDialogTitle{color:#b9e1c3;}
+body.dark-theme .androidDayOptions button,body.dark-theme .androidTimeGrid button,body.dark-theme .androidMinuteGrid button{color:#e9eee9;}
+body.dark-theme .androidDayOptions button.selected,body.dark-theme .androidTimeGrid button.selected,body.dark-theme .androidMinuteGrid button.selected{background:#2f4c37;color:#b9e1c3;}
+body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#29352d;color:#b9e1c3;}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -4369,21 +4460,21 @@ body.logged-in {
       </label>
 
       <div class="notificationField">
-        <label for="shoppingReminderDay">Dag</label>
-        <select id="shoppingReminderDay" onchange="saveNotificationSettings()">
-          <option value="2">Maandag</option>
-          <option value="3">Dinsdag</option>
-          <option value="4">Woensdag</option>
-          <option value="5">Donderdag</option>
-          <option value="6">Vrijdag</option>
-          <option value="7">Zaterdag</option>
-          <option value="1">Zondag</option>
-        </select>
+        <label for="shoppingReminderDayButton">Dag</label>
+        <input type="hidden" id="shoppingReminderDay" value="2">
+        <button type="button" id="shoppingReminderDayButton" class="notificationPickerButton" onclick="openReminderDayPicker(event)">
+          <span id="shoppingReminderDayText">Maandag</span>
+          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
       </div>
 
       <div class="notificationField">
-        <label for="shoppingReminderTime">Tijd</label>
-        <input type="time" id="shoppingReminderTime" value="18:00" onchange="saveNotificationSettings()">
+        <label for="shoppingReminderTimeButton">Tijd</label>
+        <input type="hidden" id="shoppingReminderTime" value="18:00">
+        <button type="button" id="shoppingReminderTimeButton" class="notificationPickerButton" onclick="openReminderTimePicker(event)">
+          <span id="shoppingReminderTimeText">18:00</span>
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+        </button>
       </div>
 
       <button type="button" class="notificationTestButton" onclick="testShoppingReminder()">
@@ -4392,6 +4483,40 @@ body.logged-in {
       </button>
 
       <div id="notificationSettingsStatus" class="notificationSettingsStatus" aria-live="polite"></div>
+
+      <div id="reminderDayDialog" class="androidReminderDialog" hidden aria-hidden="true">
+        <div class="androidReminderDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderDayDialogTitle">
+          <div class="androidReminderDialogTitle" id="reminderDayDialogTitle">Dag kiezen</div>
+          <div class="androidDayOptions" id="androidDayOptions">
+            <button type="button" data-day="2">Maandag</button>
+            <button type="button" data-day="3">Dinsdag</button>
+            <button type="button" data-day="4">Woensdag</button>
+            <button type="button" data-day="5">Donderdag</button>
+            <button type="button" data-day="6">Vrijdag</button>
+            <button type="button" data-day="7">Zaterdag</button>
+            <button type="button" data-day="1">Zondag</button>
+          </div>
+          <div class="androidReminderDialogActions">
+            <button type="button" class="androidDialogTextButton" onclick="closeReminderDayPicker()">Annuleren</button>
+            <button type="button" class="androidDialogPrimaryButton" onclick="confirmReminderDayPicker()">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="reminderTimeDialog" class="androidReminderDialog" hidden aria-hidden="true">
+        <div class="androidReminderDialogCard androidTimeDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderTimeDialogTitle">
+          <div class="androidReminderDialogTitle" id="reminderTimeDialogTitle">Tijd kiezen</div>
+          <div class="androidTimePreview"><span id="androidTimeHour">18</span><span class="androidTimeColon">:</span><span id="androidTimeMinute">00</span></div>
+          <div class="androidTimeLabel">Uur</div>
+          <div class="androidTimeGrid" id="androidHourGrid"></div>
+          <div class="androidTimeLabel">Minuten</div>
+          <div class="androidMinuteGrid" id="androidMinuteGrid"></div>
+          <div class="androidReminderDialogActions">
+            <button type="button" class="androidDialogTextButton" onclick="closeReminderTimePicker()">Annuleren</button>
+            <button type="button" class="androidDialogPrimaryButton" onclick="confirmReminderTimePicker()">OK</button>
+          </div>
+        </div>
+      </div>
 
       <div class="notificationInfo">
         <strong>Over deze functie</strong>
@@ -4952,7 +5077,100 @@ function loadNotificationSettings() {
   if (enabled) enabled.checked = settings.enabled;
   if (day) day.value = settings.day;
   if (time) time.value = settings.time;
+  updateReminderPickerLabels();
 }
+
+const REMINDER_DAY_NAMES = {
+  "2":"Maandag", "3":"Dinsdag", "4":"Woensdag", "5":"Donderdag",
+  "6":"Vrijdag", "7":"Zaterdag", "1":"Zondag"
+};
+let reminderDraftDay = "2";
+let reminderDraftTime = "18:00";
+
+function updateReminderPickerLabels(){
+  const day = document.getElementById("shoppingReminderDay");
+  const dayText = document.getElementById("shoppingReminderDayText");
+  const time = document.getElementById("shoppingReminderTime");
+  const timeText = document.getElementById("shoppingReminderTimeText");
+  if (day && dayText) dayText.textContent = REMINDER_DAY_NAMES[String(day.value)] || "Maandag";
+  if (time && timeText) timeText.textContent = time.value || "18:00";
+}
+
+function openReminderDayPicker(event){
+  if (event) event.stopPropagation();
+  const day = document.getElementById("shoppingReminderDay");
+  reminderDraftDay = day ? String(day.value || "2") : "2";
+  document.querySelectorAll("#androidDayOptions button").forEach(btn => {
+    btn.classList.toggle("selected", btn.dataset.day === reminderDraftDay);
+    btn.onclick = () => {
+      reminderDraftDay = btn.dataset.day;
+      document.querySelectorAll("#androidDayOptions button").forEach(b => b.classList.toggle("selected", b === btn));
+    };
+  });
+  const dialog = document.getElementById("reminderDayDialog");
+  if (dialog) { dialog.hidden = false; dialog.setAttribute("aria-hidden","false"); }
+}
+function closeReminderDayPicker(){
+  const dialog = document.getElementById("reminderDayDialog");
+  if (dialog) { dialog.hidden = true; dialog.setAttribute("aria-hidden","true"); }
+}
+function confirmReminderDayPicker(){
+  const day = document.getElementById("shoppingReminderDay");
+  if (day) day.value = reminderDraftDay;
+  updateReminderPickerLabels();
+  closeReminderDayPicker();
+  saveNotificationSettings();
+}
+
+function buildReminderTimeGrid(){
+  const hourGrid = document.getElementById("androidHourGrid");
+  const minuteGrid = document.getElementById("androidMinuteGrid");
+  if (!hourGrid || !minuteGrid || hourGrid.dataset.ready === "1") return;
+  for(let h=0; h<24; h++){
+    const btn=document.createElement("button");
+    btn.type="button"; btn.textContent=String(h).padStart(2,"0"); btn.dataset.hour=String(h);
+    btn.onclick=()=>{ reminderDraftTime = `${String(h).padStart(2,"0")}:${reminderDraftTime.split(":")[1] || "00"}`; updateReminderTimeDraftUI(); };
+    hourGrid.appendChild(btn);
+  }
+  for(let m=0; m<60; m+=5){
+    const btn=document.createElement("button");
+    btn.type="button"; btn.textContent=String(m).padStart(2,"0"); btn.dataset.minute=String(m);
+    btn.onclick=()=>{ reminderDraftTime = `${reminderDraftTime.split(":")[0] || "18"}:${String(m).padStart(2,"0")}`; updateReminderTimeDraftUI(); };
+    minuteGrid.appendChild(btn);
+  }
+  hourGrid.dataset.ready="1";
+}
+function updateReminderTimeDraftUI(){
+  const parts=String(reminderDraftTime || "18:00").split(":");
+  const h=String(parts[0] || "18").padStart(2,"0");
+  const m=String(parts[1] || "00").padStart(2,"0");
+  const hour=document.getElementById("androidTimeHour");
+  const minute=document.getElementById("androidTimeMinute");
+  if(hour) hour.textContent=h; if(minute) minute.textContent=m;
+  document.querySelectorAll("#androidHourGrid button").forEach(b=>b.classList.toggle("selected", b.dataset.hour===h));
+  document.querySelectorAll("#androidMinuteGrid button").forEach(b=>b.classList.toggle("selected", b.dataset.minute===m));
+}
+function openReminderTimePicker(event){
+  if (event) event.stopPropagation();
+  const time=document.getElementById("shoppingReminderTime");
+  reminderDraftTime = time ? String(time.value || "18:00") : "18:00";
+  buildReminderTimeGrid();
+  updateReminderTimeDraftUI();
+  const dialog=document.getElementById("reminderTimeDialog");
+  if(dialog){ dialog.hidden=false; dialog.setAttribute("aria-hidden","false"); }
+}
+function closeReminderTimePicker(){
+  const dialog=document.getElementById("reminderTimeDialog");
+  if(dialog){ dialog.hidden=true; dialog.setAttribute("aria-hidden","true"); }
+}
+function confirmReminderTimePicker(){
+  const time=document.getElementById("shoppingReminderTime");
+  if(time) time.value=reminderDraftTime || "18:00";
+  updateReminderPickerLabels();
+  closeReminderTimePicker();
+  saveNotificationSettings();
+}
+
 
 function setNotificationStatus(message, isError) {
   const el = document.getElementById("notificationSettingsStatus");
@@ -11551,569 +11769,5 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
 </div>
 
 
-
-
-<style id="android-notification-pickers-only">
-/* Alleen de Dag- en Tijd-kiezers van Meldingen: Android-stijl. */
-.notificationField .androidPickerTrigger{
-  width:100%;
-  min-height:44px;
-  box-sizing:border-box;
-  border:1px solid #d9e6dc;
-  border-radius:12px;
-  padding:0 12px;
-  background:#fff;
-  color:#263229;
-  font:inherit;
-  text-align:left;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  cursor:pointer;
-}
-.notificationField .androidPickerTrigger:active{
-  background:#eef6f0;
-}
-.notificationField .androidPickerTrigger .androidPickerValue{
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-.notificationField .androidPickerTrigger .androidPickerChevron{
-  color:#4f7658;
-  font-size:14px;
-  flex:0 0 auto;
-}
-.notificationField #shoppingReminderDay,
-.notificationField #shoppingReminderTime{
-  display:none !important;
-}
-
-/* Android/Material-achtige dialogen, uitsluitend voor de nieuwe dag- en tijdkeuze. */
-.androidNotificationPickerOverlay{
-  position:fixed;
-  inset:0;
-  z-index:100000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-  box-sizing:border-box;
-  background:rgba(20,30,24,.28);
-  -webkit-backdrop-filter:blur(2px);
-  backdrop-filter:blur(2px);
-}
-.androidNotificationPickerDialog{
-  width:min(360px,100%);
-  max-height:min(82vh,620px);
-  overflow:hidden;
-  box-sizing:border-box;
-  border-radius:28px;
-  background:#f7faf8;
-  color:#263229;
-  box-shadow:0 16px 44px rgba(32,55,42,.24);
-  border:1px solid rgba(79,118,88,.12);
-  font-family:inherit;
-}
-.androidNotificationPickerHeader{
-  padding:24px 24px 12px;
-}
-.androidNotificationPickerEyebrow{
-  margin:0 0 6px;
-  font-size:12px;
-  line-height:1.2;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:#718177;
-}
-.androidNotificationPickerTitle{
-  margin:0;
-  font-size:24px;
-  line-height:1.2;
-  font-weight:800;
-  color:#334b3a;
-}
-.androidNotificationPickerContent{
-  padding:4px 12px 12px;
-  max-height:50vh;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.androidNotificationPickerDay{
-  width:100%;
-  min-height:52px;
-  border:0;
-  border-radius:16px;
-  background:transparent;
-  color:#263229;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 14px 0 16px;
-  font:inherit;
-  font-size:17px;
-  text-align:left;
-}
-.androidNotificationPickerDay:active{
-  background:#e7f1ea;
-}
-.androidNotificationPickerDay.isSelected{
-  background:#dcebe0;
-  color:#31553d;
-  font-weight:800;
-}
-.androidNotificationPickerCheck{
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#4f7658;
-  color:#fff;
-  font-size:14px;
-}
-.androidNotificationPickerActions{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  padding:10px 18px 18px;
-}
-.androidNotificationPickerAction{
-  min-width:84px;
-  min-height:44px;
-  padding:0 16px;
-  border:0;
-  border-radius:22px;
-  background:transparent;
-  color:#41664d;
-  font:inherit;
-  font-weight:800;
-}
-.androidNotificationPickerAction:active{
-  background:#e6f0e9;
-}
-.androidNotificationPickerAction.primary{
-  background:#4f7658;
-  color:#fff;
-}
-
-/* Android/Material-achtige klok voor de tijdkeuze. */
-.androidTimeDisplay{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:4px;
-  padding:4px 24px 18px;
-}
-.androidTimePart{
-  min-width:76px;
-  height:58px;
-  border-radius:16px;
-  border:1px solid #c8d9cd;
-  background:#eaf3ed;
-  color:#31553d;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30px;
-  font-weight:800;
-}
-.androidTimePart.isActive{
-  border:2px solid #4f7658;
-  background:#dcebe0;
-}
-.androidTimeColon{
-  font-size:28px;
-  font-weight:800;
-  color:#4f7658;
-}
-.androidClock{
-  width:286px;
-  height:286px;
-  margin:0 auto 6px;
-  position:relative;
-  border-radius:50%;
-  background:#e7f1ea;
-}
-.androidClockFace{
-  position:absolute;
-  inset:0;
-}
-.androidClockHand{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:2px;
-  height:105px;
-  transform-origin:50% 100%;
-  background:#4f7658;
-  border-radius:2px;
-  pointer-events:none;
-}
-.androidClockCenter{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:12px;
-  height:12px;
-  margin:-6px;
-  border-radius:50%;
-  background:#4f7658;
-  pointer-events:none;
-}
-.androidClockNumber{
-  position:absolute;
-  width:40px;
-  height:40px;
-  margin:-20px;
-  border:0;
-  border-radius:50%;
-  background:transparent;
-  color:#263229;
-  font:inherit;
-  font-size:15px;
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0;
-}
-.androidClockNumber.isSelected{
-  background:#4f7658;
-  color:#fff;
-}
-.androidClockHint{
-  text-align:center;
-  color:#718177;
-  font-size:12px;
-  font-weight:700;
-  margin:0 0 2px;
-}
-body.dark-theme .notificationField .androidPickerTrigger{
-  background:#1f2421;
-  color:#e9eee9;
-  border-color:#3a443d;
-}
-body.dark-theme .androidNotificationPickerDialog{
-  background:#252b27;
-  color:#e9eee9;
-  border-color:#3a443d;
-}
-body.dark-theme .androidNotificationPickerTitle,
-body.dark-theme .androidTimePart,
-body.dark-theme .androidClockNumber{
-  color:#e9eee9;
-}
-body.dark-theme .androidNotificationPickerDay{
-  color:#e9eee9;
-}
-body.dark-theme .androidNotificationPickerDay.isSelected,
-body.dark-theme .androidTimePart{
-  background:#314239;
-}
-body.dark-theme .androidClock{
-  background:#303b34;
-}
-</style>
-
-<script id="android-notification-pickers-only-script">
-(function(){
-  "use strict";
-
-  var dayNames = [
-    ["2","Maandag"],["3","Dinsdag"],["4","Woensdag"],["5","Donderdag"],
-    ["6","Vrijdag"],["7","Zaterdag"],["1","Zondag"]
-  ];
-
-  function getEl(id){ return document.getElementById(id); }
-
-  function syncAndroidNotificationPickerButtons(){
-    var day = getEl("shoppingReminderDay");
-    var time = getEl("shoppingReminderTime");
-    var dayBtn = getEl("androidShoppingReminderDay");
-    var timeBtn = getEl("androidShoppingReminderTime");
-
-    if(day && dayBtn){
-      var found = dayNames.find(function(item){ return item[0] === String(day.value); });
-      dayBtn.querySelector(".androidPickerValue").textContent = found ? found[1] : "Maandag";
-    }
-    if(time && timeBtn){
-      timeBtn.querySelector(".androidPickerValue").textContent = time.value || "18:00";
-    }
-  }
-
-  function closeAndroidNotificationPicker(){
-    var overlay = getEl("androidNotificationPickerOverlay");
-    if(overlay) overlay.remove();
-  }
-
-  function makeOverlay(title, eyebrow){
-    closeAndroidNotificationPicker();
-    var overlay = document.createElement("div");
-    overlay.id = "androidNotificationPickerOverlay";
-    overlay.className = "androidNotificationPickerOverlay";
-    overlay.setAttribute("role","dialog");
-    overlay.setAttribute("aria-modal","true");
-
-    var dialog = document.createElement("div");
-    dialog.className = "androidNotificationPickerDialog";
-    dialog.innerHTML =
-      '<div class="androidNotificationPickerHeader">' +
-        '<div class="androidNotificationPickerEyebrow">'+eyebrow+'</div>' +
-        '<h3 class="androidNotificationPickerTitle">'+title+'</h3>' +
-      '</div>';
-
-    overlay.appendChild(dialog);
-    overlay.addEventListener("click",function(e){
-      if(e.target === overlay) closeAndroidNotificationPicker();
-    });
-    document.body.appendChild(overlay);
-    return {overlay:overlay, dialog:dialog};
-  }
-
-  function saveNotificationAfterPickerChange(){
-    if(typeof window.saveNotificationSettings === "function"){
-      window.saveNotificationSettings();
-    }
-  }
-
-  window.openAndroidShoppingDayPicker = function(){
-    var refs = makeOverlay("Dag kiezen","BOODSCHAPPENHERINNERING");
-    var content = document.createElement("div");
-    content.className = "androidNotificationPickerContent";
-
-    var current = String((getEl("shoppingReminderDay") || {}).value || "2");
-
-    dayNames.forEach(function(item){
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "androidNotificationPickerDay" + (item[0] === current ? " isSelected" : "");
-      btn.innerHTML =
-        '<span>'+item[1]+'</span>' +
-        (item[0] === current ? '<span class="androidNotificationPickerCheck">✓</span>' : '');
-      btn.addEventListener("click",function(){
-        var native = getEl("shoppingReminderDay");
-        if(native){
-          native.value = item[0];
-          native.dispatchEvent(new Event("change",{bubbles:true}));
-        }
-        syncAndroidNotificationPickerButtons();
-        closeAndroidNotificationPicker();
-      });
-      content.appendChild(btn);
-    });
-
-    refs.dialog.appendChild(content);
-    var actions = document.createElement("div");
-    actions.className = "androidNotificationPickerActions";
-    actions.innerHTML = '<button type="button" class="androidNotificationPickerAction primary">Annuleren</button>';
-    actions.querySelector("button").addEventListener("click",closeAndroidNotificationPicker);
-    refs.dialog.appendChild(actions);
-  };
-
-  function clockPosition(number, inner){
-    var angle = (number % 12) * 30 - 90;
-    var radius = inner ? 89 : 124;
-    var rad = angle * Math.PI / 180;
-    return {
-      left: 143 + Math.cos(rad) * radius,
-      top: 143 + Math.sin(rad) * radius
-    };
-  }
-
-  function buildClockFace(container, values, selected, inner, onSelect){
-    var face = document.createElement("div");
-    face.className = "androidClockFace";
-
-    values.forEach(function(value, index){
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "androidClockNumber";
-      btn.textContent = value;
-      var p = clockPosition(index === 0 ? 12 : index, inner);
-      btn.style.left = p.left + "px";
-      btn.style.top = p.top + "px";
-      if(String(value).padStart(2,"0") === String(selected).padStart(2,"0")){
-        btn.classList.add("isSelected");
-      }
-      btn.addEventListener("click",function(){ onSelect(String(value).padStart(2,"0")); });
-      face.appendChild(btn);
-    });
-    container.appendChild(face);
-  }
-
-  window.openAndroidShoppingTimePicker = function(){
-    var refs = makeOverlay("Tijd kiezen","BOODSCHAPPENHERINNERING");
-    var native = getEl("shoppingReminderTime");
-    var value = (native && native.value) || "18:00";
-    var parts = value.split(":");
-    var hour = parseInt(parts[0],10);
-    var minute = parseInt(parts[1],10);
-    if(isNaN(hour)) hour = 18;
-    if(isNaN(minute)) minute = 0;
-
-    var display = document.createElement("div");
-    display.className = "androidTimeDisplay";
-    display.innerHTML =
-      '<button type="button" class="androidTimePart isActive" id="androidTimeHour">'+String(hour).padStart(2,"0")+'</button>' +
-      '<span class="androidTimeColon">:</span>' +
-      '<button type="button" class="androidTimePart" id="androidTimeMinute">'+String(minute).padStart(2,"0")+'</button>';
-    refs.dialog.appendChild(display);
-
-    var clock = document.createElement("div");
-    clock.className = "androidClock";
-    refs.dialog.appendChild(clock);
-
-    var hint = document.createElement("div");
-    hint.className = "androidClockHint";
-    hint.textContent = "Kies eerst het uur en daarna de minuten";
-    refs.dialog.appendChild(hint);
-
-    var activePart = "hour";
-
-    function renderHour(){
-      clock.innerHTML = "";
-      /* 24-uurs Android-stijl klok: 00–12 binnen, 13–23 buiten. */
-      var innerValues = [0,1,2,3,4,5,6,7,8,9,10,11];
-      var outerValues = [13,14,15,16,17,18,19,20,21,22,23,12];
-      buildClockFace(clock, innerValues, hour, true, chooseHour);
-      buildClockFace(clock, outerValues, hour, false, chooseHour);
-
-      var hand = document.createElement("div");
-      hand.className = "androidClockHand";
-      var hAngle = ((hour % 12) * 30) - 90;
-      hand.style.transform = "translate(-1px,-105px) rotate("+hAngle+"deg)";
-      hand.style.transformOrigin = "1px 105px";
-      clock.appendChild(hand);
-      var center = document.createElement("div");
-      center.className = "androidClockCenter";
-      clock.appendChild(center);
-    }
-
-    function chooseHour(v){
-      hour = parseInt(v,10);
-      document.getElementById("androidTimeHour").textContent = String(hour).padStart(2,"0");
-      document.getElementById("androidTimeHour").classList.add("isActive");
-      document.getElementById("androidTimeMinute").classList.remove("isActive");
-      activePart = "minute";
-      renderMinute();
-    }
-
-    function renderMinute(){
-      clock.innerHTML = "";
-      var values = [0,5,10,15,20,25,30,35,40,45,50,55];
-      buildClockFace(clock, values, minute, true, chooseMinute);
-      var hand = document.createElement("div");
-      hand.className = "androidClockHand";
-      var mAngle = (minute / 5) * 30 - 90;
-      hand.style.transform = "translate(-1px,-105px) rotate("+mAngle+"deg)";
-      hand.style.transformOrigin = "1px 105px";
-      clock.appendChild(hand);
-      var center = document.createElement("div");
-      center.className = "androidClockCenter";
-      clock.appendChild(center);
-    }
-
-    function chooseMinute(v){
-      minute = parseInt(v,10);
-      document.getElementById("androidTimeMinute").textContent = String(minute).padStart(2,"0");
-      document.getElementById("androidTimeHour").classList.remove("isActive");
-      document.getElementById("androidTimeMinute").classList.add("isActive");
-      activePart = "minute";
-      renderMinute();
-    }
-
-    display.querySelector("#androidTimeHour").addEventListener("click",function(){
-      activePart = "hour";
-      this.classList.add("isActive");
-      display.querySelector("#androidTimeMinute").classList.remove("isActive");
-      renderHour();
-    });
-    display.querySelector("#androidTimeMinute").addEventListener("click",function(){
-      activePart = "minute";
-      this.classList.add("isActive");
-      display.querySelector("#androidTimeHour").classList.remove("isActive");
-      renderMinute();
-    });
-
-    renderHour();
-
-    var actions = document.createElement("div");
-    actions.className = "androidNotificationPickerActions";
-    var cancel = document.createElement("button");
-    cancel.type = "button";
-    cancel.className = "androidNotificationPickerAction";
-    cancel.textContent = "Annuleren";
-    cancel.addEventListener("click",closeAndroidNotificationPicker);
-    var ok = document.createElement("button");
-    ok.type = "button";
-    ok.className = "androidNotificationPickerAction primary";
-    ok.textContent = "Opslaan";
-    ok.addEventListener("click",function(){
-      if(native){
-        native.value = String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
-        native.dispatchEvent(new Event("change",{bubbles:true}));
-      }
-      syncAndroidNotificationPickerButtons();
-      closeAndroidNotificationPicker();
-    });
-    actions.appendChild(cancel);
-    actions.appendChild(ok);
-    refs.dialog.appendChild(actions);
-  };
-
-  function installAndroidNotificationPickerTriggers(){
-    var day = getEl("shoppingReminderDay");
-    var time = getEl("shoppingReminderTime");
-    if(!day || !time || getEl("androidShoppingReminderDay")) return;
-
-    var dayBtn = document.createElement("button");
-    dayBtn.type = "button";
-    dayBtn.id = "androidShoppingReminderDay";
-    dayBtn.className = "androidPickerTrigger";
-    dayBtn.innerHTML = '<span class="androidPickerValue"></span><i class="fa-solid fa-chevron-down androidPickerChevron"></i>';
-    day.parentNode.insertBefore(dayBtn,day.nextSibling);
-    dayBtn.addEventListener("click",function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openAndroidShoppingDayPicker();
-    });
-
-    var timeBtn = document.createElement("button");
-    timeBtn.type = "button";
-    timeBtn.id = "androidShoppingReminderTime";
-    timeBtn.className = "androidPickerTrigger";
-    timeBtn.innerHTML = '<span class="androidPickerValue"></span><i class="fa-solid fa-chevron-down androidPickerChevron"></i>';
-    time.parentNode.insertBefore(timeBtn,time.nextSibling);
-    timeBtn.addEventListener("click",function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openAndroidShoppingTimePicker();
-    });
-
-    day.addEventListener("change",syncAndroidNotificationPickerButtons);
-    time.addEventListener("change",syncAndroidNotificationPickerButtons);
-    syncAndroidNotificationPickerButtons();
-  }
-
-  document.addEventListener("DOMContentLoaded",function(){
-    installAndroidNotificationPickerTriggers();
-    setTimeout(installAndroidNotificationPickerTriggers,300);
-  });
-
-  /* Houd de bestaande opslaglogica intact; alleen de visuele triggers worden toegevoegd. */
-  var oldLoad = window.loadNotificationSettings;
-  if(typeof oldLoad === "function"){
-    window.loadNotificationSettings = function(){
-      oldLoad.apply(this,arguments);
-      syncAndroidNotificationPickerButtons();
-    };
-  }
-
-})();
-</script>
 
 </html>
