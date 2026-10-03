@@ -1685,21 +1685,21 @@ body.dark-theme .notificationPickerButton{background:#1f2421;color:#e9eee9;borde
   align-items:center;
   justify-content:center;
   padding:20px;
-  background:rgba(20,28,23,.28);
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
+  background:rgba(22,30,25,.28);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
 }
 .androidReminderDialogCard{
-  width:min(360px,100%);
-  max-height:min(78vh,620px);
+  width:min(360px, calc(100vw - 36px));
+  max-height:min(78vh,560px);
   overflow:auto;
   box-sizing:border-box;
-  padding:22px 20px 14px;
-  border-radius:28px;
-  background:#f8fbf8;
-  color:#263229;
-  box-shadow:0 18px 48px rgba(25,45,32,.24);
-  border:1px solid rgba(79,118,88,.10);
+  padding:18px;
+  border-radius:22px;
+  background:#ffffff;
+  color:#29322c;
+  box-shadow:0 18px 45px rgba(0,0,0,.24);
+  border:1px solid rgba(255,255,255,.72);
   animation:androidReminderDialogIn .16s ease-out;
 }
 @keyframes androidReminderDialogIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
