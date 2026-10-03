@@ -4164,6 +4164,44 @@ body.logged-in {
 }
 </style>
 
+
+<style id="android-time-dialog-compact">
+/* Alleen de tijdkiezer compacter maken; dagkiezer en de rest van de app blijven gelijk. */
+.androidTimeDialogCard{
+  width:min(330px,100%);
+  max-height:min(72vh,570px);
+  padding:18px 16px 12px;
+  border-radius:26px;
+}
+.androidTimeDialogCard .androidReminderDialogTitle{
+  font-size:20px;
+  margin:0 2px 12px;
+}
+.androidTimePreview{
+  margin:2px 0 12px;
+  font-size:34px;
+}
+.androidTimePreview span:not(.androidTimeColon){
+  min-width:58px;
+  padding:6px 5px;
+  border-radius:12px;
+}
+.androidTimeLabel{
+  margin:6px 2px 4px;
+  font-size:11px;
+}
+.androidTimeGrid,.androidMinuteGrid{
+  gap:4px;
+}
+.androidTimeGrid button,.androidMinuteGrid button{
+  min-height:34px;
+  border-radius:10px;
+  font-size:13px;
+}
+.androidTimeDialogCard .androidReminderDialogActions{
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
