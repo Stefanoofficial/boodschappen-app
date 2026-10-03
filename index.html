@@ -11326,7 +11326,7 @@ document.addEventListener('visibilitychange',function(){
   function modalOpen(){
     return !!document.querySelector(
       '.modal.show, .modal.open, .overlay.show, .overlay.open, ' +
-      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay, #clearListBackdrop.show, #barcodeOverlay.open'
+      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay:not([aria-hidden="true"]), #clearListBackdrop.show, #barcodeOverlay.open'
     );
   }
   function sync(){ document.body.classList.toggle('modal-navigation-locked', modalOpen()); }
