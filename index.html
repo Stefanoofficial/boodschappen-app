@@ -5540,6 +5540,10 @@ function closeNotificationSettings(event) {
   }
 
   if (overlay) {
+    // Geef de navigatie direct weer vrij. De sluitanimatie mag visueel
+    // nog doorlopen, maar de overlay mag geen tikken meer onderscheppen.
+    overlay.style.pointerEvents = "none";
+    overlay.setAttribute("aria-hidden", "true");
     overlay.classList.add("familyDialogClosing");
     setTimeout(() => {
       if (overlay.isConnected) overlay.remove();
