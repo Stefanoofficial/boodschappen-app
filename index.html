@@ -4073,152 +4073,6 @@ body.logged-in {
 }
 </style>
 
-
-
-<style id="android-choice-dialog">
-/* ===== Android-stijl dagkiezer voor de boodschappenherinnering ===== */
-.androidPickerButton{
-  width:100%;
-  min-height:44px;
-  box-sizing:border-box;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  border:1px solid #d9e6dc;
-  border-radius:12px;
-  padding:0 14px;
-  background:#f7faf8;
-  color:#263229;
-  font:inherit;
-  text-align:left;
-  -webkit-tap-highlight-color:transparent;
-}
-.androidPickerButton:active{
-  background:#eef5f0;
-  transform:scale(.995);
-}
-.androidPickerButton i{
-  color:#5f7666;
-  font-size:13px;
-}
-
-.androidChoiceDialog{
-  position:fixed;
-  inset:0;
-  z-index:10050;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  box-sizing:border-box;
-}
-.androidChoiceBackdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(24,34,27,.38);
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
-  opacity:0;
-  transition:opacity .18s ease;
-}
-.androidChoiceCard{
-  position:relative;
-  width:min(420px,100%);
-  max-height:min(76vh,620px);
-  overflow:hidden;
-  border-radius:24px;
-  background:#f7faf8;
-  border:1px solid #dbe7df;
-  box-shadow:0 18px 45px rgba(30,48,37,.22);
-  transform:translateY(10px) scale(.98);
-  opacity:0;
-  transition:transform .18s ease,opacity .18s ease;
-}
-.androidChoiceDialog.is-open .androidChoiceBackdrop{opacity:1}
-.androidChoiceDialog.is-open .androidChoiceCard{
-  transform:translateY(0) scale(1);
-  opacity:1;
-}
-.androidChoiceHeader{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:14px;
-  padding:20px 20px 14px;
-}
-.androidChoiceTitle{
-  color:#3f5b45;
-  font-size:20px;
-  line-height:1.2;
-  font-weight:700;
-}
-.androidChoiceSubtitle{
-  margin-top:5px;
-  color:#6c786f;
-  font-size:13px;
-  line-height:1.4;
-}
-.androidChoiceClose{
-  width:38px;
-  height:38px;
-  flex:0 0 38px;
-  border:0;
-  border-radius:50%;
-  background:#e8f1ea;
-  color:#3f5b45;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  -webkit-tap-highlight-color:transparent;
-}
-.androidChoiceList{
-  padding:4px 12px 14px;
-  overflow-y:auto;
-}
-.androidChoiceItem{
-  width:100%;
-  min-height:48px;
-  border:0;
-  border-radius:14px;
-  padding:0 14px;
-  background:transparent;
-  color:#263229;
-  font:inherit;
-  font-size:16px;
-  font-weight:500;
-  text-align:left;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  -webkit-tap-highlight-color:transparent;
-}
-.androidChoiceItem::after{
-  content:"";
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  border:2px solid #aebdb2;
-  box-sizing:border-box;
-}
-.androidChoiceItem.selected{
-  background:#e8f3ea;
-  color:#3f5b45;
-  font-weight:700;
-}
-.androidChoiceItem.selected::after{
-  border:6px solid #4f7658;
-}
-.androidChoiceItem:active{
-  background:#eef5f0;
-}
-
-body.androidChoiceOpen{
-  overflow:hidden !important;
-}
-</style>
-
 </head>
 
 <body>
@@ -4515,17 +4369,16 @@ body.androidChoiceOpen{
       </label>
 
       <div class="notificationField">
-        <label for="shoppingReminderDayButton">Dag</label>
-        <button type="button"
-                id="shoppingReminderDayButton"
-                class="androidPickerButton"
-                onclick="openShoppingReminderDayPicker(event)"
-                aria-haspopup="dialog"
-                aria-controls="shoppingReminderDayDialog">
-          <span id="shoppingReminderDayLabel">Maandag</span>
-          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-        </button>
-        <input type="hidden" id="shoppingReminderDay" value="2">
+        <label for="shoppingReminderDay">Dag</label>
+        <select id="shoppingReminderDay" onchange="saveNotificationSettings()">
+          <option value="2">Maandag</option>
+          <option value="3">Dinsdag</option>
+          <option value="4">Woensdag</option>
+          <option value="5">Donderdag</option>
+          <option value="6">Vrijdag</option>
+          <option value="7">Zaterdag</option>
+          <option value="1">Zondag</option>
+        </select>
       </div>
 
       <div class="notificationField">
@@ -4544,34 +4397,6 @@ body.androidChoiceOpen{
         <strong>Over deze functie</strong>
         <p>De herinnering wordt lokaal op je Android-telefoon ingesteld. Er is geen account of server nodig om de melding te ontvangen.</p>
         <p>Als je meldingen voor de app in Android hebt geblokkeerd, moet je ze eerst toestaan in de Android-instellingen.</p>
-      </div>
-    </div>
-
-  <div id="shoppingReminderDayDialog"
-       class="androidChoiceDialog"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="shoppingReminderDayDialogTitle"
-       style="display:none;">
-    <div class="androidChoiceBackdrop" onclick="closeShoppingReminderDayPicker(event)"></div>
-    <div class="androidChoiceCard" role="document">
-      <div class="androidChoiceHeader">
-        <div>
-          <div class="androidChoiceTitle" id="shoppingReminderDayDialogTitle">Dag kiezen</div>
-          <div class="androidChoiceSubtitle">Wanneer wil je je boodschappenherinnering ontvangen?</div>
-        </div>
-        <button type="button" class="androidChoiceClose" onclick="closeShoppingReminderDayPicker(event)" aria-label="Sluiten">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="androidChoiceList">
-        <button type="button" class="androidChoiceItem" data-day="2" onclick="selectShoppingReminderDay('2','Maandag')">Maandag</button>
-        <button type="button" class="androidChoiceItem" data-day="3" onclick="selectShoppingReminderDay('3','Dinsdag')">Dinsdag</button>
-        <button type="button" class="androidChoiceItem" data-day="4" onclick="selectShoppingReminderDay('4','Woensdag')">Woensdag</button>
-        <button type="button" class="androidChoiceItem" data-day="5" onclick="selectShoppingReminderDay('5','Donderdag')">Donderdag</button>
-        <button type="button" class="androidChoiceItem" data-day="6" onclick="selectShoppingReminderDay('6','Vrijdag')">Vrijdag</button>
-        <button type="button" class="androidChoiceItem" data-day="7" onclick="selectShoppingReminderDay('7','Zaterdag')">Zaterdag</button>
-        <button type="button" class="androidChoiceItem" data-day="1" onclick="selectShoppingReminderDay('1','Zondag')">Zondag</button>
       </div>
     </div>
   </div>
@@ -5127,64 +4952,6 @@ function loadNotificationSettings() {
   if (enabled) enabled.checked = settings.enabled;
   if (day) day.value = settings.day;
   if (time) time.value = settings.time;
-  updateShoppingReminderDayLabel(settings.day);
-}
-
-const SHOPPING_REMINDER_DAYS = {
-  "1": "Zondag",
-  "2": "Maandag",
-  "3": "Dinsdag",
-  "4": "Woensdag",
-  "5": "Donderdag",
-  "6": "Vrijdag",
-  "7": "Zaterdag"
-};
-
-function updateShoppingReminderDayLabel(dayValue) {
-  const label = document.getElementById("shoppingReminderDayLabel");
-  if (label) label.textContent = SHOPPING_REMINDER_DAYS[String(dayValue)] || "Maandag";
-
-  document.querySelectorAll("#shoppingReminderDayDialog .androidChoiceItem").forEach(btn => {
-    btn.classList.toggle("selected", btn.dataset.day === String(dayValue));
-  });
-}
-
-function openShoppingReminderDayPicker(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  const dialog = document.getElementById("shoppingReminderDayDialog");
-  if (!dialog) return;
-  const day = document.getElementById("shoppingReminderDay");
-  updateShoppingReminderDayLabel(day ? day.value : "2");
-  dialog.style.display = "flex";
-  document.body.classList.add("androidChoiceOpen");
-  requestAnimationFrame(() => dialog.classList.add("is-open"));
-}
-
-function closeShoppingReminderDayPicker(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  const dialog = document.getElementById("shoppingReminderDayDialog");
-  if (!dialog) return;
-  dialog.classList.remove("is-open");
-  document.body.classList.remove("androidChoiceOpen");
-  window.setTimeout(() => {
-    if (!dialog.classList.contains("is-open")) dialog.style.display = "none";
-  }, 180);
-}
-
-function selectShoppingReminderDay(dayValue, dayLabel) {
-  const day = document.getElementById("shoppingReminderDay");
-  if (day) day.value = String(dayValue);
-  const label = document.getElementById("shoppingReminderDayLabel");
-  if (label) label.textContent = dayLabel;
-  updateShoppingReminderDayLabel(dayValue);
-  closeShoppingReminderDayPicker();
-  saveNotificationSettings();
 }
 
 function setNotificationStatus(message, isError) {
