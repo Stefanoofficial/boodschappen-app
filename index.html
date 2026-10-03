@@ -11215,6 +11215,24 @@ document.addEventListener('visibilitychange',function(){
 })();
 </script>
 
+
+<style id="meer-only-visibility-fix">
+/* Meer is uitsluitend zichtbaar wanneer de Meer-tab actief is.
+   Voorkomt dat de titel "Meer" boven Overzicht/Lijst blijft staan. */
+.app > #moreView {
+  display: none !important;
+}
+.app.more-active > #moreView {
+  display: flex !important;
+}
+.app:not(.more-active) > #moreView {
+  display: none !important;
+}
+.app.overview-active > #moreView {
+  display: none !important;
+}
+</style>
+
 </body>
 
 <style id="overview-dashboard-final">
