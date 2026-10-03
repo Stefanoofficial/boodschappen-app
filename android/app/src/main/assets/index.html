@@ -1528,6 +1528,224 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   opacity:1 !important;
 }
 
+
+
+/* ===== Meldingen / boodschappenherinnering ===== */
+.notificationSettingsPage .notificationCard{
+  margin:12px 2px 24px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.68);
+  box-shadow:0 4px 16px rgba(40,70,50,.07);
+  color:#2e3a32;
+}
+.notificationCardHeader{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:16px;
+}
+.notificationIcon{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#e3f2e7;
+  color:#4f7658;
+  font-size:19px;
+}
+.notificationTitle{font-size:17px;font-weight:700;color:#3F5B45;margin-bottom:3px;}
+.notificationDescription{font-size:13px;line-height:1.45;opacity:.76;}
+.notificationSwitchRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:13px 0;
+  border-top:1px solid #e1ece4;
+  border-bottom:1px solid #e1ece4;
+}
+.notificationSwitchRow strong{display:block;font-size:15px;}
+.notificationSwitchRow small{display:block;font-size:12px;line-height:1.4;opacity:.68;margin-top:3px;}
+.notificationSwitchRow input{
+  appearance:none;
+  -webkit-appearance:none;
+  width:48px;
+  height:28px;
+  min-width:48px;
+  border-radius:20px;
+  background:#cfd8d1;
+  position:relative;
+  cursor:pointer;
+  transition:.2s ease;
+}
+.notificationSwitchRow input::after{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  left:3px;
+  top:3px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);
+  transition:.2s ease;
+}
+.notificationSwitchRow input:checked{background:#4f7658;}
+.notificationSwitchRow input:checked::after{transform:translateX(20px);}
+.notificationField{margin-top:14px;}
+.notificationField label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin:0 0 6px;
+  color:#3F5B45;
+}
+.notificationField select,
+.notificationField input[type="time"]{
+  width:100%;
+  box-sizing:border-box;
+  min-height:44px;
+  border:1px solid #d9e6dc;
+  border-radius:12px;
+  padding:0 12px;
+  background:#fff;
+  color:#263229;
+  font:inherit;
+}
+.notificationTestButton{
+  width:100%;
+  margin-top:16px;
+  min-height:44px;
+  border:0;
+  border-radius:12px;
+  background:#4f7658;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+}
+.notificationTestButton i{margin-right:7px;}
+.notificationSettingsStatus{
+  min-height:18px;
+  margin-top:10px;
+  font-size:12px;
+  text-align:center;
+  color:#4f7658;
+}
+.notificationSettingsStatus.isError{color:#b24b4b;}
+.notificationInfo{
+  margin-top:14px;
+  padding:12px 13px;
+  border-radius:13px;
+  background:#f1f7f3;
+  font-size:12px;
+  line-height:1.45;
+}
+.notificationInfo strong{color:#3F5B45;}
+.notificationInfo p{margin:6px 0 0;}
+body.dark-theme .notificationSettingsPage .notificationCard{background:#252b27;color:#e9eee9;}
+body.dark-theme .notificationTitle,
+body.dark-theme .notificationField label,
+body.dark-theme .notificationInfo strong{color:#9ed5ad;}
+body.dark-theme .notificationSwitchRow{border-color:#3a443d;}
+body.dark-theme .notificationField select,
+body.dark-theme .notificationField input[type="time"]{background:#1f2421;color:#e9eee9;border-color:#3a443d;}
+body.dark-theme .notificationInfo{background:#202722;}
+
+/* Android/Material-keuzevensters alleen voor de boodschappenherinnering */
+.notificationPickerButton{
+  width:100%;
+  min-height:44px;
+  box-sizing:border-box;
+  border:1px solid #d9e6dc;
+  border-radius:12px;
+  padding:0 13px;
+  background:#fff;
+  color:#263229;
+  font:inherit;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+  cursor:pointer;
+}
+.notificationPickerButton i{color:#5d7563;font-size:14px;}
+.notificationPickerButton:active{background:#f1f7f3;}
+body.dark-theme .notificationPickerButton{background:#1f2421;color:#e9eee9;border-color:#3a443d;}
+
+.androidReminderDialog[hidden]{display:none;}
+.androidReminderDialog{
+  position:fixed;
+  inset:0;
+  z-index:13000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:rgba(22,30,25,.28);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+.androidReminderDialogCard{
+  width:min(360px, calc(100vw - 36px));
+  max-height:min(78vh,560px);
+  overflow:auto;
+  box-sizing:border-box;
+  padding:18px;
+  border-radius:22px;
+  background:#ffffff;
+  color:#29322c;
+  box-shadow:0 18px 45px rgba(0,0,0,.24);
+  border:1px solid rgba(255,255,255,.72);
+  animation:androidReminderDialogIn .16s ease-out;
+}
+@keyframes androidReminderDialogIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.androidReminderDialogTitle{font-size:21px;font-weight:700;color:#2f4736;margin:0 2px 16px;}
+.androidDayOptions{display:flex;flex-direction:column;gap:4px;}
+.androidDayOptions button{
+  width:100%;
+  min-height:48px;
+  padding:0 14px;
+  border:0;
+  border-radius:14px;
+  background:transparent;
+  color:#29352e;
+  font:inherit;
+  font-size:16px;
+  text-align:left;
+  cursor:pointer;
+}
+.androidDayOptions button.selected{background:#dfeee3;color:#2f6840;font-weight:700;}
+.androidDayOptions button:active{background:#e9f3eb;}
+.androidReminderDialogActions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:14px;}
+.androidDialogTextButton,.androidDialogPrimaryButton{
+  min-height:42px;padding:0 18px;border-radius:22px;font:inherit;font-weight:700;cursor:pointer;
+}
+.androidDialogTextButton{border:0;background:transparent;color:#4f7658;}
+.androidDialogPrimaryButton{border:0;background:#4f7658;color:#fff;box-shadow:0 2px 6px rgba(79,118,88,.20);}
+.androidDialogTextButton:active{background:#e9f3eb;}
+.androidDialogPrimaryButton:active{transform:scale(.98);}
+.androidTimeDialogCard{max-height:min(82vh,680px);}
+.androidTimePreview{display:flex;justify-content:center;align-items:center;gap:4px;margin:4px 0 16px;font-size:40px;font-weight:700;color:#31543b;letter-spacing:1px;}
+.androidTimePreview span:not(.androidTimeColon){min-width:68px;text-align:center;padding:8px 6px;border-radius:14px;background:#e7f1e9;}
+.androidTimeColon{font-weight:500;color:#607065;}
+.androidTimeLabel{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#718077;margin:8px 2px 6px;}
+.androidTimeGrid,.androidMinuteGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.androidTimeGrid button,.androidMinuteGrid button{
+  min-height:40px;border:0;border-radius:12px;background:transparent;color:#344239;font:inherit;font-size:14px;cursor:pointer;
+}
+.androidTimeGrid button.selected,.androidMinuteGrid button.selected{background:#dfeee3;color:#2f6840;font-weight:700;}
+.androidTimeGrid button:active,.androidMinuteGrid button:active{background:#e9f3eb;}
+body.dark-theme .androidReminderDialog{background:rgba(0,0,0,.45);}
+body.dark-theme .androidReminderDialogCard{background:#202722;color:#e9eee9;border-color:#3a443d;}
+body.dark-theme .androidReminderDialogTitle{color:#b9e1c3;}
+body.dark-theme .androidDayOptions button,body.dark-theme .androidTimeGrid button,body.dark-theme .androidMinuteGrid button{color:#e9eee9;}
+body.dark-theme .androidDayOptions button.selected,body.dark-theme .androidTimeGrid button.selected,body.dark-theme .androidMinuteGrid button.selected{background:#2f4c37;color:#b9e1c3;}
+body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#29352d;color:#b9e1c3;}
+
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -3177,6 +3395,10 @@ body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:
   padding:12px 13px;
   margin:0 0 9px;
 }
+.aboutInfoFeatureCard{margin:0;background:#fff;border:1px solid rgba(63,91,69,.08);box-shadow:none;}
+.aboutInfoFeatureCard p{font-size:12px;line-height:1.5;}
+body.dark-theme .aboutInfoFeatureCard{background:#202821;border-color:rgba(255,255,255,.08);}
+
 .aboutInfoTitle{font-size:15px;font-weight:800;color:#3F5B45;display:flex;align-items:center;gap:9px;}
 .aboutInfoTitle i{width:30px;height:30px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;}
 .aboutInfoVersion{font-size:11px;color:#87928B;margin:5px 0 7px 39px;}
@@ -3864,6 +4086,357 @@ body.logged-in {
   -webkit-tap-highlight-color: transparent;
 }
 </style>
+
+<style id="popup-soft-color">
+/* ===== Zachte pop-up kleur =====
+   De pop-ups krijgen dezelfde zachte, bijna-witte tint als het keuzevenster.
+   Bestaande layout, knoppen en functionaliteit blijven ongewijzigd. */
+:root{
+  --popup-soft:#f7faf8;
+  --popup-soft-border:#dbe7df;
+}
+
+/* Productsuggesties */
+.productSuggestions{
+  background:var(--popup-soft) !important;
+  border-color:var(--popup-soft-border) !important;
+}
+.productSuggestion:active,
+.productSuggestion:hover{
+  background:#eef5f0 !important;
+}
+
+/* Lijstopties en sorteeropties */
+.listOptionsPanelInner{
+  background:var(--popup-soft) !important;
+  border-left:1px solid var(--popup-soft-border);
+}
+.listOptionItem:hover,
+.listOptionBack:hover{
+  background:#eef5f0 !important;
+}
+
+/* Scanner */
+.barcodeCard{
+  background:var(--popup-soft) !important;
+  border:1px solid var(--popup-soft-border) !important;
+}
+.barcodeClose{
+  background:#eef5f0 !important;
+}
+
+/* Algemene keuze-/informatiepop-ups die dezelfde zachte uitstraling
+   gebruiken, zonder de inhoud of afmetingen te wijzigen. */
+.meer-modal .modal-content,
+.more-modal .modal-content,
+.modal.meer-modal .modal-content,
+.modal.more-modal .modal-content,
+.help-modal .modal-content,
+.info-modal .modal-content,
+.privacy-modal .modal-content,
+.terms-modal .modal-content,
+.about-modal .modal-content{
+  background:var(--popup-soft) !important;
+}
+
+.meer-modal .modal-header,
+.more-modal .modal-header,
+.modal.meer-modal .modal-header,
+.modal.more-modal .modal-header,
+.help-modal .modal-header,
+.info-modal .modal-header,
+.privacy-modal .modal-header,
+.terms-modal .modal-header,
+.about-modal .modal-header{
+  background:var(--popup-soft) !important;
+}
+
+.meer-modal .modal-body,
+.more-modal .modal-body,
+.modal.meer-modal .modal-body,
+.modal.more-modal .modal-body,
+.help-modal .modal-body,
+.info-modal .modal-body,
+.privacy-modal .modal-body,
+.terms-modal .modal-body,
+.about-modal .modal-body{
+  background:var(--popup-soft) !important;
+}
+</style>
+
+
+<style id="notification-family-dialog-style">
+/* Meldingen: één nette Android-dialog, in dezelfde familie als Suggesties/Lijstopties/Scannen. */
+.notificationFamilyDialog .familyDialog {
+  width:min(390px, calc(100vw - 32px));
+  max-height:min(86vh, 720px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:20px;
+  border-radius:24px;
+}
+.notificationFamilyDialog .familyDialogHeader {
+  margin-bottom:18px;
+  padding-bottom:16px;
+  border-bottom:1px solid #e1ece4;
+}
+.notificationFamilyDialog .familyDialogBody {
+  min-width:0;
+}
+.notificationFamilyDialog .notificationCard {
+  margin:0;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.notificationFamilyDialog .notificationCardHeader {
+  display:none;
+}
+.notificationFamilyDialog .notificationSwitchRow {
+  padding:0 0 17px;
+  border-top:0;
+  border-bottom:1px solid #e1ece4;
+}
+.notificationFamilyDialog .notificationSwitchRow strong {
+  font-size:16px;
+  line-height:1.25;
+}
+.notificationFamilyDialog .notificationSwitchRow small {
+  max-width:245px;
+  font-size:12.5px;
+  line-height:1.45;
+}
+.notificationFamilyDialog .notificationField {
+  margin-top:16px;
+}
+.notificationFamilyDialog .notificationField label {
+  font-size:13px;
+  margin-bottom:7px;
+}
+.notificationFamilyDialog .notificationPickerButton {
+  min-height:48px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid #d9e6dc;
+  padding:0 14px;
+  font-size:16px;
+}
+.notificationFamilyDialog .notificationTestButton {
+  min-height:48px;
+  margin-top:18px;
+  border-radius:14px;
+  font-size:15px;
+}
+.notificationFamilyDialog .notificationSettingsStatus {
+  margin-top:8px;
+}
+.notificationFamilyDialog .notificationInfo {
+  margin-top:16px;
+  padding:14px;
+  border-radius:15px;
+  background:#f1f7f3;
+  font-size:12.5px;
+  line-height:1.5;
+}
+.notificationFamilyDialog .familyDialogActions {
+  margin-top:18px;
+  padding-top:15px;
+  border-top:1px solid #e1ece4;
+}
+.notificationFamilyDialog.picker-child-open {
+  background:transparent !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.notificationFamilyDialog.picker-child-open .familyDialog {
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+body.dark-theme .notificationFamilyDialog .familyDialogHeader,
+body.dark-theme .notificationFamilyDialog .notificationSwitchRow,
+body.dark-theme .notificationFamilyDialog .familyDialogActions {
+  border-color:#3a443d;
+}
+body.dark-theme .notificationFamilyDialog .notificationPickerButton {
+  background:#1f2421;
+  border-color:#3a443d;
+}
+body.dark-theme .notificationFamilyDialog .notificationInfo {
+  background:#202722;
+}
+@media (max-width:600px){
+  .notificationFamilyDialog .familyDialog {
+    width:calc(100vw - 32px);
+    max-height:calc(100vh - 170px);
+    border-radius:24px;
+    padding:18px;
+  }
+}
+</style>
+<style id="android-time-dialog-family-style">
+/* Tijdkiezer: dezelfde rustige dialoogstijl als Lijstopties.
+   Alleen deze popup wordt aangepast; de rest van de app blijft ongemoeid. */
+.androidReminderDialog .familyDialog{
+  opacity:1 !important;
+  visibility:visible !important;
+  transform:none !important;
+}
+
+.androidTimeDialogCard.familyDialog{
+  width:min(360px,calc(100vw - 36px));
+  max-height:min(78vh,560px);
+  overflow:auto;
+  box-sizing:border-box;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:22px;
+  box-shadow:0 18px 45px rgba(0,0,0,.24);
+  padding:18px;
+}
+.androidTimeDialogCard .familyDialogHeader{
+  margin-bottom:14px;
+}
+.androidTimeDialogCard .familyDialogIcon{
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:50%;
+  background:#dff5df;
+  color:#3F5B45;
+  font-size:18px;
+}
+.androidTimeDialogCard .familyDialogTitle{
+  font-size:19px;
+  font-weight:750;
+  line-height:1.15;
+}
+.androidTimeDialogCard .familyDialogBody{
+  color:#29322c;
+}
+.androidTimePreview{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
+  margin:2px 0 14px;
+  font-size:34px;
+  font-weight:800;
+  color:#3F5B45;
+  letter-spacing:.02em;
+}
+.androidTimePreview span:not(.androidTimeColon){
+  min-width:auto;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+}
+.androidTimeColon{
+  font-weight:500;
+  color:#718077;
+}
+.androidTimeLabel{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#718077;
+  margin:8px 2px 6px;
+}
+.androidTimeGrid,.androidMinuteGrid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:5px;
+}
+.androidTimeGrid button,.androidMinuteGrid button{
+  min-height:38px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#344239;
+  font:inherit;
+  font-size:14px;
+  cursor:pointer;
+}
+.androidTimeGrid button.selected,.androidMinuteGrid button.selected{
+  background:#dff5df;
+  color:#2f6840;
+  font-weight:700;
+}
+.androidTimeGrid button:active,.androidMinuteGrid button:active{
+  background:#eef5f0;
+}
+.androidTimeDialogCard .familyDialogActions{
+  margin-top:17px;
+}
+.androidTimeDialogCard .androidDialogTextButton{
+  background:rgba(63,91,69,.08);
+  color:#3F5B45;
+}
+.androidTimeDialogCard .androidDialogPrimaryButton{
+  background:#3F5B45;
+  color:#fff;
+  box-shadow:none;
+}
+body.dark-theme .androidTimeDialogCard.familyDialog{
+  background:#202923;
+  color:#e5ece7;
+  border-color:rgba(255,255,255,.08);
+}
+body.dark-theme .androidTimeDialogCard .familyDialogIcon{
+  background:#2f4c37;
+  color:#b9e1c3;
+}
+body.dark-theme .androidTimeDialogCard .familyDialogTitle,
+body.dark-theme .androidTimeDialogCard .androidTimePreview{
+  color:#b9e1c3;
+}
+body.dark-theme .androidTimeDialogCard .androidTimeGrid button,
+body.dark-theme .androidTimeDialogCard .androidMinuteGrid button{
+  color:#e5ece7;
+}
+</style>
+<style id="login-register-outline-fix">
+/* Account aanmaken: open/outlined Android-Material stijl */
+#loginScreen .loginBox > .registerButton {
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 18px;
+  border: 2px solid #3F6B58 !important;
+  border-radius: 16px;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #2F6650 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+#loginScreen .loginBox > .registerButton i {
+  color: #2F6650 !important;
+  font-size: 20px;
+}
+#loginScreen .loginBox > .registerButton:hover {
+  background: #F3F8F4 !important;
+}
+#loginScreen .loginBox > .registerButton:active {
+  background: #E8F2EA !important;
+}
+body.dark-theme #loginScreen .loginBox > .registerButton {
+  background: #202620 !important;
+  background-color: #202620 !important;
+  color: #9ED5AD !important;
+  border-color: #668B70 !important;
+}
+body.dark-theme #loginScreen .loginBox > .registerButton i {
+  color: #9ED5AD !important;
+}
+</style>
 </head>
 
 <body>
@@ -4128,7 +4701,107 @@ body.logged-in {
        <span>Scannen</span>
        <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
      </button>
-    <div class="settingsMenuHint">Meer instellingen kunnen hier later worden toegevoegd.</div>
+    <button type="button" class="familyMenuItem settingsMenuItem" onclick="openNotificationSettings(event)">
+      <i class="fa-solid fa-bell"></i>
+      <span>Meldingen</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+  </div>
+
+  <div id="notificationSettingsMenuSub" class="familyMenuPage settingsMenuPage notificationSettingsPage" style="display:none;">
+    <button type="button" class="settingsMenuBack" onclick="closeNotificationSettings(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Meldingen</span>
+    </button>
+    <div class="familyMenuSubTitle">Meldingen</div>
+
+    <div class="notificationCard">
+      <div class="notificationCardHeader">
+        <div class="notificationIcon"><i class="fa-solid fa-bell"></i></div>
+        <div>
+          <div class="notificationTitle">Boodschappenherinnering</div>
+          <div class="notificationDescription">Krijg op je telefoon een herinnering om je boodschappenlijst te bekijken.</div>
+        </div>
+      </div>
+
+      <label class="notificationSwitchRow">
+        <span>
+          <strong>Herinnering inschakelen</strong>
+          <small>De melding komt iedere week op de gekozen dag en tijd.</small>
+        </span>
+        <input type="checkbox" id="shoppingReminderEnabled" onchange="saveNotificationSettings()">
+      </label>
+
+      <div class="notificationField">
+        <label for="shoppingReminderDayButton">Dag</label>
+        <input type="hidden" id="shoppingReminderDay" value="2">
+        <button type="button" id="shoppingReminderDayButton" class="notificationPickerButton" onclick="openReminderDayPicker(event)">
+          <span id="shoppingReminderDayText">Maandag</span>
+          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="notificationField">
+        <label for="shoppingReminderTimeButton">Tijd</label>
+        <input type="hidden" id="shoppingReminderTime" value="18:00">
+        <button type="button" id="shoppingReminderTimeButton" class="notificationPickerButton" onclick="openReminderTimePicker(event)">
+          <span id="shoppingReminderTimeText">18:00</span>
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <button type="button" class="notificationTestButton" onclick="testShoppingReminder()">
+        <i class="fa-solid fa-paper-plane"></i>
+        Testmelding sturen
+      </button>
+
+      <div id="notificationSettingsStatus" class="notificationSettingsStatus" aria-live="polite"></div>
+
+      <div id="reminderDayDialog" class="androidReminderDialog" hidden aria-hidden="true">
+        <div class="androidReminderDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderDayDialogTitle">
+          <div class="androidReminderDialogTitle" id="reminderDayDialogTitle">Dag kiezen</div>
+          <div class="androidDayOptions" id="androidDayOptions">
+            <button type="button" data-day="2">Maandag</button>
+            <button type="button" data-day="3">Dinsdag</button>
+            <button type="button" data-day="4">Woensdag</button>
+            <button type="button" data-day="5">Donderdag</button>
+            <button type="button" data-day="6">Vrijdag</button>
+            <button type="button" data-day="7">Zaterdag</button>
+            <button type="button" data-day="1">Zondag</button>
+          </div>
+          <div class="androidReminderDialogActions">
+            <button type="button" class="androidDialogTextButton" onclick="closeReminderDayPicker()">Annuleren</button>
+            <button type="button" class="androidDialogPrimaryButton" onclick="confirmReminderDayPicker()">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="reminderTimeDialog" class="androidReminderDialog" hidden aria-hidden="true">
+        <div class="androidReminderDialogCard androidTimeDialogCard familyDialog" role="dialog" aria-modal="true" aria-labelledby="reminderTimeDialogTitle">
+          <div class="familyDialogHeader">
+            <div class="familyDialogIcon"><i class="fa-regular fa-clock"></i></div>
+            <div class="familyDialogTitle" id="reminderTimeDialogTitle">Tijd kiezen</div>
+          </div>
+          <div class="familyDialogBody">
+            <div class="androidTimePreview"><span id="androidTimeHour">18</span><span class="androidTimeColon">:</span><span id="androidTimeMinute">00</span></div>
+            <div class="androidTimeLabel">Uur</div>
+            <div class="androidTimeGrid" id="androidHourGrid"></div>
+            <div class="androidTimeLabel">Minuten</div>
+            <div class="androidMinuteGrid" id="androidMinuteGrid"></div>
+          </div>
+          <div class="familyDialogActions androidReminderDialogActions">
+            <button type="button" class="familyDialogBtn familyDialogCancel androidDialogTextButton" onclick="closeReminderTimePicker()">Annuleren</button>
+            <button type="button" class="familyDialogBtn familyDialogPrimary androidDialogPrimaryButton" onclick="confirmReminderTimePicker()">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notificationInfo">
+        <strong>Over deze functie</strong>
+        <p>De herinnering wordt lokaal op je Android-telefoon ingesteld. Er is geen account of server nodig om de melding te ontvangen.</p>
+        <p>Als je meldingen voor de app in Android hebt geblokkeerd, moet je ze eerst toestaan in de Android-instellingen.</p>
+      </div>
+    </div>
   </div>
 
   <div id="savedListsMenuSub" class="familyMenuPage savedListsMenuPage" style="display:none;">
@@ -4196,8 +4869,8 @@ body.logged-in {
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Boodschappenlijst</div>
-      <div class="aboutInfoVersion">Versie 1.2</div>
-      <p>Een eenvoudige boodschappenlijst om producten snel toe te voegen, af te vinken en je lijst overzichtelijk te houden. De app gebruikt slimme productsuggesties met echte productinformatie en productfoto’s wanneer die beschikbaar zijn. Je kunt ook producten scannen met de barcode-scanner.</p>
+      <div class="aboutInfoVersion">Versie 1.3</div>
+      <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
@@ -4208,7 +4881,7 @@ body.logged-in {
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
     </div>
     <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
-    <div class="aboutMenuHint">© 2026 Boodschappenlijst</div>
+    <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
   <div id="legalMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -4245,7 +4918,7 @@ body.logged-in {
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
         <li><strong>Familiegegevens:</strong> familie-/deellijstcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Lokale instellingen:</strong> bijvoorbeeld thema- en bepaalde appvoorkeuren die op je apparaat worden opgeslagen.</li>
+        <li><strong>Lokale instellingen:</strong> bijvoorbeeld thema-, meldings- en bepaalde appvoorkeuren die op je apparaat worden opgeslagen.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcode-scanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
@@ -4314,6 +4987,11 @@ body.logged-in {
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
       <p>Gebruik de lijstopties om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
+      <p>Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je kunt daar ook een testmelding sturen.</p>
+      <p>De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
     </div>
   </div>
 </div>
@@ -4541,6 +5219,7 @@ const __menuPageIds = [
   "sharedListsMenuSub",
   "sharedListActiveMenuSub",
   "settingsMenuSub",
+  "notificationSettingsMenuSub",
   "savedListsMenuSub",
   "accountMenuSub",
   "feedbackMenuSub",
@@ -4651,6 +5330,280 @@ function openSettingsSubmenu(event) {
   switchMenuPage("settingsMenuSub", event);
 }
 function closeSettingsSubmenu(event) { returnMenuToMain("settingsMenuSub", event); }
+
+const NOTIFICATION_SETTINGS_KEY = "boodschappenNotificationSettings";
+
+function getNotificationSettings() {
+  try {
+    const raw = localStorage.getItem(NOTIFICATION_SETTINGS_KEY);
+    const saved = raw ? JSON.parse(raw) : {};
+    return {
+      enabled: saved.enabled === true,
+      day: String(saved.day || "2"),
+      time: String(saved.time || "18:00")
+    };
+  } catch (e) {
+    return { enabled:false, day:"2", time:"18:00" };
+  }
+}
+
+function loadNotificationSettings() {
+  const settings = getNotificationSettings();
+  const enabled = document.getElementById("shoppingReminderEnabled");
+  const day = document.getElementById("shoppingReminderDay");
+  const time = document.getElementById("shoppingReminderTime");
+  if (enabled) enabled.checked = settings.enabled;
+  if (day) day.value = settings.day;
+  if (time) time.value = settings.time;
+  updateReminderPickerLabels();
+}
+
+const REMINDER_DAY_NAMES = {
+  "2":"Maandag", "3":"Dinsdag", "4":"Woensdag", "5":"Donderdag",
+  "6":"Vrijdag", "7":"Zaterdag", "1":"Zondag"
+};
+let reminderDraftDay = "2";
+let reminderDraftTime = "18:00";
+
+function updateReminderPickerLabels(){
+  const day = document.getElementById("shoppingReminderDay");
+  const dayText = document.getElementById("shoppingReminderDayText");
+  const time = document.getElementById("shoppingReminderTime");
+  const timeText = document.getElementById("shoppingReminderTimeText");
+  if (day && dayText) dayText.textContent = REMINDER_DAY_NAMES[String(day.value)] || "Maandag";
+  if (time && timeText) timeText.textContent = time.value || "18:00";
+}
+
+function openReminderDayPicker(event){
+  if (event) event.stopPropagation();
+  const day = document.getElementById("shoppingReminderDay");
+  reminderDraftDay = day ? String(day.value || "2") : "2";
+  document.querySelectorAll("#androidDayOptions button").forEach(btn => {
+    btn.classList.toggle("selected", btn.dataset.day === reminderDraftDay);
+    btn.onclick = () => {
+      reminderDraftDay = btn.dataset.day;
+      document.querySelectorAll("#androidDayOptions button").forEach(b => b.classList.toggle("selected", b === btn));
+    };
+  });
+  const dialog = document.getElementById("reminderDayDialog");
+  if (dialog) {
+    moveReminderPickerToBody("reminderDayDialog");
+    if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
+    dialog.hidden = false;
+    dialog.setAttribute("aria-hidden","false");
+  }
+}
+function closeReminderDayPicker(){
+  const dialog = document.getElementById("reminderDayDialog");
+  if (dialog) { dialog.hidden = true; dialog.setAttribute("aria-hidden","true"); }
+  if (notificationFamilyDialog) notificationFamilyDialog.classList.remove("picker-child-open");
+  restoreReminderPicker("reminderDayDialog");
+}
+function confirmReminderDayPicker(){
+  const day = document.getElementById("shoppingReminderDay");
+  if (day) day.value = reminderDraftDay;
+  updateReminderPickerLabels();
+  closeReminderDayPicker();
+  saveNotificationSettings();
+}
+
+function buildReminderTimeGrid(){
+  const hourGrid = document.getElementById("androidHourGrid");
+  const minuteGrid = document.getElementById("androidMinuteGrid");
+  if (!hourGrid || !minuteGrid || hourGrid.dataset.ready === "1") return;
+  for(let h=0; h<24; h++){
+    const btn=document.createElement("button");
+    btn.type="button"; btn.textContent=String(h).padStart(2,"0"); btn.dataset.hour=String(h);
+    btn.onclick=()=>{ reminderDraftTime = `${String(h).padStart(2,"0")}:${reminderDraftTime.split(":")[1] || "00"}`; updateReminderTimeDraftUI(); };
+    hourGrid.appendChild(btn);
+  }
+  for(let m=0; m<60; m+=5){
+    const btn=document.createElement("button");
+    btn.type="button"; btn.textContent=String(m).padStart(2,"0"); btn.dataset.minute=String(m);
+    btn.onclick=()=>{ reminderDraftTime = `${reminderDraftTime.split(":")[0] || "18"}:${String(m).padStart(2,"0")}`; updateReminderTimeDraftUI(); };
+    minuteGrid.appendChild(btn);
+  }
+  hourGrid.dataset.ready="1";
+}
+function updateReminderTimeDraftUI(){
+  const parts=String(reminderDraftTime || "18:00").split(":");
+  const h=String(parts[0] || "18").padStart(2,"0");
+  const m=String(parts[1] || "00").padStart(2,"0");
+  const hour=document.getElementById("androidTimeHour");
+  const minute=document.getElementById("androidTimeMinute");
+  if(hour) hour.textContent=h; if(minute) minute.textContent=m;
+  document.querySelectorAll("#androidHourGrid button").forEach(b=>b.classList.toggle("selected", b.dataset.hour===h));
+  document.querySelectorAll("#androidMinuteGrid button").forEach(b=>b.classList.toggle("selected", b.dataset.minute===m));
+}
+function openReminderTimePicker(event){
+  if (event) event.stopPropagation();
+  const time=document.getElementById("shoppingReminderTime");
+  reminderDraftTime = time ? String(time.value || "18:00") : "18:00";
+  buildReminderTimeGrid();
+  updateReminderTimeDraftUI();
+  const dialog=document.getElementById("reminderTimeDialog");
+  if(dialog){
+    moveReminderPickerToBody("reminderTimeDialog");
+    if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
+    dialog.hidden=false;
+    dialog.setAttribute("aria-hidden","false");
+  }
+}
+function closeReminderTimePicker(){
+  const dialog=document.getElementById("reminderTimeDialog");
+  if(dialog){ dialog.hidden=true; dialog.setAttribute("aria-hidden","true"); }
+  if (notificationFamilyDialog) notificationFamilyDialog.classList.remove("picker-child-open");
+  restoreReminderPicker("reminderTimeDialog");
+}
+function confirmReminderTimePicker(){
+  const time=document.getElementById("shoppingReminderTime");
+  if(time) time.value=reminderDraftTime || "18:00";
+  updateReminderPickerLabels();
+  closeReminderTimePicker();
+  saveNotificationSettings();
+}
+
+
+function setNotificationStatus(message, isError) {
+  const el = document.getElementById("notificationSettingsStatus");
+  if (!el) return;
+  el.textContent = message || "";
+  el.classList.toggle("isError", !!isError);
+}
+
+function saveNotificationSettings() {
+  const enabled = document.getElementById("shoppingReminderEnabled");
+  const day = document.getElementById("shoppingReminderDay");
+  const time = document.getElementById("shoppingReminderTime");
+  if (!enabled || !day || !time) return;
+
+  const settings = {
+    enabled: !!enabled.checked,
+    day: String(day.value),
+    time: String(time.value || "18:00")
+  };
+  localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
+
+  if (!window.AndroidApp) {
+    setNotificationStatus("Meldingen werken in de Android-app.", true);
+    return;
+  }
+
+  if (settings.enabled) {
+    AndroidApp.scheduleShoppingReminder(settings.day, settings.time);
+    setNotificationStatus("Boodschappenherinnering staat aan.");
+  } else {
+    AndroidApp.cancelShoppingReminder();
+    setNotificationStatus("Boodschappenherinnering staat uit.");
+  }
+}
+
+let notificationFamilyDialog = null;
+let notificationCardOriginalParent = null;
+let notificationCardOriginalNextSibling = null;
+let reminderPickerOriginalParent = null;
+let reminderPickerOriginalNextSibling = null;
+
+function moveReminderPickerToBody(id){
+  const picker = document.getElementById(id);
+  if (!picker || picker.parentElement === document.body) return;
+  reminderPickerOriginalParent = picker.parentElement;
+  reminderPickerOriginalNextSibling = picker.nextSibling;
+  document.body.appendChild(picker);
+}
+
+function restoreReminderPicker(id){
+  const picker = document.getElementById(id);
+  if (!picker || !reminderPickerOriginalParent) return;
+  if (reminderPickerOriginalNextSibling && reminderPickerOriginalNextSibling.parentNode === reminderPickerOriginalParent) {
+    reminderPickerOriginalParent.insertBefore(picker, reminderPickerOriginalNextSibling);
+  } else {
+    reminderPickerOriginalParent.appendChild(picker);
+  }
+  reminderPickerOriginalParent = null;
+  reminderPickerOriginalNextSibling = null;
+}
+
+function openNotificationSettings(event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  if (notificationFamilyDialog && notificationFamilyDialog.isConnected) return;
+
+  closeFamilyMenuForDialog();
+
+  const sourceCard = document.querySelector("#notificationSettingsMenuSub .notificationCard");
+  if (!sourceCard) return;
+
+  notificationCardOriginalParent = sourceCard.parentElement;
+  notificationCardOriginalNextSibling = sourceCard.nextSibling;
+
+  const overlay = document.createElement("div");
+  overlay.className = "familyDialogOverlay notificationFamilyDialog";
+  overlay.innerHTML = `
+    <div class="familyDialog" role="dialog" aria-modal="true" aria-labelledby="notificationFamilyDialogTitle">
+      <div class="familyDialogHeader">
+        <div class="familyDialogIcon"><i class="fa-solid fa-bell"></i></div>
+        <div class="familyDialogTitle" id="notificationFamilyDialogTitle">Meldingen</div>
+      </div>
+      <div class="familyDialogBody notificationFamilyDialogBody"></div>
+      <div class="familyDialogActions">
+        <button type="button" class="familyDialogBtn familyDialogPrimary" id="notificationFamilyDialogDone">Klaar</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  const body = overlay.querySelector(".notificationFamilyDialogBody");
+  body.appendChild(sourceCard);
+  notificationFamilyDialog = overlay;
+
+  loadNotificationSettings();
+  setNotificationStatus("");
+
+  overlay.querySelector("#notificationFamilyDialogDone").addEventListener("click", () => {
+    closeNotificationSettings();
+  });
+
+  requestAnimationFrame(() => overlay.classList.add("familyDialogShown"));
+}
+
+function closeNotificationSettings(event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  closeReminderDayPicker();
+  closeReminderTimePicker();
+  const overlay = notificationFamilyDialog;
+  const card = document.querySelector(".notificationFamilyDialog .notificationCard");
+
+  if (card && notificationCardOriginalParent) {
+    if (notificationCardOriginalNextSibling && notificationCardOriginalNextSibling.parentNode === notificationCardOriginalParent) {
+      notificationCardOriginalParent.insertBefore(card, notificationCardOriginalNextSibling);
+    } else {
+      notificationCardOriginalParent.appendChild(card);
+    }
+  }
+
+  if (overlay) {
+    // Geef de navigatie direct weer vrij. De sluitanimatie mag visueel
+    // nog doorlopen, maar de overlay mag geen tikken meer onderscheppen.
+    overlay.style.pointerEvents = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.classList.add("familyDialogClosing");
+    setTimeout(() => {
+      if (overlay.isConnected) overlay.remove();
+      notificationFamilyDialog = null;
+    }, 280);
+  }
+
+  notificationCardOriginalParent = null;
+  notificationCardOriginalNextSibling = null;
+}
+
+function testShoppingReminder() {
+  if (!window.AndroidApp) {
+    setNotificationStatus("Testmelding werkt in de Android-app.", true);
+    return;
+  }
+  AndroidApp.testShoppingReminder();
+  setNotificationStatus("Testmelding aangevraagd.");
+}
 
 function openSavedListsSubmenu(event) {
   if (event) event.stopPropagation();
@@ -10414,7 +11367,7 @@ document.addEventListener('visibilitychange',function(){
   function modalOpen(){
     return !!document.querySelector(
       '.modal.show, .modal.open, .overlay.show, .overlay.open, ' +
-      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay, #clearListBackdrop.show, #barcodeOverlay.open'
+      '[role="dialog"][aria-hidden="false"], .familyDialogOverlay:not([aria-hidden="true"]), #clearListBackdrop.show, #barcodeOverlay.open'
     );
   }
   function sync(){ document.body.classList.toggle('modal-navigation-locked', modalOpen()); }
@@ -11197,3 +12150,34 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
 
 
 </html>
+
+<style id="login-register-recommended-height">
+/* Account aanmaken: aanbevolen Material-opmaak — zelfde hoogte als primaire knop */
+#loginScreen .loginBox > .registerButton {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 18px !important;
+  border: 1.5px solid #3F6B58 !important;
+  border-radius: 13px !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #2F6650 !important;
+  box-sizing: border-box !important;
+}
+
+#loginScreen .loginBox > .registerButton i {
+  color: #2F6650 !important;
+  font-size: 19px !important;
+}
+
+body.dark-theme #loginScreen .loginBox > .registerButton {
+  background: #202620 !important;
+  background-color: #202620 !important;
+  color: #9ED5AD !important;
+  border-color: #668B70 !important;
+}
+
+body.dark-theme #loginScreen .loginBox > .registerButton i {
+  color: #9ED5AD !important;
+}
+</style>
