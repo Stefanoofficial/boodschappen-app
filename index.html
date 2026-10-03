@@ -4166,12 +4166,22 @@ body.logged-in {
 
 
 <style id="notification-family-dialog-style">
-/* Meldingen gebruikt dezelfde complete dialoogkaart als Suggesties, Lijstopties en Scannen. */
+/* Meldingen: één nette Android-dialog, in dezelfde familie als Suggesties/Lijstopties/Scannen. */
 .notificationFamilyDialog .familyDialog {
   width:min(390px, calc(100vw - 32px));
-  max-height:min(84vh, 680px);
-  overflow:auto;
-  padding:18px;
+  max-height:min(86vh, 720px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:20px;
+  border-radius:24px;
+}
+.notificationFamilyDialog .familyDialogHeader {
+  margin-bottom:18px;
+  padding-bottom:16px;
+  border-bottom:1px solid #e1ece4;
+}
+.notificationFamilyDialog .familyDialogBody {
+  min-width:0;
 }
 .notificationFamilyDialog .notificationCard {
   margin:0;
@@ -4184,19 +4194,83 @@ body.logged-in {
   display:none;
 }
 .notificationFamilyDialog .notificationSwitchRow {
-  padding:14px 0;
+  padding:0 0 17px;
+  border-top:0;
+  border-bottom:1px solid #e1ece4;
+}
+.notificationFamilyDialog .notificationSwitchRow strong {
+  font-size:16px;
+  line-height:1.25;
+}
+.notificationFamilyDialog .notificationSwitchRow small {
+  max-width:245px;
+  font-size:12.5px;
+  line-height:1.45;
+}
+.notificationFamilyDialog .notificationField {
+  margin-top:16px;
+}
+.notificationFamilyDialog .notificationField label {
+  font-size:13px;
+  margin-bottom:7px;
+}
+.notificationFamilyDialog .notificationPickerButton {
+  min-height:48px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid #d9e6dc;
+  padding:0 14px;
+  font-size:16px;
+}
+.notificationFamilyDialog .notificationTestButton {
+  min-height:48px;
+  margin-top:18px;
+  border-radius:14px;
+  font-size:15px;
+}
+.notificationFamilyDialog .notificationSettingsStatus {
+  margin-top:8px;
 }
 .notificationFamilyDialog .notificationInfo {
-  margin-top:14px;
+  margin-top:16px;
+  padding:14px;
+  border-radius:15px;
+  background:#f1f7f3;
+  font-size:12.5px;
+  line-height:1.5;
 }
-.notificationFamilyDialog .familyDialogBody {
-  min-width:0;
+.notificationFamilyDialog .familyDialogActions {
+  margin-top:18px;
+  padding-top:15px;
+  border-top:1px solid #e1ece4;
+}
+.notificationFamilyDialog.picker-child-open {
+  background:transparent !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.notificationFamilyDialog.picker-child-open .familyDialog {
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+body.dark-theme .notificationFamilyDialog .familyDialogHeader,
+body.dark-theme .notificationFamilyDialog .notificationSwitchRow,
+body.dark-theme .notificationFamilyDialog .familyDialogActions {
+  border-color:#3a443d;
+}
+body.dark-theme .notificationFamilyDialog .notificationPickerButton {
+  background:#1f2421;
+  border-color:#3a443d;
+}
+body.dark-theme .notificationFamilyDialog .notificationInfo {
+  background:#202722;
 }
 @media (max-width:600px){
   .notificationFamilyDialog .familyDialog {
-    width:calc(100vw - 28px);
-    max-height:84vh;
-    border-radius:22px;
+    width:calc(100vw - 32px);
+    max-height:calc(100vh - 170px);
+    border-radius:24px;
+    padding:18px;
   }
 }
 </style>
@@ -5271,11 +5345,18 @@ function openReminderDayPicker(event){
     };
   });
   const dialog = document.getElementById("reminderDayDialog");
-  if (dialog) { dialog.hidden = false; dialog.setAttribute("aria-hidden","false"); }
+  if (dialog) {
+    moveReminderPickerToBody("reminderDayDialog");
+    if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
+    dialog.hidden = false;
+    dialog.setAttribute("aria-hidden","false");
+  }
 }
 function closeReminderDayPicker(){
   const dialog = document.getElementById("reminderDayDialog");
   if (dialog) { dialog.hidden = true; dialog.setAttribute("aria-hidden","true"); }
+  if (notificationFamilyDialog) notificationFamilyDialog.classList.remove("picker-child-open");
+  restoreReminderPicker("reminderDayDialog");
 }
 function confirmReminderDayPicker(){
   const day = document.getElementById("shoppingReminderDay");
@@ -5320,11 +5401,18 @@ function openReminderTimePicker(event){
   buildReminderTimeGrid();
   updateReminderTimeDraftUI();
   const dialog=document.getElementById("reminderTimeDialog");
-  if(dialog){ dialog.hidden=false; dialog.setAttribute("aria-hidden","false"); }
+  if(dialog){
+    moveReminderPickerToBody("reminderTimeDialog");
+    if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
+    dialog.hidden=false;
+    dialog.setAttribute("aria-hidden","false");
+  }
 }
 function closeReminderTimePicker(){
   const dialog=document.getElementById("reminderTimeDialog");
   if(dialog){ dialog.hidden=true; dialog.setAttribute("aria-hidden","true"); }
+  if (notificationFamilyDialog) notificationFamilyDialog.classList.remove("picker-child-open");
+  restoreReminderPicker("reminderTimeDialog");
 }
 function confirmReminderTimePicker(){
   const time=document.getElementById("shoppingReminderTime");
@@ -5372,6 +5460,28 @@ function saveNotificationSettings() {
 let notificationFamilyDialog = null;
 let notificationCardOriginalParent = null;
 let notificationCardOriginalNextSibling = null;
+let reminderPickerOriginalParent = null;
+let reminderPickerOriginalNextSibling = null;
+
+function moveReminderPickerToBody(id){
+  const picker = document.getElementById(id);
+  if (!picker || picker.parentElement === document.body) return;
+  reminderPickerOriginalParent = picker.parentElement;
+  reminderPickerOriginalNextSibling = picker.nextSibling;
+  document.body.appendChild(picker);
+}
+
+function restoreReminderPicker(id){
+  const picker = document.getElementById(id);
+  if (!picker || !reminderPickerOriginalParent) return;
+  if (reminderPickerOriginalNextSibling && reminderPickerOriginalNextSibling.parentNode === reminderPickerOriginalParent) {
+    reminderPickerOriginalParent.insertBefore(picker, reminderPickerOriginalNextSibling);
+  } else {
+    reminderPickerOriginalParent.appendChild(picker);
+  }
+  reminderPickerOriginalParent = null;
+  reminderPickerOriginalNextSibling = null;
+}
 
 function openNotificationSettings(event) {
   if (event) { event.preventDefault(); event.stopPropagation(); }
@@ -5416,6 +5526,8 @@ function openNotificationSettings(event) {
 
 function closeNotificationSettings(event) {
   if (event) { event.preventDefault(); event.stopPropagation(); }
+  closeReminderDayPicker();
+  closeReminderTimePicker();
   const overlay = notificationFamilyDialog;
   const card = document.querySelector(".notificationFamilyDialog .notificationCard");
 
