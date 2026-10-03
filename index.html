@@ -1680,7 +1680,7 @@ body.dark-theme .notificationPickerButton{background:#1f2421;color:#e9eee9;borde
 .androidReminderDialog{
   position:fixed;
   inset:0;
-  z-index:12000;
+  z-index:13000;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -4165,6 +4165,41 @@ body.logged-in {
 </style>
 
 
+<style id="notification-family-dialog-style">
+/* Meldingen gebruikt dezelfde complete dialoogkaart als Suggesties, Lijstopties en Scannen. */
+.notificationFamilyDialog .familyDialog {
+  width:min(390px, calc(100vw - 32px));
+  max-height:min(84vh, 680px);
+  overflow:auto;
+  padding:18px;
+}
+.notificationFamilyDialog .notificationCard {
+  margin:0;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.notificationFamilyDialog .notificationCardHeader {
+  display:none;
+}
+.notificationFamilyDialog .notificationSwitchRow {
+  padding:14px 0;
+}
+.notificationFamilyDialog .notificationInfo {
+  margin-top:14px;
+}
+.notificationFamilyDialog .familyDialogBody {
+  min-width:0;
+}
+@media (max-width:600px){
+  .notificationFamilyDialog .familyDialog {
+    width:calc(100vw - 28px);
+    max-height:84vh;
+    border-radius:22px;
+  }
+}
+</style>
 <style id="android-time-dialog-family-style">
 /* Tijdkiezer: dezelfde rustige dialoogstijl als Lijstopties.
    Alleen deze popup wordt aangepast; de rest van de app blijft ongemoeid. */
@@ -5334,15 +5369,74 @@ function saveNotificationSettings() {
   }
 }
 
+let notificationFamilyDialog = null;
+let notificationCardOriginalParent = null;
+let notificationCardOriginalNextSibling = null;
+
 function openNotificationSettings(event) {
-  if (event) event.stopPropagation();
-  switchMenuPage("notificationSettingsMenuSub", event);
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  if (notificationFamilyDialog && notificationFamilyDialog.isConnected) return;
+
+  closeFamilyMenuForDialog();
+
+  const sourceCard = document.querySelector("#notificationSettingsMenuSub .notificationCard");
+  if (!sourceCard) return;
+
+  notificationCardOriginalParent = sourceCard.parentElement;
+  notificationCardOriginalNextSibling = sourceCard.nextSibling;
+
+  const overlay = document.createElement("div");
+  overlay.className = "familyDialogOverlay notificationFamilyDialog";
+  overlay.innerHTML = `
+    <div class="familyDialog" role="dialog" aria-modal="true" aria-labelledby="notificationFamilyDialogTitle">
+      <div class="familyDialogHeader">
+        <div class="familyDialogIcon"><i class="fa-solid fa-bell"></i></div>
+        <div class="familyDialogTitle" id="notificationFamilyDialogTitle">Meldingen</div>
+      </div>
+      <div class="familyDialogBody notificationFamilyDialogBody"></div>
+      <div class="familyDialogActions">
+        <button type="button" class="familyDialogBtn familyDialogPrimary" id="notificationFamilyDialogDone">Klaar</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  const body = overlay.querySelector(".notificationFamilyDialogBody");
+  body.appendChild(sourceCard);
+  notificationFamilyDialog = overlay;
+
   loadNotificationSettings();
   setNotificationStatus("");
+
+  overlay.querySelector("#notificationFamilyDialogDone").addEventListener("click", () => {
+    closeNotificationSettings();
+  });
+
+  requestAnimationFrame(() => overlay.classList.add("familyDialogShown"));
 }
 
 function closeNotificationSettings(event) {
-  returnMenuToMain("notificationSettingsMenuSub", event);
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  const overlay = notificationFamilyDialog;
+  const card = document.querySelector(".notificationFamilyDialog .notificationCard");
+
+  if (card && notificationCardOriginalParent) {
+    if (notificationCardOriginalNextSibling && notificationCardOriginalNextSibling.parentNode === notificationCardOriginalParent) {
+      notificationCardOriginalParent.insertBefore(card, notificationCardOriginalNextSibling);
+    } else {
+      notificationCardOriginalParent.appendChild(card);
+    }
+  }
+
+  if (overlay) {
+    overlay.classList.add("familyDialogClosing");
+    setTimeout(() => {
+      if (overlay.isConnected) overlay.remove();
+      notificationFamilyDialog = null;
+    }, 280);
+  }
+
+  notificationCardOriginalParent = null;
+  notificationCardOriginalNextSibling = null;
 }
 
 function testShoppingReminder() {
