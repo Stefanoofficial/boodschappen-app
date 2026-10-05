@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:theme="@style/AppTheme.NoActionBar"
+        android:theme="@style/AppTheme.Splash"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Mijn Boodschappen"
