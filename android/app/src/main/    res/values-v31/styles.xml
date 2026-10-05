@@ -7,15 +7,16 @@
         <item name="android:fontFamily">sans</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">#eef8f1</item>
         <item name="android:colorAccent">#4f7658</item>
-
-        <item name="android:navigationBarColor">#eef8f1</item>
         <item name="android:statusBarColor">#eef8f1</item>
+        <item name="android:navigationBarColor">#eef8f1</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
 
-        <item name="android:windowSplashScreenBackground">#eef8f1</item>
-        <item name="android:windowSplashScreenAnimationDuration">0</item>
+        <!-- Android 12+ systeem-splash -->
+        <item name="android:windowSplashScreenBackground">#FFFFFF</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
 
     </style>
 
