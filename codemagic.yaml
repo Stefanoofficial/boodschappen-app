@@ -39,38 +39,59 @@ workflows:
              android/app/src/main/res/drawable/splash_icon.png
 
           echo "=== PREPARE MIPMAP DIRECTORIES ==="
+
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-xhdpi
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
-          echo "=== COPY LEGACY LAUNCHER ICONS ==="
+          echo "=== COPY LAUNCHER ICONS ==="
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+          echo "=== CREATE VALUES DIRECTORY ==="
+          mkdir -p android/app/src/main/res/values
+
+          echo "=== CREATE SPLASH THEME ==="
+
+          printf '%s\n' \
+          '<?xml version="1.0" encoding="utf-8"?>' \
+          '<resources>' \
+          '' \
+          '    <style name="AppTheme.NoActionBar" parent="@android:style/Theme.Material.Light.NoActionBar">' \
+          '        <item name="android:fontFamily">sans</item>' \
+          '        <item name="android:windowActionModeOverlay">true</item>' \
+          '        <item name="android:windowNoTitle">true</item>' \
+          '        <item name="android:windowBackground">#eef8f1</item>' \
+          '        <item name="android:colorAccent">#4f7658</item>' \
+          '        <item name="android:statusBarColor">#eef8f1</item>' \
+          '        <item name="android:navigationBarColor">#eef8f1</item>' \
+          '        <item name="android:windowLightStatusBar">true</item>' \
+          '        <item name="android:windowLightNavigationBar">true</item>' \
+          '    </style>' \
+          '' \
+          '    <style name="AppTheme.Splash" parent="Theme.SplashScreen">' \
+          '        <item name="windowSplashScreenBackground">#FFFFFF</item>' \
+          '        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>' \
+          '        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>' \
+          '    </style>' \
+          '' \
+          '</resources>' \
+          > android/app/src/main/res/values/styles.xml
 
           echo "=== CHECK STYLES ==="
           test -f android/app/src/main/res/values/styles.xml
@@ -78,16 +99,14 @@ workflows:
           echo "=== CHECK SPLASH ==="
           test -f android/app/src/main/res/drawable/splash_icon.png
 
-          echo "=== PREPARED FILES ==="
-          ls -lh android/app/src/main/res/values/styles.xml
-          ls -lh android/app/src/main/res/drawable/splash_icon.png
-          ls -lh android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          echo "=== CHECK LAUNCHER ==="
+          test -f android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
+          echo "=== PREPARATION COMPLETE ==="
 
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-
 
       - name: Build Android APK
         script: |
@@ -98,7 +117,6 @@ workflows:
           chmod +x ./gradlew
 
           ./gradlew assembleDebug
-
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
