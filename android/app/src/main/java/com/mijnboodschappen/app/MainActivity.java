@@ -25,6 +25,8 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import androidx.core.splashscreen.SplashScreen;
+
 public class MainActivity extends Activity {
 
     private WebView webView;
@@ -34,6 +36,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Android 12+ SplashScreen API
+        SplashScreen.installSplashScreen(this);
+
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
