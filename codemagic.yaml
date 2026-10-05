@@ -8,13 +8,12 @@ workflows:
       - name: Prepare Android app
         script: |
           #!/usr/bin/env bash
-
           set -e
 
           echo "=== BUILD DIRECTORY ==="
           pwd
 
-          echo "=== ROOT FILES ==="
+          echo "=== CHECK ROOT FILES ==="
           ls -la
 
           echo "=== CHECK INDEX ==="
@@ -30,14 +29,12 @@ workflows:
           mkdir -p android/app/src/main/assets
           cp index.html android/app/src/main/assets/index.html
 
-          echo "=== PREPARE DRAWABLE DIRECTORY ==="
+          echo "=== PREPARE DRAWABLE ==="
           mkdir -p android/app/src/main/res/drawable
 
-          echo "=== COPY APP ICON TO DRAWABLE ==="
           cp icon-512-maskable.png \
              android/app/src/main/res/drawable/ic_launcher.png
 
-          echo "=== COPY SPLASH ICON ==="
           cp splash_icon.png \
              android/app/src/main/res/drawable/splash_icon.png
 
@@ -52,81 +49,39 @@ workflows:
 
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
 
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
-          echo "=== PREPARE VALUES DIRECTORY ==="
-          mkdir -p android/app/src/main/res/values
-
-          echo "=== CREATE STYLES.XML ==="
-          cat > android/app/src/main/res/values/styles.xml <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-
-              <style name="AppTheme.NoActionBar"
-                  parent="@android:style/Theme.Material.Light.NoActionBar">
-
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:windowActionModeOverlay">true</item>
-                  <item name="android:windowNoTitle">true</item>
-                  <item name="android:windowBackground">#eef8f1</item>
-                  <item name="android:colorAccent">#4f7658</item>
-                  <item name="android:statusBarColor">#eef8f1</item>
-                  <item name="android:navigationBarColor">#eef8f1</item>
-                  <item name="android:windowLightStatusBar">true</item>
-                  <item name="android:windowLightNavigationBar">true</item>
-
-              </style>
-
-              <style name="AppTheme.Splash"
-              parent="Theme.SplashScreen">
-
-              <item name="windowSplashScreenBackground">#FFFFFF</item>
-              <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-              <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
-
-</style>
-
-          </resources>
-          EOF
-
-          echo "=== CHECK LAUNCHER ICONS ==="
-          ls -lh android/app/src/main/res/mipmap-mdpi/
-          ls -lh android/app/src/main/res/mipmap-hdpi/
-          ls -lh android/app/src/main/res/mipmap-xhdpi/
-          ls -lh android/app/src/main/res/mipmap-xxhdpi/
-          ls -lh android/app/src/main/res/mipmap-xxxhdpi/
-
-          echo "=== CHECK SPLASH ICON ==="
-          ls -lh android/app/src/main/res/drawable/splash_icon.png
-
           echo "=== CHECK STYLES ==="
+          test -f android/app/src/main/res/values/styles.xml
+
+          echo "=== CHECK SPLASH ==="
+          test -f android/app/src/main/res/drawable/splash_icon.png
+
+          echo "=== PREPARED FILES ==="
           ls -lh android/app/src/main/res/values/styles.xml
+          ls -lh android/app/src/main/res/drawable/splash_icon.png
+          ls -lh android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
 
       - name: Set Android SDK location
