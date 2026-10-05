@@ -33,7 +33,7 @@ workflows:
           echo "=== PREPARE ANDROID DRAWABLE ==="
           mkdir -p android/app/src/main/res/drawable
 
-          echo "=== COPY APP ICON ==="
+          echo "=== COPY APP ICON TO DRAWABLE ==="
           cp icon-512-maskable.png \
              android/app/src/main/res/drawable/ic_launcher.png
 
@@ -43,6 +43,45 @@ workflows:
 
           echo "=== CHECK SPLASH ICON ==="
           ls -lh android/app/src/main/res/drawable/splash_icon.png
+
+          echo "=== PREPARE MIPMAP DIRECTORIES ==="
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+          echo "=== COPY LEGACY APP ICONS ==="
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
           echo "=== PREPARE VALUES DIRECTORY ==="
           mkdir -p android/app/src/main/res/values
@@ -75,6 +114,9 @@ workflows:
           ls -l android/app/src/main/res/drawable/ic_launcher.png
           ls -l android/app/src/main/res/drawable/splash_icon.png
           ls -l android/app/src/main/res/values/styles.xml
+
+          echo "=== CHECK MIPMAP ICONS ==="
+          find android/app/src/main/res -path "*/mipmap-*/*" -type f -print
 
           echo "=== ANDROID DRAWABLE FILES ==="
           ls -la android/app/src/main/res/drawable/
