@@ -345,7 +345,7 @@ public class MainActivity extends ComponentActivity {
             builder = new android.app.Notification.Builder(this);
         }
 
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("Mijn Boodschappen")
                 .setContentText("Dit is een testmelding van Mijn Boodschappen.")
                 .setStyle(new android.app.Notification.BigTextStyle()
