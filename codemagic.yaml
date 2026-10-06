@@ -5,9 +5,6 @@ workflows:
 
     scripts:
 
-      # ============================================================
-      # 1. PREPARE ANDROID APP
-      # ============================================================
       - name: Prepare Android app
         script: |
           #!/usr/bin/env bash
@@ -23,16 +20,8 @@ workflows:
           echo "=== CHECK ROOT FILES ==="
           ls -la
 
-          # --------------------------------------------------------
-          # CHECK WEB APP
-          # --------------------------------------------------------
-
           echo "=== CHECK INDEX ==="
           test -f index.html
-
-          # --------------------------------------------------------
-          # CHECK ICONS
-          # --------------------------------------------------------
 
           echo "=== CHECK APP ICON ==="
           test -f icon-512-maskable.png
@@ -40,42 +29,22 @@ workflows:
           echo "=== CHECK SPLASH ICON ==="
           test -f splash_icon.png
 
-          # --------------------------------------------------------
-          # CHECK ANDROID PROJECT
-          # --------------------------------------------------------
-
           echo "=== CHECK ANDROID PROJECT ==="
           test -d android
           test -f android/gradlew
           test -f android/settings.gradle
           test -f android/app/build.gradle
 
-          # --------------------------------------------------------
-          # CHECK NATIVE ML KIT ACTIVITY
-          # --------------------------------------------------------
-
           echo "=== CHECK MAIN ACTIVITY ==="
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
-          # --------------------------------------------------------
-          # PREPARE WEB ASSET
-          # --------------------------------------------------------
-
           echo "=== PREPARE WEB ASSET ==="
-
           mkdir -p android/app/src/main/assets
 
           cp index.html \
              android/app/src/main/assets/index.html
 
-          echo "=== INDEX COPIED ==="
-
-          # --------------------------------------------------------
-          # PREPARE DRAWABLE
-          # --------------------------------------------------------
-
           echo "=== PREPARE DRAWABLE ==="
-
           mkdir -p android/app/src/main/res/drawable
 
           cp icon-512-maskable.png \
@@ -84,10 +53,6 @@ workflows:
           cp splash_icon.png \
              android/app/src/main/res/drawable/splash_icon.png
 
-          # --------------------------------------------------------
-          # PREPARE MIPMAP DIRECTORIES
-          # --------------------------------------------------------
-
           echo "=== PREPARE MIPMAP DIRECTORIES ==="
 
           mkdir -p android/app/src/main/res/mipmap-mdpi
@@ -95,10 +60,6 @@ workflows:
           mkdir -p android/app/src/main/res/mipmap-xhdpi
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-
-          # --------------------------------------------------------
-          # COPY LAUNCHER ICONS
-          # --------------------------------------------------------
 
           echo "=== COPY LAUNCHER ICONS ==="
 
@@ -132,17 +93,8 @@ workflows:
           cp icon-512-maskable.png \
              android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
-          # --------------------------------------------------------
-          # CREATE VALUES DIRECTORY
-          # --------------------------------------------------------
-
           echo "=== CREATE VALUES DIRECTORY ==="
-
           mkdir -p android/app/src/main/res/values
-
-          # --------------------------------------------------------
-          # CREATE SPLASH THEME
-          # --------------------------------------------------------
 
           echo "=== CREATE SPLASH THEME ==="
 
@@ -171,10 +123,6 @@ workflows:
           '</resources>' \
           > android/app/src/main/res/values/styles.xml
 
-          # --------------------------------------------------------
-          # VERIFY PREPARATION
-          # --------------------------------------------------------
-
           echo "=== CHECK STYLES ==="
           test -f android/app/src/main/res/values/styles.xml
 
@@ -195,9 +143,6 @@ workflows:
           echo "========================================"
 
 
-      # ============================================================
-      # 2. SET ANDROID SDK LOCATION
-      # ============================================================
       - name: Set Android SDK location
         script: |
           set -e
@@ -211,9 +156,6 @@ workflows:
           cat "$CM_BUILD_DIR/android/local.properties"
 
 
-      # ============================================================
-      # 3. VERIFY GRADLE + ML KIT PROJECT
-      # ============================================================
       - name: Verify Android ML Kit project
         script: |
           set -e
@@ -249,9 +191,6 @@ workflows:
           echo "=== ML KIT PROJECT CHECK COMPLETE ==="
 
 
-      # ============================================================
-      # 4. BUILD ANDROID APK
-      # ============================================================
       - name: Build Android APK
         script: |
           set -e
@@ -279,8 +218,5 @@ workflows:
             -print
 
 
-    # ==============================================================
-    # BUILD ARTIFACT
-    # ==============================================================
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
