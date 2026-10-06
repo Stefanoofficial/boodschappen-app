@@ -11137,6 +11137,18 @@ async function openBarcodeScanner(){
     setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
     return;
   }
+  // Android: use the native CameraX + ML Kit scanner.
+  // iPhone/web keeps the existing JavaScript camera scanner unchanged.
+  if(window.AndroidApp && typeof AndroidApp.startNativeBarcodeScanner === 'function'){
+    try{
+      setBarcodeStatus('Native scanner wordt gestart…');
+      AndroidApp.startNativeBarcodeScanner();
+      return;
+    }catch(nativeErr){
+      console.warn('Native scanner kon niet starten, webscanner wordt gebruikt:', nativeErr);
+    }
+  }
+
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.');
     return;
@@ -11239,7 +11251,28 @@ async function openBarcodeScanner(){
   }
 }
 
+window.nativeBarcodeDetected = async function(code){
+  try{
+    await handleBarcode(code);
+  }catch(err){
+    console.warn('Native barcode result:', err);
+    setBarcodeStatus('Barcode gevonden, maar product kon niet worden verwerkt.');
+  }
+};
+
+window.nativeBarcodeError = function(){
+  const overlay=document.getElementById('barcodeOverlay');
+  const input=document.getElementById('barcodeManualInput');
+  if(overlay && !overlay.classList.contains('open')) overlay.classList.add('open');
+  setBarcodeStatus('Native camera kon niet starten. Je kunt de barcode hieronder handmatig invoeren.');
+  if(input) input.focus();
+};
+
 function closeBarcodeScanner(){
+    if(window.AndroidApp && typeof AndroidApp.stopNativeBarcodeScanner === 'function'){
+      try{ AndroidApp.stopNativeBarcodeScanner(); }catch(_){}
+    }
+    
   stopBarcodeCamera();
   const wrap=document.querySelector('.barcodeVideoWrap');
   if(wrap){
