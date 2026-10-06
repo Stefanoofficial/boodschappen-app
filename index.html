@@ -10832,6 +10832,11 @@ let barcodeScanFrame = 0;
 let barcodeLastScan = 0;
 let barcodeBusy = false;
 
+// Android krijgt een snellere scan-loop en lichtere camerabeelden.
+// iPhone/iOS blijft volledig op de bestaande scannerinstellingen.
+const isAndroidScanner = /Android/i.test(navigator.userAgent || '');
+const barcodeScanInterval = isAndroidScanner ? 70 : 180;
+
 const EAN_L = {
   0:[3,2,1,1], 1:[2,2,2,1], 2:[2,1,2,2], 3:[1,4,1,1], 4:[1,1,3,2],
   5:[1,2,3,1], 6:[1,1,1,4], 7:[1,3,1,2], 8:[1,2,1,3], 9:[3,1,1,2]
@@ -11063,7 +11068,7 @@ function tryDecodeCanvas(){
 async function scheduleBarcodeScan(){
   if(!barcodeScanRunning) return;
   const now=performance.now();
-  if(!barcodeScanBusy && now-barcodeLastScan>180){
+  if(!barcodeScanBusy && now-barcodeLastScan>barcodeScanInterval){
     barcodeLastScan=now;
     barcodeScanBusy=true;
     try{
@@ -11152,7 +11157,30 @@ async function openBarcodeScanner(){
     barcodeVideo.setAttribute('webkit-playsinline','');
     ensureBarcodeCanvas();
 
-    let constraints={audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960},aspectRatio:{ideal:4/3}}};
+    let constraints;
+    if(isAndroidScanner){
+      // Android: lagere resolutie = camera sneller beschikbaar en frames sneller decodeerbaar.
+      constraints={
+        audio:false,
+        video:{
+          facingMode:{ideal:'environment'},
+          width:{ideal:640},
+          height:{ideal:480},
+          aspectRatio:{ideal:4/3}
+        }
+      };
+    }else{
+      // iPhone/iOS: bestaande instellingen ongewijzigd.
+      constraints={
+        audio:false,
+        video:{
+          facingMode:{ideal:'environment'},
+          width:{ideal:1280},
+          height:{ideal:960},
+          aspectRatio:{ideal:4/3}
+        }
+      };
+    }
     try{
       barcodeStream=await navigator.mediaDevices.getUserMedia(constraints);
     }catch(firstErr){
