@@ -35,10 +35,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 
 import java.util.concurrent.ExecutorService;
@@ -66,7 +66,6 @@ public class MainActivity extends ComponentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Android 12+ splash screen
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
@@ -99,7 +98,6 @@ public class MainActivity extends ComponentActivity {
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-
         settings.setMediaPlaybackRequiresUserGesture(false);
 
         webView.setWebViewClient(new WebViewClient());
@@ -131,8 +129,7 @@ public class MainActivity extends ComponentActivity {
 
                         request.grant(
                                 new String[]{
-                                        PermissionRequest
-                                                .RESOURCE_VIDEO_CAPTURE
+                                        PermissionRequest.RESOURCE_VIDEO_CAPTURE
                                 }
                         );
                     }
@@ -140,7 +137,6 @@ public class MainActivity extends ComponentActivity {
             }
         });
 
-        // JavaScript bridge
         webView.addJavascriptInterface(
                 new AppBridge(),
                 "AndroidApp"
@@ -161,7 +157,7 @@ public class MainActivity extends ComponentActivity {
         );
 
         // ============================================================
-        // ROOT LAYOUT
+        // ROOT
         // ============================================================
 
         FrameLayout root = new FrameLayout(this);
@@ -206,10 +202,6 @@ public class MainActivity extends ComponentActivity {
 
         setContentView(root);
 
-        // ============================================================
-        // APP SPLASH
-        // ============================================================
-
         showAppSplash(root);
     }
 
@@ -240,8 +232,7 @@ public class MainActivity extends ComponentActivity {
 
                     pendingPermissionRequest.grant(
                             new String[]{
-                                    PermissionRequest
-                                            .RESOURCE_VIDEO_CAPTURE
+                                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
                             }
                     );
 
@@ -283,22 +274,16 @@ public class MainActivity extends ComponentActivity {
         nativeScannerActive.set(true);
         barcodeDelivered.set(false);
 
-        webView.setVisibility(
-                View.GONE
-        );
-
-        nativePreviewView.setVisibility(
-                View.VISIBLE
-        );
+        webView.setVisibility(View.GONE);
+        nativePreviewView.setVisibility(View.VISIBLE);
 
         if (barcodeExecutor == null) {
-
             barcodeExecutor =
                     Executors.newSingleThreadExecutor();
         }
 
         // ============================================================
-        // ML KIT BARCODE FORMATS
+        // ML KIT BARCODE CONFIGURATION
         // ============================================================
 
         BarcodeScannerOptions options =
@@ -442,6 +427,13 @@ public class MainActivity extends ComponentActivity {
                                                         break;
                                                     }
                                                 }
+                                            })
+
+                                    .addOnFailureListener(
+                                            e -> {
+                                                // Analysefout negeren.
+                                                // De volgende frame wordt
+                                                // automatisch opnieuw verwerkt.
                                             })
 
                                     .addOnCompleteListener(
