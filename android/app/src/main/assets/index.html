@@ -3368,6 +3368,7 @@ body.dark-theme .feedbackLabel{color:#b8c6bd !important}
 body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:#3b493f}
 .feedbackTextarea:focus{border-color:#7da789;box-shadow:0 0 0 3px rgba(63,91,69,.10)}
 .feedbackSendBtn{margin-top:10px;justify-content:center;background:#3F5B45 !important;color:#fff !important}
+.feedbackSendBtn > i:first-child{background:transparent !important;color:#fff !important;width:auto !important;height:auto !important;min-width:0 !important;flex:0 0 auto !important;border-radius:0 !important;display:inline-flex !important;align-items:center;justify-content:center}
 </style>
 <style id="more-submenu-horizontal-fix">
 /* In Meer staan de submenu's boven elkaar in dezelfde ruimte.
@@ -4435,24 +4436,6 @@ body.dark-theme #loginScreen .loginBox > .registerButton {
 }
 body.dark-theme #loginScreen .loginBox > .registerButton i {
   color: #9ED5AD !important;
-}
-</style>
-<style id="feedback-send-icon-white">
-.feedbackSendBtn > i:first-child {
-  width:auto !important;
-  height:auto !important;
-  min-width:0 !important;
-  flex:0 0 auto !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  color:#ffffff !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-body.dark-theme .feedbackSendBtn > i:first-child {
-  background:transparent !important;
-  color:#ffffff !important;
 }
 </style>
 </head>
@@ -5614,13 +5597,17 @@ function closeNotificationSettings(event) {
   notificationCardOriginalNextSibling = null;
 }
 
+function nativeNotificationStatus(message, isError) {
+  setNotificationStatus(message || "", !!isError);
+}
+
 function testShoppingReminder() {
-  if (!window.AndroidApp) {
-    setNotificationStatus("Testmelding werkt in de Android-app.", true);
+  if (!window.AndroidApp || typeof AndroidApp.testShoppingReminder !== "function") {
+    setNotificationStatus("Testmelding werkt alleen in de Android-app.", true);
     return;
   }
+  setNotificationStatus("Testmelding wordt verzonden...");
   AndroidApp.testShoppingReminder();
-  setNotificationStatus("Testmelding aangevraagd.");
 }
 
 function openSavedListsSubmenu(event) {
