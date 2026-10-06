@@ -10832,8 +10832,7 @@ let barcodeScanFrame = 0;
 let barcodeLastScan = 0;
 let barcodeBusy = false;
 
-// Android krijgt een snellere scan-loop en lichtere camerabeelden.
-// iPhone/iOS blijft volledig op de bestaande scannerinstellingen.
+// iPhone en Android gebruiken dezelfde scanmethode.
 const isAndroidScanner = /Android/i.test(navigator.userAgent || '');
 const barcodeScanInterval = 60;
 
@@ -11152,30 +11151,17 @@ async function openBarcodeScanner(){
     barcodeVideo.setAttribute('webkit-playsinline','');
     ensureBarcodeCanvas();
 
-    let constraints;
-    if(isAndroidScanner){
-      // Android: lagere resolutie = camera sneller beschikbaar en frames sneller decodeerbaar.
-      constraints={
-        audio:false,
-        video:{
-          facingMode:{ideal:'environment'},
-          width:{ideal:640},
-          height:{ideal:480},
-          aspectRatio:{ideal:4/3}
-        }
-      };
-    }else{
-      // iPhone/iOS: bestaande instellingen ongewijzigd.
-      constraints={
-        audio:false,
-        video:{
-          facingMode:{ideal:'environment'},
-          width:{ideal:1280},
-          height:{ideal:960},
-          aspectRatio:{ideal:4/3}
-        }
-      };
-    }
+    // iPhone en Android gebruiken dezelfde camera-instellingen.
+    // Alleen de fysieke camera/autofocus van het toestel kan nog verschillen.
+    const constraints={
+      audio:false,
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1280},
+        height:{ideal:960},
+        aspectRatio:{ideal:4/3}
+      }
+    };
     try{
       barcodeStream=await navigator.mediaDevices.getUserMedia(constraints);
     }catch(firstErr){
@@ -11184,6 +11170,19 @@ async function openBarcodeScanner(){
     }
 
     barcodeVideo.srcObject=barcodeStream;
+
+    // Vraag continue autofocus aan wanneer de camera/browser dit ondersteunt.
+    // Op iPhone/Android wordt dit alleen toegepast als de hardware het aanbiedt.
+    try{
+      const track=barcodeStream.getVideoTracks && barcodeStream.getVideoTracks()[0];
+      if(track && track.getCapabilities && track.applyConstraints){
+        const caps=track.getCapabilities();
+        if(caps.focusMode && caps.focusMode.includes('continuous')){
+          await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
+        }
+      }
+    }catch(_){}
+
     await new Promise((resolve)=>{
       if(barcodeVideo.readyState>=1) return resolve();
       barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
