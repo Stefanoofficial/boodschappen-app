@@ -11262,10 +11262,12 @@ async function lookupManualBarcode(){
 
 async function handleBarcode(code){
   code = String(code || '').replace(/\D/g,'');
-  setBarcodeStatus('Product wordt opgezocht…');
+  if(!code) return;
 
-  // Fast local cache: products scanned before are shown without another network request.
-  const cacheKey = 'barcodeProductCache_v2_' + code;
+  setBarcodeStatus('Barcode gevonden — product wordt opgezocht…');
+
+  // Een eerder gevonden product wordt onmiddellijk herkend.
+  const cacheKey = 'barcodeProductCache_v3_' + code;
   try{
     const cached = localStorage.getItem(cacheKey);
     if(cached){
@@ -11283,66 +11285,87 @@ async function handleBarcode(code){
     'https://world.openbeautyfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?product_type=all&lc=nl&cc=nl&fields=code,product_name,product_name_nl,brands,image_front_small_url,image_front_url'
   ];
 
-  try{
-    let found = null;
+  async function lookupProduct(){
+    // Verwerk de eerste geldige database-respons zodra die binnenkomt.
+    // We wachten dus niet onnodig op de langzaamste database.
+    return await new Promise(resolve => {
+      let remaining = barcodeSources.length;
+      let settled = false;
 
-    // Query all product databases in parallel instead of waiting for each one in sequence.
-    const responses = await Promise.allSettled(
-      barcodeSources.map(url => fetch(url, {
-        method:'GET',
-        headers:{'Accept':'application/json'}
-      }))
-    );
-
-    for(const result of responses){
-      if(result.status !== 'fulfilled') continue;
-      const response = result.value;
-      if(!response.ok) continue;
-
-      try{
-        const data = await response.json();
+      const accept = (data) => {
         const p = data && data.product;
+        if(!p || !(data.status === 1 || p.product_name || p.product_name_nl)) return null;
 
-        if(p && (data.status === 1 || p.product_name || p.product_name_nl)){
-          const imageUrl = String(p.image_front_small_url || p.image_front_url || '').trim();
-          const rawName = String(p.product_name || '').trim();
-          const dutchName = String(p.product_name_nl || '').trim();
-          const name = dutchName || toDutchProductName(rawName);
+        const rawName = String(p.product_name || '').trim();
+        const dutchName = String(p.product_name_nl || '').trim();
+        const name = dutchName || toDutchProductName(rawName);
+        if(!name) return null;
 
-          if(name){
-            found = {
-              text:name,
-              barcode:code,
-              brand:String(p.brands||'').split(',')[0].trim(),
-              imageUrl
-            };
-            break;
+        return {
+          text:name,
+          barcode:code,
+          brand:String(p.brands||'').split(',')[0].trim(),
+          imageUrl:String(p.image_front_small_url || p.image_front_url || '').trim()
+        };
+      };
+
+      barcodeSources.forEach(url => {
+        fetch(url, {
+          method:'GET',
+          headers:{'Accept':'application/json'}
+        }).then(async response => {
+          if(!response.ok) throw new Error('HTTP '+response.status);
+          return response.json();
+        }).then(data => {
+          if(settled) return;
+          const product=accept(data);
+          if(product){
+            settled=true;
+            resolve(product);
           }
-        }
-      }catch(sourceError){
-        console.warn('Barcodebron mislukt:', sourceError);
-      }
+        }).catch(()=>{}).finally(()=>{
+          remaining--;
+          if(!remaining && !settled){
+            settled=true;
+            resolve(null);
+          }
+        });
+      });
+    });
+  }
+
+  try{
+    // Soms is de eerste API-aanvraag te vroeg/mislukt terwijl dezelfde barcode
+    // een fractie later wel beschikbaar is. Daarom automatisch één korte retry.
+    let found = await lookupProduct();
+
+    if(!found){
+      setBarcodeStatus('Nog één keer zoeken…');
+      await new Promise(resolve => setTimeout(resolve, 250));
+      found = await lookupProduct();
     }
 
     if(!found){
       const result=document.getElementById('barcodeResult');
-      result.textContent='Geen product gevonden voor deze barcode. Je kunt het product handmatig toevoegen.';
-      result.classList.add('open');
-      setBarcodeStatus('Geen product gevonden.');
-      barcodeBusy=false;
+      if(result){
+        result.textContent='Barcode gelezen, maar product tijdelijk niet gevonden. Probeer opnieuw.';
+        result.classList.add('open');
+      }
+      setBarcodeStatus('Product niet gevonden');
+      setTimeout(closeBarcodeScanner,1200);
       return;
     }
 
+    // Alleen succesvolle productmatches cachen.
     try{
       localStorage.setItem(cacheKey, JSON.stringify(found));
     }catch(_){}
 
     await finishBarcodeProduct(found);
   }catch(err){
-    console.error('Product lookup:',err);
-    setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
-  }finally{
-    barcodeBusy=false;
+    console.warn('Product lookup:',err);
+    setBarcodeStatus('Product zoeken mislukt — probeer opnieuw.');
+    setTimeout(closeBarcodeScanner,1200);
   }
 }
 
