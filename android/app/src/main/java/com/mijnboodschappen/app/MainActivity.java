@@ -4,7 +4,6 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,29 +22,30 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+
+import androidx.activity.ComponentActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
-import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
-import androidx.core.splashscreen.SplashScreen;
-
-public class MainActivity extends Activity {
+public class MainActivity extends ComponentActivity {
 
     private WebView webView;
     private PermissionRequest pendingPermissionRequest;
@@ -54,98 +54,168 @@ public class MainActivity extends Activity {
     private ProcessCameraProvider cameraProvider;
     private ExecutorService barcodeExecutor;
     private BarcodeScanner barcodeScanner;
-    private final AtomicBoolean nativeScannerActive = new AtomicBoolean(false);
-    private final AtomicBoolean barcodeDelivered = new AtomicBoolean(false);
+
+    private final AtomicBoolean nativeScannerActive =
+            new AtomicBoolean(false);
+
+    private final AtomicBoolean barcodeDelivered =
+            new AtomicBoolean(false);
 
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Android 12+ SplashScreen API
+        // Android 12+ splash screen
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-        window.setStatusBarColor(Color.rgb(238, 248, 241));
-        window.setNavigationBarColor(Color.rgb(238, 248, 241));
+
+        window.setStatusBarColor(
+                Color.rgb(238, 248, 241)
+        );
+
+        window.setNavigationBarColor(
+                Color.rgb(238, 248, 241)
+        );
+
         window.getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR |
                 View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         );
 
+        // ============================================================
+        // WEBVIEW
+        // ============================================================
+
         webView = new WebView(this);
 
         WebSettings settings = webView.getSettings();
+
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
 
-        // Laat cameravideo automatisch afspelen zonder extra play-knop
         settings.setMediaPlaybackRequiresUserGesture(false);
 
         webView.setWebViewClient(new WebViewClient());
 
         webView.setWebChromeClient(new WebChromeClient() {
+
             @Override
-            public void onPermissionRequest(final PermissionRequest request) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+            public void onPermissionRequest(
+                    final PermissionRequest request
+            ) {
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                                && checkSelfPermission(Manifest.permission.CAMERA)
-                                != PackageManager.PERMISSION_GRANTED) {
+                runOnUiThread(() -> {
 
-                            pendingPermissionRequest = request;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                            && checkSelfPermission(
+                            Manifest.permission.CAMERA
+                    ) != PackageManager.PERMISSION_GRANTED) {
 
-                            requestPermissions(
-                                    new String[]{Manifest.permission.CAMERA},
-                                    CAMERA_PERMISSION_REQUEST
-                            );
+                        pendingPermissionRequest = request;
 
-                        } else {
-                            request.grant(
-                                    new String[]{
-                                            PermissionRequest.RESOURCE_VIDEO_CAPTURE
-                                    }
-                            );
-                        }
+                        requestPermissions(
+                                new String[]{
+                                        Manifest.permission.CAMERA
+                                },
+                                CAMERA_PERMISSION_REQUEST
+                        );
+
+                    } else {
+
+                        request.grant(
+                                new String[]{
+                                        PermissionRequest
+                                                .RESOURCE_VIDEO_CAPTURE
+                                }
+                        );
                     }
                 });
             }
         });
 
-        webView.addJavascriptInterface(new AppBridge(), "AndroidApp");
-        webView.setBackgroundColor(Color.rgb(238, 248, 241));
-        webView.setVerticalScrollBarEnabled(false);
-        webView.setOverScrollMode(WebView.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        // JavaScript bridge
+        webView.addJavascriptInterface(
+                new AppBridge(),
+                "AndroidApp"
+        );
 
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.setBackgroundColor(
+                Color.rgb(238, 248, 241)
+        );
+
+        webView.setVerticalScrollBarEnabled(false);
+
+        webView.setOverScrollMode(
+                WebView.OVER_SCROLL_IF_CONTENT_SCROLLS
+        );
+
+        webView.loadUrl(
+                "file:///android_asset/index.html"
+        );
+
+        // ============================================================
+        // ROOT LAYOUT
+        // ============================================================
 
         FrameLayout root = new FrameLayout(this);
 
-        nativePreviewView = new PreviewView(this);
-        nativePreviewView.setVisibility(View.GONE);
-        nativePreviewView.setImplementationMode(PreviewView.ImplementationMode.PERFORMANCE);
-        nativePreviewView.setScaleType(PreviewView.ScaleType.FILL_CENTER);
-        root.addView(nativePreviewView, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
+        // ============================================================
+        // NATIVE CAMERA PREVIEW
+        // ============================================================
 
-        root.addView(webView, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
+        nativePreviewView = new PreviewView(this);
+
+        nativePreviewView.setVisibility(
+                View.GONE
+        );
+
+        nativePreviewView.setImplementationMode(
+                PreviewView.ImplementationMode.PERFORMANCE
+        );
+
+        nativePreviewView.setScaleType(
+                PreviewView.ScaleType.FILL_CENTER
+        );
+
+        root.addView(
+                nativePreviewView,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+        );
+
+        // ============================================================
+        // WEBVIEW
+        // ============================================================
+
+        root.addView(
+                webView,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+        );
 
         setContentView(root);
 
+        // ============================================================
+        // APP SPLASH
+        // ============================================================
+
         showAppSplash(root);
     }
+
+    // ================================================================
+    // CAMERA PERMISSION
+    // ================================================================
 
     @Override
     public void onRequestPermissionsResult(
@@ -153,6 +223,7 @@ public class MainActivity extends Activity {
             String[] permissions,
             int[] grantResults
     ) {
+
         super.onRequestPermissionsResult(
                 requestCode,
                 permissions,
@@ -164,15 +235,18 @@ public class MainActivity extends Activity {
             if (pendingPermissionRequest != null) {
 
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
 
                     pendingPermissionRequest.grant(
                             new String[]{
-                                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                                    PermissionRequest
+                                            .RESOURCE_VIDEO_CAPTURE
                             }
                     );
 
                 } else {
+
                     pendingPermissionRequest.deny();
                 }
 
@@ -181,143 +255,360 @@ public class MainActivity extends Activity {
         }
     }
 
+    // ================================================================
+    // START NATIVE BARCODE SCANNER
+    // ================================================================
+
     private void startNativeBarcodeScanner() {
-        if (nativeScannerActive.get()) return;
+
+        if (nativeScannerActive.get()) {
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+                && checkSelfPermission(
+                Manifest.permission.CAMERA
+        ) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(
+                    new String[]{
+                            Manifest.permission.CAMERA
+                    },
+                    CAMERA_PERMISSION_REQUEST
+            );
+
             return;
         }
 
         nativeScannerActive.set(true);
         barcodeDelivered.set(false);
-        webView.setVisibility(View.GONE);
-        nativePreviewView.setVisibility(View.VISIBLE);
 
-        if (barcodeExecutor == null) barcodeExecutor = Executors.newSingleThreadExecutor();
+        webView.setVisibility(
+                View.GONE
+        );
 
-        BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(
-                        Barcode.FORMAT_EAN_13,
-                        Barcode.FORMAT_EAN_8,
-                        Barcode.FORMAT_UPC_A,
-                        Barcode.FORMAT_UPC_E
-                )
-                .build();
+        nativePreviewView.setVisibility(
+                View.VISIBLE
+        );
 
-        barcodeScanner = BarcodeScanning.getClient(options);
+        if (barcodeExecutor == null) {
+
+            barcodeExecutor =
+                    Executors.newSingleThreadExecutor();
+        }
+
+        // ============================================================
+        // ML KIT BARCODE FORMATS
+        // ============================================================
+
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_EAN_13,
+                                Barcode.FORMAT_EAN_8,
+                                Barcode.FORMAT_UPC_A,
+                                Barcode.FORMAT_UPC_E
+                        )
+                        .build();
+
+        barcodeScanner =
+                BarcodeScanning.getClient(options);
+
         ListenableFuture<ProcessCameraProvider> future =
                 ProcessCameraProvider.getInstance(this);
 
         future.addListener(() -> {
+
             try {
+
                 cameraProvider = future.get();
 
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(nativePreviewView.getSurfaceProvider());
+                // ====================================================
+                // CAMERA PREVIEW
+                // ====================================================
 
-                ImageAnalysis analysis = new ImageAnalysis.Builder()
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .build();
+                Preview preview =
+                        new Preview.Builder()
+                                .build();
 
-                analysis.setAnalyzer(barcodeExecutor, imageProxy -> {
-                    if (!nativeScannerActive.get() || barcodeDelivered.get()) {
-                        imageProxy.close();
-                        return;
-                    }
+                preview.setSurfaceProvider(
+                        nativePreviewView
+                                .getSurfaceProvider()
+                );
 
-                    android.media.Image mediaImage = imageProxy.getImage();
-                    if (mediaImage == null) {
-                        imageProxy.close();
-                        return;
-                    }
+                // ====================================================
+                // IMAGE ANALYSIS
+                // ====================================================
 
-                    InputImage image = InputImage.fromMediaImage(
-                            mediaImage, imageProxy.getImageInfo().getRotationDegrees());
+                ImageAnalysis analysis =
+                        new ImageAnalysis.Builder()
+                                .setBackpressureStrategy(
+                                        ImageAnalysis
+                                                .STRATEGY_KEEP_ONLY_LATEST
+                                )
+                                .build();
 
-                    barcodeScanner.process(image)
-                            .addOnSuccessListener(barcodes -> {
-                                if (!nativeScannerActive.get() || barcodeDelivered.get()) return;
+                analysis.setAnalyzer(
+                        barcodeExecutor,
+                        imageProxy -> {
 
-                                for (Barcode barcode : barcodes) {
-                                    String raw = barcode.getRawValue();
-                                    if (raw == null) continue;
-                                    String code = raw.replaceAll("\\D", "");
-                                    if (code.length() >= 8 &&
-                                            barcodeDelivered.compareAndSet(false, true)) {
-                                        runOnUiThread(() -> {
-                                            nativePreviewView.setVisibility(View.GONE);
-                                            webView.setVisibility(View.VISIBLE);
-                                            webView.evaluateJavascript(
-                                                    "window.nativeBarcodeDetected && window.nativeBarcodeDetected("
-                                                            + org.json.JSONObject.quote(code) + ")", null);
-                                        });
-                                        break;
-                                    }
-                                }
-                            })
-                            .addOnCompleteListener(task -> imageProxy.close());
-                });
+                            if (!nativeScannerActive.get()
+                                    || barcodeDelivered.get()) {
+
+                                imageProxy.close();
+                                return;
+                            }
+
+                            android.media.Image mediaImage =
+                                    imageProxy.getImage();
+
+                            if (mediaImage == null) {
+
+                                imageProxy.close();
+                                return;
+                            }
+
+                            InputImage image =
+                                    InputImage.fromMediaImage(
+                                            mediaImage,
+                                            imageProxy
+                                                    .getImageInfo()
+                                                    .getRotationDegrees()
+                                    );
+
+                            barcodeScanner
+                                    .process(image)
+
+                                    .addOnSuccessListener(
+                                            barcodes -> {
+
+                                                if (!nativeScannerActive
+                                                        .get()
+                                                        || barcodeDelivered
+                                                        .get()) {
+
+                                                    return;
+                                                }
+
+                                                for (Barcode barcode :
+                                                        barcodes) {
+
+                                                    String raw =
+                                                            barcode
+                                                                    .getRawValue();
+
+                                                    if (raw == null) {
+                                                        continue;
+                                                    }
+
+                                                    String code =
+                                                            raw.replaceAll(
+                                                                    "\\D",
+                                                                    ""
+                                                            );
+
+                                                    if (code.length() >= 8
+                                                            && barcodeDelivered
+                                                            .compareAndSet(
+                                                                    false,
+                                                                    true
+                                                            )) {
+
+                                                        runOnUiThread(() -> {
+
+                                                            nativeScannerActive
+                                                                    .set(false);
+
+                                                            nativePreviewView
+                                                                    .setVisibility(
+                                                                            View.GONE
+                                                                    );
+
+                                                            webView
+                                                                    .setVisibility(
+                                                                            View.VISIBLE
+                                                                    );
+
+                                                            webView
+                                                                    .evaluateJavascript(
+                                                                            "window.nativeBarcodeDetected && window.nativeBarcodeDetected("
+                                                                                    + org.json.JSONObject
+                                                                                    .quote(code)
+                                                                                    + ")",
+                                                                            null
+                                                                    );
+                                                        });
+
+                                                        break;
+                                                    }
+                                                }
+                                            })
+
+                                    .addOnCompleteListener(
+                                            task ->
+                                                    imageProxy.close()
+                                    );
+                        }
+                );
+
+                // ====================================================
+                // START CAMERA
+                // ====================================================
 
                 cameraProvider.unbindAll();
+
                 cameraProvider.bindToLifecycle(
-                        this, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis);
+                        this,
+                        CameraSelector.DEFAULT_BACK_CAMERA,
+                        preview,
+                        analysis
+                );
+
             } catch (Exception e) {
+
                 nativeScannerActive.set(false);
-                runOnUiThread(() -> webView.evaluateJavascript(
-                        "window.nativeBarcodeError && window.nativeBarcodeError()", null));
+
+                runOnUiThread(() -> {
+
+                    nativePreviewView.setVisibility(
+                            View.GONE
+                    );
+
+                    webView.setVisibility(
+                            View.VISIBLE
+                    );
+
+                    webView.evaluateJavascript(
+                            "window.nativeBarcodeError && window.nativeBarcodeError()",
+                            null
+                    );
+                });
             }
+
         }, ContextCompat.getMainExecutor(this));
     }
 
+    // ================================================================
+    // STOP NATIVE BARCODE SCANNER
+    // ================================================================
+
     private void stopNativeBarcodeScanner() {
+
         nativeScannerActive.set(false);
         barcodeDelivered.set(false);
+
         if (cameraProvider != null) {
-            try { cameraProvider.unbindAll(); } catch (Exception ignored) {}
+
+            try {
+                cameraProvider.unbindAll();
+            } catch (Exception ignored) {
+            }
         }
+
         if (barcodeScanner != null) {
-            try { barcodeScanner.close(); } catch (Exception ignored) {}
+
+            try {
+                barcodeScanner.close();
+            } catch (Exception ignored) {
+            }
+
             barcodeScanner = null;
         }
-        if (nativePreviewView != null) nativePreviewView.setVisibility(View.GONE);
-        if (webView != null) webView.setVisibility(View.VISIBLE);
+
+        if (nativePreviewView != null) {
+
+            nativePreviewView.setVisibility(
+                    View.GONE
+            );
+        }
+
+        if (webView != null) {
+
+            webView.setVisibility(
+                    View.VISIBLE
+            );
+        }
     }
 
-    private void showAppSplash(final FrameLayout root) {
-        final FrameLayout splash = new FrameLayout(this);
-        splash.setBackgroundColor(Color.rgb(238, 248, 241));
+    // ================================================================
+    // APP SPLASH
+    // ================================================================
 
-        SplashPattern pattern = new SplashPattern(this);
-        splash.addView(pattern, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
+    private void showAppSplash(
+            final FrameLayout root
+    ) {
 
-        ImageView icon = new ImageView(this);
-        icon.setImageResource(R.drawable.splash_icon);
-        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        final FrameLayout splash =
+                new FrameLayout(this);
+
+        splash.setBackgroundColor(
+                Color.rgb(238, 248, 241)
+        );
+
+        SplashPattern pattern =
+                new SplashPattern(this);
+
+        splash.addView(
+                pattern,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+        );
+
+        ImageView icon =
+                new ImageView(this);
+
+        icon.setImageResource(
+                R.drawable.splash_icon
+        );
+
+        icon.setScaleType(
+                ImageView.ScaleType.FIT_CENTER
+        );
 
         int iconSize = dp(150);
+
         FrameLayout.LayoutParams iconParams =
-                new FrameLayout.LayoutParams(iconSize, iconSize);
+                new FrameLayout.LayoutParams(
+                        iconSize,
+                        iconSize
+                );
 
-        iconParams.gravity = android.view.Gravity.CENTER;
-        splash.addView(icon, iconParams);
+        iconParams.gravity =
+                android.view.Gravity.CENTER;
 
-        SplashRing ring = new SplashRing(this);
+        splash.addView(
+                icon,
+                iconParams
+        );
+
+        SplashRing ring =
+                new SplashRing(this);
+
         int ringSize = dp(230);
 
         FrameLayout.LayoutParams ringParams =
-                new FrameLayout.LayoutParams(ringSize, ringSize);
+                new FrameLayout.LayoutParams(
+                        ringSize,
+                        ringSize
+                );
 
-        ringParams.gravity = android.view.Gravity.CENTER;
-        splash.addView(ring, ringParams);
+        ringParams.gravity =
+                android.view.Gravity.CENTER;
 
-        root.addView(splash, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
+        splash.addView(
+                ring,
+                ringParams
+        );
+
+        root.addView(
+                splash,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+        );
 
         icon.setAlpha(0f);
         icon.setScaleX(0.92f);
@@ -328,55 +619,97 @@ public class MainActivity extends Activity {
                 .scaleX(1f)
                 .scaleY(1f)
                 .setDuration(280)
-                .setInterpolator(new DecelerateInterpolator())
+                .setInterpolator(
+                        new DecelerateInterpolator()
+                )
                 .start();
 
         ring.start();
 
-        splash.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        splash.postDelayed(() -> {
 
-                splash.animate()
-                        .alpha(0f)
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
+            splash.animate()
+                    .alpha(0f)
+                    .setDuration(250)
+                    .setListener(
+                            new AnimatorListenerAdapter() {
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                root.removeView(splash);
+                                @Override
+                                public void onAnimationEnd(
+                                        Animator animation
+                                ) {
+
+                                    root.removeView(
+                                            splash
+                                    );
+                                }
                             }
-                        })
-                        .start();
-            }
+                    )
+                    .start();
+
         }, 1100);
     }
 
     private int dp(int value) {
+
         return Math.round(
-                value * getResources().getDisplayMetrics().density
+                value *
+                        getResources()
+                                .getDisplayMetrics()
+                                .density
         );
     }
 
-    private static class SplashPattern extends View {
+    // ================================================================
+    // SPLASH PATTERN
+    // ================================================================
+
+    private static class SplashPattern
+            extends View {
 
         private final Paint paint =
                 new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        private final Path path = new Path();
+        private final Path path =
+                new Path();
+
         private final float density;
 
-        SplashPattern(android.content.Context context) {
+        SplashPattern(
+                android.content.Context context
+        ) {
+
             super(context);
 
             density =
-                    getResources().getDisplayMetrics().density;
+                    getResources()
+                            .getDisplayMetrics()
+                            .density;
 
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(2.2f * density);
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeJoin(Paint.Join.ROUND);
-            paint.setColor(Color.rgb(190, 224, 202));
+            paint.setStyle(
+                    Paint.Style.STROKE
+            );
+
+            paint.setStrokeWidth(
+                    2.2f * density
+            );
+
+            paint.setStrokeCap(
+                    Paint.Cap.ROUND
+            );
+
+            paint.setStrokeJoin(
+                    Paint.Join.ROUND
+            );
+
+            paint.setColor(
+                    Color.rgb(
+                            190,
+                            224,
+                            202
+                    )
+            );
+
             paint.setAlpha(75);
         }
 
@@ -385,20 +718,70 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        protected void onDraw(Canvas canvas) {
+        protected void onDraw(
+                Canvas canvas
+        ) {
+
             super.onDraw(canvas);
 
             float w = getWidth();
             float h = getHeight();
 
-            drawApple(canvas, w * 0.15f, h * 0.22f, d(24));
-            drawMilk(canvas, w * 0.83f, h * 0.20f, d(22));
-            drawCarrot(canvas, w * 0.12f, h * 0.52f, d(25));
-            drawCheese(canvas, w * 0.86f, h * 0.48f, d(25));
-            drawBread(canvas, w * 0.17f, h * 0.78f, d(26));
-            drawBroccoli(canvas, w * 0.82f, h * 0.78f, d(25));
-            drawApple(canvas, w * 0.50f, h * 0.10f, d(18));
-            drawMilk(canvas, w * 0.52f, h * 0.91f, d(19));
+            drawApple(
+                    canvas,
+                    w * 0.15f,
+                    h * 0.22f,
+                    d(24)
+            );
+
+            drawMilk(
+                    canvas,
+                    w * 0.83f,
+                    h * 0.20f,
+                    d(22)
+            );
+
+            drawCarrot(
+                    canvas,
+                    w * 0.12f,
+                    h * 0.52f,
+                    d(25)
+            );
+
+            drawCheese(
+                    canvas,
+                    w * 0.86f,
+                    h * 0.48f,
+                    d(25)
+            );
+
+            drawBread(
+                    canvas,
+                    w * 0.17f,
+                    h * 0.78f,
+                    d(26)
+            );
+
+            drawBroccoli(
+                    canvas,
+                    w * 0.82f,
+                    h * 0.78f,
+                    d(25)
+            );
+
+            drawApple(
+                    canvas,
+                    w * 0.50f,
+                    h * 0.10f,
+                    d(18)
+            );
+
+            drawMilk(
+                    canvas,
+                    w * 0.52f,
+                    h * 0.91f,
+                    d(19)
+            );
         }
 
         private void drawApple(
@@ -407,6 +790,7 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
+
             c.drawOval(
                     new RectF(
                             x - s * 0.65f,
@@ -431,7 +815,10 @@ public class MainActivity extends Activity {
                     y - s * 0.78f
             );
 
-            c.drawPath(path, paint);
+            c.drawPath(
+                    path,
+                    paint
+            );
 
             c.drawLine(
                     x,
@@ -448,6 +835,7 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
+
             path.reset();
 
             path.moveTo(
@@ -472,7 +860,10 @@ public class MainActivity extends Activity {
 
             path.close();
 
-            c.drawPath(path, paint);
+            c.drawPath(
+                    path,
+                    paint
+            );
 
             c.drawLine(
                     x - s * 0.55f,
@@ -497,6 +888,7 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
+
             path.reset();
 
             path.moveTo(
@@ -511,7 +903,10 @@ public class MainActivity extends Activity {
                     y - s * 0.45f
             );
 
-            c.drawPath(path, paint);
+            c.drawPath(
+                    path,
+                    paint
+            );
 
             c.drawLine(
                     x - s * 0.15f,
@@ -544,6 +939,7 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
+
             path.reset();
 
             path.moveTo(
@@ -563,7 +959,10 @@ public class MainActivity extends Activity {
 
             path.close();
 
-            c.drawPath(path, paint);
+            c.drawPath(
+                    path,
+                    paint
+            );
 
             c.drawCircle(
                     x - s * 0.05f,
@@ -586,12 +985,14 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
-            RectF r = new RectF(
-                    x - s * 0.75f,
-                    y - s * 0.35f,
-                    x + s * 0.75f,
-                    y + s * 0.40f
-            );
+
+            RectF r =
+                    new RectF(
+                            x - s * 0.75f,
+                            y - s * 0.35f,
+                            x + s * 0.75f,
+                            y + s * 0.40f
+                    );
 
             c.drawRoundRect(
                     r,
@@ -636,6 +1037,7 @@ public class MainActivity extends Activity {
                 float y,
                 float s
         ) {
+
             c.drawCircle(
                     x - s * 0.35f,
                     y - s * 0.15f,
@@ -683,12 +1085,18 @@ public class MainActivity extends Activity {
         }
     }
 
-    private static class SplashRing extends View {
+    // ================================================================
+    // SPLASH RING
+    // ================================================================
+
+    private static class SplashRing
+            extends View {
 
         private final Paint paint =
                 new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        private final RectF oval = new RectF();
+        private final RectF oval =
+                new RectF();
 
         private float start = -90f;
 
@@ -696,39 +1104,65 @@ public class MainActivity extends Activity {
 
         private ValueAnimator animator;
 
-        SplashRing(android.content.Context context) {
+        SplashRing(
+                android.content.Context context
+        ) {
+
             super(context);
 
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(
-                    5f * getResources().getDisplayMetrics().density
+            paint.setStyle(
+                    Paint.Style.STROKE
             );
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setColor(Color.rgb(20, 190, 75));
+
+            paint.setStrokeWidth(
+                    5f *
+                            getResources()
+                                    .getDisplayMetrics()
+                                    .density
+            );
+
+            paint.setStrokeCap(
+                    Paint.Cap.ROUND
+            );
+
+            paint.setColor(
+                    Color.rgb(
+                            20,
+                            190,
+                            75
+                    )
+            );
         }
 
         void start() {
-            animator = ValueAnimator.ofFloat(0f, 360f);
+
+            animator =
+                    ValueAnimator.ofFloat(
+                            0f,
+                            360f
+                    );
 
             animator.setDuration(1800);
-            animator.setRepeatCount(ValueAnimator.INFINITE);
+
+            animator.setRepeatCount(
+                    ValueAnimator.INFINITE
+            );
 
             animator.setInterpolator(
-                    new android.view.animation.LinearInterpolator()
+                    new android.view.animation
+                            .LinearInterpolator()
             );
 
             animator.addUpdateListener(
-                    new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(
-                                ValueAnimator animation
-                        ) {
-                            start =
-                                    -90f +
-                                    (float) animation.getAnimatedValue();
+                    animation -> {
 
-                            invalidate();
-                        }
+                        start =
+                                -90f +
+                                (float)
+                                        animation
+                                                .getAnimatedValue();
+
+                        invalidate();
                     }
             );
 
@@ -736,7 +1170,10 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        protected void onDraw(Canvas canvas) {
+        protected void onDraw(
+                Canvas canvas
+        ) {
+
             super.onDraw(canvas);
 
             float inset =
@@ -759,48 +1196,108 @@ public class MainActivity extends Activity {
         }
     }
 
+    // ================================================================
+    // JAVASCRIPT BRIDGE
+    // ================================================================
+
     private class AppBridge {
 
         @JavascriptInterface
-        public void setMenuDimmed(final boolean dimmed) {
+        public void setMenuDimmed(
+                final boolean dimmed
+        ) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+            runOnUiThread(() -> {
 
-                    Window window = getWindow();
+                Window window =
+                        getWindow();
 
-                    if (dimmed) {
-                        window.setStatusBarColor(
-                                Color.rgb(200, 211, 204)
-                        );
-                    } else {
-                        window.setStatusBarColor(
-                                Color.rgb(238, 248, 241)
-                        );
-                    }
+                if (dimmed) {
+
+                    window.setStatusBarColor(
+                            Color.rgb(
+                                    200,
+                                    211,
+                                    204
+                            )
+                    );
+
+                } else {
+
+                    window.setStatusBarColor(
+                            Color.rgb(
+                                    238,
+                                    248,
+                                    241
+                            )
+                    );
                 }
             });
         }
-    
+
         @JavascriptInterface
         public void startNativeBarcodeScanner() {
-            runOnUiThread(() -> startNativeBarcodeScanner());
+
+            runOnUiThread(
+                    () -> startNativeBarcodeScanner()
+            );
         }
 
         @JavascriptInterface
         public void stopNativeBarcodeScanner() {
-            runOnUiThread(() -> MainActivity.this.stopNativeBarcodeScanner());
+
+            runOnUiThread(
+                    () -> MainActivity.this
+                            .stopNativeBarcodeScanner()
+            );
         }
-}
+    }
+
+    // ================================================================
+    // BACK BUTTON
+    // ================================================================
 
     @Override
     public void onBackPressed() {
 
-        if (webView != null && webView.canGoBack()) {
+        if (nativeScannerActive.get()) {
+
+            stopNativeBarcodeScanner();
+            return;
+        }
+
+        if (webView != null
+                && webView.canGoBack()) {
+
             webView.goBack();
+
         } else {
+
             super.onBackPressed();
         }
+    }
+
+    // ================================================================
+    // CLEANUP
+    // ================================================================
+
+    @Override
+    protected void onDestroy() {
+
+        stopNativeBarcodeScanner();
+
+        if (barcodeExecutor != null) {
+
+            barcodeExecutor.shutdownNow();
+            barcodeExecutor = null;
+        }
+
+        if (webView != null) {
+
+            webView.destroy();
+            webView = null;
+        }
+
+        super.onDestroy();
     }
 }
