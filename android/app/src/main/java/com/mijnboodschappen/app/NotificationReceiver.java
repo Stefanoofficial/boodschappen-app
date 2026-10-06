@@ -50,7 +50,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             builder = new Notification.Builder(context);
         }
 
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("Mijn Boodschappen")
                 .setContentText("Tijd om je boodschappenlijst te bekijken.")
                 .setContentIntent(contentIntent)
