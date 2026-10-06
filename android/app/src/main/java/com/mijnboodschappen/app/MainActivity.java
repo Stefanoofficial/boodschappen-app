@@ -5,6 +5,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import java.util.Calendar;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -62,6 +70,12 @@ public class MainActivity extends ComponentActivity {
             new AtomicBoolean(false);
 
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1002;
+    private static final String NOTIFICATION_CHANNEL_ID = "shopping_reminders";
+    private static final int REMINDER_REQUEST_CODE = 2001;
+    private static final String PREFS_NAME = "notification_settings";
+    private boolean pendingTestNotification = false;
+    private boolean pendingScheduleAfterPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +83,8 @@ public class MainActivity extends ComponentActivity {
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
+
+        createNotificationChannel();
 
         Window window = getWindow();
 
@@ -222,6 +238,27 @@ public class MainActivity extends ComponentActivity {
                 grantResults
         );
 
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+            boolean granted = grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+            if (granted) {
+                if (pendingTestNotification) {
+                    pendingTestNotification = false;
+                    sendTestNotification();
+                }
+                if (pendingScheduleAfterPermission) {
+                    pendingScheduleAfterPermission = false;
+                    scheduleSavedReminder();
+                }
+            } else {
+                pendingTestNotification = false;
+                pendingScheduleAfterPermission = false;
+                notifyWebStatus("Meldingen zijn niet toegestaan in Android.", true);
+            }
+            return;
+        }
+
         if (requestCode == CAMERA_PERMISSION_REQUEST) {
 
             if (pendingPermissionRequest != null) {
@@ -244,6 +281,198 @@ public class MainActivity extends ComponentActivity {
                 pendingPermissionRequest = null;
             }
         }
+    }
+
+    // ================================================================
+    // ANDROID NOTIFICATIONS
+    // ================================================================
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+
+        NotificationManager manager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (manager == null) return;
+
+        NotificationChannel channel = new NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Boodschappenherinneringen",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        channel.setDescription("Herinneringen van Mijn Boodschappen");
+        channel.enableVibration(true);
+        manager.createNotificationChannel(channel);
+    }
+
+    private boolean hasNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true;
+        return checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestNotificationPermission(boolean forTest, boolean forSchedule) {
+        pendingTestNotification = forTest;
+        pendingScheduleAfterPermission = forSchedule;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    NOTIFICATION_PERMISSION_REQUEST
+            );
+        }
+    }
+
+    private void sendTestNotification() {
+        createNotificationChannel();
+
+        NotificationManager manager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null) return;
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this,
+                3001,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        android.app.Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new android.app.Notification.Builder(this, NOTIFICATION_CHANNEL_ID);
+        } else {
+            builder = new android.app.Notification.Builder(this);
+        }
+
+        builder.setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("Mijn Boodschappen")
+                .setContentText("Dit is een testmelding van Mijn Boodschappen.")
+                .setStyle(new android.app.Notification.BigTextStyle()
+                        .bigText("Dit is een testmelding van Mijn Boodschappen. De meldingen werken op deze Android-telefoon."))
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setPriority(android.app.Notification.PRIORITY_HIGH)
+                .setCategory(android.app.Notification.CATEGORY_REMINDER)
+                .setWhen(System.currentTimeMillis());
+
+        manager.notify(3001, builder.build());
+        notifyWebStatus("Testmelding verzonden. Kijk in de meldingenbalk van Android.", false);
+    }
+
+    private void testShoppingReminderNative() {
+        if (!hasNotificationPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestNotificationPermission(true, false);
+                notifyWebStatus("Android vraagt eerst toestemming voor meldingen.", false);
+                return;
+            }
+        }
+        sendTestNotification();
+    }
+
+    private void scheduleShoppingReminderNative(String day, String time) {
+        if (!hasNotificationPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                        .edit()
+                        .putString("day", day)
+                        .putString("time", time)
+                        .apply();
+                pendingScheduleAfterPermission = true;
+                requestNotificationPermission(false, true);
+                notifyWebStatus("Geef Android toestemming voor meldingen om de herinnering in te plannen.", false);
+                return;
+            }
+        }
+        scheduleSavedReminder(day, time);
+    }
+
+    private void scheduleSavedReminder() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String day = prefs.getString("day", "2");
+        String time = prefs.getString("time", "18:00");
+        scheduleSavedReminder(day, time);
+    }
+
+    private void scheduleSavedReminder(String day, String time) {
+        try {
+            String[] parts = String.valueOf(time).split(":");
+            int hour = Integer.parseInt(parts[0]);
+            int minute = Integer.parseInt(parts[1]);
+            int wantedDay = Integer.parseInt(String.valueOf(day));
+
+            Calendar now = Calendar.getInstance();
+            Calendar next = Calendar.getInstance();
+            next.set(Calendar.SECOND, 0);
+            next.set(Calendar.MILLISECOND, 0);
+            next.set(Calendar.HOUR_OF_DAY, hour);
+            next.set(Calendar.MINUTE, minute);
+            next.set(Calendar.DAY_OF_WEEK, wantedDay);
+
+            if (!next.after(now)) {
+                next.add(Calendar.WEEK_OF_YEAR, 1);
+            }
+
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (alarmManager == null) return;
+
+            Intent intent = new Intent(this, NotificationReceiver.class);
+            intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this,
+                    REMINDER_REQUEST_CODE,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            alarmManager.cancel(pendingIntent);
+
+            long triggerAt = next.getTimeInMillis();
+            long interval = 7L * 24L * 60L * 60L * 1000L;
+            alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    interval,
+                    pendingIntent
+            );
+
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .edit()
+                    .putString("day", String.valueOf(day))
+                    .putString("time", String.valueOf(time))
+                    .apply();
+
+            notifyWebStatus("Boodschappenherinnering staat aan.", false);
+        } catch (Exception e) {
+            notifyWebStatus("De herinnering kon niet worden ingesteld.", true);
+        }
+    }
+
+    private void cancelShoppingReminderNative() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (alarmManager != null) {
+            Intent intent = new Intent(this, NotificationReceiver.class);
+            intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this,
+                    REMINDER_REQUEST_CODE,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+        }
+        notifyWebStatus("Boodschappenherinnering staat uit.", false);
+    }
+
+    private void notifyWebStatus(String message, boolean error) {
+        if (webView == null) return;
+        String safe = org.json.JSONObject.quote(message == null ? "" : message);
+        runOnUiThread(() -> webView.evaluateJavascript(
+                "window.nativeNotificationStatus && window.nativeNotificationStatus(" + safe + "," + error + ")",
+                null
+        ));
     }
 
     // ================================================================
@@ -1242,6 +1471,21 @@ public class MainActivity extends ComponentActivity {
                     () -> MainActivity.this
                             .stopNativeBarcodeScanner()
             );
+        }
+
+        @JavascriptInterface
+        public void testShoppingReminder() {
+            runOnUiThread(() -> testShoppingReminderNative());
+        }
+
+        @JavascriptInterface
+        public void scheduleShoppingReminder(final String day, final String time) {
+            runOnUiThread(() -> scheduleShoppingReminderNative(day, time));
+        }
+
+        @JavascriptInterface
+        public void cancelShoppingReminder() {
+            runOnUiThread(() -> cancelShoppingReminderNative());
         }
     }
 
