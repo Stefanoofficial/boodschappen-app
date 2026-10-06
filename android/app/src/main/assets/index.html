@@ -10835,7 +10835,7 @@ let barcodeBusy = false;
 // Android krijgt een snellere scan-loop en lichtere camerabeelden.
 // iPhone/iOS blijft volledig op de bestaande scannerinstellingen.
 const isAndroidScanner = /Android/i.test(navigator.userAgent || '');
-const barcodeScanInterval = isAndroidScanner ? 70 : 180;
+const barcodeScanInterval = 60;
 
 const EAN_L = {
   0:[3,2,1,1], 1:[2,2,2,1], 2:[2,1,2,2], 3:[1,4,1,1], 4:[1,1,3,2],
@@ -11084,24 +11084,19 @@ async function scheduleBarcodeScan(){
         barcodeCtx.drawImage(barcodeVideo,0,0,w,h);
         const imageData=barcodeCtx.getImageData(0,0,w,h);
 
-        // The decoder reads a frame only. It never owns or stops the camera stream.
-        const code=window.decodeBarcodeFrameWasm
-          ? await window.decodeBarcodeFrameWasm(imageData)
-          : null;
+        // Fast path: use the lightweight local EAN decoder first.
+        // This avoids waiting for the WASM decoder on normal supermarket barcodes.
+        let code = tryDecodeCanvas();
+
+        // Fallback: use ZXing/WASM only when the fast decoder cannot read the frame.
+        if(!code && window.decodeBarcodeFrameWasm){
+          code = await window.decodeBarcodeFrameWasm(imageData);
+        }
 
         if(code){
           barcodeScanRunning=false;
           stopBarcodeCamera();
           await handleBarcode(code);
-          return;
-        }
-
-        // Keep the existing lightweight decoder as a local fallback.
-        const fallback=tryDecodeCanvas();
-        if(fallback){
-          barcodeScanRunning=false;
-          stopBarcodeCamera();
-          await handleBarcode(fallback);
           return;
         }
       }
@@ -11267,7 +11262,21 @@ async function lookupManualBarcode(){
 }
 
 async function handleBarcode(code){
+  code = String(code || '').replace(/\D/g,'');
   setBarcodeStatus('Product wordt opgezocht…');
+
+  // Fast local cache: products scanned before are shown without another network request.
+  const cacheKey = 'barcodeProductCache_v2_' + code;
+  try{
+    const cached = localStorage.getItem(cacheKey);
+    if(cached){
+      const cachedProduct = JSON.parse(cached);
+      if(cachedProduct && cachedProduct.text){
+        await finishBarcodeProduct(cachedProduct);
+        return;
+      }
+    }
+  }catch(_){}
 
   const barcodeSources = [
     'https://world.openfoodfacts.org/api/v3/product/' + encodeURIComponent(code) + '.json?product_type=all&lc=nl&cc=nl&fields=code,product_name,product_name_nl,brands,image_front_small_url,image_front_url',
@@ -11278,15 +11287,20 @@ async function handleBarcode(code){
   try{
     let found = null;
 
-    for(const url of barcodeSources){
-      try{
-        const response = await fetch(url, {
-          method:'GET',
-          headers:{'Accept':'application/json'},
-          cache:'no-store'
-        });
-        if(!response.ok) continue;
+    // Query all product databases in parallel instead of waiting for each one in sequence.
+    const responses = await Promise.allSettled(
+      barcodeSources.map(url => fetch(url, {
+        method:'GET',
+        headers:{'Accept':'application/json'}
+      }))
+    );
 
+    for(const result of responses){
+      if(result.status !== 'fulfilled') continue;
+      const response = result.value;
+      if(!response.ok) continue;
+
+      try{
         const data = await response.json();
         const p = data && data.product;
 
@@ -11296,8 +11310,6 @@ async function handleBarcode(code){
           const dutchName = String(p.product_name_nl || '').trim();
           const name = dutchName || toDutchProductName(rawName);
 
-          // Voor de scanner accepteren we het exacte barcodeproduct ook
-          // wanneer er geen foto is; de scanner moet het product kunnen vinden.
           if(name){
             found = {
               text:name,
@@ -11322,36 +11334,43 @@ async function handleBarcode(code){
       return;
     }
 
-    const scannedProduct=found;
-    const name=scannedProduct.text;
-    const brand=scannedProduct.brand || '';
-    const completedExisting=await completeScannedProduct(scannedProduct);
-    const result=document.getElementById('barcodeResult');
+    try{
+      localStorage.setItem(cacheKey, JSON.stringify(found));
+    }catch(_){}
 
-    if(completedExisting){
-      result.textContent=(brand?brand+' · ':'')+name+' is afgevinkt ✓';
-      result.classList.add('open');
-      setBarcodeStatus('Product afgevinkt ✓');
-    }else{
-      const alreadyCompletedIndex=findScannedListItem(scannedProduct.barcode, scannedProduct.text, true);
-      if(alreadyCompletedIndex >= 0){
-        result.textContent=(brand?brand+' · ':'')+name+' staat al als gekocht op je lijst.';
-        result.classList.add('open');
-        setBarcodeStatus('Al afgevinkt ✓');
-      }else{
-        await addScannedProduct(scannedProduct);
-        result.textContent=(brand?brand+' · ':'')+name+' stond nog niet op je lijst en is toegevoegd.';
-        result.classList.add('open');
-        setBarcodeStatus('Product toegevoegd');
-      }
-    }
-    setTimeout(closeBarcodeScanner,900);
+    await finishBarcodeProduct(found);
   }catch(err){
     console.error('Product lookup:',err);
     setBarcodeStatus('Product kon niet worden opgezocht. Controleer je internetverbinding.');
   }finally{
     barcodeBusy=false;
   }
+}
+
+async function finishBarcodeProduct(scannedProduct){
+  const name=scannedProduct.text;
+  const brand=scannedProduct.brand || '';
+  const completedExisting=await completeScannedProduct(scannedProduct);
+  const result=document.getElementById('barcodeResult');
+
+  if(completedExisting){
+    result.textContent=(brand?brand+' · ':'')+name+' is afgevinkt ✓';
+    result.classList.add('open');
+    setBarcodeStatus('Product afgevinkt ✓');
+  }else{
+    const alreadyCompletedIndex=findScannedListItem(scannedProduct.barcode, scannedProduct.text, true);
+    if(alreadyCompletedIndex >= 0){
+      result.textContent=(brand?brand+' · ':'')+name+' staat al als gekocht op je lijst.';
+      result.classList.add('open');
+      setBarcodeStatus('Al afgevinkt ✓');
+    }else{
+      await addScannedProduct(scannedProduct);
+      result.textContent=(brand?brand+' · ':'')+name+' stond nog niet op je lijst en is toegevoegd.';
+      result.classList.add('open');
+      setBarcodeStatus('Product toegevoegd');
+    }
+  }
+  setTimeout(closeBarcodeScanner,700);
 }
 
 async function addScannedProduct(product){
@@ -11438,7 +11457,7 @@ document.addEventListener('visibilitychange',function(){
       const m=await getReader();
       const results=await m.readBarcodes(imageData,{
         formats:["EAN13","EAN8","UPCA","UPCE"],
-        tryHarder:true,
+        tryHarder:false,
         maxNumberOfSymbols:1
       });
       if(results && results.length){
