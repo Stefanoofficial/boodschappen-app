@@ -11142,18 +11142,8 @@ async function openBarcodeScanner(){
     setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
     return;
   }
-  // Android: use the native CameraX + ML Kit scanner.
-  // iPhone/web keeps the existing JavaScript camera scanner unchanged.
-  if(window.AndroidApp && typeof AndroidApp.startNativeBarcodeScanner === 'function'){
-    try{
-      setBarcodeStatus('Native scanner wordt gestart…');
-      AndroidApp.startNativeBarcodeScanner();
-      return;
-    }catch(nativeErr){
-      console.warn('Native scanner kon niet starten, webscanner wordt gebruikt:', nativeErr);
-    }
-  }
-
+  // Android gebruikt dezelfde webscanner als de browser.
+  // Er wordt bewust geen aparte native CameraX-scanner gestart.
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.');
     return;
@@ -11675,6 +11665,31 @@ document.addEventListener('visibilitychange',function(){
   });
 })();
 </script>
+
+
+<style id="final-ui-cleanup">
+/* Meer-menu: geen schaduw/fade */
+.familyMenu {
+  box-shadow: none !important;
+}
+body.dark-theme .familyMenu {
+  box-shadow: none !important;
+}
+
+/* Feedback delen: alleen het witte icoon, zonder groene cirkel */
+.feedbackSendBtn > i:first-child,
+.feedbackSendBtn .fa-paper-plane {
+  background: transparent !important;
+  color: #ffffff !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+</style>
 
 </body>
 
