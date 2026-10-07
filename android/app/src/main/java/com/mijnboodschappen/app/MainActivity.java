@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -29,51 +30,24 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.activity.ComponentActivity;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.Preview;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.camera.view.CameraController;
-import androidx.camera.view.LifecycleCameraController;
-import androidx.camera.mlkit.vision.MlKitAnalyzer;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.webkit.WebViewAssetLoader;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.barcode.BarcodeScanner;
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
-import com.google.mlkit.vision.barcode.BarcodeScanning;
-import com.google.mlkit.vision.barcode.common.Barcode;
-import com.google.mlkit.vision.common.InputImage;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.Arrays;
 
 public class MainActivity extends ComponentActivity {
 
     private WebView webView;
     private PermissionRequest pendingPermissionRequest;
+    private WebViewAssetLoader assetLoader;
 
-    private PreviewView nativePreviewView;
-    private ProcessCameraProvider cameraProvider;
-    private LifecycleCameraController cameraController;
-    private ExecutorService barcodeExecutor;
-    private BarcodeScanner barcodeScanner;
-
-    private final AtomicBoolean nativeScannerActive =
-            new AtomicBoolean(false);
-
-    private final AtomicBoolean barcodeDelivered =
-            new AtomicBoolean(false);
 
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 1002;
@@ -82,7 +56,6 @@ public class MainActivity extends ComponentActivity {
     private static final String PREFS_NAME = "notification_settings";
     private boolean pendingTestNotification = false;
     private boolean pendingScheduleAfterPermission = false;
-    private boolean pendingNativeScannerStart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,34 +96,22 @@ public class MainActivity extends ComponentActivity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        // Gebruik een HTTPS-achtige lokale origin voor de WebView.
-        // Hierdoor kan de bestaande webscanner met getUserMedia() veilig
-        // de camera gebruiken in de APK.
-        final WebViewAssetLoader assetLoader =
-                new WebViewAssetLoader.Builder()
-                        .addPathHandler(
-                                "/assets/",
-                                new WebViewAssetLoader.AssetsPathHandler(this)
-                        )
-                        .build();
+        assetLoader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/",
+                        new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
 
         webView.setWebViewClient(new WebViewClient() {
-
             @Override
-            public android.webkit.WebResourceResponse shouldInterceptRequest(
-                    WebView view,
-                    android.webkit.WebResourceRequest request
-            ) {
+            public WebResourceResponse shouldInterceptRequest(
+                    WebView view, WebResourceRequest request) {
                 return assetLoader.shouldInterceptRequest(request.getUrl());
             }
 
             @Override
-            @SuppressWarnings("deprecation")
-            public android.webkit.WebResourceResponse shouldInterceptRequest(
-                    WebView view,
-                    String url
-            ) {
-                return assetLoader.shouldInterceptRequest(url);
+            public WebResourceResponse shouldInterceptRequest(
+                    WebView view, String url) {
+                return assetLoader.shouldInterceptRequest(Uri.parse(url));
             }
         });
 
@@ -160,20 +121,8 @@ public class MainActivity extends ComponentActivity {
             public void onPermissionRequest(
                     final PermissionRequest request
             ) {
+
                 runOnUiThread(() -> {
-
-                    boolean wantsCamera = false;
-                    for (String resource : request.getResources()) {
-                        if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
-                            wantsCamera = true;
-                            break;
-                        }
-                    }
-
-                    if (!wantsCamera) {
-                        request.deny();
-                        return;
-                    }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                             && checkSelfPermission(
@@ -199,15 +148,6 @@ public class MainActivity extends ComponentActivity {
                     }
                 });
             }
-
-            @Override
-            public void onPermissionRequestCanceled(
-                    PermissionRequest request
-            ) {
-                if (pendingPermissionRequest == request) {
-                    pendingPermissionRequest = null;
-                }
-            }
         });
 
         webView.addJavascriptInterface(
@@ -230,41 +170,10 @@ public class MainActivity extends ComponentActivity {
         );
 
         // ============================================================
-        // ROOT
+        // ROOT / WEBVIEW
         // ============================================================
 
         FrameLayout root = new FrameLayout(this);
-
-        // ============================================================
-        // NATIVE CAMERA PREVIEW
-        // ============================================================
-
-        nativePreviewView = new PreviewView(this);
-
-        nativePreviewView.setVisibility(
-                View.GONE
-        );
-
-        nativePreviewView.setImplementationMode(
-                PreviewView.ImplementationMode.COMPATIBLE
-        );
-
-        nativePreviewView.setScaleType(
-                PreviewView.ScaleType.FILL_CENTER
-        );
-
-        root.addView(
-                nativePreviewView,
-                new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                )
-        );
-
-        // ============================================================
-        // WEBVIEW
-        // ============================================================
-
         root.addView(
                 webView,
                 new FrameLayout.LayoutParams(
@@ -332,15 +241,6 @@ public class MainActivity extends ComponentActivity {
                     pendingPermissionRequest.deny();
                 }
                 pendingPermissionRequest = null;
-            }
-
-            if (pendingNativeScannerStart) {
-                pendingNativeScannerStart = false;
-                if (granted) {
-                    runOnUiThread(() -> startNativeBarcodeScanner());
-                } else {
-                    notifyWebStatus("Cameratoegang is niet toegestaan.", true);
-                }
             }
         }
     }
@@ -535,191 +435,6 @@ public class MainActivity extends ComponentActivity {
                 "window.nativeNotificationStatus && window.nativeNotificationStatus(" + safe + "," + error + ")",
                 null
         ));
-    }
-
-    // ================================================================
-    // START NATIVE BARCODE SCANNER
-    // ================================================================
-
-    private void startNativeBarcodeScanner() {
-
-        if (!nativeScannerActive.compareAndSet(false, true)) {
-            return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            nativeScannerActive.set(false);
-            pendingNativeScannerStart = true;
-            requestPermissions(
-                    new String[]{Manifest.permission.CAMERA},
-                    CAMERA_PERMISSION_REQUEST
-            );
-            return;
-        }
-
-        barcodeDelivered.set(false);
-
-        runOnUiThread(() -> {
-            webView.setVisibility(View.GONE);
-            nativePreviewView.setVisibility(View.VISIBLE);
-        });
-
-        try {
-            if (barcodeExecutor == null || barcodeExecutor.isShutdown()) {
-                barcodeExecutor = Executors.newSingleThreadExecutor();
-            }
-
-            BarcodeScannerOptions options =
-                    new BarcodeScannerOptions.Builder()
-                            .setBarcodeFormats(
-                                    Barcode.FORMAT_EAN_13,
-                                    Barcode.FORMAT_EAN_8,
-                                    Barcode.FORMAT_UPC_A,
-                                    Barcode.FORMAT_UPC_E
-                            )
-                            .build();
-
-            barcodeScanner = BarcodeScanning.getClient(options);
-
-            cameraController = new LifecycleCameraController(this);
-            cameraController.setCameraSelector(
-                    CameraSelector.DEFAULT_BACK_CAMERA
-            );
-            cameraController.setEnabledUseCases(
-                    CameraController.IMAGE_ANALYSIS
-            );
-            cameraController.setImageAnalysisBackpressureStrategy(
-                    ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-            );
-
-            MlKitAnalyzer analyzer = new MlKitAnalyzer(
-                    Arrays.asList(barcodeScanner),
-                    ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL,
-                    barcodeExecutor,
-                    result -> {
-                        if (!nativeScannerActive.get()
-                                || barcodeDelivered.get()) {
-                            return;
-                        }
-
-                        try {
-                            java.util.List<Barcode> barcodes =
-                                    result.getValue(barcodeScanner);
-
-                            if (barcodes == null) return;
-
-                            for (Barcode barcode : barcodes) {
-                                String raw = barcode.getRawValue();
-                                if (raw == null) continue;
-
-                                String code = raw.replaceAll("\\D", "");
-                                if (code.length() < 8) continue;
-
-                                if (barcodeDelivered.compareAndSet(false, true)) {
-                                    runOnUiThread(() -> {
-                                        stopNativeBarcodeScanner();
-                                        if (webView != null) {
-                                            webView.evaluateJavascript(
-                                                    "window.nativeBarcodeDetected && window.nativeBarcodeDetected("
-                                                            + org.json.JSONObject.quote(code)
-                                                            + ")",
-                                                    null
-                                            );
-                                        }
-                                    });
-                                    break;
-                                }
-                            }
-                        } catch (Exception ignored) {
-                            // Een enkele analysefout mag de scanner niet sluiten.
-                        }
-                    }
-            );
-
-            cameraController.setImageAnalysisAnalyzer(
-                    barcodeExecutor,
-                    analyzer
-            );
-
-            cameraController.bindToLifecycle(this);
-            nativePreviewView.setController(cameraController);
-
-        } catch (Exception e) {
-            nativeScannerActive.set(false);
-            barcodeDelivered.set(false);
-
-            if (barcodeScanner != null) {
-                try { barcodeScanner.close(); } catch (Exception ignored) {}
-                barcodeScanner = null;
-            }
-
-            if (cameraController != null) {
-                try { cameraController.unbind(); } catch (Exception ignored) {}
-                cameraController = null;
-            }
-
-            runOnUiThread(() -> {
-                nativePreviewView.setVisibility(View.GONE);
-                webView.setVisibility(View.VISIBLE);
-                webView.evaluateJavascript(
-                        "window.nativeBarcodeError && window.nativeBarcodeError()",
-                        null
-                );
-            });
-        }
-    }
-
-    // ================================================================
-    // STOP NATIVE BARCODE SCANNER
-    // ================================================================
-
-    private void stopNativeBarcodeScanner() {
-
-        nativeScannerActive.set(false);
-        barcodeDelivered.set(false);
-
-        if (cameraController != null) {
-            try {
-                cameraController.unbind();
-            } catch (Exception ignored) {
-            }
-            cameraController = null;
-        }
-
-        if (cameraProvider != null) {
-            try {
-                cameraProvider.unbindAll();
-            } catch (Exception ignored) {
-            }
-            cameraProvider = null;
-        }
-
-        if (barcodeScanner != null) {
-
-            try {
-                barcodeScanner.close();
-            } catch (Exception ignored) {
-            }
-
-            barcodeScanner = null;
-        }
-
-        if (nativePreviewView != null) {
-
-            nativePreviewView.setVisibility(
-                    View.GONE
-            );
-        }
-
-        if (webView != null) {
-
-            webView.setVisibility(
-                    View.VISIBLE
-            );
-        }
     }
 
     // ================================================================
@@ -1428,23 +1143,6 @@ public class MainActivity extends ComponentActivity {
         }
 
         @JavascriptInterface
-        public void startNativeBarcodeScanner() {
-
-            runOnUiThread(
-                    () -> startNativeBarcodeScanner()
-            );
-        }
-
-        @JavascriptInterface
-        public void stopNativeBarcodeScanner() {
-
-            runOnUiThread(
-                    () -> MainActivity.this
-                            .stopNativeBarcodeScanner()
-            );
-        }
-
-        @JavascriptInterface
         public void testShoppingReminder() {
             runOnUiThread(() -> testShoppingReminderNative());
         }
@@ -1467,12 +1165,6 @@ public class MainActivity extends ComponentActivity {
     @Override
     public void onBackPressed() {
 
-        if (nativeScannerActive.get()) {
-
-            stopNativeBarcodeScanner();
-            return;
-        }
-
         if (webView != null
                 && webView.canGoBack()) {
 
@@ -1490,14 +1182,6 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
-
-        stopNativeBarcodeScanner();
-
-        if (barcodeExecutor != null) {
-
-            barcodeExecutor.shutdownNow();
-            barcodeExecutor = null;
-        }
 
         if (webView != null) {
 
