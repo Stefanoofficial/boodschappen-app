@@ -22,6 +22,7 @@ dependencies {
 
     // AndroidX Core / SplashScreen
     implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.webkit:webkit:1.17.1'
 
     // CameraX
     implementation 'androidx.camera:camera-core:1.4.1'
