@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
         ));
 
         ImageView icon = new ImageView(this);
-        icon.setImageResource(R.drawable.splash_icon);
+        icon.setImageResource(R.mipmap.ic_launcher);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         int iconSize = dp(150);
