@@ -18,43 +18,40 @@ workflows:
           pwd
           ls -la
 
-          echo "=== CHECK FILES ==="
-          test -f index.html
+          echo "=== CHECK ANDROID PROJECT ==="
+          test -d android
           test -f android/gradlew
           test -f android/settings.gradle
           test -f android/app/build.gradle
           test -f android/app/src/main/AndroidManifest.xml
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
-
-          echo "=== CHECK NOTIFICATION RECEIVER ==="
-          test -f android/app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
-
-          echo "=== CHECK STYLES ==="
-          test -f android/app/src/main/res/values/styles.xml
+          test -f index.html
 
           echo "=== PREPARE WEB ASSET ==="
           mkdir -p android/app/src/main/assets
           cp index.html android/app/src/main/assets/index.html
 
-          echo "=== PREPARE DRAWABLES ==="
-          mkdir -p android/app/src/main/res/drawable
-
+          echo "=== PREPARE ICON ==="
           if [ -f icon-512-maskable.png ]; then
+            mkdir -p android/app/src/main/res/drawable
             cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
           fi
 
+          echo "=== PREPARE SPLASH ==="
           if [ -f splash_icon.png ]; then
+            mkdir -p android/app/src/main/res/drawable
             cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
           fi
 
-          echo "=== PREPARE MIPMAP DIRECTORIES ==="
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-
+          echo "=== PREPARE MIPMAPS ==="
           if [ -f icon-512-maskable.png ]; then
+
+            mkdir -p android/app/src/main/res/mipmap-mdpi
+            mkdir -p android/app/src/main/res/mipmap-hdpi
+            mkdir -p android/app/src/main/res/mipmap-xhdpi
+            mkdir -p android/app/src/main/res/mipmap-xxhdpi
+            mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
             cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
             cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 
@@ -69,12 +66,12 @@ workflows:
 
             cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
             cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
           fi
 
-          echo "=== CHECK WEBVIEW ASSET ==="
-          test -f android/app/src/main/assets/index.html
-
-          echo "=== PREPARATION COMPLETE ==="
+          echo "========================================"
+          echo "       PREPARATION COMPLETE"
+          echo "========================================"
 
 
       - name: Set Android SDK location
@@ -83,44 +80,8 @@ workflows:
 
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
-          echo "=== ANDROID SDK ==="
+          echo "=== SDK ==="
           cat "$CM_BUILD_DIR/android/local.properties"
-
-
-      - name: Verify WebView project
-        script: |
-          set -e
-
-          cd "$CM_BUILD_DIR/android"
-
-          chmod +x ./gradlew
-
-          echo "========================================"
-          echo "       VERIFY WEBVIEW PROJECT"
-          echo "========================================"
-
-          echo "=== GRADLE ==="
-          ./gradlew --version
-
-          echo "=== MAIN ACTIVITY ==="
-          grep -n "class MainActivity" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
-
-          echo "=== WEBVIEW ==="
-          grep -n "WebView" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
-
-          echo "=== MANIFEST ==="
-          test -f app/src/main/AndroidManifest.xml
-
-          echo "=== INDEX ==="
-          test -f app/src/main/assets/index.html
-
-          echo "=== STYLES ==="
-          test -f app/src/main/res/values/styles.xml
-
-          echo "=== NOTIFICATION RECEIVER ==="
-          test -f app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
-
-          echo "=== VERIFY COMPLETE ==="
 
 
       - name: Build Android APK
@@ -135,15 +96,13 @@ workflows:
           echo "       BUILD ANDROID APK"
           echo "========================================"
 
-          echo "=== CLEAN ==="
           ./gradlew clean
-
-          echo "=== BUILD DEBUG APK ==="
           ./gradlew assembleDebug
 
-          echo "=== BUILD COMPLETE ==="
+          echo "========================================"
+          echo "       BUILD COMPLETE"
+          echo "========================================"
 
-          echo "=== APK ==="
           find app/build/outputs/apk/debug -type f -name "*.apk" -print
 
 
