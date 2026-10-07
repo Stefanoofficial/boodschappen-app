@@ -44,6 +44,7 @@ import androidx.camera.view.LifecycleCameraController;
 import androidx.camera.mlkit.vision.MlKitAnalyzer;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
+import androidx.webkit.WebViewAssetLoader;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -122,7 +123,36 @@ public class MainActivity extends ComponentActivity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        webView.setWebViewClient(new WebViewClient());
+        // Gebruik een HTTPS-achtige lokale origin voor de WebView.
+        // Hierdoor kan de bestaande webscanner met getUserMedia() veilig
+        // de camera gebruiken in de APK.
+        final WebViewAssetLoader assetLoader =
+                new WebViewAssetLoader.Builder()
+                        .addPathHandler(
+                                "/assets/",
+                                new WebViewAssetLoader.AssetsPathHandler(this)
+                        )
+                        .build();
+
+        webView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public android.webkit.WebResourceResponse shouldInterceptRequest(
+                    WebView view,
+                    android.webkit.WebResourceRequest request
+            ) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
+            @SuppressWarnings("deprecation")
+            public android.webkit.WebResourceResponse shouldInterceptRequest(
+                    WebView view,
+                    String url
+            ) {
+                return assetLoader.shouldInterceptRequest(url);
+            }
+        });
 
         webView.setWebChromeClient(new WebChromeClient() {
 
@@ -130,8 +160,20 @@ public class MainActivity extends ComponentActivity {
             public void onPermissionRequest(
                     final PermissionRequest request
             ) {
-
                 runOnUiThread(() -> {
+
+                    boolean wantsCamera = false;
+                    for (String resource : request.getResources()) {
+                        if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                            wantsCamera = true;
+                            break;
+                        }
+                    }
+
+                    if (!wantsCamera) {
+                        request.deny();
+                        return;
+                    }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                             && checkSelfPermission(
@@ -157,6 +199,15 @@ public class MainActivity extends ComponentActivity {
                     }
                 });
             }
+
+            @Override
+            public void onPermissionRequestCanceled(
+                    PermissionRequest request
+            ) {
+                if (pendingPermissionRequest == request) {
+                    pendingPermissionRequest = null;
+                }
+            }
         });
 
         webView.addJavascriptInterface(
@@ -175,7 +226,7 @@ public class MainActivity extends ComponentActivity {
         );
 
         webView.loadUrl(
-                "file:///android_asset/index.html"
+                "https://appassets.androidplatform.net/assets/index.html"
         );
 
         // ============================================================
