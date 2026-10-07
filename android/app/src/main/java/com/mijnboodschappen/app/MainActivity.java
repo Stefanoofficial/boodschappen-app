@@ -39,6 +39,9 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
+import androidx.camera.view.CameraController;
+import androidx.camera.view.LifecycleCameraController;
+import androidx.camera.mlkit.vision.MlKitAnalyzer;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -52,6 +55,7 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 
 public class MainActivity extends ComponentActivity {
 
@@ -60,6 +64,7 @@ public class MainActivity extends ComponentActivity {
 
     private PreviewView nativePreviewView;
     private ProcessCameraProvider cameraProvider;
+    private LifecycleCameraController cameraController;
     private ExecutorService barcodeExecutor;
     private BarcodeScanner barcodeScanner;
 
@@ -76,6 +81,7 @@ public class MainActivity extends ComponentActivity {
     private static final String PREFS_NAME = "notification_settings";
     private boolean pendingTestNotification = false;
     private boolean pendingScheduleAfterPermission = false;
+    private boolean pendingNativeScannerStart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +195,7 @@ public class MainActivity extends ComponentActivity {
         );
 
         nativePreviewView.setImplementationMode(
-                PreviewView.ImplementationMode.PERFORMANCE
+                PreviewView.ImplementationMode.COMPATIBLE
         );
 
         nativePreviewView.setScaleType(
@@ -261,24 +267,29 @@ public class MainActivity extends ComponentActivity {
 
         if (requestCode == CAMERA_PERMISSION_REQUEST) {
 
+            boolean granted = grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
             if (pendingPermissionRequest != null) {
-
-                if (grantResults.length > 0
-                        && grantResults[0]
-                        == PackageManager.PERMISSION_GRANTED) {
-
+                if (granted) {
                     pendingPermissionRequest.grant(
                             new String[]{
                                     PermissionRequest.RESOURCE_VIDEO_CAPTURE
                             }
                     );
-
                 } else {
-
                     pendingPermissionRequest.deny();
                 }
-
                 pendingPermissionRequest = null;
+            }
+
+            if (pendingNativeScannerStart) {
+                pendingNativeScannerStart = false;
+                if (granted) {
+                    runOnUiThread(() -> startNativeBarcodeScanner());
+                } else {
+                    notifyWebStatus("Cameratoegang is niet toegestaan.", true);
+                }
             }
         }
     }
@@ -481,232 +492,133 @@ public class MainActivity extends ComponentActivity {
 
     private void startNativeBarcodeScanner() {
 
-        if (nativeScannerActive.get()) {
+        if (!nativeScannerActive.compareAndSet(false, true)) {
             return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && checkSelfPermission(
-                Manifest.permission.CAMERA
-        ) != PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
 
+            nativeScannerActive.set(false);
+            pendingNativeScannerStart = true;
             requestPermissions(
-                    new String[]{
-                            Manifest.permission.CAMERA
-                    },
+                    new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_REQUEST
             );
-
             return;
         }
 
-        nativeScannerActive.set(true);
         barcodeDelivered.set(false);
 
-        webView.setVisibility(View.GONE);
-        nativePreviewView.setVisibility(View.VISIBLE);
+        runOnUiThread(() -> {
+            webView.setVisibility(View.GONE);
+            nativePreviewView.setVisibility(View.VISIBLE);
+        });
 
-        if (barcodeExecutor == null) {
-            barcodeExecutor =
-                    Executors.newSingleThreadExecutor();
-        }
-
-        // ============================================================
-        // ML KIT BARCODE CONFIGURATION
-        // ============================================================
-
-        BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(
-                                Barcode.FORMAT_EAN_13,
-                                Barcode.FORMAT_EAN_8,
-                                Barcode.FORMAT_UPC_A,
-                                Barcode.FORMAT_UPC_E
-                        )
-                        .build();
-
-        barcodeScanner =
-                BarcodeScanning.getClient(options);
-
-        ListenableFuture<ProcessCameraProvider> future =
-                ProcessCameraProvider.getInstance(this);
-
-        future.addListener(() -> {
-
-            try {
-
-                cameraProvider = future.get();
-
-                // ====================================================
-                // CAMERA PREVIEW
-                // ====================================================
-
-                Preview preview =
-                        new Preview.Builder()
-                                .build();
-
-                preview.setSurfaceProvider(
-                        nativePreviewView
-                                .getSurfaceProvider()
-                );
-
-                // ====================================================
-                // IMAGE ANALYSIS
-                // ====================================================
-
-                ImageAnalysis analysis =
-                        new ImageAnalysis.Builder()
-                                .setBackpressureStrategy(
-                                        ImageAnalysis
-                                                .STRATEGY_KEEP_ONLY_LATEST
-                                )
-                                .build();
-
-                analysis.setAnalyzer(
-                        barcodeExecutor,
-                        imageProxy -> {
-
-                            if (!nativeScannerActive.get()
-                                    || barcodeDelivered.get()) {
-
-                                imageProxy.close();
-                                return;
-                            }
-
-                            android.media.Image mediaImage =
-                                    imageProxy.getImage();
-
-                            if (mediaImage == null) {
-
-                                imageProxy.close();
-                                return;
-                            }
-
-                            InputImage image =
-                                    InputImage.fromMediaImage(
-                                            mediaImage,
-                                            imageProxy
-                                                    .getImageInfo()
-                                                    .getRotationDegrees()
-                                    );
-
-                            barcodeScanner
-                                    .process(image)
-
-                                    .addOnSuccessListener(
-                                            barcodes -> {
-
-                                                if (!nativeScannerActive
-                                                        .get()
-                                                        || barcodeDelivered
-                                                        .get()) {
-
-                                                    return;
-                                                }
-
-                                                for (Barcode barcode :
-                                                        barcodes) {
-
-                                                    String raw =
-                                                            barcode
-                                                                    .getRawValue();
-
-                                                    if (raw == null) {
-                                                        continue;
-                                                    }
-
-                                                    String code =
-                                                            raw.replaceAll(
-                                                                    "\\D",
-                                                                    ""
-                                                            );
-
-                                                    if (code.length() >= 8
-                                                            && barcodeDelivered
-                                                            .compareAndSet(
-                                                                    false,
-                                                                    true
-                                                            )) {
-
-                                                        runOnUiThread(() -> {
-
-                                                            nativeScannerActive
-                                                                    .set(false);
-
-                                                            nativePreviewView
-                                                                    .setVisibility(
-                                                                            View.GONE
-                                                                    );
-
-                                                            webView
-                                                                    .setVisibility(
-                                                                            View.VISIBLE
-                                                                    );
-
-                                                            webView
-                                                                    .evaluateJavascript(
-                                                                            "window.nativeBarcodeDetected && window.nativeBarcodeDetected("
-                                                                                    + org.json.JSONObject
-                                                                                    .quote(code)
-                                                                                    + ")",
-                                                                            null
-                                                                    );
-                                                        });
-
-                                                        break;
-                                                    }
-                                                }
-                                            })
-
-                                    .addOnFailureListener(
-                                            e -> {
-                                                // Analysefout negeren.
-                                                // De volgende frame wordt
-                                                // automatisch opnieuw verwerkt.
-                                            })
-
-                                    .addOnCompleteListener(
-                                            task ->
-                                                    imageProxy.close()
-                                    );
-                        }
-                );
-
-                // ====================================================
-                // START CAMERA
-                // ====================================================
-
-                cameraProvider.unbindAll();
-
-                cameraProvider.bindToLifecycle(
-                        this,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview,
-                        analysis
-                );
-
-            } catch (Exception e) {
-
-                nativeScannerActive.set(false);
-
-                runOnUiThread(() -> {
-
-                    nativePreviewView.setVisibility(
-                            View.GONE
-                    );
-
-                    webView.setVisibility(
-                            View.VISIBLE
-                    );
-
-                    webView.evaluateJavascript(
-                            "window.nativeBarcodeError && window.nativeBarcodeError()",
-                            null
-                    );
-                });
+        try {
+            if (barcodeExecutor == null || barcodeExecutor.isShutdown()) {
+                barcodeExecutor = Executors.newSingleThreadExecutor();
             }
 
-        }, ContextCompat.getMainExecutor(this));
+            BarcodeScannerOptions options =
+                    new BarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(
+                                    Barcode.FORMAT_EAN_13,
+                                    Barcode.FORMAT_EAN_8,
+                                    Barcode.FORMAT_UPC_A,
+                                    Barcode.FORMAT_UPC_E
+                            )
+                            .build();
+
+            barcodeScanner = BarcodeScanning.getClient(options);
+
+            cameraController = new LifecycleCameraController(this);
+            cameraController.setCameraSelector(
+                    CameraSelector.DEFAULT_BACK_CAMERA
+            );
+            cameraController.setEnabledUseCases(
+                    CameraController.IMAGE_ANALYSIS
+            );
+            cameraController.setImageAnalysisBackpressureStrategy(
+                    ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+            );
+
+            MlKitAnalyzer analyzer = new MlKitAnalyzer(
+                    Arrays.asList(barcodeScanner),
+                    ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL,
+                    barcodeExecutor,
+                    result -> {
+                        if (!nativeScannerActive.get()
+                                || barcodeDelivered.get()) {
+                            return;
+                        }
+
+                        try {
+                            java.util.List<Barcode> barcodes =
+                                    result.getResult(barcodeScanner);
+
+                            if (barcodes == null) return;
+
+                            for (Barcode barcode : barcodes) {
+                                String raw = barcode.getRawValue();
+                                if (raw == null) continue;
+
+                                String code = raw.replaceAll("\\D", "");
+                                if (code.length() < 8) continue;
+
+                                if (barcodeDelivered.compareAndSet(false, true)) {
+                                    runOnUiThread(() -> {
+                                        stopNativeBarcodeScanner();
+                                        if (webView != null) {
+                                            webView.evaluateJavascript(
+                                                    "window.nativeBarcodeDetected && window.nativeBarcodeDetected("
+                                                            + org.json.JSONObject.quote(code)
+                                                            + ")",
+                                                    null
+                                            );
+                                        }
+                                    });
+                                    break;
+                                }
+                            }
+                        } catch (Exception ignored) {
+                            // Een enkele analysefout mag de scanner niet sluiten.
+                        }
+                    }
+            );
+
+            cameraController.setImageAnalysisAnalyzer(
+                    barcodeExecutor,
+                    analyzer
+            );
+
+            cameraController.bindToLifecycle(this);
+            nativePreviewView.setController(cameraController);
+
+        } catch (Exception e) {
+            nativeScannerActive.set(false);
+            barcodeDelivered.set(false);
+
+            if (barcodeScanner != null) {
+                try { barcodeScanner.close(); } catch (Exception ignored) {}
+                barcodeScanner = null;
+            }
+
+            if (cameraController != null) {
+                try { cameraController.unbind(); } catch (Exception ignored) {}
+                cameraController = null;
+            }
+
+            runOnUiThread(() -> {
+                nativePreviewView.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+                webView.evaluateJavascript(
+                        "window.nativeBarcodeError && window.nativeBarcodeError()",
+                        null
+                );
+            });
+        }
     }
 
     // ================================================================
@@ -718,12 +630,20 @@ public class MainActivity extends ComponentActivity {
         nativeScannerActive.set(false);
         barcodeDelivered.set(false);
 
-        if (cameraProvider != null) {
+        if (cameraController != null) {
+            try {
+                cameraController.unbind();
+            } catch (Exception ignored) {
+            }
+            cameraController = null;
+        }
 
+        if (cameraProvider != null) {
             try {
                 cameraProvider.unbindAll();
             } catch (Exception ignored) {
             }
+            cameraProvider = null;
         }
 
         if (barcodeScanner != null) {
