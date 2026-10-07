@@ -11157,8 +11157,7 @@ async function openBarcodeScanner(){
     barcodeVideo.setAttribute('webkit-playsinline','');
     ensureBarcodeCanvas();
 
-    // iPhone blijft met de bestaande camera-instellingen werken.
-    // Alleen Android krijgt de extra camera-optimalisaties.
+    // Alleen Android krijgt de extra WebView-camera-optimalisaties.
     if(isAndroidScanner){
       barcodeVideo.controls=false;
       barcodeVideo.disablePictureInPicture=true;
@@ -11173,7 +11172,8 @@ async function openBarcodeScanner(){
         facingMode:{ideal:'environment'},
         width:{ideal:960},
         height:{ideal:720},
-        aspectRatio:{ideal:4/3}
+        aspectRatio:{ideal:4/3},
+        frameRate:{ideal:30,max:30}
       }
     } : {
       audio:false,
@@ -11184,56 +11184,53 @@ async function openBarcodeScanner(){
         aspectRatio:{ideal:4/3}
       }
     };
+
     try{
       barcodeStream=await navigator.mediaDevices.getUserMedia(constraints);
     }catch(firstErr){
-      // Some older Safari/Android implementations are happier with a simpler constraint.
+      // Fallback voor oudere Android/WebView-camera's.
       barcodeStream=await navigator.mediaDevices.getUserMedia({audio:false,video:true});
     }
 
     barcodeVideo.srcObject=barcodeStream;
 
     if(isAndroidScanner){
-      // Android: laat de eerste camera-frame zo snel mogelijk door.
+      // Niet meer 900 ms kunstmatig wachten. Zodra metadata beschikbaar is,
+      // tonen we het camerabeeld meteen.
       await new Promise((resolve)=>{
-        if(barcodeVideo.readyState>=1) return resolve();
-        barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
-        setTimeout(resolve,900);
+        if(barcodeVideo.readyState>=1 && barcodeVideo.videoWidth) return resolve();
+        const done=()=>{
+          barcodeVideo.removeEventListener('loadedmetadata',done);
+          resolve();
+        };
+        barcodeVideo.addEventListener('loadedmetadata',done,{once:true});
+        setTimeout(done,300);
       });
 
-      // Probeer autoplay direct. Als WebView het eerste verzoek afwijst,
-      // proberen we nog kort opnieuw zodra de video klaar is.
-      let androidPlaying=false;
+      // Start playback zonder erop te wachten. Daardoor blokkeert play()
+      // het zichtbaar worden van de camera niet.
       try{
-        await barcodeVideo.play();
-        androidPlaying=true;
+        const playPromise=barcodeVideo.play();
+        if(playPromise && typeof playPromise.catch==='function') playPromise.catch(()=>{});
       }catch(_){ }
 
-      if(!androidPlaying){
-        await new Promise((resolve)=>{
-          let done=false;
-          const finish=()=>{
-            if(done) return;
-            done=true;
-            barcodeVideo.removeEventListener('canplay',retryPlay);
-            resolve();
-          };
-          const retryPlay=()=>{
-            barcodeVideo.play().catch(()=>{}).finally(finish);
-          };
-          barcodeVideo.addEventListener('canplay',retryPlay,{once:true});
-          setTimeout(finish,500);
-        });
-      }
-
-      // Continuous autofocus is requested after the stream is alive,
-      // zodat autofocus het openen van de scanner niet vertraagt.
+      // Continuous autofocus zodra de camera-track beschikbaar is.
       try{
         const track=barcodeStream.getVideoTracks && barcodeStream.getVideoTracks()[0];
         if(track && track.getCapabilities && track.applyConstraints){
           const caps=track.getCapabilities();
+          const advanced={};
           if(caps.focusMode && caps.focusMode.includes('continuous')){
-            track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{});
+            advanced.focusMode='continuous';
+          }
+          if(caps.exposureMode && caps.exposureMode.includes('continuous')){
+            advanced.exposureMode='continuous';
+          }
+          if(caps.whiteBalanceMode && caps.whiteBalanceMode.includes('continuous')){
+            advanced.whiteBalanceMode='continuous';
+          }
+          if(Object.keys(advanced).length){
+            track.applyConstraints({advanced:[advanced]}).catch(()=>{});
           }
         }
       }catch(_){ }
@@ -11251,17 +11248,18 @@ async function openBarcodeScanner(){
     }
 
     if(videoWrap){
-      // Wait until iOS/WebView has committed the actual camera dimensions.
-      await new Promise(resolve => requestAnimationFrame(() =>
-        requestAnimationFrame(resolve)
-      ));
+      // Android hoeft niet meer op twee extra animation frames te wachten.
+      if(!isAndroidScanner){
+        await new Promise(resolve => requestAnimationFrame(() =>
+          requestAnimationFrame(resolve)
+        ));
+      }
+
       const vw = Number(barcodeVideo.videoWidth || 0);
       const vh = Number(barcodeVideo.videoHeight || 0);
       videoWrap.classList.remove('video-portrait','video-landscape','video-normal');
       if(vw && vh){
         if(vh > vw * 1.12){
-          // Some subsequent camera opens return a portrait stream.
-          // Make the video element wider than the frame so no side bars show.
           videoWrap.classList.add('video-portrait');
         }else if(vw > vh * 1.12){
           videoWrap.classList.add('video-landscape');
