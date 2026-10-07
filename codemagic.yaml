@@ -43,6 +43,30 @@ workflows:
             cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
           fi
 
+          echo "=== PREPARE STYLES ==="
+          mkdir -p android/app/src/main/res/values
+
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+
+              <style name="AppTheme.NoActionBar" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#14BE4B</item>
+                  <item name="android:windowActionModeOverlay">true</item>
+                  <item name="android:windowNoTitle">true</item>
+              </style>
+
+              <style name="AppTheme.Splash" parent="AppTheme.NoActionBar">
+                  <item name="android:windowBackground">#FFFFFF</item>
+              </style>
+
+          </resources>
+          EOF
+
+          echo "=== CHECK STYLES ==="
+          cat android/app/src/main/res/values/styles.xml
+
           echo "=== PREPARE MIPMAPS ==="
           if [ -f icon-512-maskable.png ]; then
 
