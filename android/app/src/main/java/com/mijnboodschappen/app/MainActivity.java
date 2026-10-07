@@ -556,7 +556,7 @@ public class MainActivity extends ComponentActivity {
 
                         try {
                             java.util.List<Barcode> barcodes =
-                                    result.getResult(barcodeScanner);
+                                    result.getValue(barcodeScanner);
 
                             if (barcodes == null) return;
 
