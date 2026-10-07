@@ -14,35 +14,23 @@ workflows:
           echo "       PREPARE ANDROID APP"
           echo "========================================"
 
-          echo "=== BUILD DIRECTORY ==="
+          echo "=== ROOT ==="
           pwd
-
-          echo "=== CHECK ROOT FILES ==="
           ls -la
 
-          echo "=== CHECK INDEX ==="
+          echo "=== CHECK FILES ==="
           test -f index.html
-
-          echo "=== CHECK APP ICON ==="
-          test -f icon-512-maskable.png
-
-          echo "=== CHECK SPLASH ICON ==="
-          test -f splash_icon.png
-
-          echo "=== CHECK ANDROID PROJECT ==="
-          test -d android
           test -f android/gradlew
           test -f android/settings.gradle
           test -f android/app/build.gradle
-
-          echo "=== CHECK MAIN ACTIVITY ==="
+          test -f android/app/src/main/AndroidManifest.xml
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
           echo "=== CHECK NOTIFICATION RECEIVER ==="
           test -f android/app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
 
-          echo "=== CHECK MANIFEST ==="
-          test -f android/app/src/main/AndroidManifest.xml
+          echo "=== CHECK STYLES ==="
+          test -f android/app/src/main/res/values/styles.xml
 
           echo "=== PREPARE WEB ASSET ==="
           mkdir -p android/app/src/main/assets
@@ -50,13 +38,13 @@ workflows:
 
           echo "=== PREPARE DRAWABLES ==="
           mkdir -p android/app/src/main/res/drawable
-          cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
-          cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
 
-          if [ -f android/app/src/main/res/drawable/ic_notification.xml ]; then
-            echo "Notification icon found"
-          else
-            echo "WARNING: ic_notification.xml not found"
+          if [ -f icon-512-maskable.png ]; then
+            cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
+          fi
+
+          if [ -f splash_icon.png ]; then
+            cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
           fi
 
           echo "=== PREPARE MIPMAP DIRECTORIES ==="
@@ -66,93 +54,88 @@ workflows:
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
-          echo "=== COPY LAUNCHER ICONS ==="
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          if [ -f icon-512-maskable.png ]; then
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+          fi
 
-          echo "=== CHECK REQUIRED FILES ==="
+          echo "=== CHECK WEBVIEW ASSET ==="
           test -f android/app/src/main/assets/index.html
-          test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
-          test -f android/app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
-          test -f android/app/src/main/AndroidManifest.xml
 
-          echo "========================================"
-          echo "       PREPARATION COMPLETE"
-          echo "========================================"
+          echo "=== PREPARATION COMPLETE ==="
 
 
       - name: Set Android SDK location
         script: |
           set -e
 
-          echo "=== SET ANDROID SDK ==="
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
-          echo "=== LOCAL.PROPERTIES ==="
+          echo "=== ANDROID SDK ==="
           cat "$CM_BUILD_DIR/android/local.properties"
 
 
-      - name: Verify Android project
+      - name: Verify WebView project
         script: |
           set -e
-
-          echo "========================================"
-          echo "       VERIFY ANDROID PROJECT"
-          echo "========================================"
 
           cd "$CM_BUILD_DIR/android"
 
           chmod +x ./gradlew
 
-          echo "=== GRADLE VERSION ==="
+          echo "========================================"
+          echo "       VERIFY WEBVIEW PROJECT"
+          echo "========================================"
+
+          echo "=== GRADLE ==="
           ./gradlew --version
 
-          echo "=== CHECK MAIN ACTIVITY ==="
+          echo "=== MAIN ACTIVITY ==="
           grep -n "class MainActivity" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
-          echo "=== CHECK NOTIFICATION RECEIVER ==="
-          grep -n "class NotificationReceiver" app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
-
-          echo "=== CHECK WEBVIEW ==="
+          echo "=== WEBVIEW ==="
           grep -n "WebView" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
-          echo "=== CHECK NOTIFICATIONS ==="
-          grep -n "POST_NOTIFICATIONS" app/src/main/AndroidManifest.xml
+          echo "=== MANIFEST ==="
+          test -f app/src/main/AndroidManifest.xml
 
-          echo "=== CHECK CAMERA ==="
-          grep -n "CAMERA" app/src/main/AndroidManifest.xml
-
-          echo "=== CHECK WEB ASSET ==="
+          echo "=== INDEX ==="
           test -f app/src/main/assets/index.html
 
-          echo "=== PROJECT CHECK COMPLETE ==="
+          echo "=== STYLES ==="
+          test -f app/src/main/res/values/styles.xml
+
+          echo "=== NOTIFICATION RECEIVER ==="
+          test -f app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
+
+          echo "=== VERIFY COMPLETE ==="
 
 
       - name: Build Android APK
         script: |
           set -e
 
-          echo "========================================"
-          echo "       BUILD ANDROID APK"
-          echo "========================================"
-
           cd "$CM_BUILD_DIR/android"
 
           chmod +x ./gradlew
 
-          echo "=== CLEAN BUILD ==="
+          echo "========================================"
+          echo "       BUILD ANDROID APK"
+          echo "========================================"
+
+          echo "=== CLEAN ==="
           ./gradlew clean
 
           echo "=== BUILD DEBUG APK ==="
@@ -160,7 +143,7 @@ workflows:
 
           echo "=== BUILD COMPLETE ==="
 
-          echo "=== APK FILES ==="
+          echo "=== APK ==="
           find app/build/outputs/apk/debug -type f -name "*.apk" -print
 
 
