@@ -1,6 +1,6 @@
 workflows:
   android-apk:
-    name: Android APK - ML Kit Scanner
+    name: Android APK - Mijn Boodschappen
     instance_type: mac_mini_m2
 
     scripts:
@@ -38,23 +38,28 @@ workflows:
           echo "=== CHECK MAIN ACTIVITY ==="
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
+          echo "=== CHECK NOTIFICATION RECEIVER ==="
+          test -f android/app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
+
+          echo "=== CHECK MANIFEST ==="
+          test -f android/app/src/main/AndroidManifest.xml
+
           echo "=== PREPARE WEB ASSET ==="
           mkdir -p android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
 
-          cp index.html \
-             android/app/src/main/assets/index.html
-
-          echo "=== PREPARE DRAWABLE ==="
+          echo "=== PREPARE DRAWABLES ==="
           mkdir -p android/app/src/main/res/drawable
+          cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
+          cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/drawable/ic_launcher.png
-
-          cp splash_icon.png \
-             android/app/src/main/res/drawable/splash_icon.png
+          if [ -f android/app/src/main/res/drawable/ic_notification.xml ]; then
+            echo "Notification icon found"
+          else
+            echo "WARNING: ic_notification.xml not found"
+          fi
 
           echo "=== PREPARE MIPMAP DIRECTORIES ==="
-
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-xhdpi
@@ -62,81 +67,26 @@ workflows:
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
           echo "=== COPY LAUNCHER ICONS ==="
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-
-          echo "=== CREATE VALUES DIRECTORY ==="
-          mkdir -p android/app/src/main/res/values
-
-          echo "=== CREATE SPLASH THEME ==="
-
-          printf '%s\n' \
-          '<?xml version="1.0" encoding="utf-8"?>' \
-          '<resources>' \
-          '' \
-          '    <style name="AppTheme.NoActionBar" parent="@android:style/Theme.Material.Light.NoActionBar">' \
-          '        <item name="android:fontFamily">sans</item>' \
-          '        <item name="android:windowActionModeOverlay">true</item>' \
-          '        <item name="android:windowNoTitle">true</item>' \
-          '        <item name="android:windowBackground">#eef8f1</item>' \
-          '        <item name="android:colorAccent">#4f7658</item>' \
-          '        <item name="android:statusBarColor">#eef8f1</item>' \
-          '        <item name="android:navigationBarColor">#eef8f1</item>' \
-          '        <item name="android:windowLightStatusBar">true</item>' \
-          '        <item name="android:windowLightNavigationBar">true</item>' \
-          '    </style>' \
-          '' \
-          '    <style name="AppTheme.Splash" parent="Theme.SplashScreen">' \
-          '        <item name="windowSplashScreenBackground">#FFFFFF</item>' \
-          '        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>' \
-          '        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>' \
-          '    </style>' \
-          '' \
-          '</resources>' \
-          > android/app/src/main/res/values/styles.xml
-
-          echo "=== CHECK STYLES ==="
-          test -f android/app/src/main/res/values/styles.xml
-
-          echo "=== CHECK SPLASH ==="
-          test -f android/app/src/main/res/drawable/splash_icon.png
-
-          echo "=== CHECK LAUNCHER ==="
-          test -f android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
-          echo "=== CHECK WEB ASSET ==="
+          echo "=== CHECK REQUIRED FILES ==="
           test -f android/app/src/main/assets/index.html
-
-          echo "=== CHECK MAIN ACTIVITY ==="
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
+          test -f android/app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
+          test -f android/app/src/main/AndroidManifest.xml
 
           echo "========================================"
           echo "       PREPARATION COMPLETE"
@@ -148,47 +98,46 @@ workflows:
           set -e
 
           echo "=== SET ANDROID SDK ==="
-
-          echo "sdk.dir=$ANDROID_SDK_ROOT" \
-            > "$CM_BUILD_DIR/android/local.properties"
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
           echo "=== LOCAL.PROPERTIES ==="
           cat "$CM_BUILD_DIR/android/local.properties"
 
 
-      - name: Verify Android ML Kit project
+      - name: Verify Android project
         script: |
           set -e
 
           echo "========================================"
-          echo "       VERIFY ANDROID ML KIT"
+          echo "       VERIFY ANDROID PROJECT"
           echo "========================================"
 
           cd "$CM_BUILD_DIR/android"
 
-          echo "=== GRADLE VERSION ==="
           chmod +x ./gradlew
+
+          echo "=== GRADLE VERSION ==="
           ./gradlew --version
 
           echo "=== CHECK MAIN ACTIVITY ==="
-          grep -n "class MainActivity" \
-            app/src/main/java/com/mijnboodschappen/app/MainActivity.java
+          grep -n "class MainActivity" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
-          echo "=== CHECK ML KIT ==="
-          grep -n "barcode-scanning" \
-            app/build.gradle
+          echo "=== CHECK NOTIFICATION RECEIVER ==="
+          grep -n "class NotificationReceiver" app/src/main/java/com/mijnboodschappen/app/NotificationReceiver.java
 
-          echo "=== CHECK CAMERAX ==="
-          grep -n "camera-" \
-            app/build.gradle || true
+          echo "=== CHECK WEBVIEW ==="
+          grep -n "WebView" app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
-          echo "=== CHECK ANDROID MANIFEST ==="
-          test -f app/src/main/AndroidManifest.xml
+          echo "=== CHECK NOTIFICATIONS ==="
+          grep -n "POST_NOTIFICATIONS" app/src/main/AndroidManifest.xml
 
-          echo "=== CHECK INDEX ==="
+          echo "=== CHECK CAMERA ==="
+          grep -n "CAMERA" app/src/main/AndroidManifest.xml
+
+          echo "=== CHECK WEB ASSET ==="
           test -f app/src/main/assets/index.html
 
-          echo "=== ML KIT PROJECT CHECK COMPLETE ==="
+          echo "=== PROJECT CHECK COMPLETE ==="
 
 
       - name: Build Android APK
@@ -212,10 +161,7 @@ workflows:
           echo "=== BUILD COMPLETE ==="
 
           echo "=== APK FILES ==="
-          find app/build/outputs/apk/debug \
-            -type f \
-            -name "*.apk" \
-            -print
+          find app/build/outputs/apk/debug -type f -name "*.apk" -print
 
 
     artifacts:
