@@ -9906,7 +9906,8 @@ function slideToTab(tabIndex){
   // Meer is één zelfstandig scherm. Laat niet tegelijk de algemene app-animatie
   // én het Meer-scherm bewegen; dat gaf de indruk dat Meer dubbel open ging.
   if(tabIndex === 2){
-    app.classList.add('more-screen-enter');
+    // Meer opent direct: geen fade-out/fade-in of schuifanimatie.
+    app.classList.remove('more-screen-enter');
   } else if(previous === 2 && tabIndex === 0){
     // Bij teruggaan naar Lijst schuift alleen het hoofdscherm één keer binnen.
     app.classList.add('main-screen-enter');
@@ -10839,7 +10840,7 @@ let barcodeBusy = false;
 
 // iPhone en Android gebruiken dezelfde scanmethode.
 const isAndroidScanner = /Android/i.test(navigator.userAgent || '');
-const barcodeScanInterval = 60;
+const barcodeScanInterval = isAndroidScanner ? 45 : 60;
 
 const EAN_L = {
   0:[3,2,1,1], 1:[2,2,2,1], 2:[2,1,2,2], 3:[1,4,1,1], 4:[1,1,3,2],
@@ -11156,9 +11157,25 @@ async function openBarcodeScanner(){
     barcodeVideo.setAttribute('webkit-playsinline','');
     ensureBarcodeCanvas();
 
-    // iPhone en Android gebruiken dezelfde camera-instellingen.
-    // Alleen de fysieke camera/autofocus van het toestel kan nog verschillen.
-    const constraints={
+    // iPhone blijft met de bestaande camera-instellingen werken.
+    // Alleen Android krijgt de extra camera-optimalisaties.
+    if(isAndroidScanner){
+      barcodeVideo.controls=false;
+      barcodeVideo.disablePictureInPicture=true;
+      barcodeVideo.preload='auto';
+      barcodeVideo.setAttribute('disablepictureinpicture','');
+      barcodeVideo.removeAttribute('controls');
+    }
+
+    const constraints = isAndroidScanner ? {
+      audio:false,
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:960},
+        height:{ideal:720},
+        aspectRatio:{ideal:4/3}
+      }
+    } : {
       audio:false,
       video:{
         facingMode:{ideal:'environment'},
@@ -11176,26 +11193,61 @@ async function openBarcodeScanner(){
 
     barcodeVideo.srcObject=barcodeStream;
 
-    // Vraag continue autofocus aan wanneer de camera/browser dit ondersteunt.
-    // Op iPhone/Android wordt dit alleen toegepast als de hardware het aanbiedt.
-    try{
-      const track=barcodeStream.getVideoTracks && barcodeStream.getVideoTracks()[0];
-      if(track && track.getCapabilities && track.applyConstraints){
-        const caps=track.getCapabilities();
-        if(caps.focusMode && caps.focusMode.includes('continuous')){
-          await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
-        }
-      }
-    }catch(_){}
+    if(isAndroidScanner){
+      // Android: laat de eerste camera-frame zo snel mogelijk door.
+      await new Promise((resolve)=>{
+        if(barcodeVideo.readyState>=1) return resolve();
+        barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
+        setTimeout(resolve,900);
+      });
 
-    await new Promise((resolve)=>{
-      if(barcodeVideo.readyState>=1) return resolve();
-      barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
-      setTimeout(resolve,2000);
-    });
-    try{ await barcodeVideo.play(); }catch(playErr){
-      setBarcodeStatus('Tik op de camera om het beeld te starten.');
-      return;
+      // Probeer autoplay direct. Als WebView het eerste verzoek afwijst,
+      // proberen we nog kort opnieuw zodra de video klaar is.
+      let androidPlaying=false;
+      try{
+        await barcodeVideo.play();
+        androidPlaying=true;
+      }catch(_){ }
+
+      if(!androidPlaying){
+        await new Promise((resolve)=>{
+          let done=false;
+          const finish=()=>{
+            if(done) return;
+            done=true;
+            barcodeVideo.removeEventListener('canplay',retryPlay);
+            resolve();
+          };
+          const retryPlay=()=>{
+            barcodeVideo.play().catch(()=>{}).finally(finish);
+          };
+          barcodeVideo.addEventListener('canplay',retryPlay,{once:true});
+          setTimeout(finish,500);
+        });
+      }
+
+      // Continuous autofocus is requested after the stream is alive,
+      // zodat autofocus het openen van de scanner niet vertraagt.
+      try{
+        const track=barcodeStream.getVideoTracks && barcodeStream.getVideoTracks()[0];
+        if(track && track.getCapabilities && track.applyConstraints){
+          const caps=track.getCapabilities();
+          if(caps.focusMode && caps.focusMode.includes('continuous')){
+            track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{});
+          }
+        }
+      }catch(_){ }
+    }else{
+      // iPhone: bestaande flow ongewijzigd.
+      await new Promise((resolve)=>{
+        if(barcodeVideo.readyState>=1) return resolve();
+        barcodeVideo.addEventListener('loadedmetadata',resolve,{once:true});
+        setTimeout(resolve,2000);
+      });
+      try{ await barcodeVideo.play(); }catch(playErr){
+        setBarcodeStatus('Tik op de camera om het beeld te starten.');
+        return;
+      }
     }
 
     if(videoWrap){
@@ -12274,5 +12326,20 @@ body.dark-theme #loginScreen .loginBox > .registerButton {
 
 body.dark-theme #loginScreen .loginBox > .registerButton i {
   color: #9ED5AD !important;
+}
+</style>
+
+<style id="meer-menu-no-fade-final">
+/* Meer-menu: direct openen/sluiten zonder fade of schermanimatie. */
+.app.more-screen-enter > #moreView,
+.app.more-active > #moreView,
+.app.more-active #familyMenu,
+.app.more-active .familyMenuPage {
+  animation: none !important;
+  transition: none !important;
+}
+.app.more-active > #moreView {
+  opacity: 1 !important;
+  transform: none !important;
 }
 </style>
