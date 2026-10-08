@@ -145,7 +145,6 @@ workflows:
           set -e
           cd "$CM_BUILD_DIR/android"
           chmod +x ./gradlew
-          ./gradlew clean
           ./gradlew assembleDebug
           find app/build/outputs/apk/debug -type f -name "*.apk" -print
 
