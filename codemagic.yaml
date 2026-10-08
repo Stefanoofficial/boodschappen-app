@@ -19,6 +19,7 @@ workflows:
           ls -la
 
           echo "=== CHECK ANDROID PROJECT ==="
+
           test -d android
           test -f android/gradlew
           test -f android/settings.gradle
@@ -27,30 +28,63 @@ workflows:
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
           test -f index.html
 
-          # Verwijder de oude verkeerd benoemde resource-map als die nog in Git staat.
-          # Alle echte Android resources staan in android/app/src/main/res.
-          rm -rf "android/app/src/main/    res"
-
           echo "=== PREPARE WEB ASSET ==="
+
           mkdir -p android/app/src/main/assets
           cp index.html android/app/src/main/assets/index.html
 
-          echo "=== PREPARE ICON ==="
-          if [ -f icon-512-maskable.png ]; then
-            mkdir -p android/app/src/main/res/drawable
-            cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher.png
-          fi
+          echo "=== PREPARE DRAWABLE DIRECTORY ==="
 
-          echo "=== PREPARE SPLASH ==="
-          if [ -f splash_icon.png ]; then
-            mkdir -p android/app/src/main/res/drawable
-            cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
-          fi
-
-          echo "=== PREPARE ADAPTIVE ANDROID ICON ==="
-          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
-          mkdir -p android/app/src/main/res/values
           mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/values
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+
+          echo "=== PREPARE APP ICON ==="
+
+          if [ -f icon-512-maskable.png ]; then
+            cp icon-512-maskable.png \
+              android/app/src/main/res/drawable/ic_launcher.png
+
+            echo "Launcher source copied."
+          else
+            echo "ERROR: icon-512-maskable.png not found."
+            exit 1
+          fi
+
+          echo "=== PREPARE SPLASH IMAGE ==="
+
+          if [ -f splash_icon.png ]; then
+            cp splash_icon.png \
+              android/app/src/main/res/drawable/splash_icon.png
+
+            echo "Splash image copied."
+          else
+            echo "WARNING: splash_icon.png not found."
+          fi
+
+          echo "=== PREPARE ADAPTIVE ICON FOREGROUND ==="
+
+          if [ -f ic_launcher_foreground.png ]; then
+
+            cp ic_launcher_foreground.png \
+              android/app/src/main/res/drawable/ic_launcher_foreground.png
+
+            echo "Foreground copied from project root."
+
+          elif [ -f android/app/src/main/res/drawable/ic_launcher_foreground.png ]; then
+
+            echo "Foreground already exists in Android resources."
+
+          else
+
+            echo "ERROR: ic_launcher_foreground.png not found."
+            echo ""
+            echo "Place ic_launcher_foreground.png in the root of the repository."
+            exit 1
+
+          fi
+
+          echo "=== PREPARE ICON COLORS ==="
 
           cat > android/app/src/main/res/values/colors.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
@@ -58,6 +92,8 @@ workflows:
               <color name="icon_green">#14BE4B</color>
           </resources>
           EOF
+
+          echo "=== PREPARE ADAPTIVE ICON ==="
 
           cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
@@ -75,60 +111,98 @@ workflows:
           </adaptive-icon>
           EOF
 
-          echo "=== PREPARE SPLASH THEME ==="
+          echo "=== PREPARE MIPMAP ICONS ==="
+
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          cp icon-512-maskable.png \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+          echo "=== PREPARE STYLES ==="
+
           cat > android/app/src/main/res/values/styles.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
 
-              <style name="AppTheme.NoActionBar" parent="android:style/Theme.Material.Light.NoActionBar">
+              <style name="AppTheme.NoActionBar"
+                  parent="android:style/Theme.Material.Light.NoActionBar">
+
                   <item name="android:fontFamily">sans</item>
                   <item name="android:colorAccent">#14BE4B</item>
+
                   <item name="android:windowActionModeOverlay">true</item>
                   <item name="android:windowNoTitle">true</item>
+
                   <item name="android:navigationBarColor">#eef8f1</item>
                   <item name="android:statusBarColor">#eef8f1</item>
+
                   <item name="android:windowLightStatusBar">true</item>
                   <item name="android:windowLightNavigationBar">true</item>
+
               </style>
 
-              <style name="AppTheme.Splash" parent="Theme.SplashScreen">
-                  <item name="windowSplashScreenBackground">#eef8f1</item>
-                  <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-                  <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+              <style name="AppTheme.Splash"
+                  parent="AppTheme.NoActionBar">
+
+                  <item name="android:windowBackground">#eef8f1</item>
+
               </style>
 
           </resources>
           EOF
 
-          echo "=== CHECK SPLASH THEME ==="
+          echo "=== VERIFY IMPORTANT RESOURCES ==="
+
+          test -f android/app/src/main/res/drawable/ic_launcher_foreground.png
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+          test -f android/app/src/main/res/values/colors.xml
+          test -f android/app/src/main/res/values/styles.xml
+
+          echo ""
+          echo "=== FOREGROUND FILE ==="
+          ls -lh android/app/src/main/res/drawable/ic_launcher_foreground.png
+
+          echo ""
+          echo "=== ADAPTIVE ICON ==="
+          cat android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+
+          echo ""
+          echo "=== STYLES ==="
           cat android/app/src/main/res/values/styles.xml
 
-          echo "=== PREPARE MIPMAPS ==="
-          if [ -f icon-512-maskable.png ]; then
-
-            mkdir -p android/app/src/main/res/mipmap-mdpi
-            mkdir -p android/app/src/main/res/mipmap-hdpi
-            mkdir -p android/app/src/main/res/mipmap-xhdpi
-            mkdir -p android/app/src/main/res/mipmap-xxhdpi
-            mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-            cp icon-512-maskable.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-
-          fi
-
+          echo ""
           echo "========================================"
           echo "       PREPARATION COMPLETE"
           echo "========================================"
@@ -138,7 +212,8 @@ workflows:
         script: |
           set -e
 
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          echo "sdk.dir=$ANDROID_SDK_ROOT" \
+            > "$CM_BUILD_DIR/android/local.properties"
 
           echo "=== SDK ==="
           cat "$CM_BUILD_DIR/android/local.properties"
@@ -163,7 +238,12 @@ workflows:
           echo "       BUILD COMPLETE"
           echo "========================================"
 
-          find app/build/outputs/apk/debug -type f -name "*.apk" -print
+          echo "=== APK FILES ==="
+
+          find app/build/outputs/apk/debug \
+            -type f \
+            -name "*.apk" \
+            -print
 
 
     artifacts:
