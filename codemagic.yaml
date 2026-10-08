@@ -33,7 +33,7 @@ workflows:
           mkdir -p android/app/src/main/assets
           cp index.html android/app/src/main/assets/index.html
 
-          echo "=== PREPARE DRAWABLE DIRECTORY ==="
+          echo "=== PREPARE ANDROID RESOURCE DIRECTORIES ==="
 
           mkdir -p android/app/src/main/res/drawable
           mkdir -p android/app/src/main/res/values
@@ -45,7 +45,7 @@ workflows:
             cp icon-512-maskable.png \
               android/app/src/main/res/drawable/ic_launcher.png
 
-            echo "Launcher source copied."
+            echo "Launcher icon copied."
           else
             echo "ERROR: icon-512-maskable.png not found."
             exit 1
@@ -64,25 +64,14 @@ workflows:
 
           echo "=== PREPARE ADAPTIVE ICON FOREGROUND ==="
 
-          if [ -f ic_launcher_foreground.png ]; then
+          # Gebruik het bestaande icon-512-maskable.png.
+          # Er is geen apart ic_launcher_foreground.png
+          # in de root van het project nodig.
 
-            cp ic_launcher_foreground.png \
-              android/app/src/main/res/drawable/ic_launcher_foreground.png
+          cp icon-512-maskable.png \
+            android/app/src/main/res/drawable/ic_launcher_foreground.png
 
-            echo "Foreground copied from project root."
-
-          elif [ -f android/app/src/main/res/drawable/ic_launcher_foreground.png ]; then
-
-            echo "Foreground already exists in Android resources."
-
-          else
-
-            echo "ERROR: ic_launcher_foreground.png not found."
-            echo ""
-            echo "Place ic_launcher_foreground.png in the root of the repository."
-            exit 1
-
-          fi
+          echo "Adaptive icon foreground created."
 
           echo "=== PREPARE ICON COLORS ==="
 
@@ -182,8 +171,9 @@ workflows:
           </resources>
           EOF
 
-          echo "=== VERIFY IMPORTANT RESOURCES ==="
+          echo "=== VERIFY RESOURCES ==="
 
+          test -f android/app/src/main/res/drawable/ic_launcher.png
           test -f android/app/src/main/res/drawable/ic_launcher_foreground.png
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
@@ -191,15 +181,19 @@ workflows:
           test -f android/app/src/main/res/values/styles.xml
 
           echo ""
-          echo "=== FOREGROUND FILE ==="
+          echo "=== ICON FILES ==="
+
+          ls -lh android/app/src/main/res/drawable/ic_launcher.png
           ls -lh android/app/src/main/res/drawable/ic_launcher_foreground.png
 
           echo ""
           echo "=== ADAPTIVE ICON ==="
+
           cat android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
 
           echo ""
           echo "=== STYLES ==="
+
           cat android/app/src/main/res/values/styles.xml
 
           echo ""
