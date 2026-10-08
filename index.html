@@ -11725,6 +11725,33 @@ document.addEventListener('visibilitychange',function(){
 })();
 </script>
 
+
+<style id="meer-menu-no-black-fade-final">
+/* Meer-menu: geen zwarte fade, overlay of schaduw. */
+.app.more-active > #moreView,
+.app.more-active > #moreView::before,
+.app.more-active > #moreView::after,
+.app.more-active #familyMenu,
+.app.more-active #familyMenu::before,
+.app.more-active #familyMenu::after,
+.app.more-active .familyMenuPage {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.app.more-active > #moreView {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.app.more-active #familyMenu {
+  box-shadow: none !important;
+}
+body.dark-theme .app.more-active #familyMenu {
+  box-shadow: none !important;
+}
+</style>
+
 </body>
 
 <style id="overview-dashboard-final">
