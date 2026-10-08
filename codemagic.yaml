@@ -23,24 +23,33 @@ workflows:
           test -d android
           test -f android/gradlew
           test -f android/settings.gradle
+          test -f android/build.gradle
           test -f android/app/build.gradle
           test -f android/app/src/main/AndroidManifest.xml
           test -f android/app/src/main/java/com/mijnboodschappen/app/MainActivity.java
 
+          echo "Android project found."
+
+          echo "=== CHECK WEB FILES ==="
+
           test -f index.html
           test -f splash_icon.png
           test -f icon-512-maskable.png
-          test -f android_system_splash_icon.png
-          test -f ic_launcher_foreground.png
 
-          echo "=== CLEAN OLD GENERATED RESOURCE PATH ==="
+          echo "Web files found."
 
-          rm -rf "android/app/src/main/res"
+          echo "=== CLEAN GENERATED ANDROID RESOURCES ==="
+
+          rm -rf android/app/src/main/res
 
           echo "=== PREPARE WEB ASSET ==="
 
           mkdir -p android/app/src/main/assets
-          cp index.html android/app/src/main/assets/index.html
+
+          cp index.html \
+            android/app/src/main/assets/index.html
+
+          echo "index.html copied."
 
           echo "=== PREPARE RESOURCE DIRECTORIES ==="
 
@@ -48,22 +57,36 @@ workflows:
           mkdir -p android/app/src/main/res/values
           mkdir -p android/app/src/main/res/mipmap-anydpi-v26
 
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+          echo "Resource directories created."
+
           echo "=== PREPARE CUSTOM SPLASH ==="
 
           cp splash_icon.png \
             android/app/src/main/res/drawable/splash_icon.png
 
-          echo "=== PREPARE SMALL ANDROID SYSTEM SPLASH ==="
+          echo "Custom splash copied."
 
-          cp android_system_splash_icon.png \
+          echo "=== PREPARE ANDROID SYSTEM SPLASH ==="
+
+          cp splash_icon.png \
             android/app/src/main/res/drawable/android_system_splash_icon.png
 
-          echo "=== PREPARE LESS-ZOOMED ADAPTIVE ICON FOREGROUND ==="
+          echo "System splash icon copied."
 
-          cp ic_launcher_foreground.png \
+          echo "=== PREPARE LAUNCHER FOREGROUND ==="
+
+          cp splash_icon.png \
             android/app/src/main/res/drawable/ic_launcher_foreground.png
 
-          echo "=== PREPARE ICON COLORS ==="
+          echo "Launcher foreground copied."
+
+          echo "=== PREPARE COLORS ==="
 
           cat > android/app/src/main/res/values/colors.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
@@ -71,6 +94,8 @@ workflows:
               <color name="icon_green">#14BE4B</color>
           </resources>
           EOF
+
+          echo "Colors prepared."
 
           echo "=== PREPARE ADAPTIVE ICON ==="
 
@@ -89,6 +114,8 @@ workflows:
               <foreground android:drawable="@drawable/ic_launcher_foreground" />
           </adaptive-icon>
           EOF
+
+          echo "Adaptive icons prepared."
 
           echo "=== PREPARE SPLASH THEME ==="
 
@@ -133,13 +160,9 @@ workflows:
           </resources>
           EOF
 
-          echo "=== PREPARE MIPMAP ICONS ==="
+          echo "Splash theme prepared."
 
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          echo "=== PREPARE LAUNCHER ICONS ==="
 
           cp icon-512-maskable.png \
             android/app/src/main/res/mipmap-mdpi/ic_launcher.png
@@ -171,23 +194,26 @@ workflows:
           cp icon-512-maskable.png \
             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
+          echo "Launcher icons prepared."
+
           echo "=== VERIFY RESOURCES ==="
 
+          test -f android/app/src/main/res/drawable/splash_icon.png
           test -f android/app/src/main/res/drawable/android_system_splash_icon.png
           test -f android/app/src/main/res/drawable/ic_launcher_foreground.png
-          test -f android/app/src/main/res/drawable/splash_icon.png
-
-          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
           test -f android/app/src/main/res/values/colors.xml
           test -f android/app/src/main/res/values/styles.xml
 
-          echo ""
-          echo "=== RESOURCE CHECK COMPLETE ==="
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
+          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+
+          echo ""
           echo "========================================"
-          echo "       PREPARATION COMPLETE"
+          echo "       RESOURCE CHECK COMPLETE"
           echo "========================================"
 
 
@@ -215,7 +241,7 @@ workflows:
           echo "       BUILD ANDROID APK"
           echo "========================================"
 
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace
 
           echo "========================================"
           echo "       BUILD COMPLETE"
