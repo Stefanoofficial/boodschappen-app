@@ -1,3 +1,4 @@
+
 package com.mijnboodschappen.app;
 
 import android.Manifest;
@@ -36,10 +37,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // Android 12+ SplashScreen API
         SplashScreen.installSplashScreen(this);
-
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
@@ -58,8 +56,6 @@ public class MainActivity extends Activity {
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-
-        // Laat cameravideo automatisch afspelen zonder extra play-knop
         settings.setMediaPlaybackRequiresUserGesture(false);
 
         webView.setWebViewClient(new WebViewClient());
@@ -67,28 +63,20 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                runOnUiThread(() -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                            && checkSelfPermission(Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                                && checkSelfPermission(Manifest.permission.CAMERA)
-                                != PackageManager.PERMISSION_GRANTED) {
-
-                            pendingPermissionRequest = request;
-
-                            requestPermissions(
-                                    new String[]{Manifest.permission.CAMERA},
-                                    CAMERA_PERMISSION_REQUEST
-                            );
-
-                        } else {
-                            request.grant(
-                                    new String[]{
-                                            PermissionRequest.RESOURCE_VIDEO_CAPTURE
-                                    }
-                            );
-                        }
+                        pendingPermissionRequest = request;
+                        requestPermissions(
+                                new String[]{Manifest.permission.CAMERA},
+                                CAMERA_PERMISSION_REQUEST
+                        );
+                    } else {
+                        request.grant(new String[]{
+                                PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                        });
                     }
                 });
             }
@@ -97,19 +85,16 @@ public class MainActivity extends Activity {
         webView.addJavascriptInterface(new AppBridge(), "AndroidApp");
         webView.setBackgroundColor(Color.rgb(238, 248, 241));
         webView.setVerticalScrollBarEnabled(false);
-        webView.setOverScrollMode(WebView.OVER_SCROLL_IF_CONTENT_SCROLLS);
-
+        webView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         webView.loadUrl("file:///android_asset/index.html");
 
         FrameLayout root = new FrameLayout(this);
-
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
         ));
 
         setContentView(root);
-
         showAppSplash(root);
     }
 
@@ -119,31 +104,21 @@ public class MainActivity extends Activity {
             String[] permissions,
             int[] grantResults
     ) {
-        super.onRequestPermissionsResult(
-                requestCode,
-                permissions,
-                grantResults
-        );
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST
+                && pendingPermissionRequest != null) {
 
-            if (pendingPermissionRequest != null) {
-
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    pendingPermissionRequest.grant(
-                            new String[]{
-                                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
-                            }
-                    );
-
-                } else {
-                    pendingPermissionRequest.deny();
-                }
-
-                pendingPermissionRequest = null;
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                pendingPermissionRequest.grant(new String[]{
+                        PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                });
+            } else {
+                pendingPermissionRequest.deny();
             }
+
+            pendingPermissionRequest = null;
         }
     }
 
@@ -164,16 +139,13 @@ public class MainActivity extends Activity {
         int iconSize = dp(150);
         FrameLayout.LayoutParams iconParams =
                 new FrameLayout.LayoutParams(iconSize, iconSize);
-
         iconParams.gravity = android.view.Gravity.CENTER;
         splash.addView(icon, iconParams);
 
         SplashRing ring = new SplashRing(this);
         int ringSize = dp(230);
-
         FrameLayout.LayoutParams ringParams =
                 new FrameLayout.LayoutParams(ringSize, ringSize);
-
         ringParams.gravity = android.view.Gravity.CENTER;
         splash.addView(ring, ringParams);
 
@@ -196,23 +168,16 @@ public class MainActivity extends Activity {
 
         ring.start();
 
-        splash.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                splash.animate()
-                        .alpha(0f)
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                root.removeView(splash);
-                            }
-                        })
-                        .start();
-            }
-        }, 2000);
+        splash.postDelayed(() -> splash.animate()
+                .alpha(0f)
+                .setDuration(250)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        root.removeView(splash);
+                    }
+                })
+                .start(), 4000);
     }
 
     private int dp(int value) {
@@ -223,17 +188,13 @@ public class MainActivity extends Activity {
 
     private static class SplashPattern extends View {
 
-        private final Paint paint =
-                new Paint(Paint.ANTI_ALIAS_FLAG);
-
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path path = new Path();
         private final float density;
 
         SplashPattern(android.content.Context context) {
             super(context);
-
-            density =
-                    getResources().getDisplayMetrics().density;
+            density = getResources().getDisplayMetrics().density;
 
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(2.2f * density);
@@ -250,7 +211,6 @@ public class MainActivity extends Activity {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-
             float w = getWidth();
             float h = getHeight();
 
@@ -264,304 +224,96 @@ public class MainActivity extends Activity {
             drawMilk(canvas, w * 0.52f, h * 0.91f, d(19));
         }
 
-        private void drawApple(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
-            c.drawOval(
-                    new RectF(
-                            x - s * 0.65f,
-                            y - s * 0.45f,
-                            x + s * 0.65f,
-                            y + s * 0.55f
-                    ),
-                    paint
-            );
+        private void drawApple(Canvas c, float x, float y, float s) {
+            c.drawOval(new RectF(
+                    x - s * 0.65f, y - s * 0.45f,
+                    x + s * 0.65f, y + s * 0.55f
+            ), paint);
 
             path.reset();
-
-            path.moveTo(
-                    x,
-                    y - s * 0.45f
-            );
-
+            path.moveTo(x, y - s * 0.45f);
             path.quadTo(
-                    x + s * 0.10f,
-                    y - s * 0.85f,
-                    x + s * 0.45f,
-                    y - s * 0.78f
+                    x + s * 0.10f, y - s * 0.85f,
+                    x + s * 0.45f, y - s * 0.78f
             );
-
             c.drawPath(path, paint);
-
-            c.drawLine(
-                    x,
-                    y - s * 0.45f,
-                    x + s * 0.05f,
-                    y - s * 0.72f,
-                    paint
-            );
+            c.drawLine(x, y - s * 0.45f,
+                    x + s * 0.05f, y - s * 0.72f, paint);
         }
 
-        private void drawMilk(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
+        private void drawMilk(Canvas c, float x, float y, float s) {
             path.reset();
-
-            path.moveTo(
-                    x - s * 0.55f,
-                    y - s * 0.75f
-            );
-
-            path.lineTo(
-                    x + s * 0.45f,
-                    y - s * 0.75f
-            );
-
-            path.lineTo(
-                    x + s * 0.58f,
-                    y + s * 0.72f
-            );
-
-            path.lineTo(
-                    x - s * 0.58f,
-                    y + s * 0.72f
-            );
-
+            path.moveTo(x - s * 0.55f, y - s * 0.75f);
+            path.lineTo(x + s * 0.45f, y - s * 0.75f);
+            path.lineTo(x + s * 0.58f, y + s * 0.72f);
+            path.lineTo(x - s * 0.58f, y + s * 0.72f);
             path.close();
-
             c.drawPath(path, paint);
-
-            c.drawLine(
-                    x - s * 0.55f,
-                    y - s * 0.75f,
-                    x - s * 0.25f,
-                    y - s * 1.0f,
-                    paint
-            );
-
-            c.drawLine(
-                    x + s * 0.45f,
-                    y - s * 0.75f,
-                    x + s * 0.15f,
-                    y - s * 1.0f,
-                    paint
-            );
+            c.drawLine(x - s * 0.55f, y - s * 0.75f,
+                    x - s * 0.25f, y - s, paint);
+            c.drawLine(x + s * 0.45f, y - s * 0.75f,
+                    x + s * 0.15f, y - s, paint);
         }
 
-        private void drawCarrot(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
+        private void drawCarrot(Canvas c, float x, float y, float s) {
             path.reset();
-
-            path.moveTo(
-                    x - s * 0.35f,
-                    y - s * 0.45f
-            );
-
-            path.quadTo(
-                    x,
-                    y + s * 0.55f,
-                    x + s * 0.35f,
-                    y - s * 0.45f
-            );
-
+            path.moveTo(x - s * 0.35f, y - s * 0.45f);
+            path.quadTo(x, y + s * 0.55f, x + s * 0.35f, y - s * 0.45f);
             c.drawPath(path, paint);
-
-            c.drawLine(
-                    x - s * 0.15f,
-                    y - s * 0.55f,
-                    x - s * 0.35f,
-                    y - s * 0.9f,
-                    paint
-            );
-
-            c.drawLine(
-                    x,
-                    y - s * 0.58f,
-                    x,
-                    y - s * 0.98f,
-                    paint
-            );
-
-            c.drawLine(
-                    x + s * 0.15f,
-                    y - s * 0.55f,
-                    x + s * 0.38f,
-                    y - s * 0.88f,
-                    paint
-            );
+            c.drawLine(x - s * 0.15f, y - s * 0.55f,
+                    x - s * 0.35f, y - s * 0.9f, paint);
+            c.drawLine(x, y - s * 0.58f, x, y - s * 0.98f, paint);
+            c.drawLine(x + s * 0.15f, y - s * 0.55f,
+                    x + s * 0.38f, y - s * 0.88f, paint);
         }
 
-        private void drawCheese(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
+        private void drawCheese(Canvas c, float x, float y, float s) {
             path.reset();
-
-            path.moveTo(
-                    x - s * 0.65f,
-                    y + s * 0.5f
-            );
-
-            path.lineTo(
-                    x + s * 0.65f,
-                    y + s * 0.5f
-            );
-
-            path.lineTo(
-                    x + s * 0.15f,
-                    y - s * 0.55f
-            );
-
+            path.moveTo(x - s * 0.65f, y + s * 0.5f);
+            path.lineTo(x + s * 0.65f, y + s * 0.5f);
+            path.lineTo(x + s * 0.15f, y - s * 0.55f);
             path.close();
-
             c.drawPath(path, paint);
-
-            c.drawCircle(
-                    x - s * 0.05f,
-                    y + s * 0.08f,
-                    s * 0.10f,
-                    paint
-            );
-
-            c.drawCircle(
-                    x + s * 0.30f,
-                    y + s * 0.28f,
-                    s * 0.08f,
-                    paint
-            );
+            c.drawCircle(x - s * 0.05f, y + s * 0.08f, s * 0.10f, paint);
+            c.drawCircle(x + s * 0.30f, y + s * 0.28f, s * 0.08f, paint);
         }
 
-        private void drawBread(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
+        private void drawBread(Canvas c, float x, float y, float s) {
             RectF r = new RectF(
-                    x - s * 0.75f,
-                    y - s * 0.35f,
-                    x + s * 0.75f,
-                    y + s * 0.40f
+                    x - s * 0.75f, y - s * 0.35f,
+                    x + s * 0.75f, y + s * 0.40f
             );
-
-            c.drawRoundRect(
-                    r,
-                    s * 0.35f,
-                    s * 0.35f,
-                    paint
-            );
-
-            c.drawArc(
-                    new RectF(
-                            x - s * 0.45f,
-                            y - s * 0.65f,
-                            x + s * 0.45f,
-                            y + s * 0.10f
-                    ),
-                    180,
-                    180,
-                    false,
-                    paint
-            );
-
-            c.drawLine(
-                    x - s * 0.25f,
-                    y - s * 0.15f,
-                    x - s * 0.10f,
-                    y - s * 0.35f,
-                    paint
-            );
-
-            c.drawLine(
-                    x + s * 0.05f,
-                    y - s * 0.12f,
-                    x + s * 0.20f,
-                    y - s * 0.32f,
-                    paint
-            );
+            c.drawRoundRect(r, s * 0.35f, s * 0.35f, paint);
+            c.drawArc(new RectF(
+                    x - s * 0.45f, y - s * 0.65f,
+                    x + s * 0.45f, y + s * 0.10f
+            ), 180, 180, false, paint);
+            c.drawLine(x - s * 0.25f, y - s * 0.15f,
+                    x - s * 0.10f, y - s * 0.35f, paint);
+            c.drawLine(x + s * 0.05f, y - s * 0.12f,
+                    x + s * 0.20f, y - s * 0.32f, paint);
         }
 
-        private void drawBroccoli(
-                Canvas c,
-                float x,
-                float y,
-                float s
-        ) {
-            c.drawCircle(
-                    x - s * 0.35f,
-                    y - s * 0.15f,
-                    s * 0.30f,
-                    paint
-            );
-
-            c.drawCircle(
-                    x,
-                    y - s * 0.30f,
-                    s * 0.35f,
-                    paint
-            );
-
-            c.drawCircle(
-                    x + s * 0.35f,
-                    y - s * 0.12f,
-                    s * 0.30f,
-                    paint
-            );
-
-            c.drawLine(
-                    x,
-                    y,
-                    x,
-                    y + s * 0.65f,
-                    paint
-            );
-
-            c.drawLine(
-                    x,
-                    y + s * 0.25f,
-                    x - s * 0.20f,
-                    y + s * 0.65f,
-                    paint
-            );
-
-            c.drawLine(
-                    x,
-                    y + s * 0.25f,
-                    x + s * 0.20f,
-                    y + s * 0.65f,
-                    paint
-            );
+        private void drawBroccoli(Canvas c, float x, float y, float s) {
+            c.drawCircle(x - s * 0.35f, y - s * 0.15f, s * 0.30f, paint);
+            c.drawCircle(x, y - s * 0.30f, s * 0.35f, paint);
+            c.drawCircle(x + s * 0.35f, y - s * 0.12f, s * 0.30f, paint);
+            c.drawLine(x, y, x, y + s * 0.65f, paint);
+            c.drawLine(x, y + s * 0.25f, x - s * 0.20f, y + s * 0.65f, paint);
+            c.drawLine(x, y + s * 0.25f, x + s * 0.20f, y + s * 0.65f, paint);
         }
     }
 
     private static class SplashRing extends View {
 
-        private final Paint paint =
-                new Paint(Paint.ANTI_ALIAS_FLAG);
-
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final RectF oval = new RectF();
-
         private float start = -90f;
-
         private final float sweep = 70f;
-
         private ValueAnimator animator;
 
         SplashRing(android.content.Context context) {
             super(context);
-
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(
                     5f * getResources().getDisplayMetrics().density
@@ -572,28 +324,16 @@ public class MainActivity extends Activity {
 
         void start() {
             animator = ValueAnimator.ofFloat(0f, 360f);
-
-            animator.setDuration(1800);
+            animator.setDuration(2000);
             animator.setRepeatCount(ValueAnimator.INFINITE);
-
             animator.setInterpolator(
                     new android.view.animation.LinearInterpolator()
             );
 
-            animator.addUpdateListener(
-                    new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(
-                                ValueAnimator animation
-                        ) {
-                            start =
-                                    -90f +
-                                    (float) animation.getAnimatedValue();
-
-                            invalidate();
-                        }
-                    }
-            );
+            animator.addUpdateListener(animation -> {
+                start = -90f + (float) animation.getAnimatedValue();
+                invalidate();
+            });
 
             animator.start();
         }
@@ -601,24 +341,9 @@ public class MainActivity extends Activity {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-
-            float inset =
-                    paint.getStrokeWidth() * 2.2f;
-
-            oval.set(
-                    inset,
-                    inset,
-                    getWidth() - inset,
-                    getHeight() - inset
-            );
-
-            canvas.drawArc(
-                    oval,
-                    start,
-                    sweep,
-                    false,
-                    paint
-            );
+            float inset = paint.getStrokeWidth() * 2.2f;
+            oval.set(inset, inset, getWidth() - inset, getHeight() - inset);
+            canvas.drawArc(oval, start, sweep, false, paint);
         }
     }
 
@@ -626,22 +351,12 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void setMenuDimmed(final boolean dimmed) {
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    Window window = getWindow();
-
-                    if (dimmed) {
-                        window.setStatusBarColor(
-                                Color.rgb(200, 211, 204)
-                        );
-                    } else {
-                        window.setStatusBarColor(
-                                Color.rgb(238, 248, 241)
-                        );
-                    }
+            runOnUiThread(() -> {
+                Window window = getWindow();
+                if (dimmed) {
+                    window.setStatusBarColor(Color.rgb(200, 211, 204));
+                } else {
+                    window.setStatusBarColor(Color.rgb(238, 248, 241));
                 }
             });
         }
@@ -649,7 +364,6 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-
         if (webView != null && webView.canGoBack()) {
             webView.goBack();
         } else {
