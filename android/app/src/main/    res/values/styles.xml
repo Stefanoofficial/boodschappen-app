@@ -15,10 +15,8 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="AppTheme.Splash" parent="AppTheme.NoActionBar">
-        <item name="android:windowBackground">#eef8f1</item>
-        <item name="android:windowSplashScreenBackground">#eef8f1</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
-    </style>
-
-</resources>
+<style name="AppTheme.Splash" parent="AppTheme.NoActionBar">
+    <item name="android:windowBackground">#eef8f1</item>
+    <item name="android:windowSplashScreenBackground">#eef8f1</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+</style>
