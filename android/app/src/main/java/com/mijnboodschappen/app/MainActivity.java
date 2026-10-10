@@ -1,4 +1,3 @@
-
 package com.mijnboodschappen.app;
 
 import android.Manifest;
