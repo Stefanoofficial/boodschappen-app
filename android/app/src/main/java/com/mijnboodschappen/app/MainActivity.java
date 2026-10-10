@@ -186,124 +186,246 @@ public class MainActivity extends Activity {
         );
     }
 
+    // =========================================================
+    // NIEUWE ACHTERGROND: verfijnde boodschappenillustraties
+    // =========================================================
+
     private static class SplashPattern extends View {
 
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path path = new Path();
         private final float density;
 
+        private final int green = Color.rgb(69, 160, 94);
+        private final int paleGreen = Color.rgb(183, 220, 190);
+        private final int softGreen = Color.rgb(218, 239, 222);
+
         SplashPattern(android.content.Context context) {
             super(context);
             density = getResources().getDisplayMetrics().density;
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(2.2f * density);
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeJoin(Paint.Join.ROUND);
-            paint.setColor(Color.rgb(190, 224, 202));
-            paint.setAlpha(75);
         }
 
-        private float d(float v) {
-            return v * density;
+        private float d(float value) {
+            return value * density;
+        }
+
+        private void stroke(int color, float width) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(d(width));
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setColor(color);
+            paint.setAlpha(150);
+        }
+
+        private void fill(int color) {
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(color);
+            paint.setAlpha(125);
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
+
             float w = getWidth();
             float h = getHeight();
 
-            drawApple(canvas, w * 0.15f, h * 0.22f, d(24));
-            drawMilk(canvas, w * 0.83f, h * 0.20f, d(22));
-            drawCarrot(canvas, w * 0.12f, h * 0.52f, d(25));
-            drawCheese(canvas, w * 0.86f, h * 0.48f, d(25));
-            drawBread(canvas, w * 0.17f, h * 0.78f, d(26));
-            drawBroccoli(canvas, w * 0.82f, h * 0.78f, d(25));
-            drawApple(canvas, w * 0.50f, h * 0.10f, d(18));
-            drawMilk(canvas, w * 0.52f, h * 0.91f, d(19));
+            // Zachte decoratieve ringen achter het centrale icoon.
+            stroke(softGreen, 2f);
+            canvas.drawCircle(
+                    w / 2f, h / 2f,
+                    Math.min(w, h) * 0.34f, paint
+            );
+            canvas.drawCircle(
+                    w / 2f, h / 2f,
+                    Math.min(w, h) * 0.39f, paint
+            );
+
+            // Boodschappen rondom het midden.
+            drawApple(canvas, w * 0.15f, h * 0.22f, d(22));
+            drawMilk(canvas, w * 0.83f, h * 0.20f, d(21));
+            drawCarrot(canvas, w * 0.12f, h * 0.52f, d(24));
+            drawCheese(canvas, w * 0.86f, h * 0.48f, d(24));
+            drawBread(canvas, w * 0.17f, h * 0.78f, d(24));
+            drawBroccoli(canvas, w * 0.82f, h * 0.78f, d(24));
+
+            // Kleine decoratieve blaadjes.
+            drawLeaf(canvas, w * 0.28f, h * 0.12f, d(9), -35f);
+            drawLeaf(canvas, w * 0.72f, h * 0.34f, d(8), 35f);
+            drawLeaf(canvas, w * 0.28f, h * 0.66f, d(8), 30f);
+            drawLeaf(canvas, w * 0.73f, h * 0.89f, d(9), -30f);
         }
 
         private void drawApple(Canvas c, float x, float y, float s) {
+            fill(softGreen);
+            c.drawCircle(x, y, s * 0.9f, paint);
+
+            stroke(green, 1.8f);
             c.drawOval(new RectF(
-                    x - s * 0.65f, y - s * 0.45f,
-                    x + s * 0.65f, y + s * 0.55f
+                    x - s * 0.55f, y - s * 0.22f,
+                    x + s * 0.55f, y + s * 0.58f
             ), paint);
 
             path.reset();
-            path.moveTo(x, y - s * 0.45f);
+            path.moveTo(x, y - s * 0.28f);
             path.quadTo(
-                    x + s * 0.10f, y - s * 0.85f,
-                    x + s * 0.45f, y - s * 0.78f
+                    x - s * 0.08f, y - s * 0.65f,
+                    x + s * 0.25f, y - s * 0.70f
             );
             c.drawPath(path, paint);
-            c.drawLine(x, y - s * 0.45f,
-                    x + s * 0.05f, y - s * 0.72f, paint);
+
+            fill(paleGreen);
+            path.reset();
+            path.moveTo(x + s * 0.05f, y - s * 0.55f);
+            path.quadTo(
+                    x + s * 0.45f, y - s * 0.80f,
+                    x + s * 0.42f, y - s * 0.40f
+            );
+            path.quadTo(
+                    x + s * 0.20f, y - s * 0.32f,
+                    x + s * 0.05f, y - s * 0.55f
+            );
+            path.close();
+            c.drawPath(path, paint);
         }
 
         private void drawMilk(Canvas c, float x, float y, float s) {
+            fill(softGreen);
+            c.drawRoundRect(new RectF(
+                    x - s * 0.48f, y - s * 0.50f,
+                    x + s * 0.48f, y + s * 0.55f
+            ), s * 0.12f, s * 0.12f, paint);
+
+            stroke(green, 1.8f);
             path.reset();
-            path.moveTo(x - s * 0.55f, y - s * 0.75f);
-            path.lineTo(x + s * 0.45f, y - s * 0.75f);
-            path.lineTo(x + s * 0.58f, y + s * 0.72f);
-            path.lineTo(x - s * 0.58f, y + s * 0.72f);
-            path.close();
+            path.moveTo(x - s * 0.35f, y - s * 0.50f);
+            path.lineTo(x - s * 0.18f, y - s * 0.78f);
+            path.lineTo(x + s * 0.28f, y - s * 0.78f);
+            path.lineTo(x + s * 0.43f, y - s * 0.50f);
             c.drawPath(path, paint);
-            c.drawLine(x - s * 0.55f, y - s * 0.75f,
-                    x - s * 0.25f, y - s, paint);
-            c.drawLine(x + s * 0.45f, y - s * 0.75f,
-                    x + s * 0.15f, y - s, paint);
+
+            stroke(paleGreen, 3f);
+            c.drawLine(
+                    x - s * 0.30f, y + s * 0.10f,
+                    x + s * 0.30f, y + s * 0.10f, paint
+            );
         }
 
         private void drawCarrot(Canvas c, float x, float y, float s) {
+            stroke(green, 2f);
             path.reset();
-            path.moveTo(x - s * 0.35f, y - s * 0.45f);
-            path.quadTo(x, y + s * 0.55f, x + s * 0.35f, y - s * 0.45f);
+            path.moveTo(x - s * 0.38f, y - s * 0.30f);
+            path.quadTo(x, y + s * 0.45f, x + s * 0.28f, y - s * 0.32f);
             c.drawPath(path, paint);
-            c.drawLine(x - s * 0.15f, y - s * 0.55f,
-                    x - s * 0.35f, y - s * 0.9f, paint);
-            c.drawLine(x, y - s * 0.58f, x, y - s * 0.98f, paint);
-            c.drawLine(x + s * 0.15f, y - s * 0.55f,
-                    x + s * 0.38f, y - s * 0.88f, paint);
+
+            c.drawLine(
+                    x - s * 0.10f, y - s * 0.35f,
+                    x - s * 0.30f, y - s * 0.72f, paint
+            );
+            c.drawLine(
+                    x, y - s * 0.35f,
+                    x + s * 0.03f, y - s * 0.78f, paint
+            );
+            c.drawLine(
+                    x + s * 0.10f, y - s * 0.35f,
+                    x + s * 0.38f, y - s * 0.65f, paint
+            );
+
+            stroke(paleGreen, 1.4f);
+            c.drawLine(
+                    x - s * 0.08f, y,
+                    x + s * 0.08f, y + s * 0.20f, paint
+            );
         }
 
         private void drawCheese(Canvas c, float x, float y, float s) {
+            fill(softGreen);
             path.reset();
-            path.moveTo(x - s * 0.65f, y + s * 0.5f);
-            path.lineTo(x + s * 0.65f, y + s * 0.5f);
-            path.lineTo(x + s * 0.15f, y - s * 0.55f);
+            path.moveTo(x - s * 0.55f, y + s * 0.38f);
+            path.lineTo(x + s * 0.55f, y + s * 0.38f);
+            path.lineTo(x + s * 0.22f, y - s * 0.48f);
             path.close();
             c.drawPath(path, paint);
-            c.drawCircle(x - s * 0.05f, y + s * 0.08f, s * 0.10f, paint);
-            c.drawCircle(x + s * 0.30f, y + s * 0.28f, s * 0.08f, paint);
+
+            stroke(green, 1.8f);
+            c.drawPath(path, paint);
+
+            fill(paleGreen);
+            c.drawCircle(x - s * 0.12f, y + s * 0.08f, s * 0.09f, paint);
+            c.drawCircle(x + s * 0.19f, y + s * 0.20f, s * 0.07f, paint);
+            c.drawCircle(x + s * 0.12f, y - s * 0.18f, s * 0.06f, paint);
         }
 
         private void drawBread(Canvas c, float x, float y, float s) {
-            RectF r = new RectF(
-                    x - s * 0.75f, y - s * 0.35f,
-                    x + s * 0.75f, y + s * 0.40f
+            fill(softGreen);
+            c.drawRoundRect(new RectF(
+                    x - s * 0.60f, y - s * 0.30f,
+                    x + s * 0.60f, y + s * 0.38f
+            ), s * 0.28f, s * 0.28f, paint);
+
+            stroke(green, 1.8f);
+            c.drawRoundRect(new RectF(
+                    x - s * 0.60f, y - s * 0.30f,
+                    x + s * 0.60f, y + s * 0.38f
+            ), s * 0.28f, s * 0.28f, paint);
+
+            stroke(paleGreen, 2f);
+            c.drawLine(
+                    x - s * 0.24f, y - s * 0.08f,
+                    x - s * 0.08f, y - s * 0.24f, paint
             );
-            c.drawRoundRect(r, s * 0.35f, s * 0.35f, paint);
-            c.drawArc(new RectF(
-                    x - s * 0.45f, y - s * 0.65f,
-                    x + s * 0.45f, y + s * 0.10f
-            ), 180, 180, false, paint);
-            c.drawLine(x - s * 0.25f, y - s * 0.15f,
-                    x - s * 0.10f, y - s * 0.35f, paint);
-            c.drawLine(x + s * 0.05f, y - s * 0.12f,
-                    x + s * 0.20f, y - s * 0.32f, paint);
+            c.drawLine(
+                    x + s * 0.05f, y - s * 0.08f,
+                    x + s * 0.21f, y - s * 0.24f, paint
+            );
         }
 
         private void drawBroccoli(Canvas c, float x, float y, float s) {
-            c.drawCircle(x - s * 0.35f, y - s * 0.15f, s * 0.30f, paint);
-            c.drawCircle(x, y - s * 0.30f, s * 0.35f, paint);
-            c.drawCircle(x + s * 0.35f, y - s * 0.12f, s * 0.30f, paint);
-            c.drawLine(x, y, x, y + s * 0.65f, paint);
-            c.drawLine(x, y + s * 0.25f, x - s * 0.20f, y + s * 0.65f, paint);
-            c.drawLine(x, y + s * 0.25f, x + s * 0.20f, y + s * 0.65f, paint);
+            fill(softGreen);
+            c.drawCircle(x - s * 0.30f, y - s * 0.12f, s * 0.28f, paint);
+            c.drawCircle(x, y - s * 0.28f, s * 0.34f, paint);
+            c.drawCircle(x + s * 0.30f, y - s * 0.10f, s * 0.28f, paint);
+
+            stroke(green, 1.8f);
+            c.drawCircle(x - s * 0.30f, y - s * 0.12f, s * 0.28f, paint);
+            c.drawCircle(x, y - s * 0.28f, s * 0.34f, paint);
+            c.drawCircle(x + s * 0.30f, y - s * 0.10f, s * 0.28f, paint);
+
+            c.drawLine(x, y + s * 0.02f, x, y + s * 0.60f, paint);
+            c.drawLine(
+                    x, y + s * 0.30f,
+                    x - s * 0.22f, y + s * 0.55f, paint
+            );
+            c.drawLine(
+                    x, y + s * 0.30f,
+                    x + s * 0.22f, y + s * 0.55f, paint
+            );
+        }
+
+        private void drawLeaf(
+                Canvas c, float x, float y, float s, float angle
+        ) {
+            c.save();
+            c.rotate(angle, x, y);
+
+            fill(softGreen);
+            path.reset();
+            path.moveTo(x, y + s);
+            path.quadTo(x - s, y, x, y - s);
+            path.quadTo(x + s, y, x, y + s);
+            path.close();
+            c.drawPath(path, paint);
+
+            stroke(green, 1.4f);
+            c.drawPath(path, paint);
+            c.drawLine(x, y + s * 0.75f, x, y - s * 0.65f, paint);
+
+            c.restore();
         }
     }
 
+    // De bestaande draaiende cirkel blijft ongewijzigd.
     private static class SplashRing extends View {
 
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
