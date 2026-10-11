@@ -2654,6 +2654,23 @@ body.dark-theme .familyDialogDanger { background:#b92e2e; }
   background:#3F5B45;
   color:#fff;
 }
+.familyDialogRemove {
+  background:#FCE8E8;
+  color:#B42318;
+  box-shadow:0 2px 0 rgba(180,35,24,.08);
+  transition:transform .12s ease, background-color .12s ease, box-shadow .12s ease, opacity .12s ease;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.familyDialogRemove:active {
+  transform:scale(.96);
+  background:#F6D3D3;
+  box-shadow:0 0 0 rgba(180,35,24,0);
+}
+.familyDialogRemove:focus-visible {
+  outline:2px solid #B42318;
+  outline-offset:2px;
+}
 .familyDialogDanger {
   background:#c93434;
   color:#fff;
@@ -8588,7 +8605,7 @@ async function showSharedListMembers(){
       row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
       const label=document.createElement("span"); label.textContent=(uid===ownerUid?"👑 ":"👤 ")+name; row.appendChild(label);
       if(user.uid===ownerUid && uid!==ownerUid){
-        const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogCancel"; btn.textContent="Verwijderen";
+        const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogRemove"; btn.textContent="Verwijderen";
         btn.addEventListener("click",async()=>{
           if(!window.confirm("Wil je "+name+" uit deze deellijst verwijderen?")) return;
           try{
@@ -9174,7 +9191,7 @@ async function showFamilyMembers() {
       row.appendChild(label);
       if (user.uid === ownerUid && uid !== ownerUid) {
         const btn = document.createElement("button");
-        btn.type = "button"; btn.className = "familyDialogBtn familyDialogCancel";
+        btn.type = "button"; btn.className = "familyDialogBtn familyDialogRemove";
         btn.textContent = "Verwijderen";
         btn.addEventListener("click", async () => {
           const ok = window.confirm("Wil je " + name + " uit de familielijst verwijderen?");
