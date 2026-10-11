@@ -8299,7 +8299,17 @@ function returnToSharedListsMenu(event){
   renderSharedLists();
 }
 
-function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
+function makeSecureInviteCode(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(10);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  return Array.from(bytes, b => chars[b % chars.length]).join("");
+}
+function makeSharedCode(){ return makeSecureInviteCode(); }
 function makeSharedListLink(code){
   const base = window.location.href.split("#")[0].split("?")[0];
   return base + "?code=" + encodeURIComponent(code);
@@ -8350,7 +8360,7 @@ async function createSharedList(){
 async function joinSharedListByCode(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const code=(await familyPrompt("Deellijstcode","Voer de 6-cijferige code in.","fa-key") || "").trim();
+  const code=(await familyPrompt("Deellijstcode","Voer de code van 10 letters en cijfers in.","fa-key") || "").trim();
   if(!code) return;
 
   try{
@@ -8811,20 +8821,24 @@ async function deleteCurrentSharedList(){
   );
   if(!ok) return;
 
-  // Bewaar deze gegevens vóórdat de hoofdnode wordt verwijderd.
+  // Bewaar gegevens en verwijder de lijst, code-index en eigen index in één
+  // multi-location update. Zo blijft de uitnodigingscode niet achter als de
+  // lijst succesvol wordt verwijderd. De regels moeten verwijdering van de
+  // code toestaan zolang de eigenaar nog bij de lijst kan worden gecontroleerd.
   const inviteCode = list.inviteCode ? String(list.inviteCode) : null;
-  const ref = database.ref("sharedLists/" + id);
+  const updates = {};
+  updates["sharedLists/" + id] = null;
+  updates["userSharedLists/" + user.uid + "/" + id] = null;
+  if(inviteCode) updates["sharedListCodes/" + inviteCode] = null;
 
   try{
-    // Verwijder de hoofdnode. Dit is de enige bewerking die noodzakelijk is
-    // om de Deellijst voor alle gebruikers te laten verdwijnen.
-    await ref.remove();
+    await database.ref().update(updates);
   }catch(error){
-    console.error("Deellijst hoofdnode verwijderen mislukt:", error);
+    console.error("Deellijst en code veilig verwijderen mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
     await familyAlert(
       "Deellijst",
-      "De deellijst kon niet worden verwijderd." + detail,
+      "De deellijst kon niet volledig worden verwijderd. Er zijn geen wijzigingen bevestigd. Controleer de Firebase-regels en probeer het opnieuw." + detail,
       "fa-triangle-exclamation"
     );
     return;
@@ -8846,22 +8860,9 @@ async function deleteCurrentSharedList(){
 
   try { localStorage.removeItem("sharedListInviteCode:" + id); } catch(_) {}
 
-  // Opruimen van index/code is best-effort. De regels voor sharedListCodes
-  // kunnen het verwijderen van de code weigeren nadat sharedLists/$id al weg is;
-  // dat is niet fataal voor het verwijderen van de lijst.
-  try{
-    await database.ref("userSharedLists/" + user.uid + "/" + id).remove();
-  }catch(cleanupError){
-    console.warn("Eigen Deellijst-index kon niet worden opgeruimd:", cleanupError);
-  }
-
-  if(inviteCode){
-    try{
-      await database.ref("sharedListCodes/" + inviteCode).remove();
-    }catch(cleanupError){
-      console.warn("Deellijst-uitnodigingscode kon niet worden opgeruimd:", cleanupError);
-    }
-  }
+  // De lijst, uitnodigingscode en eigen index zijn hierboven samen verwijderd.
+  // Lokale cache opruimen.
+  try { localStorage.removeItem("sharedListInviteCode:" + id); } catch(_) {}
 
   // Ga DIRECT terug naar de gewone boodschappenlijst. Dit gebeurt bewust
   // vóór de bevestigingsmelding, zodat de gebruiker na het verwijderen niet
@@ -9043,7 +9044,7 @@ async function showFamilyCode() {
     // lid is mag een willekeurige andere familie niet uitlezen. De Rules
     // bepalen veilig dat een bestaande familie niet overschreven kan worden.
     for (let attempt = 0; attempt < 8 && !created; attempt++) {
-      code = Math.floor(100000 + Math.random() * 900000).toString();
+      code = makeSecureInviteCode();
       try {
         await database.ref("households/" + code).set({
           owner: user.uid,
@@ -9233,10 +9234,10 @@ async function showFamilyMembers() {
 }
  async function enterFamilyCode() {
 
-  const code = await familyPrompt("Familiecode invoeren", "Voer de 6-cijferige familiecode in.", "fa-keyboard");
+  const code = await familyPrompt("Familiecode invoeren", "Voer de familiecode van 10 letters en cijfers in.", "fa-keyboard");
   if (!code) return;
-  if (!/^\d{6}$/.test(code)) {
-    await familyAlert("Ongeldige code", "Voer een geldige 6-cijferige familiecode in.", "fa-triangle-exclamation");
+  if (!/^[A-HJ-NP-Z2-9]{10}$/i.test(code)) {
+    await familyAlert("Ongeldige code", "Voer een geldige code van 10 letters en cijfers in.", "fa-triangle-exclamation");
     return;
   }
 
