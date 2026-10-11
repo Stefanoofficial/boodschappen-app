@@ -7319,10 +7319,20 @@ async function fetchOnlineProductSuggestions(query) {
   // Zo vervuilen cosmetica de gewone boodschappenresultaten niet.
   const beautyIntent = /\b(shampoo|conditioner|gezicht\w*|creme|crème|zonnebrand|make ?up|mascara|lipstick|deodorant|tandpasta|huid|serum|lotion|reiniger|bodywash|body wash|skin care|skincare|moisturizer|sunscreen|toothpaste|cosmetic|beauty)\b/i.test(normalized);
 
+  // Boodschappen/voeding zoeken we in een voedingsdatabase. De algemene
+  // productdatabase bevat ook telefoons en accessoires met woorden als "Apple".
+  const groceryIntent = /\b(appel|appels|appelmoes|appelsap|peer|peren|banaan|bananen|sinaasappel|sinaasappels|mandarijn|mandarijnen|citroen|citroenen|limoen|druif|druiven|aardbei|aardbeien|ananas|kiwi|mango|avocado|komkommer|komkommers|tomaat|tomaten|paprika|paprikas|wortel|wortels|ui|uien|knoflook|prei|sla|spinazie|broccoli|bloemkool|courgette|aubergine|champignon|champignons|sperziebonen|bonen|mais|maïs|doperwten|aardappel|aardappelen|zoete aardappel|brood|stokbrood|broodjes|kaas|melk|chocomelk|chocolademelk|yoghurt|boter|ei|eieren|kip|rijst|pasta|vlees|gehakt|vis|zalm|tonijn|worst|ham|pindakaas|koffie|thee|sap|water|chips|koek|koekjes|ijs|frisdrank|cola|fanta|sprite)\b/i.test(normalized);
+
   const sourceDefinitions = [
-    { name:"Open Food Facts", base:"https://world.openfoodfacts.org" },
-    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" }
+    { name:"Open Food Facts", base:"https://world.openfoodfacts.org" }
   ];
+  // Gebruik de algemene productdatabase alleen voor niet-voedingsproducten.
+  if (!groceryIntent && !beautyIntent) {
+    sourceDefinitions.push({
+      name:"Open Products Facts",
+      base:"https://world.openproductsfacts.org"
+    });
+  }
   if (beautyIntent) {
     sourceDefinitions.push({
       name:"Open Beauty Facts",
