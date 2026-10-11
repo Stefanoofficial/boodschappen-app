@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Boodschappenlijst</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
 <style>
 * {
   box-sizing: border-box;
@@ -8263,7 +8263,7 @@ function returnToSharedListsMenu(event){
   renderSharedLists();
 }
 
-function makeSharedCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
+function makeSharedCode(){ var A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",a=new Uint8Array(10),s="";crypto.getRandomValues(a);for(var i=0;i<10;i++)s+=A[a[i]%A.length];return s; }
 function makeSharedListLink(code){
   const base = window.location.href.split("#")[0].split("?")[0];
   return base + "?code=" + encodeURIComponent(code);
@@ -8314,7 +8314,7 @@ async function createSharedList(){
 async function joinSharedListByCode(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const code=(await familyPrompt("Deellijstcode","Voer de 6-cijferige code in.","fa-key") || "").trim();
+  const code=(await familyPrompt("Deellijstcode","Voer de code in.","fa-key") || "").trim().toUpperCase();
   if(!code) return;
 
   try{
@@ -9007,7 +9007,7 @@ async function showFamilyCode() {
     // lid is mag een willekeurige andere familie niet uitlezen. De Rules
     // bepalen veilig dat een bestaande familie niet overschreven kan worden.
     for (let attempt = 0; attempt < 8 && !created; attempt++) {
-      code = Math.floor(100000 + Math.random() * 900000).toString();
+      code = makeSharedCode();
       try {
         await database.ref("households/" + code).set({
           owner: user.uid,
@@ -9125,7 +9125,7 @@ function familyPrompt(title, message, icon="fa-keyboard", initial="") {
     const overlay = familyDialogBase(
       icon, title,
       `<div class="familyDialogText">${message}</div>
-       <input class="familyDialogInput" inputmode="numeric" maxlength="6" autocomplete="off" value="${initial}" aria-label="${title}">`,
+       <input class="familyDialogInput" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="12" autocomplete="off" value="${initial}" aria-label="${title}">`,
       `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
        <button type="button" class="familyDialogBtn familyDialogPrimary">Doorgaan</button>`
     );
@@ -9197,10 +9197,10 @@ async function showFamilyMembers() {
 }
  async function enterFamilyCode() {
 
-  const code = await familyPrompt("Familiecode invoeren", "Voer de 6-cijferige familiecode in.", "fa-keyboard");
+  const code = ((await familyPrompt("Familiecode invoeren", "Voer de familiecode in.", "fa-keyboard")) || "").trim().toUpperCase();
   if (!code) return;
-  if (!/^\d{6}$/.test(code)) {
-    await familyAlert("Ongeldige code", "Voer een geldige 6-cijferige familiecode in.", "fa-triangle-exclamation");
+  if (!/^(\d{6}|[A-Z2-9]{10})$/.test(code)) {
+    await familyAlert("Ongeldige code", "Voer een geldige familiecode in.", "fa-triangle-exclamation");
     return;
   }
 
