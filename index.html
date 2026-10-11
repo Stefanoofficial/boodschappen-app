@@ -8653,10 +8653,62 @@ async function showSharedListMembers(){
     const overlay=familyDialogBase("fa-user-group","Personen","",'<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>');
     overlay.querySelector(".familyDialogBody").replaceChildren(wrap);
     overlay.querySelector("#closeSharedMembers").addEventListener("click",()=>closeFamilyDialog(overlay));
+    if (String(list.owner || "") !== String(user.uid)) {
+      const footer = overlay.querySelector(".familyDialogFooter") || overlay.querySelector(".familyDialogActions") || overlay.querySelector(".familyDialogBody").parentElement;
+      const leaveBtn = document.createElement("button");
+      leaveBtn.type = "button";
+      leaveBtn.className = "familyDialogBtn familyDialogRemove";
+      leaveBtn.textContent = "Deellijst verlaten";
+      leaveBtn.addEventListener("click", leaveCurrentSharedList);
+      footer.appendChild(leaveBtn);
+    }
     overlay.addEventListener("click",e=>{if(e.target===overlay) closeFamilyDialog(overlay);});
   }catch(error){
     console.error("Personen van deellijst konden niet worden geladen:",error);
     await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen. Controleer de Firebase-regels.","fa-triangle-exclamation");
+  }
+}
+
+async function leaveCurrentSharedList(){
+  const user = auth.currentUser;
+  const listId = currentSharedListId;
+  if (!user || !listId) {
+    await familyAlert("Deellijst verlaten", "Er is geen actieve deellijst geselecteerd.", "fa-triangle-exclamation");
+    return;
+  }
+  try {
+    const snap = await database.ref("sharedLists/" + listId).once("value");
+    const list = snap.val();
+    if (!list) {
+      await database.ref("userSharedLists/" + user.uid + "/" + listId).remove();
+    } else if (String(list.owner || "") === String(user.uid)) {
+      await familyAlert("Eigenaar van deellijst", "Als eigenaar kun je deze lijst niet verlaten terwijl hij blijft bestaan. Verwijder de deellijst als je deze wilt beëindigen. Een overdracht van eigenaarschap is nog niet beschikbaar.", "fa-crown");
+      return;
+    } else {
+      const confirmed = await familyConfirm("Deellijst verlaten", "Wil je deze deellijst verlaten? Je verliest daarna toegang tot de gedeelde boodschappen.", true);
+      if (!confirmed) return;
+      const updates = {};
+      updates["sharedLists/" + listId + "/members/" + user.uid] = null;
+      updates["sharedLists/" + listId + "/memberNames/" + user.uid] = null;
+      updates["userSharedLists/" + user.uid + "/" + listId] = null;
+      await database.ref().update(updates);
+    }
+    try { localStorage.removeItem("sharedListInviteCode:" + listId); } catch (_) {}
+    const overlay = document.querySelector(".familyDialogOverlay");
+    if (overlay) closeFamilyDialog(overlay);
+    currentSharedListId = null;
+    currentSharedListInviteCode = null;
+    boodschappen = [];
+    selectedIndex = -1;
+    setActiveListState("private", null, "Boodschappenlijst");
+    activeListType = "private";
+    await loadPrivateList();
+    await renderSharedLists();
+    await familyAlert("Deellijst verlaten", "Je hebt de deellijst verlaten. Je persoonlijke boodschappenlijst is weer geopend.", "fa-right-from-bracket");
+  } catch (error) {
+    console.error("Deellijst verlaten mislukt:", error);
+    const detail = error && error.code ? " (" + error.code + ")" : "";
+    await familyAlert("Verlaten mislukt", "De deellijst kon niet worden verlaten. Controleer je verbinding en de Firebase-regels." + detail, "fa-triangle-exclamation");
   }
 }
 
