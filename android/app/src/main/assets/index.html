@@ -7315,14 +7315,20 @@ async function fetchOnlineProductSuggestions(query) {
       : false;
   };
 
+  // Gebruik de beauty-database alleen bij zoekopdrachten over persoonlijke verzorging.
+  // Zo vervuilen cosmetica de gewone boodschappenresultaten niet.
+  const beautyIntent = /\b(shampoo|conditioner|gezicht\w*|creme|crème|zonnebrand|make ?up|mascara|lipstick|deodorant|tandpasta|huid|serum|lotion|reiniger|bodywash|body wash|skin care|skincare|moisturizer|sunscreen|toothpaste|cosmetic|beauty)\b/i.test(normalized);
+
   const sourceDefinitions = [
-    // Voeding: grootste en belangrijkste bron.
     { name:"Open Food Facts", base:"https://world.openfoodfacts.org" },
-    // Producten buiten voeding/huishouden: tweede Open Facts-database.
-    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" },
-    // Extra dekking voor persoonlijke verzorging als iemand daarnaar zoekt.
-    { name:"Open Beauty Facts", base:"https://world.openbeautyfacts.org" }
+    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" }
   ];
+  if (beautyIntent) {
+    sourceDefinitions.push({
+      name:"Open Beauty Facts",
+      base:"https://world.openbeautyfacts.org"
+    });
+  }
 
   const results = [];
   const seen = new Set();
@@ -7374,6 +7380,16 @@ async function fetchOnlineProductSuggestions(query) {
       const categories = Array.isArray(p.categories_tags_en)
         ? p.categories_tags_en.join(" ")
         : String(p.categories || "");
+
+      // Sluit cosmetica uit bij gewone boodschappenzoekopdrachten, ook als een
+      // algemene productdatabase een Engelse naam heeft die toevallig overeenkomt.
+      if (!beautyIntent) {
+        const categoryText = cleanText(categories);
+        const productText = cleanText([rawName, dutchName, englishName].join(" "));
+        const beautyCategory = /\b(cosmetics|beauty|skin care|skincare|personal care|make up|makeup|hair care|oral care)\b/i.test(categoryText);
+        const beautyProduct = /\b(shampoo|conditioner|sunscreen|sun cream|moisturizer|moisturiser|facial cleanser|face wash|skin care|skincare|serum|mascara|lipstick|toothpaste|deodorant|body lotion|hand cream|cosmetic)\b/i.test(productText);
+        if (beautyCategory || beautyProduct) continue;
+      }
 
       // Geen nepafbeeldingen: online suggesties alleen met echte databasefoto.
       if (!rawName || !imageUrl) continue;
