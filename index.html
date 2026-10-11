@@ -4439,49 +4439,46 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 }
 </style>
 
-<style id="verified-quantity-darkmode-and-trash-fix">
-/* Fix: force the actual generated quantity span to remain visible in dark mode. */
-body.dark-theme .itemProductContent .productQuantity .quantityValue,
-body.dark-theme .itemProductContent span.quantityValue {
-  color: #f4fff7 !important;
-  -webkit-text-fill-color: #f4fff7 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: inline-block !important;
-  font-weight: 800 !important;
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-/* Give the quantity control enough room for minus + number + plus. */
+<style id="minimal-quantity-and-trash-fix">
+/* Fix the squeezed quantity control: reserve enough width for minus, number and plus. */
 .itemProductContent .productQuantity {
-  width: 96px !important;
-  min-width: 96px !important;
-  max-width: 96px !important;
-  flex: 0 0 96px !important;
+  box-sizing: border-box !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  flex: 0 0 100px !important;
+  height: 36px !important;
+  gap: 4px !important;
+  padding: 2px !important;
   overflow: visible !important;
   justify-content: space-between !important;
 }
-.itemProductContent {
-  grid-template-columns: 19px minmax(0,1fr) 32px 96px 32px !important;
-}
 .itemProductContent .quantityValue {
-  width: 28px !important;
-  min-width: 28px !important;
-  flex: 0 0 28px !important;
+  display: inline-block !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  flex: 0 0 24px !important;
   text-align: center !important;
   white-space: nowrap !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-
-/* Match the trash button's outer dimensions to the +/- buttons (30 x 30 px). */
+body.dark-theme .itemProductContent .quantityValue {
+  color: #f3f5f3 !important;
+  -webkit-text-fill-color: #f3f5f3 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+/* Match the delete button to the 29px compact +/- buttons; retain its red styling. */
 .itemProductContent .product-row-trash-can {
   box-sizing: border-box !important;
-  width: 30px !important;
-  min-width: 30px !important;
-  max-width: 30px !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
+  width: 29px !important;
+  min-width: 29px !important;
+  max-width: 29px !important;
+  height: 29px !important;
+  min-height: 29px !important;
+  max-height: 29px !important;
+  flex: 0 0 29px !important;
   padding: 0 !important;
   margin: 0 !important;
   transform: none !important;
@@ -4490,34 +4487,6 @@ body.dark-theme .itemProductContent span.quantityValue {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  flex: 0 0 30px !important;
-}
-@media (max-width: 430px) {
-  .itemProductContent {
-    grid-template-columns: 19px minmax(0,1fr) 32px 96px 32px !important;
-    column-gap: 4px !important;
-  }
-  .itemProductContent .productQuantity {
-    width: 96px !important;
-    min-width: 96px !important;
-    max-width: 96px !important;
-    flex-basis: 96px !important;
-  }
-  .itemProductContent .quantityButton {
-    width: 28px !important;
-    min-width: 28px !important;
-    height: 28px !important;
-    flex-basis: 28px !important;
-  }
-  .itemProductContent .product-row-trash-can {
-    width: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    max-height: 28px !important;
-    flex-basis: 28px !important;
-  }
 }
 </style>
 
