@@ -8575,7 +8575,7 @@ async function showSharedListMembers(){
     const list=snap.val();
     if(!list || !list.members){ await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen.","fa-users"); return; }
     const ownerUid=String(list.owner || "");
-    const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true);
+    const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true).sort((a,b)=>a===ownerUid?-1:b===ownerUid?1:0);
     const names=list.memberNames || {};
     const wrap=document.createElement("div"); wrap.className="familyDialogList";
     for(const uid of memberIds){
@@ -9157,7 +9157,7 @@ async function showFamilyMembers() {
     const household = snap.val() || {};
     const members = household.members || {};
     const ownerUid = String(household.owner || "");
-    const ids = Object.keys(members).filter(uid => members[uid] === true);
+    const ids = Object.keys(members).filter(uid => members[uid] === true).sort((a, b) => a === ownerUid ? -1 : b === ownerUid ? 1 : 0);
     const wrap = document.createElement("div");
     wrap.className = "familyDialogList";
     for (const uid of ids) {
