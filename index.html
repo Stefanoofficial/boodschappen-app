@@ -4438,6 +4438,89 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
   color: #9ED5AD !important;
 }
 </style>
+
+<style id="verified-quantity-darkmode-and-trash-fix">
+/* Fix: force the actual generated quantity span to remain visible in dark mode. */
+body.dark-theme .itemProductContent .productQuantity .quantityValue,
+body.dark-theme .itemProductContent span.quantityValue {
+  color: #f4fff7 !important;
+  -webkit-text-fill-color: #f4fff7 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  font-weight: 800 !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Give the quantity control enough room for minus + number + plus. */
+.itemProductContent .productQuantity {
+  width: 96px !important;
+  min-width: 96px !important;
+  max-width: 96px !important;
+  flex: 0 0 96px !important;
+  overflow: visible !important;
+  justify-content: space-between !important;
+}
+.itemProductContent {
+  grid-template-columns: 19px minmax(0,1fr) 32px 96px 32px !important;
+}
+.itemProductContent .quantityValue {
+  width: 28px !important;
+  min-width: 28px !important;
+  flex: 0 0 28px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* Match the trash button's outer dimensions to the +/- buttons (30 x 30 px). */
+.itemProductContent .product-row-trash-can {
+  box-sizing: border-box !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  align-self: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 30px !important;
+}
+@media (max-width: 430px) {
+  .itemProductContent {
+    grid-template-columns: 19px minmax(0,1fr) 32px 96px 32px !important;
+    column-gap: 4px !important;
+  }
+  .itemProductContent .productQuantity {
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    flex-basis: 96px !important;
+  }
+  .itemProductContent .quantityButton {
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+  .itemProductContent .product-row-trash-can {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    flex-basis: 28px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -11749,41 +11832,6 @@ document.addEventListener('visibilitychange',function(){
 }
 body.dark-theme .app.more-active #familyMenu {
   box-shadow: none !important;
-}
-</style>
-
-
-<style id="final-quantity-visibility-and-trash-alignment">
-/* Alleen de productaantallen in nachtmodus: hoog contrast, normale modus blijft gelijk. */
-body.dark-theme .itemProductContent .quantityValue,
-body.dark-theme .productQuantity .quantityValue {
-  color: #ffffff !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  -webkit-text-fill-color: #ffffff !important;
-  font-weight: 800 !important;
-}
-
-/* Prullenbak dezelfde buitenmaat als de min-/plusknoppen op de productregel. */
-.itemProductContent .product-row-trash-can {
-  box-sizing: border-box !important;
-  width: 28px !important;
-  min-width: 28px !important;
-  max-width: 28px !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-  padding: 0 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  flex: 0 0 28px !important;
-  align-self: center !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-.itemProductContent .product-row-trash-can i {
-  line-height: 1 !important;
 }
 </style>
 
