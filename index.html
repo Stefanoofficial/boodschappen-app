@@ -7470,6 +7470,29 @@ async function fetchOnlineProductSuggestions(query) {
       // Geef een Nederlandstalige productnaam een kleine voorkeur, zonder
       // een exact passende Engelse database-match boven een exact NL-match te zetten.
       if (dutchName) score += 100;
+
+      // Semantische prioriteit: bij gewone boodschappenwoorden eerst het
+      // daadwerkelijke voedingsmiddel, daarna cosmetica/afgeleide producten.
+      const productTextForRanking = cleanText([rawName, dutchName, englishName, brand, categories, foodGroups].join(" "));
+      const groceryIntentTerms = {
+        "melk": ["milk", "melk"], "kaas": ["cheese", "kaas"],
+        "boter": ["butter", "boter"], "yoghurt": ["yogurt", "yoghurt"],
+        "brood": ["bread", "brood"], "eieren": ["egg", "eieren", "ei"],
+        "ei": ["egg", "eieren", "ei"], "appels": ["apple", "appel"],
+        "appel": ["apple", "appel"], "bananen": ["banana", "banaan"],
+        "banaan": ["banana", "banaan"], "tomaten": ["tomato", "tomaat"],
+        "tomaat": ["tomato", "tomaat"], "aardappelen": ["potato", "aardappel"],
+        "aardappel": ["potato", "aardappel"]
+      };
+      const cosmeticTerms = ["cosmetic", "cosmetica", "shampoo", "conditioner", "face cream", "gezichtscreme", "skin care", "skincare", "body lotion", "lotion", "hydrating", "hydraterende", "moisturizer", "moisturiser", "make-up", "makeup", "parfum", "deodorant", "soap", "zeep"];
+      const isCosmetic = cosmeticTerms.some(term => productTextForRanking.includes(cleanText(term)));
+      const foodCategories = /en:(dairies|milks|cheeses|yogurts|butters|breads|eggs|fruits|vegetables|fresh-fruits|fresh-vegetables|potatoes)(\s|$)/i.test(categories);
+      const expectedTerms = groceryIntentTerms[q] || [];
+      const matchesExpectedFood = expectedTerms.some(term => productTextForRanking.includes(cleanText(term))) && !isCosmetic;
+      if (matchesExpectedFood) score += 1800;
+      if (foodCategories && !isCosmetic) score += 500;
+      if (isCosmetic && expectedTerms.length) score -= 1800;
+
       if (p.countries_tags && Array.isArray(p.countries_tags) &&
           p.countries_tags.some(x => String(x).toLowerCase().includes("netherlands") || String(x).toLowerCase().includes("nederland"))) {
         score += 120;
@@ -8607,7 +8630,8 @@ async function showSharedListMembers(){
       if(user.uid===ownerUid && uid!==ownerUid){
         const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogRemove"; btn.textContent="Verwijderen";
         btn.addEventListener("click",async()=>{
-          if(!window.confirm("Wil je "+name+" uit deze deellijst verwijderen?")) return;
+          const confirmed = await familyConfirm("Lid verwijderen", "Wil je " + name + " uit deze deellijst verwijderen?", true);
+          if (!confirmed) return;
           try{
             const updates={};
             updates["sharedLists/"+listId+"/members/"+uid]=null;
@@ -9194,7 +9218,7 @@ async function showFamilyMembers() {
         btn.type = "button"; btn.className = "familyDialogBtn familyDialogRemove";
         btn.textContent = "Verwijderen";
         btn.addEventListener("click", async () => {
-          const ok = window.confirm("Wil je " + name + " uit de familielijst verwijderen?");
+          const ok = await familyConfirm("Familielid verwijderen", "Wil je " + name + " uit de familielijst verwijderen?", true);
           if (!ok) return;
           try {
             const updates = {};
