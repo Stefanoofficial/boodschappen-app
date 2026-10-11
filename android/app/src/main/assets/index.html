@@ -9223,11 +9223,13 @@ function familyPrompt(title, message, icon="fa-keyboard", initial="") {
     const overlay = familyDialogBase(
       icon, title,
       `<div class="familyDialogText">${message}</div>
-       <input class="familyDialogInput" inputmode="numeric" maxlength="6" autocomplete="off" value="${initial}" aria-label="${title}">`,
+       <input class="familyDialogInput" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" maxlength="10" autocomplete="off" value="${initial}" aria-label="${title}">`,
       `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
        <button type="button" class="familyDialogBtn familyDialogPrimary">Doorgaan</button>`
     );
     const input=overlay.querySelector(".familyDialogInput");
+    // Familiecodes bestaan uit 10 hoofdletters/cijfers; toon het juiste Android-toetsenbord.
+    input.addEventListener("input",()=>{ input.value=input.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0,10); });
     const finish=value=>{ closeFamilyDialog(overlay, () => resolve(value)); };
     overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(null));
     overlay.querySelector(".familyDialogPrimary").addEventListener("click",()=>finish(input.value.trim()));
@@ -9300,8 +9302,9 @@ async function showFamilyMembers() {
 }
  async function enterFamilyCode() {
 
-  const code = await familyPrompt("Familiecode invoeren", "Voer de familiecode van 10 letters en cijfers in.", "fa-keyboard");
-  if (!code) return;
+  const enteredCode = await familyPrompt("Familiecode invoeren", "Voer de familiecode van 10 letters en cijfers in.", "fa-keyboard");
+  if (!enteredCode) return;
+  const code = enteredCode.toUpperCase();
   if (!/^[A-HJ-NP-Z2-9]{10}$/i.test(code)) {
     await familyAlert("Ongeldige code", "Voer een geldige code van 10 letters en cijfers in.", "fa-triangle-exclamation");
     return;
