@@ -8569,85 +8569,53 @@ async function showSharedListCode(){
 async function showSharedListMembers(){
   const user=auth.currentUser;
   if(!user || !currentSharedListId) return;
-
   try{
-    const snap=await database.ref("sharedLists/" + currentSharedListId).once("value");
+    const listId=currentSharedListId;
+    const snap=await database.ref("sharedLists/" + listId).once("value");
     const list=snap.val();
-
-    if(!list || !list.members){
-      await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen.","fa-users");
-      return;
-    }
-
+    if(!list || !list.members){ await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen.","fa-users"); return; }
     const ownerUid=String(list.owner || "");
     const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true);
-    const memberNames=list.memberNames || {};
-
-    const rows=[];
+    const names=list.memberNames || {};
+    const wrap=document.createElement("div"); wrap.className="familyDialogList";
     for(const uid of memberIds){
-      // Never show an e-mail address. The account name is stored in users/{uid}/name.
-      let name=String(memberNames[uid] || "").trim();
-      if(name.includes("@")) name="";
-
-      if(!name){
-        try{
-          const ns=await database.ref("users/" + uid + "/name").once("value");
-          name=String(ns.val() || "").trim();
-        }catch(_){}
+      let name=String(names[uid]||"").trim();
+      if(!name || name.includes("@")) {
+        try { const ns=await database.ref("users/"+uid+"/name").once("value"); name=String(ns.val()||"").trim(); } catch(_){}
       }
-
-      // Only for the current user, use Firebase displayName as a secondary
-      // name source. Never fall back to user.email.
-      if(!name && uid===user.uid){
-        name=String(user.displayName || "").trim();
+      if(!name) name=uid===user.uid ? (user.displayName||"Jij") : "Naam niet ingesteld";
+      const row=document.createElement("div"); row.className="familyDialogMember";
+      row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
+      const label=document.createElement("span"); label.textContent=(uid===ownerUid?"👑 ":"👤 ")+name; row.appendChild(label);
+      if(user.uid===ownerUid && uid!==ownerUid){
+        const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogCancel"; btn.textContent="Verwijderen";
+        btn.addEventListener("click",async()=>{
+          if(!window.confirm("Wil je "+name+" uit deze deellijst verwijderen?")) return;
+          try{
+            const updates={};
+            updates["sharedLists/"+listId+"/members/"+uid]=null;
+            updates["sharedLists/"+listId+"/memberNames/"+uid]=null;
+            updates["userSharedLists/"+uid+"/"+listId]=null;
+            await database.ref().update(updates);
+            closeFamilyDialog(row.closest(".familyDialogOverlay"));
+            await showSharedListMembers();
+            await familyAlert("Lid verwijderd",name+" heeft geen toegang meer tot deze deellijst.","fa-user-check");
+          }catch(e){
+            console.error("Lid verwijderen mislukt:",e);
+            await familyAlert("Verwijderen mislukt","Firebase heeft het verwijderen geweigerd. Controleer de beveiligingsregels.","fa-triangle-exclamation");
+          }
+        });
+        row.appendChild(btn);
       }
-
-      if(!name) name="Naam niet ingesteld";
-
-      const row=document.createElement("div");
-      row.className="familyDialogMember";
-
-      const icon=document.createElement("span");
-      icon.textContent = uid===ownerUid ? "👑" : "👤";
-      icon.setAttribute("aria-hidden","true");
-      icon.className = "sharedMemberEmoji";
-
-      const nameNode=document.createElement("span");
-      nameNode.textContent=name;
-
-      row.appendChild(icon);
-      row.appendChild(nameNode);
-      rows.push(row);
+      wrap.appendChild(row);
     }
-
-    rows.sort((a,b)=>{
-      const ai=a.querySelector(".sharedMemberEmoji")?.textContent==="👑" ? 0 : 1;
-      const bi=b.querySelector(".sharedMemberEmoji")?.textContent==="👑" ? 0 : 1;
-      return ai-bi;
-    });
-
-    const wrap=document.createElement("div");
-    wrap.className="familyDialogList";
-    rows.forEach(row=>wrap.appendChild(row));
-
-    const overlay=familyDialogBase(
-      "fa-user-group",
-      "Personen",
-      "",
-      '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>'
-    );
-
-    const body=overlay.querySelector(".familyDialogBody");
-    body.replaceChildren(wrap);
-
-    const close=()=>closeFamilyDialog(overlay);
-    const closeBtn=overlay.querySelector("#closeSharedMembers");
-    if(closeBtn) closeBtn.addEventListener("click",close);
-    overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
+    const overlay=familyDialogBase("fa-user-group","Personen","",'<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>');
+    overlay.querySelector(".familyDialogBody").replaceChildren(wrap);
+    overlay.querySelector("#closeSharedMembers").addEventListener("click",()=>closeFamilyDialog(overlay));
+    overlay.addEventListener("click",e=>{if(e.target===overlay) closeFamilyDialog(overlay);});
   }catch(error){
     console.error("Personen van deellijst konden niet worden geladen:",error);
-    const detail=error && error.code ? "\n\nFoutcode: " + error.code : "";
-    await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen." + detail,"fa-triangle-exclamation");
+    await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen. Controleer de Firebase-regels.","fa-triangle-exclamation");
   }
 }
 
@@ -9176,61 +9144,66 @@ function familyPrompt(title, message, icon="fa-keyboard", initial="") {
   });
 }
 async function showFamilyMembers() {
-
   const user = auth.currentUser;
   if (!user) return;
-
   try {
     if (!currentHouseholdId) {
-      const nameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
-      const name = nameSnapshot.val() || user.email || "Gebruiker";
-      await familyAlert("Mijn account", "👑 " + name, "fa-user");
+      const ns = await database.ref("users/" + user.uid + "/name").once("value");
+      await familyAlert("Mijn account", "👑 " + (ns.val() || user.displayName || "Gebruiker"), "fa-user");
       return;
     }
-
-    const householdRef = database.ref("households/" + currentHouseholdId);
-    const [membersSnapshot, ownerSnapshot] = await Promise.all([
-      householdRef.child("members").once("value"),
-      householdRef.child("owner").once("value")
-    ]);
-
-    const members = membersSnapshot.val() || {};
-    const ownerUid = ownerSnapshot.val();
-
-    const memberIds = Object.keys(members).sort((a, b) => {
-      if (a === ownerUid) return -1;
-      if (b === ownerUid) return 1;
-      return 0;
-    });
-
-    const names = await Promise.all(memberIds.map(async (uid) => {
-      try {
-        const nameSnapshot = await database.ref("users/" + uid + "/name").once("value");
-        const name = nameSnapshot.val() || "Onbekend";
-        return uid === ownerUid ? "👑 " + name : "👤 " + name;
-      } catch (nameError) {
-        if (uid === user.uid) {
+    const ref = database.ref("households/" + currentHouseholdId);
+    const snap = await ref.once("value");
+    const household = snap.val() || {};
+    const members = household.members || {};
+    const ownerUid = String(household.owner || "");
+    const ids = Object.keys(members).filter(uid => members[uid] === true);
+    const wrap = document.createElement("div");
+    wrap.className = "familyDialogList";
+    for (const uid of ids) {
+      let name = "";
+      try { const ns = await database.ref("users/" + uid + "/name").once("value"); name = String(ns.val() || "").trim(); } catch (_) {}
+      if (!name) name = uid === user.uid ? (user.displayName || "Jij") : "Onbekend";
+      const row = document.createElement("div");
+      row.className = "familyDialogMember";
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      const label = document.createElement("span");
+      label.textContent = (uid === ownerUid ? "👑 " : "👤 ") + name;
+      row.appendChild(label);
+      if (user.uid === ownerUid && uid !== ownerUid) {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "familyDialogBtn familyDialogCancel";
+        btn.textContent = "Verwijderen";
+        btn.addEventListener("click", async () => {
+          const ok = window.confirm("Wil je " + name + " uit de familielijst verwijderen?");
+          if (!ok) return;
           try {
-            const ownNameSnapshot = await database.ref("users/" + user.uid + "/name").once("value");
-            const ownName = ownNameSnapshot.val() || user.email || "Gebruiker";
-            return uid === ownerUid ? "👑 " + ownName : "👤 " + ownName;
-          } catch (_) {}
-        }
-        console.error("Naam van familielid kon niet worden geladen:", uid, nameError);
-        return "👤 Onbekend";
+            const updates = {};
+            updates["households/" + currentHouseholdId + "/members/" + uid] = null;
+            updates["users/" + uid + "/householdId"] = null;
+            await database.ref().update(updates);
+            closeFamilyDialog(row.closest(".familyDialogOverlay"));
+            await showFamilyMembers();
+            await familyAlert("Lid verwijderd", name + " heeft geen toegang meer via deze familielijst.", "fa-user-check");
+          } catch (e) {
+            console.error(e);
+            await familyAlert("Verwijderen mislukt", "Firebase heeft het verwijderen geweigerd. Controleer de beveiligingsregels.", "fa-triangle-exclamation");
+          }
+        });
+        row.appendChild(btn);
       }
-    }));
-
-    const list = names.length
-      ? `<div class="familyDialogList">${names.map(n => `<div class="familyDialogMember">${n}</div>`).join("")}</div>`
-      : `<div class="familyDialogText">Nog geen familieleden.</div>`;
-    await familyAlert("Familieleden", list, "fa-user-group");
+      wrap.appendChild(row);
+    }
+    const overlay = familyDialogBase("fa-user-group", "Familieleden", "", '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeFamilyMembers">OK</button>');
+    overlay.querySelector(".familyDialogBody").replaceChildren(wrap);
+    overlay.querySelector("#closeFamilyMembers").addEventListener("click", () => closeFamilyDialog(overlay));
+    overlay.addEventListener("click", e => { if (e.target === overlay) closeFamilyDialog(overlay); });
   } catch (error) {
-    console.error("Familieleden konden niet worden geladen:", error);
-    const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    await familyAlert("Familieleden", "De familieleden konden niet worden geladen." + detail, "fa-triangle-exclamation");
+    console.error(error);
+    await familyAlert("Familieleden", "De familieleden konden niet worden geladen. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
   }
-
 }
  async function enterFamilyCode() {
 
