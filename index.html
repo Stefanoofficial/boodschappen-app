@@ -7273,7 +7273,9 @@ async function fetchOnlineProductSuggestions(query) {
     "sperziebonen":["green beans"], "bonen":["beans"], "mais":["corn","sweet corn"], "maïs":["corn","sweet corn"],
     "doperwten":["peas","green peas"], "aardappel":["potato","potatoes"],
     "aardappelen":["potato","potatoes"], "zoete aardappel":["sweet potato","sweet potatoes"],
-    "brood":["bread"], "stokbrood":["baguette"], "broodjes":["bread rolls"],
+    "brood":["bread"], "stokbrood":["baguette"], "broodjes":["bread rolls"], "bolletjes":["bread rolls"],
+    "schoonmaakmiddel":["cleaning product"], "afwasmiddel":["dishwashing liquid", "dish soap"],
+    "wc papier":["toilet paper"], "toiletpapier":["toilet paper"], "keukenpapier":["paper towels"],
     "kaas":["cheese"], "jonge kaas":["young cheese"], "oude kaas":["aged cheese"],
     "melk":["milk"], "chocomelk":["chocolate milk"], "chocolademelk":["chocolate milk"],
     "yoghurt":["yogurt"], "boter":["butter"], "ei":["egg","eggs"], "eieren":["egg","eggs"],
@@ -7315,13 +7317,13 @@ async function fetchOnlineProductSuggestions(query) {
       : false;
   };
 
+  // Zoek in voeding, beauty en overige supermarkt-/huishoudproducten.
+  // Relevantie wordt hieronder bepaald op basis van de ingetypte productnaam;
+  // elektronica wordt apart uitgesloten.
   const sourceDefinitions = [
-    // Voeding: grootste en belangrijkste bron.
     { name:"Open Food Facts", base:"https://world.openfoodfacts.org" },
-    // Producten buiten voeding/huishouden: tweede Open Facts-database.
-    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" },
-    // Extra dekking voor persoonlijke verzorging als iemand daarnaar zoekt.
-    { name:"Open Beauty Facts", base:"https://world.openbeautyfacts.org" }
+    { name:"Open Beauty Facts", base:"https://world.openbeautyfacts.org" },
+    { name:"Open Products Facts", base:"https://world.openproductsfacts.org" }
   ];
 
   const results = [];
@@ -7335,7 +7337,7 @@ async function fetchOnlineProductSuggestions(query) {
         encodeURIComponent(term) +
         "&search_simple=1&action=process&json=1&page_size=60" +
         "&sort_by=unique_scans_n&lc=nl&cc=nl" +
-        "&fields=code,product_name,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,categories,categories_tags_en,countries_tags";
+        "&fields=code,product_name,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,categories,categories_tags_en,countries_tags,product_type,food_groups_tags";
 
       requests.push(
         fetch(url, {
@@ -7374,6 +7376,19 @@ async function fetchOnlineProductSuggestions(query) {
       const categories = Array.isArray(p.categories_tags_en)
         ? p.categories_tags_en.join(" ")
         : String(p.categories || "");
+      const foodGroups = Array.isArray(p.food_groups_tags) ? p.food_groups_tags.join(" ") : "";
+      const productType = String(p.product_type || "").toLowerCase();
+
+      // Geen elektronica of andere niet-boodschappen, ongeacht de zoekterm.
+      const searchableProduct = cleanText([rawName, dutchName, englishName, brand, categories, foodGroups].join(" "));
+      const nonGroceryTerms = [
+        "iphone", "ipad", "macbook", "airpods", "apple watch", "smartphone",
+        "mobile phone", "laptop", "tablet computer", "electronics", "electronic device",
+        "headphones", "charger", "keyboard", "computer mouse", "monitor", "desktop computer",
+        "television", "camera lens", "video game console", "playstation", "xbox", "nintendo switch"
+      ];
+      if (nonGroceryTerms.some(term => searchableProduct.includes(cleanText(term)))) continue;
+      if (/en:(electronics|computers|mobile-phones|audio|video-games|home-appliances)(\s|$)/i.test(categories)) continue;
 
       // Geen nepafbeeldingen: online suggesties alleen met echte databasefoto.
       if (!rawName || !imageUrl) continue;
@@ -7398,7 +7413,11 @@ async function fetchOnlineProductSuggestions(query) {
           "mayonnaise","mayonaise","sauce","saus","dressing","salsa","drink","beverage",
           "water","juice","sap","milk","melk","yogurt","yoghurt","cream","shampoo",
           "conditioner","mask","face","skin","soap","gel","lotion","supplement",
-          "powder","protein","snack","chips","cracker","cookie","cake","pizza","soup"
+          "powder","protein","snack","chips","cracker","cookie","cake","pizza","soup",
+          // Voorkom dat Engelse vertalingen zoals "apple" elektronica van Apple opleveren.
+          "iphone","ipad","macbook","airpods","apple watch","smartphone","mobile phone",
+          "laptop","tablet","computer","electronics","electronic device","headphones",
+          "charger","keyboard","computer mouse","monitor","desktop"
         ];
         if (forbidden.some(x => all.includes(cleanText(x)))) continue;
       }
@@ -7410,13 +7429,25 @@ async function fetchOnlineProductSuggestions(query) {
       const shown = cleanText(shownName);
       const q = cleanText(normalized);
 
-      if (shown === q) score += 1500;
-      else if (shown.startsWith(q + " ")) score += 1250;
-      else if (shown.startsWith(q)) score += 1150;
-      else if (matchesIntent(shownName, normalized)) score += 1000;
-      else if (aliasMatch) score += 700;
+      // Eerst het product dat letterlijk overeenkomt met wat de gebruiker typt.
+      // Daarna varianten/meervouden en pas daarna vertaalde aliasmatches.
+      const normalizedNames = allNames.map(name => cleanText(name));
+      const exactTyped = normalizedNames.some(name => name === q);
+      const startsTyped = normalizedNames.some(name => name.startsWith(q + " ") || name.startsWith(q));
+      const exactAlias = aliasesFor.some(alias => {
+        const a = cleanText(alias);
+        return normalizedNames.some(name => name === a || name.startsWith(a + " "));
+      });
 
-      if (dutchName) score += 180;
+      if (exactTyped) score += 3000;
+      else if (startsTyped) score += 2200;
+      else if (matchesIntent(shownName, normalized)) score += 1600;
+      else if (exactAlias) score += 1200;
+      else if (aliasMatch) score += 800;
+
+      // Geef een Nederlandstalige productnaam een kleine voorkeur, zonder
+      // een exact passende Engelse database-match boven een exact NL-match te zetten.
+      if (dutchName) score += 100;
       if (p.countries_tags && Array.isArray(p.countries_tags) &&
           p.countries_tags.some(x => String(x).toLowerCase().includes("netherlands") || String(x).toLowerCase().includes("nederland"))) {
         score += 120;
