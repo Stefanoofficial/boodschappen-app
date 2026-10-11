@@ -4490,6 +4490,28 @@ body.dark-theme .itemProductContent .quantityValue {
 }
 </style>
 
+
+<style id="actual-dark-quantity-color-fix">
+/* In dark mode the product row remains white, so the number must be dark too. */
+body.dark-theme .itemProductContent .quantityValue {
+  color: #30483a !important;
+  -webkit-text-fill-color: #30483a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 700 !important;
+}
+/* Keep the delete button the same height as the quantity buttons. */
+.itemProductContent .product-row-trash-can {
+  box-sizing: border-box !important;
+  height: 29px !important;
+  min-height: 29px !important;
+  max-height: 29px !important;
+  align-self: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+</style>
+
 </head>
 
 <body>
