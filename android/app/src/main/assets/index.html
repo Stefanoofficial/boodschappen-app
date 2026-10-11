@@ -171,7 +171,12 @@ h2 {
   border-radius: 14px;
   border: 1px solid #e1ece4;
   box-shadow: 0 8px 20px rgba(63,91,69,.14);
-  overflow: hidden;
+  max-height: min(62vh, 560px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   z-index: 5000;
   display: none;
 }
@@ -7546,7 +7551,7 @@ async function updateProductSuggestions() {
     ];
   }
 
-  const matches = suggestionResults.slice(0, 5).map(({name, icon}) => [name, icon || getProductIcon(name)]);
+  const matches = suggestionResults.slice(0, 30).map(({name, icon}) => [name, icon || getProductIcon(name)]);
   box.innerHTML = "";
   matches.forEach(([name, icon]) => {
     const button = document.createElement("button");
@@ -12502,4 +12507,8 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
   opacity: 1 !important;
   transform: none !important;
 }
+</style>
+
+<style id="scrollable-product-suggestions-fix">
+#productSuggestions.productSuggestions { max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; touch-action: pan-y; }
 </style>
