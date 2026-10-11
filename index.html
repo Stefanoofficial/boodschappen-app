@@ -7472,7 +7472,7 @@ async function fetchOnlineProductSuggestions(query) {
 
   results.sort((a,b) => b._score - a._score);
 
-  const finalResults = results.slice(0, 5).map(({_score, ...product}) => product);
+  const finalResults = results.slice(0, 30).map(({_score, ...product}) => product);
   productSuggestionCache.set(key, finalResults);
   return finalResults;
 }
@@ -12510,5 +12510,6 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 </style>
 
 <style id="scrollable-product-suggestions-fix">
-#productSuggestions.productSuggestions { max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; touch-action: pan-y; }
+#productSuggestions.productSuggestions { position: relative !important; max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain; touch-action: pan-y !important; pointer-events: auto !important; }
+#productSuggestions.productSuggestions .productSuggestion { touch-action: pan-y !important; }
 </style>
