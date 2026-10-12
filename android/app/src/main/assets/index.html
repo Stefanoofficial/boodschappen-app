@@ -7362,8 +7362,8 @@ async function fetchOnlineProductSuggestions(query) {
         "&sort_by=unique_scans_n&lc=nl&cc=nl" +
         "&fields=code,product_name,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,categories,categories_tags_en,countries_tags,product_type,food_groups_tags";
 
-      requests.push(
-        fetch(url, {
+      const addRequest = requestUrl => requests.push(
+        fetch(requestUrl, {
           method:"GET",
           headers:{"Accept":"application/json"},
           cache:"no-store"
@@ -7373,6 +7373,18 @@ async function fetchOnlineProductSuggestions(query) {
           return {source, products:Array.isArray(data.products) ? data.products : []};
         }).catch(() => ({source, products:[]}))
       );
+      addRequest(url);
+
+      // Open Food Facts' free-text search can miss products when the query
+      // is only a brand. Add a dedicated brand-tag query for single-word
+      // searches (e.g. "Campina") so products are retrieved by brands too.
+      if (source.name === "Open Food Facts" && cleanText(term).split(" ").length === 1) {
+        const brandUrl = source.base + "/cgi/search.pl?tagtype_0=brands&tag_contains_0=contains&tag_0=" +
+          encodeURIComponent(term) +
+          "&action=process&json=1&page_size=60&sort_by=unique_scans_n&lc=nl&cc=nl" +
+          "&fields=code,product_name,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,categories,categories_tags_en,countries_tags,product_type,food_groups_tags";
+        addRequest(brandUrl);
+      }
     }
   }
 
