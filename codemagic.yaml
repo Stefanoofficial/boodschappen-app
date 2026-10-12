@@ -1,10 +1,15 @@
+
 workflows:
   android-apk:
     name: Android APK - Mijn Boodschappen
     instance_type: mac_mini_m2
 
-    scripts:
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
 
+    scripts:
       - name: Prepare Android app
         script: |
           #!/usr/bin/env bash
@@ -19,7 +24,6 @@ workflows:
           ls -la
 
           echo "=== CHECK ANDROID PROJECT ==="
-
           test -d android
           test -f android/gradlew
           test -f android/settings.gradle
@@ -31,7 +35,6 @@ workflows:
           echo "Android project found."
 
           echo "=== CHECK WEB FILES ==="
-
           test -f index.html
           test -f splash_icon.png
           test -f icon-512-maskable.png
@@ -39,55 +42,30 @@ workflows:
           echo "Web files found."
 
           echo "=== CLEAN GENERATED ANDROID RESOURCES ==="
-
           rm -rf android/app/src/main/res
 
           echo "=== PREPARE WEB ASSET ==="
-
           mkdir -p android/app/src/main/assets
-
-          cp index.html \
-            android/app/src/main/assets/index.html
+          cp index.html android/app/src/main/assets/index.html
 
           echo "index.html copied."
 
           echo "=== PREPARE RESOURCE DIRECTORIES ==="
-
           mkdir -p android/app/src/main/res/drawable
           mkdir -p android/app/src/main/res/values
           mkdir -p android/app/src/main/res/mipmap-anydpi-v26
-
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-xhdpi
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
-          echo "Resource directories created."
-
           echo "=== PREPARE CUSTOM SPLASH ==="
-
-          cp splash_icon.png \
-            android/app/src/main/res/drawable/splash_icon.png
-
-          echo "Custom splash copied."
-
-          echo "=== PREPARE ANDROID SYSTEM SPLASH ==="
-
-          cp splash_icon.png \
-            android/app/src/main/res/drawable/android_system_splash_icon.png
-
-          echo "System splash icon copied."
-
-          echo "=== PREPARE LAUNCHER FOREGROUND ==="
-
-          cp splash_icon.png \
-            android/app/src/main/res/drawable/ic_launcher_foreground.png
-
-          echo "Launcher foreground copied."
+          cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
+          cp splash_icon.png android/app/src/main/res/drawable/android_system_splash_icon.png
+          cp splash_icon.png android/app/src/main/res/drawable/ic_launcher_foreground.png
 
           echo "=== PREPARE COLORS ==="
-
           cat > android/app/src/main/res/values/colors.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
@@ -95,10 +73,7 @@ workflows:
           </resources>
           EOF
 
-          echo "Colors prepared."
-
           echo "=== PREPARE ADAPTIVE ICON ==="
-
           cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
@@ -115,145 +90,75 @@ workflows:
           </adaptive-icon>
           EOF
 
-          echo "Adaptive icons prepared."
-
           echo "=== PREPARE SPLASH THEME ==="
-
           cat > android/app/src/main/res/values/styles.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-
               <style name="AppTheme.NoActionBar"
                   parent="android:style/Theme.Material.Light.NoActionBar">
-
                   <item name="android:fontFamily">sans</item>
                   <item name="android:colorAccent">#14BE4B</item>
-
                   <item name="android:windowActionModeOverlay">true</item>
                   <item name="android:windowNoTitle">true</item>
-
                   <item name="android:navigationBarColor">#eef8f1</item>
                   <item name="android:statusBarColor">#eef8f1</item>
-
                   <item name="android:windowLightStatusBar">true</item>
                   <item name="android:windowLightNavigationBar">true</item>
-
               </style>
 
-              <style name="AppTheme.Splash"
-                  parent="Theme.SplashScreen">
-
-                  <item name="windowSplashScreenBackground">
-                      #eef8f1
-                  </item>
-
-                  <item name="windowSplashScreenAnimatedIcon">
-                      @drawable/android_system_splash_icon
-                  </item>
-
-                  <item name="postSplashScreenTheme">
-                      @style/AppTheme.NoActionBar
-                  </item>
-
+              <style name="AppTheme.Splash" parent="Theme.SplashScreen">
+                  <item name="windowSplashScreenBackground">#eef8f1</item>
+                  <item name="windowSplashScreenAnimatedIcon">@drawable/android_system_splash_icon</item>
+                  <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
               </style>
-
           </resources>
           EOF
 
-          echo "Splash theme prepared."
-
           echo "=== PREPARE LAUNCHER ICONS ==="
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
-          cp icon-512-maskable.png \
-            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-
-          echo "Launcher icons prepared."
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            cp icon-512-maskable.png \
+              "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
+            cp icon-512-maskable.png \
+              "android/app/src/main/res/mipmap-${density}/ic_launcher_round.png"
+          done
 
           echo "=== VERIFY RESOURCES ==="
-
           test -f android/app/src/main/res/drawable/splash_icon.png
           test -f android/app/src/main/res/drawable/android_system_splash_icon.png
           test -f android/app/src/main/res/drawable/ic_launcher_foreground.png
-
           test -f android/app/src/main/res/values/colors.xml
           test -f android/app/src/main/res/values/styles.xml
-
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
-          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
-          echo ""
-          echo "========================================"
-          echo "       RESOURCE CHECK COMPLETE"
-          echo "========================================"
-
+          echo "Resource check complete."
 
       - name: Set Android SDK location
         script: |
           set -e
-
-          echo "sdk.dir=$ANDROID_SDK_ROOT" \
-            > "$CM_BUILD_DIR/android/local.properties"
-
-          echo "=== SDK LOCATION ==="
-
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
           cat "$CM_BUILD_DIR/android/local.properties"
-
 
       - name: Build Android APK
         script: |
           set -e
-
           cd "$CM_BUILD_DIR/android"
-
           chmod +x ./gradlew
 
           echo "========================================"
           echo "       BUILD ANDROID APK"
           echo "========================================"
 
-          ./gradlew assembleDebug --stacktrace
-
-          echo "========================================"
-          echo "       BUILD COMPLETE"
-          echo "========================================"
+          ./gradlew assembleDebug \
+            --build-cache \
+            --parallel \
+            --stacktrace
 
           echo "=== APK FILES ==="
-
           find app/build/outputs/apk/debug \
             -type f \
             -name "*.apk" \
             -print
-
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
