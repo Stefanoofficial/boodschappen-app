@@ -25,7 +25,7 @@ jobs:
           cache-dependency-path: android/**/*.gradle*
 
       - name: Android SDK instellen
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Android APK bouwen
         working-directory: android
