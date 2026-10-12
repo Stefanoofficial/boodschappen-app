@@ -7405,7 +7405,8 @@ async function fetchOnlineProductSuggestions(query) {
       const rawName = String(p.product_name || "").trim();
       const dutchName = String(p.product_name_nl || "").trim();
       const englishName = String(p.product_name_en || "").trim();
-      const brand = String(p.brands || "").split(",")[0].trim();
+      const brand = String(p.brands || "").trim();
+      const primaryBrand = brand.split(",")[0].trim();
       const imageUrl = String(p.image_front_small_url || p.image_front_url || "").trim();
       const barcode = String(p.code || "").trim();
       const categories = Array.isArray(p.categories_tags_en)
