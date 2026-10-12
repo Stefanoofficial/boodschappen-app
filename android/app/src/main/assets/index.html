@@ -7299,6 +7299,7 @@ async function fetchOnlineProductSuggestions(query) {
     "schoonmaakmiddel":["cleaning product"], "afwasmiddel":["dishwashing liquid", "dish soap"],
     "wc papier":["toilet paper"], "toiletpapier":["toilet paper"], "keukenpapier":["paper towels"],
     "kaas":["cheese"], "jonge kaas":["young cheese"], "oude kaas":["aged cheese"],
+    "kwark":["quark", "curd cheese", "fromage frais"], "campina kwark":["campina quark", "campina curd cheese"],
     "melk":["milk"], "chocomelk":["chocolate milk"], "chocolademelk":["chocolate milk"],
     "yoghurt":["yogurt"], "boter":["butter"], "ei":["egg","eggs"], "eieren":["egg","eggs"],
     "kip":["chicken"], "rijst":["rice"], "pasta":["pasta"], "vlees":["meat"],
@@ -7412,20 +7413,25 @@ async function fetchOnlineProductSuggestions(query) {
       if (nonGroceryTerms.some(term => searchableProduct.includes(cleanText(term)))) continue;
       if (/en:(electronics|computers|mobile-phones|audio|video-games|home-appliances)(\s|$)/i.test(categories)) continue;
 
-      // Geen nepafbeeldingen: online suggesties alleen met echte databasefoto.
-      if (!rawName || !imageUrl) continue;
+      // Producten zonder foto blijven bruikbaar: de UI toont dan een passend icoon.
+      if (!rawName && !dutchName && !englishName) continue;
 
-      const shownName = dutchName || toDutchProductName(rawName);
+      const shownName = dutchName || toDutchProductName(rawName || englishName);
       const allNames = [shownName, rawName, englishName].filter(Boolean);
+      const brandText = cleanText(brand);
+      const categoryText = cleanText(categories + " " + foodGroups);
 
-      // Harde inhoudelijke match. Merk/categorie mag nooit op zichzelf
-      // een product relevant maken.
+      // Zoek zowel productnamen als merken. Dit is essentieel voor zoekopdrachten
+      // zoals 'Campina', waarbij de merknaam niet altijd in product_name staat.
       const direct = allNames.some(name => matchesIntent(name, normalized));
+      const brandMatch = !!brandText && matchesIntent(brandText, normalized);
+      const categoryMatch = (normalized === "kwark" || normalized === "yoghurt" || normalized === "melk") &&
+        (categoryText.includes(normalized) || (normalized === "kwark" && /quark|curd cheese|fromage frais/.test(categoryText)));
       const aliasMatch = aliasesFor.some(alias =>
-        allNames.some(name => matchesIntent(name, alias))
+        allNames.some(name => matchesIntent(name, alias)) || matchesIntent(brandText, alias)
       );
 
-      if (!direct && !aliasMatch) continue;
+      if (!direct && !brandMatch && !categoryMatch && !aliasMatch) continue;
 
       // Verse groente/fruit: uitgesloten als het eigenlijk saus, drank,
       // cosmetica of een ander afgeleid product is.
@@ -7461,6 +7467,7 @@ async function fetchOnlineProductSuggestions(query) {
         return normalizedNames.some(name => name === a || name.startsWith(a + " "));
       });
 
+      if (brandMatch) score += 2600;
       if (exactTyped) score += 3000;
       else if (startsTyped) score += 2200;
       else if (matchesIntent(shownName, normalized)) score += 1600;
@@ -7469,6 +7476,7 @@ async function fetchOnlineProductSuggestions(query) {
 
       // Geef een Nederlandstalige productnaam een kleine voorkeur, zonder
       // een exact passende Engelse database-match boven een exact NL-match te zetten.
+      if (categoryMatch) score += 700;
       if (dutchName) score += 100;
 
       // Semantische prioriteit: bij gewone boodschappenwoorden eerst het
