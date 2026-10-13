@@ -13544,3 +13544,12 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 #productSuggestions.productSuggestions { position: relative !important; max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain; touch-action: pan-y !important; pointer-events: auto !important; }
 #productSuggestions.productSuggestions .productSuggestion { touch-action: pan-y !important; }
 </style>
+<style id="ios-picker-hide-duplicate-native-options">
+/* iOS: verberg de bestaande Android/native dag- en tijdlijsten zodra de iOS-wielen worden getoond. */
+html.platform-ios #androidDayOptions,
+html.platform-ios #androidHourGrid,
+html.platform-ios #androidMinuteGrid {
+  display: none !important;
+}
+html.platform-ios #reminderDayDialog .ios-wheel-wrap { margin-top: 18px; }
+</style>
