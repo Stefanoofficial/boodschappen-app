@@ -6501,7 +6501,7 @@ async function manageProfilePhoto() {
       img.onerror = () => reject(new Error("Dit afbeeldingsbestand kan niet worden geopend."));
       img.src = imageData;
     });
-    const maxSide = 160;
+    const maxSide = 320;
     const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -6532,7 +6532,7 @@ async function manageProfilePhoto() {
     chooseButton.textContent = "Foto verwerken...";
     try {
       const dataURL = await makeSmallPhotoDataURL(file);
-      if (dataURL.length > 120000) {
+      if (dataURL.length > 300000) {
         throw new Error("De verkleinde foto is nog te groot. Kies een andere foto.");
       }
       chooseButton.textContent = "Opslaan...";
@@ -6552,7 +6552,7 @@ async function manageProfilePhoto() {
       chooseButton.disabled = false;
       chooseButton.textContent = "Foto kiezen";
       const message = error && error.code === "PERMISSION_DENIED"
-        ? "Firebase weigert deze foto. Pas de photoURL-regel aan zodat verkleinde afbeeldingen tot 120.000 tekens zijn toegestaan."
+        ? "Firebase weigert deze foto. Pas de photoURL-regel aan zodat verkleinde afbeeldingen tot 300.000 tekens zijn toegestaan."
         : (error && error.message ? error.message : "Controleer je verbinding en Firebase-regels.");
       await familyAlert("Foto niet opgeslagen", message, "fa-triangle-exclamation");
     } finally {
@@ -9832,11 +9832,11 @@ async function showFamilyMembers() {
           lightbox.setAttribute("aria-label", "Profielfoto van " + name);
           const large = document.createElement("img");
           large.src = photoURL; large.alt = "Profielfoto van " + name;
-          large.style.cssText = "display:block;max-width:100%;max-height:80vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.35)";
+          large.style.cssText = "display:block;max-width:min(78vw, 520px);max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)";
           const close = document.createElement("button");
           close.type = "button"; close.textContent = "×";
           close.setAttribute("aria-label", "Foto sluiten");
-          close.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:32px;line-height:1;cursor:pointer";
+          close.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:30px;line-height:44px;text-align:center;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer";
           const dismiss = () => lightbox.remove();
           close.addEventListener("click", dismiss);
           lightbox.addEventListener("click", (event) => { if (event.target === lightbox) dismiss(); });
