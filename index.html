@@ -1751,6 +1751,8 @@ body.dark-theme .androidDayOptions button,body.dark-theme .androidTimeGrid butto
 body.dark-theme .androidDayOptions button.selected,body.dark-theme .androidTimeGrid button.selected,body.dark-theme .androidMinuteGrid button.selected{background:#2f4c37;color:#b9e1c3;}
 body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#29352d;color:#b9e1c3;}
 
+
+/* Reminder messaging adapts to the detected device; never hide it on iOS. */
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -4947,6 +4949,14 @@ html.platform-ios #reminderTimeDialog .androidTimePreview{font-size:32px!importa
 html.platform-ios .ios-wheel-actions-label{display:flex;justify-content:space-between;color:#5b8cc9;font-size:18px;margin-bottom:18px}
 html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
 </style>
+<script>
+(function(){
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS) document.documentElement.classList.add("ios-device");
+  document.addEventListener("DOMContentLoaded", function(){ if (isIOS) document.body.classList.add("ios-device"); });
+})();
+</script>
 </head>
 
 <body>
@@ -6005,14 +6015,9 @@ function saveNotificationSettings() {
   localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
 
   if (!window.AndroidApp) {
-    // Op iPhone geen Android-melding tonen; de melding blijft alleen in de Android-app.
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent || "") ||
+    const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || "") ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (!isIOSDevice) {
-      setNotificationStatus("Meldingen werken in de Android-app.", true);
-    } else {
-      setNotificationStatus("", false);
-    }
+    setNotificationStatus(isIOSDevice ? "Meldingen zijn afhankelijk van de iPhone-app." : "Meldingen werken in de Android-app.", true);
     return;
   }
 
@@ -6129,7 +6134,7 @@ function nativeNotificationStatus(message, isError) {
 
 function testShoppingReminder() {
   if (!window.AndroidApp || typeof AndroidApp.testShoppingReminder !== "function") {
-    setNotificationStatus("Testmelding werkt alleen in de Android-app.", true);
+    setNotificationStatus((/iPad|iPhone|iPod/i.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) ? "Testmelding werkt alleen in de iPhone-app." : "Testmelding werkt alleen in de Android-app.", true);
     return;
   }
   setNotificationStatus("Testmelding wordt verzonden...");
@@ -12634,6 +12639,30 @@ body.dark-theme .app.more-active #familyMenu {
     row.appendChild(hours.firstElementChild);row.appendChild(mins.firstElementChild);
     minuteGrid.insertAdjacentElement("afterend",row);
   };
+})();
+</script>
+
+
+<script>
+// Pas alleen de uitleg/labels aan op basis van het apparaat; functies blijven ongewijzigd.
+(function updateReminderPlatformCopy() {
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const info = document.querySelector(".notificationInfo");
+  if (isIOS) {
+    const testButton = document.querySelector(".notificationTestButton");
+    if (testButton) testButton.setAttribute("aria-label", "Testmelding voor iPhone");
+    if (info) {
+      const paragraphs = info.querySelectorAll("p");
+      if (paragraphs[0]) paragraphs[0].textContent = "Herinneringen via meldingen zijn afhankelijk van ondersteuning in de iPhone-app. Er is geen account nodig.";
+      if (paragraphs[1]) paragraphs[1].textContent = "Sta meldingen voor deze app toe via Instellingen op je iPhone als de app daarom vraagt.";
+    }
+    const status = document.getElementById("notificationSettingsStatus");
+    if (status && /Android-app/i.test(status.textContent)) {
+      status.textContent = "Meldingen voor iPhone zijn afhankelijk van de iPhone-app.";
+    }
+  }
 })();
 </script>
 
