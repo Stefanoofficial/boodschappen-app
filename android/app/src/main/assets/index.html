@@ -4553,6 +4553,93 @@ body.dark-theme .itemProductContent .quantityValue {
 }
 </style>
 
+
+<style id="platform-specific-popup-styles">
+/* Platformdetectie wordt hieronder gezet; functies en bestaande handlers blijven intact. */
+html.platform-ios {
+  --platform-dialog-radius: 24px;
+  --platform-dialog-motion: cubic-bezier(.22,.8,.25,1);
+  --platform-dialog-cancel-bg: #f1f1f4;
+  --platform-dialog-cancel-color: #202124;
+  --platform-dialog-primary: #3F5B45;
+}
+html.platform-android {
+  --platform-dialog-radius: 20px;
+  --platform-dialog-motion: cubic-bezier(.2,0,0,1);
+  --platform-dialog-cancel-bg: #eaf2ec;
+  --platform-dialog-cancel-color: #31543b;
+  --platform-dialog-primary: #3F5B45;
+}
+/* De bestaande familie- en bevestigingsdialogen krijgen platformpassende vormen. */
+.platform-ios .familyDialog,
+.platform-ios .androidReminderDialogCard,
+.platform-ios .useModeBox,
+.platform-ios .registerBox,
+.platform-ios .modal-content {
+  border-radius: var(--platform-dialog-radius);
+  transition-timing-function: var(--platform-dialog-motion);
+}
+.platform-ios .familyDialogOverlay,
+.platform-ios .androidReminderDialog {
+  background: rgba(20, 24, 22, .24);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.platform-ios .familyDialogCancel,
+.platform-ios .androidDialogTextButton {
+  background: var(--platform-dialog-cancel-bg);
+  color: var(--platform-dialog-cancel-color);
+  border-radius: 12px;
+}
+.platform-ios .familyDialogPrimary,
+.platform-ios .androidDialogPrimaryButton {
+  border-radius: 12px;
+}
+.platform-android .familyDialog,
+.platform-android .androidReminderDialogCard,
+.platform-android .useModeBox,
+.platform-android .registerBox,
+.platform-android .modal-content {
+  border-radius: var(--platform-dialog-radius);
+  transition-timing-function: var(--platform-dialog-motion);
+}
+.platform-android .familyDialogOverlay,
+.platform-android .androidReminderDialog {
+  background: rgba(22, 30, 25, .30);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.platform-android .familyDialogCancel,
+.platform-android .androidDialogTextButton {
+  background: var(--platform-dialog-cancel-bg);
+  color: var(--platform-dialog-cancel-color);
+  border-radius: 10px;
+}
+.platform-android .familyDialogPrimary,
+.platform-android .androidDialogPrimaryButton {
+  border-radius: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .platform-ios .familyDialog, .platform-android .familyDialog,
+  .platform-ios .modal-content, .platform-android .modal-content {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+<script id="platform-popup-detection">
+(function () {
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(ua);
+  var root = document.documentElement;
+  root.classList.remove("platform-ios", "platform-android", "platform-other");
+  root.classList.add(isIOS ? "platform-ios" : (isAndroid ? "platform-android" : "platform-other"));
+  root.dataset.platform = isIOS ? "ios" : (isAndroid ? "android" : "other");
+})();
+</script>
+
 </head>
 
 <body>
