@@ -6152,52 +6152,96 @@ async function manageProfilePhoto() {
     photoURL = String(snap.val() || "");
   } catch (error) {
     console.error("Profielfoto laden mislukt", error);
+    await familyAlert("Foto niet geladen", "De profielfoto kon niet worden geladen. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
+    return;
   }
   const preview = photoURL
     ? `<img src="${photoURL.replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" alt="Huidige profielfoto" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #dff5df">`
     : `<div style="width:88px;height:88px;border-radius:50%;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:34px"><i class="fa-solid fa-user"></i></div>`;
-  const overlay = familyDialogBase("fa-camera", "Profielfoto", `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 14px"><div id="profilePhotoPreview">${preview}</div><div class="familyDialogText" style="text-align:center">Kies een foto uit je telefoon. Je foto is zichtbaar voor leden van je familie.</div><input id="profilePhotoFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none"><button type="button" class="familyDialogBtn familyDialogPrimary" id="chooseProfilePhoto">Foto kiezen</button></div>`, `<button type="button" class="familyDialogBtn familyDialogCancel" id="cancelProfilePhoto">Sluiten</button>${photoURL ? '<button type="button" class="familyDialogBtn familyDialogRemove" id="removeProfilePhoto">Verwijderen</button>' : ''}`);
+  const overlay = familyDialogBase("fa-camera", "Profielfoto", `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 14px"><div id="profilePhotoPreview">${preview}</div><div class="familyDialogText" style="text-align:center">Kies een foto uit je telefoon. De foto wordt verkleind opgeslagen en is zichtbaar voor leden van je familie.</div><input id="profilePhotoFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none"><button type="button" class="familyDialogBtn familyDialogPrimary" id="chooseProfilePhoto">Foto kiezen</button></div>`, `<button type="button" class="familyDialogBtn familyDialogCancel" id="cancelProfilePhoto">Sluiten</button>${photoURL ? '<button type="button" class="familyDialogBtn familyDialogRemove" id="removeProfilePhoto">Verwijderen</button>' : ''}`);
   const fileInput = overlay.querySelector("#profilePhotoFile");
   overlay.querySelector("#chooseProfilePhoto").addEventListener("click", () => fileInput.click());
   overlay.querySelector("#cancelProfilePhoto").addEventListener("click", () => closeFamilyDialog(overlay));
+
+  // Convert the selected image to a small JPEG data URL so Firebase Storage is not required.
+  async function makeSmallPhotoDataURL(file) {
+    const imageData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("De foto kon niet worden gelezen."));
+      reader.readAsDataURL(file);
+    });
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Dit afbeeldingsbestand kan niet worden geopend."));
+      img.src = imageData;
+    });
+    const maxSide = 160;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) throw new Error("Afbeelding verkleinen wordt niet ondersteund op dit toestel.");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.68);
+  }
+
   fileInput.addEventListener("change", async () => {
     const file = fileInput.files && fileInput.files[0];
     if (!file) return;
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) {
       await familyAlert("Ongeldig bestand", "Kies een JPG-, PNG- of WebP-afbeelding.", "fa-triangle-exclamation");
       fileInput.value = "";
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      await familyAlert("Foto te groot", "Kies een foto van maximaal 5 MB.", "fa-triangle-exclamation");
+    if (file.size > 10 * 1024 * 1024) {
+      await familyAlert("Foto te groot", "Kies een foto van maximaal 10 MB.", "fa-triangle-exclamation");
       fileInput.value = "";
       return;
     }
     const chooseButton = overlay.querySelector("#chooseProfilePhoto");
     chooseButton.disabled = true;
-    chooseButton.textContent = "Uploaden...";
+    chooseButton.textContent = "Foto verwerken...";
     try {
-      const path = "profilePhotos/" + user.uid + "/profile";
-      const fileRef = storage.ref(path);
-      await fileRef.put(file, { contentType: file.type });
-      const url = await fileRef.getDownloadURL();
-      await database.ref("users/" + user.uid + "/photoURL").set(url);
+      const dataURL = await makeSmallPhotoDataURL(file);
+      if (dataURL.length > 120000) {
+        throw new Error("De verkleinde foto is nog te groot. Kies een andere foto.");
+      }
+      chooseButton.textContent = "Opslaan...";
+      await database.ref("users/" + user.uid + "/photoURL").set(dataURL);
+      const previewContainer = overlay.querySelector("#profilePhotoPreview");
+      if (previewContainer) {
+        previewContainer.innerHTML = `<img src="${dataURL}" alt="Profielfoto" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #dff5df">`;
+      }
       closeFamilyDialog(overlay);
       await familyAlert("Profielfoto opgeslagen", "Je profielfoto is bijgewerkt.", "fa-circle-check");
+      // Refresh family list if the existing page exposes a refresh hook.
+      if (typeof showFamilyMembers === "function") {
+        try { /* The list reads the saved photo the next time it opens. */ } catch (_) {}
+      }
     } catch (error) {
       console.error("Profielfoto opslaan mislukt", error);
       chooseButton.disabled = false;
       chooseButton.textContent = "Foto kiezen";
-      await familyAlert("Foto niet opgeslagen", "Controleer of Firebase Storage is ingeschakeld en de beveiligingsregels zijn ingesteld.", "fa-triangle-exclamation");
+      const message = error && error.code === "PERMISSION_DENIED"
+        ? "Firebase weigert deze foto. Pas de photoURL-regel aan zodat verkleinde afbeeldingen tot 120.000 tekens zijn toegestaan."
+        : (error && error.message ? error.message : "Controleer je verbinding en Firebase-regels.");
+      await familyAlert("Foto niet opgeslagen", message, "fa-triangle-exclamation");
+    } finally {
+      fileInput.value = "";
     }
   });
+
   const removeButton = overlay.querySelector("#removeProfilePhoto");
   if (removeButton) removeButton.addEventListener("click", async () => {
     const ok = await familyConfirm("Profielfoto verwijderen", "Wil je je profielfoto verwijderen?", true);
     if (!ok) return;
     try {
       await database.ref("users/" + user.uid + "/photoURL").remove();
-      try { await storage.ref("profilePhotos/" + user.uid + "/profile").delete(); } catch (_) {}
       closeFamilyDialog(overlay);
       await familyAlert("Profielfoto verwijderd", "Je standaardpictogram wordt weer getoond.", "fa-circle-check");
     } catch (error) {
@@ -8329,7 +8373,6 @@ if (document.readyState === "loading") {
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-storage-compat.js"></script>
 
 <script>
   // Import the functions you need from the SDKs you need
@@ -8343,7 +8386,6 @@ if (document.readyState === "loading") {
     authDomain: "boodschappenthuis1.firebaseapp.com",
     databaseURL: "https://boodschappenthuis1-default-rtdb.firebaseio.com",
     projectId: "boodschappenthuis1",
-    storageBucket: "boodschappenthuis1.firebasestorage.app",
     messagingSenderId: "845995010779",
     appId: "1:845995010779:web:5896c89bde8b3ace507afe"
   };
@@ -8352,7 +8394,6 @@ if (document.readyState === "loading") {
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
-const storage = firebase.storage();
 // Bewaar de Firebase-inlogsessie lokaal totdat de gebruiker zelf uitlogt.
 const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
   console.error("Loginpersistentie instellen mislukt:", error);
