@@ -5515,8 +5515,8 @@ html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
-      <p>Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je kunt daar ook een testmelding sturen.</p>
-      <p>De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
+      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je kunt daar ook een testmelding sturen.</p>
+      <p id="helpReminderPlatform">De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
     </div>
   </div>
 </div>
@@ -12650,6 +12650,12 @@ body.dark-theme .app.more-active #familyMenu {
   const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const info = document.querySelector(".notificationInfo");
+  const helpReminderPlatform = document.getElementById("helpReminderPlatform");
+  if (isIOS && helpReminderPlatform) {
+    helpReminderPlatform.textContent = "Op je iPhone moet de app meldingen ondersteunen. Sta meldingen toe wanneer de app daarom vraagt en controleer de meldingsinstellingen van je iPhone.";
+  } else if (helpReminderPlatform) {
+    helpReminderPlatform.textContent = "De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.";
+  }
   if (isIOS) {
     const testButton = document.querySelector(".notificationTestButton");
     if (testButton) testButton.setAttribute("aria-label", "Testmelding voor iPhone");
