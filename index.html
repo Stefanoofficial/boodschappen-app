@@ -4626,8 +4626,6 @@ html.platform-android {
     transition: none !important;
   }
 }
-</style>
-
 /* Dag- en tijdkiezer: iOS-specifieke vormgeving, bestaande functies blijven behouden. */
 html.platform-ios #reminderDayDialog .androidReminderDialogCard,
 html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
@@ -4736,6 +4734,7 @@ html.platform-ios #reminderTimeDialog .androidDialogPrimaryButton {
   root.dataset.platform = isIOS ? "ios" : (isAndroid ? "android" : "other");
 })();
 </script>
+</style>
 
 <style>
 /* iOS-specific styling for reminder day/time dialogs; behaviour and handlers unchanged */
