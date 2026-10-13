@@ -4941,6 +4941,11 @@ body.dark-theme .itemProductContent .quantityValue {
     </button>
     <div class="familyMenuSubTitle">Account</div>
     <div id="accountMenuEmail" class="accountMenuEmail"></div>
+    <button type="button" class="familyMenuItem" onclick="manageProfilePhoto()">
+      <i class="fa-solid fa-camera"></i>
+      <span>Profielfoto</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <button type="button" class="familyMenuItem" onclick="showAccountName()">
       <i class="fa-solid fa-user"></i>
       <span>Mijn naam</span>
@@ -6050,6 +6055,71 @@ async function shareFeedback(event) {
     }
   }
 }
+async function manageProfilePhoto() {
+  const user = auth && auth.currentUser;
+  if (!user) return;
+  closeFamilyMenuForDialog();
+  let photoURL = "";
+  try {
+    const snap = await database.ref("users/" + user.uid + "/photoURL").once("value");
+    photoURL = String(snap.val() || "");
+  } catch (error) {
+    console.error("Profielfoto laden mislukt", error);
+  }
+  const preview = photoURL
+    ? `<img src="${photoURL.replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" alt="Huidige profielfoto" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #dff5df">`
+    : `<div style="width:88px;height:88px;border-radius:50%;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:34px"><i class="fa-solid fa-user"></i></div>`;
+  const overlay = familyDialogBase("fa-camera", "Profielfoto", `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 14px"><div id="profilePhotoPreview">${preview}</div><div class="familyDialogText" style="text-align:center">Kies een foto uit je telefoon. Je foto is zichtbaar voor leden van je familie.</div><input id="profilePhotoFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none"><button type="button" class="familyDialogBtn familyDialogPrimary" id="chooseProfilePhoto">Foto kiezen</button></div>`, `<button type="button" class="familyDialogBtn familyDialogCancel" id="cancelProfilePhoto">Sluiten</button>${photoURL ? '<button type="button" class="familyDialogBtn familyDialogRemove" id="removeProfilePhoto">Verwijderen</button>' : ''}`);
+  const fileInput = overlay.querySelector("#profilePhotoFile");
+  overlay.querySelector("#chooseProfilePhoto").addEventListener("click", () => fileInput.click());
+  overlay.querySelector("#cancelProfilePhoto").addEventListener("click", () => closeFamilyDialog(overlay));
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      await familyAlert("Ongeldig bestand", "Kies een JPG-, PNG- of WebP-afbeelding.", "fa-triangle-exclamation");
+      fileInput.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      await familyAlert("Foto te groot", "Kies een foto van maximaal 5 MB.", "fa-triangle-exclamation");
+      fileInput.value = "";
+      return;
+    }
+    const chooseButton = overlay.querySelector("#chooseProfilePhoto");
+    chooseButton.disabled = true;
+    chooseButton.textContent = "Uploaden...";
+    try {
+      const path = "profilePhotos/" + user.uid + "/profile";
+      const fileRef = storage.ref(path);
+      await fileRef.put(file, { contentType: file.type });
+      const url = await fileRef.getDownloadURL();
+      await database.ref("users/" + user.uid + "/photoURL").set(url);
+      closeFamilyDialog(overlay);
+      await familyAlert("Profielfoto opgeslagen", "Je profielfoto is bijgewerkt.", "fa-circle-check");
+    } catch (error) {
+      console.error("Profielfoto opslaan mislukt", error);
+      chooseButton.disabled = false;
+      chooseButton.textContent = "Foto kiezen";
+      await familyAlert("Foto niet opgeslagen", "Controleer of Firebase Storage is ingeschakeld en de beveiligingsregels zijn ingesteld.", "fa-triangle-exclamation");
+    }
+  });
+  const removeButton = overlay.querySelector("#removeProfilePhoto");
+  if (removeButton) removeButton.addEventListener("click", async () => {
+    const ok = await familyConfirm("Profielfoto verwijderen", "Wil je je profielfoto verwijderen?", true);
+    if (!ok) return;
+    try {
+      await database.ref("users/" + user.uid + "/photoURL").remove();
+      try { await storage.ref("profilePhotos/" + user.uid + "/profile").delete(); } catch (_) {}
+      closeFamilyDialog(overlay);
+      await familyAlert("Profielfoto verwijderd", "Je standaardpictogram wordt weer getoond.", "fa-circle-check");
+    } catch (error) {
+      console.error("Profielfoto verwijderen mislukt", error);
+      await familyAlert("Verwijderen mislukt", "De profielfoto kon niet worden verwijderd. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
+    }
+  });
+}
+
 async function showAccountName() {
   const user = auth && auth.currentUser;
   if (!user) return;
@@ -8172,6 +8242,7 @@ if (document.readyState === "loading") {
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-storage-compat.js"></script>
 
 <script>
   // Import the functions you need from the SDKs you need
@@ -8194,6 +8265,7 @@ if (document.readyState === "loading") {
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
+const storage = firebase.storage();
 // Bewaar de Firebase-inlogsessie lokaal totdat de gebruiker zelf uitlogt.
 const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
   console.error("Loginpersistentie instellen mislukt:", error);
@@ -9285,8 +9357,24 @@ async function showFamilyMembers() {
       row.style.display = "flex";
       row.style.alignItems = "center";
       row.style.justifyContent = "space-between";
+      row.style.justifyContent = "flex-start";
+      const avatar = document.createElement("div");
+      avatar.style.cssText = "width:42px;height:42px;flex:0 0 42px;border-radius:50%;overflow:hidden;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:18px";
+      let photoURL = "";
+      try { const ps = await database.ref("users/" + uid + "/photoURL").once("value"); photoURL = String(ps.val() || ""); } catch (_) {}
+      if (photoURL) {
+        const img = document.createElement("img");
+        img.src = photoURL; img.alt = "Profielfoto van " + name;
+        img.style.cssText = "width:100%;height:100%;object-fit:cover";
+        img.onerror = () => { avatar.replaceChildren(); avatar.innerHTML = '<i class="fa-solid fa-user"></i>'; };
+        avatar.appendChild(img);
+      } else {
+        const icon = document.createElement("i"); icon.className = "fa-solid fa-user"; avatar.appendChild(icon);
+      }
+      row.appendChild(avatar);
       const label = document.createElement("span");
-      label.textContent = (uid === ownerUid ? "👑 " : "👤 ") + name;
+      label.style.flex = "1";
+      label.textContent = (uid === ownerUid ? "👑 " : "") + name;
       row.appendChild(label);
       if (user.uid === ownerUid && uid !== ownerUid) {
         const btn = document.createElement("button");
