@@ -4640,6 +4640,40 @@ html.platform-android {
 })();
 </script>
 
+<style>
+/* iOS-specific styling for reminder day/time dialogs; behaviour and handlers unchanged */
+html.platform-ios .androidReminderDialogCard {
+  width: min(390px, calc(100vw - 32px));
+  max-height: min(82dvh, 760px);
+  padding: 24px 20px 20px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 20px 55px rgba(0,0,0,.18);
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogTitle {
+  font-size: 25px; font-weight: 700; letter-spacing: -.4px; margin: 0 0 18px;
+}
+html.platform-ios .androidDayOptions { gap: 3px; }
+html.platform-ios .androidDayOptions button {
+  min-height: 52px; padding: 0 16px; border-radius: 16px; font-size: 17px;
+}
+html.platform-ios .androidDayOptions button.selected { background: #e0f1e4; color: #315b3d; }
+html.platform-ios .androidReminderDialogActions { gap: 10px; margin-top: 18px; }
+html.platform-ios .androidDialogTextButton,
+html.platform-ios .androidDialogPrimaryButton {
+  min-height: 48px; border-radius: 15px; padding: 0 20px; font-size: 16px;
+}
+html.platform-ios .androidDialogTextButton { background: #f0f0f4; color: #202124; }
+html.platform-ios .androidDialogPrimaryButton { background: #3f5b45; color: #fff; box-shadow: none; }
+html.platform-ios .androidTimeDialogCard .familyDialogHeader { margin-bottom: 12px; }
+html.platform-ios .androidTimePreview { margin: 8px 0 20px; font-size: 42px; }
+html.platform-ios .androidTimePreview span:not(.androidTimeColon) { background: #eef5ef; border-radius: 16px; }
+html.platform-ios .androidTimeLabel { font-size: 12px; letter-spacing: .1em; }
+html.platform-ios .androidTimeGrid button,
+html.platform-ios .androidMinuteGrid button { min-height: 44px; border-radius: 14px; font-size: 15px; }
+html.platform-ios .androidTimeGrid button.selected,
+html.platform-ios .androidMinuteGrid button.selected { background: #dff2e1; color: #315b3d; }
+</style>
 </head>
 
 <body>
@@ -9487,7 +9521,7 @@ async function showFamilyMembers() {
       row.style.justifyContent = "space-between";
       row.style.justifyContent = "flex-start";
       const avatar = document.createElement("div");
-      avatar.style.cssText = "width:42px;height:42px;flex:0 0 42px;border-radius:50%;overflow:hidden;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:18px";
+      avatar.style.cssText = "width:54px;height:54px;flex:0 0 54px;border-radius:50%;overflow:hidden;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:18px";
       let photoURL = "";
       try { const ps = await database.ref("users/" + uid + "/photoURL").once("value"); photoURL = String(ps.val() || ""); } catch (_) {}
       if (photoURL) {
@@ -9500,10 +9534,20 @@ async function showFamilyMembers() {
         const icon = document.createElement("i"); icon.className = "fa-solid fa-user"; avatar.appendChild(icon);
       }
       row.appendChild(avatar);
-      const label = document.createElement("span");
-      label.style.flex = "1";
-      label.textContent = (uid === ownerUid ? "👑 " : "") + name;
+
+      const label = document.createElement("div");
+      label.style.cssText = "flex:1;min-width:0;display:flex;flex-direction:column;gap:3px";
+      const nameLine = document.createElement("span");
+      nameLine.style.cssText = "font-weight:600;line-height:1.3";
+      nameLine.textContent = name;
+      label.appendChild(nameLine);
+
+      const subtitle = document.createElement("span");
+      subtitle.style.cssText = "font-size:13px;line-height:1.3;color:var(--muted,#6f7d73)";
+      subtitle.textContent = uid === ownerUid ? "Hoofdpersoon" : "Eigen profiel";
+      label.appendChild(subtitle);
       row.appendChild(label);
+
       if (user.uid === ownerUid && uid !== ownerUid) {
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "familyDialogBtn familyDialogRemove";
@@ -9527,6 +9571,13 @@ async function showFamilyMembers() {
         row.appendChild(btn);
       }
       wrap.appendChild(row);
+
+      if (uid === ownerUid) {
+        const separator = document.createElement("div");
+        separator.setAttribute("aria-hidden", "true");
+        separator.style.cssText = "height:1px;background:rgba(63,91,69,.13);margin:8px 8px 10px";
+        wrap.appendChild(separator);
+      }
     }
     const overlay = familyDialogBase("fa-user-group", "Familieleden", "", '<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeFamilyMembers">OK</button>');
     overlay.querySelector(".familyDialogBody").replaceChildren(wrap);
