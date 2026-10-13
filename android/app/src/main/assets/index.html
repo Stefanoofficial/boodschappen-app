@@ -9820,6 +9820,33 @@ async function showFamilyMembers() {
         img.style.cssText = "width:100%;height:100%;object-fit:cover";
         img.onerror = () => { avatar.replaceChildren(); avatar.innerHTML = '<i class="fa-solid fa-user"></i>'; };
         avatar.appendChild(img);
+        avatar.style.cursor = "pointer";
+        avatar.setAttribute("role", "button");
+        avatar.setAttribute("aria-label", "Bekijk profielfoto van " + name);
+        avatar.tabIndex = 0;
+        const openPhoto = () => {
+          const lightbox = document.createElement("div");
+          lightbox.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box";
+          lightbox.setAttribute("role", "dialog");
+          lightbox.setAttribute("aria-modal", "true");
+          lightbox.setAttribute("aria-label", "Profielfoto van " + name);
+          const large = document.createElement("img");
+          large.src = photoURL; large.alt = "Profielfoto van " + name;
+          large.style.cssText = "display:block;max-width:100%;max-height:80vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.35)";
+          const close = document.createElement("button");
+          close.type = "button"; close.textContent = "×";
+          close.setAttribute("aria-label", "Foto sluiten");
+          close.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:32px;line-height:1;cursor:pointer";
+          const dismiss = () => lightbox.remove();
+          close.addEventListener("click", dismiss);
+          lightbox.addEventListener("click", (event) => { if (event.target === lightbox) dismiss(); });
+          const onKey = (event) => { if (event.key === "Escape") { dismiss(); document.removeEventListener("keydown", onKey); } };
+          document.addEventListener("keydown", onKey);
+          lightbox.appendChild(large); lightbox.appendChild(close); document.body.appendChild(lightbox);
+          close.focus();
+        };
+        avatar.addEventListener("click", openPhoto);
+        avatar.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openPhoto(); } });
       } else {
         const icon = document.createElement("i"); icon.className = "fa-solid fa-user"; avatar.appendChild(icon);
       }
