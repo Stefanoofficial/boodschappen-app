@@ -5000,31 +5000,95 @@ html.platform-ios .ios-wheel-actions-label{display:flex;justify-content:space-be
 html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
 </style>
 
-<style id="ios-wheel-final-fix">
-/* iOS: show one wheel only; hide the older picker controls that caused duplicate day lists. */
+<style id="ios-wheel-single-instance-fix">
+/* Keep the iOS day picker to a single wheel viewport. */
+html.platform-ios #reminderDayDialog .androidReminderDialogCard {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(390px, calc(100vw - 32px)) !important;
+  max-width: 390px !important;
+  max-height: 82dvh !important;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 30px !important;
+  background: #fff !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelPicker {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
 html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
 html.platform-ios #reminderDayDialog .androidDayOptions,
-html.platform-ios #reminderDayDialog .androidReminderDialogActions,
+html.platform-ios #reminderDayDialog .androidReminderDialogActions {
+  display: none !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelViewport {
+  display: flex !important;
+  flex: 0 0 360px !important;
+  height: 360px !important;
+  min-height: 360px !important;
+  padding: 0 20px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+html.platform-ios #reminderDayDialog #iosDayWheel {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
 html.platform-ios #reminderTimeDialog .familyDialogHeader,
 html.platform-ios #reminderTimeDialog .familyDialogBody,
 html.platform-ios #reminderTimeDialog .familyDialogActions { display:none !important; }
-html.platform-ios #reminderDayDialog .iosWheelPicker,
-html.platform-ios #reminderTimeDialog .iosWheelPicker { display:block !important; }
-html.platform-ios #reminderDayDialog .androidReminderDialogCard,
-html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
-  width:min(390px,calc(100vw - 32px)) !important;
-  max-width:390px !important; max-height:82dvh !important; height:auto !important;
-  padding:0 !important; overflow:hidden !important; border-radius:30px !important;
-  background:#fff !important;
-}
-html.platform-ios #reminderDayDialog .iosWheelViewport { height:360px !important; padding:0 20px !important; }
-html.platform-ios #reminderDayDialog #iosDayWheel { flex:1 1 100% !important; max-width:100% !important; }
-html.platform-ios #reminderTimeDialog .iosTimeViewport { height:360px !important; padding:0 20px !important; }
-html.platform-ios #reminderDayDialog .iosWheelPicker .iosWheelViewport { margin:0 !important; }
-html.platform-ios #reminderTimeDialog .iosWheelToolbar { flex-shrink:0 !important; }
-html.platform-ios #reminderTimeDialog .iosWheelPicker,
-html.platform-ios #reminderDayDialog .iosWheelPicker { overflow:hidden !important; }
 </style>
+<script id="ios-wheel-single-instance-fix-js">
+(function () {
+  function keepSingleDayWheel() {
+    if (!document.documentElement.classList.contains("platform-ios")) return;
+    var dialog = document.getElementById("reminderDayDialog");
+    if (!dialog) return;
+    var card = dialog.querySelector(".androidReminderDialogCard");
+    if (!card) return;
+    var picker = document.getElementById("iosDayWheelPicker");
+    if (!picker) return;
+    /* Remove accidental duplicate wheel/viewports if the page has been injected twice. */
+    card.querySelectorAll(".iosWheelPicker").forEach(function (node) {
+      if (node !== picker) node.remove();
+    });
+    var viewports = picker.querySelectorAll(".iosWheelViewport");
+    viewports.forEach(function (node, index) {
+      if (index > 0) node.remove();
+    });
+    var wheel = document.getElementById("iosDayWheel");
+    if (wheel) {
+      var options = Array.from(wheel.querySelectorAll(".iosWheelOption"));
+      var seen = new Set();
+      options.forEach(function (node) {
+        var key = node.dataset.value || node.textContent.trim();
+        if (seen.has(key)) node.remove();
+        else seen.add(key);
+      });
+    }
+  }
+  window.addEventListener("DOMContentLoaded", keepSingleDayWheel);
+  var originalOpenReminderDayPicker = window.openReminderDayPicker;
+  if (typeof originalOpenReminderDayPicker === "function") {
+    window.openReminderDayPicker = function () {
+      keepSingleDayWheel();
+      return originalOpenReminderDayPicker.apply(this, arguments);
+    };
+  }
+  document.addEventListener("click", function (event) {
+    if (event.target.closest && event.target.closest('[onclick*="openReminderDayPicker"]')) {
+      setTimeout(keepSingleDayWheel, 0);
+    }
+  }, true);
+})();
+</script>
 
 </head>
 
