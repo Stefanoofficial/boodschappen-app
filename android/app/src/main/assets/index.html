@@ -5322,7 +5322,7 @@ html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
       <div id="reminderDayDialog" class="androidReminderDialog" hidden aria-hidden="true">
         <div class="androidReminderDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderDayDialogTitle">
           <div class="iosWheelPicker" id="iosDayWheelPicker" aria-label="iOS dagkiezer">
-            <div class="iosWheelToolbar"><button type="button" class="iosWheelClear" onclick="clearIOSDayWheel()">Wis</button><button type="button" class="iosWheelDone" onclick="confirmReminderDayPicker()">Gereed</button></div>
+            <div class="iosWheelToolbar"><span class="iosWheelLeadingLabel">Dag kiezen</span><button type="button" class="iosWheelDone" onclick="confirmReminderDayPicker()">Gereed</button></div>
             <div class="iosWheelViewport"><div class="iosWheelSelection"></div><div class="iosWheelColumn" id="iosDayWheel" role="listbox" aria-label="Weekdag"></div></div>
           </div>
           <div class="androidReminderDialogTitle" id="reminderDayDialogTitle">Dag kiezen</div>
@@ -13409,4 +13409,76 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 <style id="scrollable-product-suggestions-fix">
 #productSuggestions.productSuggestions { position: relative !important; max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain; touch-action: pan-y !important; pointer-events: auto !important; }
 #productSuggestions.productSuggestions .productSuggestion { touch-action: pan-y !important; }
+</style>
+
+
+<style id="ios-wheel-picker-layout-fix">
+/* Correcte iOS-draaiwielen: toon uitsluitend de wiel-interface op iPhone. */
+html.platform-ios #reminderDayDialog .iosWheelPicker,
+html.platform-ios #reminderTimeDialog .iosWheelPicker {
+  display:block !important;
+  width:100% !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
+html.platform-ios #reminderDayDialog .androidDayOptions,
+html.platform-ios #reminderDayDialog .androidReminderDialogActions {
+  display:none !important;
+}
+html.platform-ios #reminderTimeDialog .familyDialogHeader,
+html.platform-ios #reminderTimeDialog .familyDialogBody,
+html.platform-ios #reminderTimeDialog .familyDialogActions,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions {
+  display:none !important;
+}
+html.platform-android #reminderDayDialog .iosWheelPicker,
+html.platform-android #reminderTimeDialog .iosWheelPicker,
+html.platform-other #reminderDayDialog .iosWheelPicker,
+html.platform-other #reminderTimeDialog .iosWheelPicker {
+  display:none !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogCard,
+html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
+  padding:0 !important;
+  overflow:hidden !important;
+  max-height: min(82dvh, 720px) !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelToolbar {
+  height:64px !important;
+  padding:0 24px !important;
+  border-bottom:1px solid rgba(60,60,67,.14) !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelViewport {
+  height:280px !important;
+  padding:0 18px !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelColumn {
+  flex:1 1 100% !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelSelection,
+html.platform-ios #reminderTimeDialog .iosWheelSelection {
+  top:calc(50% - 26px) !important;
+  height:52px !important;
+  z-index:0 !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelColumn,
+html.platform-ios #reminderTimeDialog .iosWheelColumn {
+  position:relative !important;
+  z-index:1 !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelOption,
+html.platform-ios #reminderTimeDialog .iosWheelOption {
+  height:52px !important;
+  min-height:52px !important;
+  scroll-snap-align:center !important;
+}
+html.platform-ios #reminderTimeDialog .iosTimeViewport {
+  height:300px !important;
+}
+html.platform-ios #reminderTimeDialog .iosTimeBottomToolbar {
+  display:flex !important;
+}
+html.platform-ios #reminderDayDialog .iosWheelToolbar .iosWheelLeadingLabel {
+  font-size:20px !important;
+  color:#202124 !important;
+}
 </style>
