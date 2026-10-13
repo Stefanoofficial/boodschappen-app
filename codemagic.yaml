@@ -63,7 +63,7 @@ workflows:
           echo "=== PREPARE CUSTOM SPLASH ==="
           cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
           cp splash_icon.png android/app/src/main/res/drawable/android_system_splash_icon.png
-          cp splash_icon.png android/app/src/main/res/drawable/ic_launcher_foreground.png
+          cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher_foreground.png
 
           echo "=== PREPARE COLORS ==="
           cat > android/app/src/main/res/values/colors.xml <<'EOF'
