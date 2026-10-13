@@ -4758,58 +4758,6 @@ html.platform-ios .androidMinuteGrid button { min-height: 44px; border-radius: 1
 html.platform-ios .androidTimeGrid button.selected,
 html.platform-ios .androidMinuteGrid button.selected { background: #dff2e1; color: #315b3d; }
 </style>
-
-<style id="ios-native-style-wheel-picker">
-html.platform-ios #reminderDayDialog .androidReminderDialogCard,
-html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
-  width:min(430px,calc(100vw - 32px)) !important;
-  max-width:430px !important;
-  padding:0 !important;
-  border:0 !important;
-  border-radius:34px !important;
-  overflow:hidden !important;
-  background:rgba(255,255,255,.98) !important;
-  color:#111 !important;
-  box-shadow:0 22px 70px rgba(0,0,0,.20) !important;
-}
-html.platform-ios #reminderDayDialog .iosWheelPicker,
-html.platform-ios #reminderTimeDialog .iosWheelPicker {display:block;}
-html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
-html.platform-ios #reminderDayDialog .androidDayOptions,
-html.platform-ios #reminderDayDialog .androidReminderDialogActions,
-html.platform-ios #reminderTimeDialog .familyDialogHeader,
-html.platform-ios #reminderTimeDialog .familyDialogBody,
-html.platform-ios #reminderTimeDialog .familyDialogActions {display:none !important;}
-html.platform-android #reminderDayDialog .iosWheelPicker,
-html.platform-android #reminderTimeDialog .iosWheelPicker,
-html.platform-other #reminderDayDialog .iosWheelPicker,
-html.platform-other #reminderTimeDialog .iosWheelPicker {display:none !important;}
-.iosWheelPicker {display:none;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#111;background:rgba(255,255,255,.98);}
-.iosWheelToolbar {height:72px;box-sizing:border-box;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(60,60,67,.14);background:rgba(247,247,249,.96);}
-.iosWheelToolbar button {border:0!important;background:transparent!important;box-shadow:none!important;padding:8px 0!important;min-height:0!important;font-family:inherit!important;font-size:20px!important;font-weight:400!important;color:#087aff!important;border-radius:0!important;}
-.iosWheelToolbar .iosWheelLeadingLabel {font-size:18px;font-weight:500;color:#111;}
-.iosWheelToolbar .iosWheelTimeValue {background:#f0f0f3!important;border-radius:30px!important;padding:9px 18px!important;color:#087aff!important;}
-.iosWheelViewport {height:300px;position:relative;overflow:hidden;display:flex;align-items:stretch;justify-content:center;padding:0 18px;box-sizing:border-box;isolation:isolate;}
-.iosWheelSelection {position:absolute;left:6%;right:6%;top:calc(50% - 26px);height:52px;border-radius:13px;background:rgba(118,118,128,.10);z-index:-1;pointer-events:none;}
-.iosWheelColumn {height:100%;min-width:0;flex:1;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%);}
-.iosWheelColumn::-webkit-scrollbar {display:none;}
-.iosWheelOption {height:52px;min-height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:inherit;font-size:27px;font-weight:400;color:#8e8e93;white-space:nowrap;user-select:none;-webkit-user-select:none;}
-.iosWheelOption.is-current {color:#171719;}
-.iosWheelViewport:has(#iosDayWheel) #iosDayWheel {max-width:100%;}
-.iosTimeViewport {height:300px;padding:0 28px;}
-.iosTimeViewport .iosWheelColumn {flex:0 1 31%;text-align:center;}
-.iosTimeViewport .iosAmPmColumn {flex-basis:26%;}
-.iosTimeViewport .iosWheelOption {font-size:25px;}
-.iosTimeBottomToolbar {border-top:1px solid rgba(60,60,67,.14);border-bottom:0;justify-content:flex-end;gap:32px;height:76px;}
-@media(max-width:430px){
- .iosWheelToolbar{padding:0 22px;height:64px}
- .iosWheelViewport{height:280px;padding:0 12px}
- .iosTimeViewport{height:300px;padding:0 20px}
- .iosWheelOption{font-size:25px}
- .iosTimeViewport .iosWheelOption{font-size:23px}
-}
-</style>
-
 <script id="platform-popup-detection">
 (function () {
   var ua = navigator.userAgent || "";
@@ -4999,140 +4947,6 @@ html.platform-ios #reminderTimeDialog .androidTimePreview{font-size:32px!importa
 html.platform-ios .ios-wheel-actions-label{display:flex;justify-content:space-between;color:#5b8cc9;font-size:18px;margin-bottom:18px}
 html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
 </style>
-
-<style id="ios-wheel-single-instance-fix">
-/* Keep the iOS day picker to a single wheel viewport. */
-html.platform-ios #reminderDayDialog .androidReminderDialogCard {
-  display: flex !important;
-  flex-direction: column !important;
-  width: min(390px, calc(100vw - 32px)) !important;
-  max-width: 390px !important;
-  max-height: 82dvh !important;
-  height: auto !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  border-radius: 30px !important;
-  background: #fff !important;
-}
-html.platform-ios #reminderDayDialog .iosWheelPicker {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
-html.platform-ios #reminderDayDialog .androidDayOptions,
-html.platform-ios #reminderDayDialog .androidReminderDialogActions {
-  display: none !important;
-}
-html.platform-ios #reminderDayDialog .iosWheelViewport {
-  display: flex !important;
-  flex: 0 0 360px !important;
-  height: 360px !important;
-  min-height: 360px !important;
-  padding: 0 20px !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-html.platform-ios #reminderDayDialog #iosDayWheel {
-  flex: 1 1 100% !important;
-  width: 100% !important;
-  max-width: 100% !important;
-}
-html.platform-ios #reminderTimeDialog .familyDialogHeader,
-html.platform-ios #reminderTimeDialog .familyDialogBody,
-html.platform-ios #reminderTimeDialog .familyDialogActions { display:none !important; }
-</style>
-<script id="ios-wheel-single-instance-fix-js">
-(function () {
-  function keepSingleDayWheel() {
-    if (!document.documentElement.classList.contains("platform-ios")) return;
-    var dialog = document.getElementById("reminderDayDialog");
-    if (!dialog) return;
-    var card = dialog.querySelector(".androidReminderDialogCard");
-    if (!card) return;
-    var picker = document.getElementById("iosDayWheelPicker");
-    if (!picker) return;
-    /* Remove accidental duplicate wheel/viewports if the page has been injected twice. */
-    card.querySelectorAll(".iosWheelPicker").forEach(function (node) {
-      if (node !== picker) node.remove();
-    });
-    var viewports = picker.querySelectorAll(".iosWheelViewport");
-    viewports.forEach(function (node, index) {
-      if (index > 0) node.remove();
-    });
-    var wheel = document.getElementById("iosDayWheel");
-    if (wheel) {
-      var options = Array.from(wheel.querySelectorAll(".iosWheelOption"));
-      var seen = new Set();
-      options.forEach(function (node) {
-        var key = node.dataset.value || node.textContent.trim();
-        if (seen.has(key)) node.remove();
-        else seen.add(key);
-      });
-    }
-  }
-  window.addEventListener("DOMContentLoaded", keepSingleDayWheel);
-  var originalOpenReminderDayPicker = window.openReminderDayPicker;
-  if (typeof originalOpenReminderDayPicker === "function") {
-    window.openReminderDayPicker = function () {
-      keepSingleDayWheel();
-      return originalOpenReminderDayPicker.apply(this, arguments);
-    };
-  }
-  document.addEventListener("click", function (event) {
-    if (event.target.closest && event.target.closest('[onclick*="openReminderDayPicker"]')) {
-      setTimeout(keepSingleDayWheel, 0);
-    }
-  }, true);
-})();
-</script>
-
-
-<style id="ios-settings-picker-polish">
-/* Alleen iOS: weekdag- en tijdkiezer zoals de iOS wheel picker. Android blijft ongewijzigd. */
-html.platform-ios #reminderDayDialog,
-html.platform-ios #reminderTimeDialog {
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 18px !important;
-  background: rgba(45, 45, 48, .42) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  backdrop-filter: blur(12px) !important;
-}
-html.platform-ios #reminderDayDialog .androidReminderDialogCard,
-html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
-  width: min(430px, calc(100vw - 36px)) !important;
-  max-width: 430px !important;
-  max-height: min(78vh, 560px) !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  border: 0 !important;
-  border-radius: 34px !important;
-  background: rgba(255,255,255,.98) !important;
-  box-shadow: 0 22px 70px rgba(0,0,0,.20) !important;
-}
-html.platform-ios .iosWheelToolbar {
-  background: rgba(250,250,252,.98) !important;
-}
-html.platform-ios .iosWheelClear,
-html.platform-ios .iosWheelDone {
-  color: #087aff !important;
-}
-html.platform-ios .iosWheelSelection {
-  background: rgba(118,118,128,.12) !important;
-}
-@media (prefers-reduced-motion: reduce) {
-  html.platform-ios #reminderDayDialog .androidReminderDialogCard,
-  html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-</style>
-
 </head>
 
 <body>
@@ -5455,10 +5269,6 @@ html.platform-ios .iosWheelSelection {
 
       <div id="reminderDayDialog" class="androidReminderDialog" hidden aria-hidden="true">
         <div class="androidReminderDialogCard" role="dialog" aria-modal="true" aria-labelledby="reminderDayDialogTitle">
-          <div class="iosWheelPicker" id="iosDayWheelPicker" aria-label="iOS dagkiezer">
-            <div class="iosWheelToolbar"><button type="button" class="iosWheelClear" onclick="clearIOSDayWheel()">Wis</button><button type="button" class="iosWheelDone" onclick="confirmReminderDayPicker()">Gereed</button></div>
-            <div class="iosWheelViewport"><div class="iosWheelSelection"></div><div class="iosWheelColumn" id="iosDayWheel" role="listbox" aria-label="Weekdag"></div></div>
-          </div>
           <div class="androidReminderDialogTitle" id="reminderDayDialogTitle">Dag kiezen</div>
           <div class="androidDayOptions" id="androidDayOptions">
             <button type="button" data-day="2">Maandag</button>
@@ -5478,11 +5288,6 @@ html.platform-ios .iosWheelSelection {
 
       <div id="reminderTimeDialog" class="androidReminderDialog" hidden aria-hidden="true">
         <div class="androidReminderDialogCard androidTimeDialogCard familyDialog" role="dialog" aria-modal="true" aria-labelledby="reminderTimeDialogTitle">
-          <div class="iosWheelPicker iosTimeWheelPicker" id="iosTimeWheelPicker" aria-label="iOS tijdkiezer">
-            <div class="iosWheelToolbar"><span class="iosWheelLeadingLabel">Time</span><button type="button" class="iosWheelTimeValue" id="iosTimeValue" onclick="focusIOSCurrentTime()">18:00</button></div>
-            <div class="iosWheelViewport iosTimeViewport"><div class="iosWheelSelection"></div><div class="iosWheelColumn" id="iosHourWheel" aria-label="Uur"></div><div class="iosWheelColumn" id="iosMinuteWheel" aria-label="Minuten"></div><div class="iosWheelColumn iosAmPmColumn" id="iosAmPmWheel" aria-label="AM of PM"></div></div>
-            <div class="iosWheelToolbar iosTimeBottomToolbar"><button type="button" class="iosWheelClear" onclick="clearIOSTimeWheel()">Wis</button><button type="button" class="iosWheelDone" onclick="confirmReminderTimePicker()">Gereed</button></div>
-          </div>
           <div class="familyDialogHeader">
             <div class="familyDialogIcon"><i class="fa-regular fa-clock"></i></div>
             <div class="familyDialogTitle" id="reminderTimeDialogTitle">Tijd kiezen</div>
@@ -6075,91 +5880,6 @@ const REMINDER_DAY_NAMES = {
 let reminderDraftDay = "2";
 let reminderDraftTime = "18:00";
 
-let iosWheelTimers = {};
-function iosWheelMakeOptions(container, values, selectedValue, onSelect) {
-  if (!container) return;
-  container.innerHTML = "";
-  const padTop = document.createElement("div");
-  padTop.style.height = "124px"; padTop.style.flex = "0 0 124px";
-  container.appendChild(padTop);
-  values.forEach(function(item, index) {
-    const btn = document.createElement("div");
-    btn.className = "iosWheelOption";
-    btn.textContent = item.label;
-    btn.dataset.value = String(item.value);
-    btn.setAttribute("role","option");
-    btn.addEventListener("click", function() {
-      container.scrollTo({top:index*52,behavior:"smooth"});
-      if (onSelect) onSelect(String(item.value));
-    });
-    container.appendChild(btn);
-  });
-  const padBottom = document.createElement("div");
-  padBottom.style.height = "124px"; padBottom.style.flex = "0 0 124px";
-  container.appendChild(padBottom);
-  const selectedIndex = Math.max(0, values.findIndex(x => String(x.value) === String(selectedValue)));
-  requestAnimationFrame(function() {
-    container.scrollTop = selectedIndex * 52;
-    iosWheelMarkCurrent(container);
-  });
-  container.onscroll = function() {
-    clearTimeout(iosWheelTimers[container.id]);
-    iosWheelTimers[container.id] = setTimeout(function() {
-      const index = Math.max(0, Math.min(values.length-1, Math.round(container.scrollTop/52)));
-      container.scrollTo({top:index*52,behavior:"smooth"});
-      iosWheelMarkCurrent(container);
-      if (onSelect && values[index]) onSelect(String(values[index].value));
-    }, 90);
-  };
-}
-function iosWheelMarkCurrent(container) {
-  if (!container) return;
-  const index = Math.round(container.scrollTop/52);
-  container.querySelectorAll(".iosWheelOption").forEach((el,i)=>el.classList.toggle("is-current",i===index));
-}
-function buildIOSDayWheel() {
-  const days = [
-    {value:"2",label:"Maandag"},{value:"3",label:"Dinsdag"},{value:"4",label:"Woensdag"},
-    {value:"5",label:"Donderdag"},{value:"6",label:"Vrijdag"},{value:"7",label:"Zaterdag"},{value:"1",label:"Zondag"}
-  ];
-  iosWheelMakeOptions(document.getElementById("iosDayWheel"), days, reminderDraftDay, function(v){reminderDraftDay=v;});
-}
-function clearIOSDayWheel() {
-  reminderDraftDay = "2";
-  buildIOSDayWheel();
-}
-function getIOSDraftTimeParts() {
-  const parts=String(reminderDraftTime||"18:00").split(":");
-  const h24=parseInt(parts[0],10)||0, m=parseInt(parts[1],10)||0;
-  return {hour12:String((h24%12)||12), minute:String(m).padStart(2,"0"), ampm:h24>=12?"PM":"AM"};
-}
-function updateIOSDraftTime(hour12, minute, ampm) {
-  const h12=parseInt(hour12,10)||12, m=parseInt(minute,10)||0;
-  let h24=h12%12;
-  if(ampm==="PM") h24+=12;
-  reminderDraftTime=String(h24).padStart(2,"0")+":"+String(m).padStart(2,"0");
-  const label=document.getElementById("iosTimeValue");
-  if(label) label.textContent=h12+":"+String(m).padStart(2,"0")+" "+ampm;
-  updateReminderTimeDraftUI();
-}
-function buildIOSTimeWheel() {
-  const p=getIOSDraftTimeParts();
-  const hours=Array.from({length:12},(_,i)=>({value:String(i+1),label:String(i+1)}));
-  const minutes=Array.from({length:60},(_,i)=>({value:String(i).padStart(2,"0"),label:String(i).padStart(2,"0")}));
-  const ampm=[{value:"AM",label:"AM"},{value:"PM",label:"PM"}];
-  iosWheelMakeOptions(document.getElementById("iosHourWheel"),hours,p.hour12,function(v){const x=getIOSDraftTimeParts();updateIOSDraftTime(v,x.minute,x.ampm);});
-  iosWheelMakeOptions(document.getElementById("iosMinuteWheel"),minutes,p.minute,function(v){const x=getIOSDraftTimeParts();updateIOSDraftTime(x.hour12,v,x.ampm);});
-  iosWheelMakeOptions(document.getElementById("iosAmPmWheel"),ampm,p.ampm,function(v){const x=getIOSDraftTimeParts();updateIOSDraftTime(x.hour12,x.minute,v);});
-  updateIOSDraftTime(p.hour12,p.minute,p.ampm);
-}
-function clearIOSTimeWheel() {
-  reminderDraftTime="08:00";
-  buildIOSTimeWheel();
-}
-function focusIOSCurrentTime() {
-  buildIOSTimeWheel();
-}
-
 function updateReminderPickerLabels(){
   const day = document.getElementById("shoppingReminderDay");
   const dayText = document.getElementById("shoppingReminderDayText");
@@ -6173,7 +5893,6 @@ function openReminderDayPicker(event){
   if (event) event.stopPropagation();
   const day = document.getElementById("shoppingReminderDay");
   reminderDraftDay = day ? String(day.value || "2") : "2";
-  if (document.documentElement.classList.contains("platform-ios")) buildIOSDayWheel();
   document.querySelectorAll("#androidDayOptions button").forEach(btn => {
     btn.classList.toggle("selected", btn.dataset.day === reminderDraftDay);
     btn.onclick = () => {
@@ -6238,7 +5957,6 @@ function openReminderTimePicker(event){
   reminderDraftTime = time ? String(time.value || "18:00") : "18:00";
   buildReminderTimeGrid();
   updateReminderTimeDraftUI();
-  if (document.documentElement.classList.contains("platform-ios")) buildIOSTimeWheel();
   const dialog=document.getElementById("reminderTimeDialog");
   if(dialog){
     moveReminderPickerToBody("reminderTimeDialog");
@@ -13543,13 +13261,4 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 <style id="scrollable-product-suggestions-fix">
 #productSuggestions.productSuggestions { position: relative !important; max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain; touch-action: pan-y !important; pointer-events: auto !important; }
 #productSuggestions.productSuggestions .productSuggestion { touch-action: pan-y !important; }
-</style>
-<style id="ios-picker-hide-duplicate-native-options">
-/* iOS: verberg de bestaande Android/native dag- en tijdlijsten zodra de iOS-wielen worden getoond. */
-html.platform-ios #androidDayOptions,
-html.platform-ios #androidHourGrid,
-html.platform-ios #androidMinuteGrid {
-  display: none !important;
-}
-html.platform-ios #reminderDayDialog .ios-wheel-wrap { margin-top: 18px; }
 </style>
