@@ -5090,6 +5090,49 @@ html.platform-ios #reminderTimeDialog .familyDialogActions { display:none !impor
 })();
 </script>
 
+
+<style id="ios-settings-picker-polish">
+/* Alleen iOS: weekdag- en tijdkiezer zoals de iOS wheel picker. Android blijft ongewijzigd. */
+html.platform-ios #reminderDayDialog,
+html.platform-ios #reminderTimeDialog {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 18px !important;
+  background: rgba(45, 45, 48, .42) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogCard,
+html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
+  width: min(430px, calc(100vw - 36px)) !important;
+  max-width: 430px !important;
+  max-height: min(78vh, 560px) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 34px !important;
+  background: rgba(255,255,255,.98) !important;
+  box-shadow: 0 22px 70px rgba(0,0,0,.20) !important;
+}
+html.platform-ios .iosWheelToolbar {
+  background: rgba(250,250,252,.98) !important;
+}
+html.platform-ios .iosWheelClear,
+html.platform-ios .iosWheelDone {
+  color: #087aff !important;
+}
+html.platform-ios .iosWheelSelection {
+  background: rgba(118,118,128,.12) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.platform-ios #reminderDayDialog .androidReminderDialogCard,
+  html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
