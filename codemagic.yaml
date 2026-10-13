@@ -62,7 +62,27 @@ workflows:
 
           echo "=== PREPARE CUSTOM SPLASH ==="
           cp splash_icon.png android/app/src/main/res/drawable/splash_icon.png
-          cp splash_icon.png android/app/src/main/res/drawable/android_system_splash_icon.png
+          python3 -m pip install --user Pillow
+          python3 - <<'PY'
+          from PIL import Image
+
+          source = Image.open("splash_icon.png").convert("RGBA")
+          width, height = source.size
+
+          new_width = round(width * 0.75)
+          new_height = round(height * 0.75)
+
+          smaller = source.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+          result = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+          result.alpha_composite(
+          smaller,
+          ((width - new_width) // 2, (height - new_height) // 2))
+
+          result.save("android_system_splash_icon.png")
+          PY
+
+          cp android_system_splash_icon.png android/app/src/main/res/drawable/android_system_splash_icon.png
           cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher_foreground.png
 
           echo "=== PREPARE COLORS ==="
