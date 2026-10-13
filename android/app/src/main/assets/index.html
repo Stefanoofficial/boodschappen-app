@@ -4722,18 +4722,6 @@ html.platform-ios #reminderTimeDialog .androidDialogPrimaryButton {
   }
 }
 
-<script id="platform-popup-detection">
-(function () {
-  var ua = navigator.userAgent || "";
-  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  var isAndroid = /Android/i.test(ua);
-  var root = document.documentElement;
-  root.classList.remove("platform-ios", "platform-android", "platform-other");
-  root.classList.add(isIOS ? "platform-ios" : (isAndroid ? "platform-android" : "platform-other"));
-  root.dataset.platform = isIOS ? "ios" : (isAndroid ? "android" : "other");
-})();
-</script>
 </style>
 
 <style>
@@ -4769,6 +4757,195 @@ html.platform-ios .androidTimeGrid button,
 html.platform-ios .androidMinuteGrid button { min-height: 44px; border-radius: 14px; font-size: 15px; }
 html.platform-ios .androidTimeGrid button.selected,
 html.platform-ios .androidMinuteGrid button.selected { background: #dff2e1; color: #315b3d; }
+</style>
+<script id="platform-popup-detection">
+(function () {
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(ua);
+  var root = document.documentElement;
+  root.classList.remove("platform-ios", "platform-android", "platform-other");
+  root.classList.add(isIOS ? "platform-ios" : (isAndroid ? "platform-android" : "platform-other"));
+  root.dataset.platform = isIOS ? "ios" : (isAndroid ? "android" : "other");
+})();
+</script>
+
+<style id="ios-native-like-reminder-wheel">
+/* iOS-like wheel controls only; Android controls remain unchanged. */
+html.platform-ios #reminderDayDialog .androidReminderDialogCard,
+html.platform-ios #reminderTimeDialog .androidReminderDialogCard {
+  width: min(390px, calc(100vw - 32px)) !important;
+  max-width: 390px !important;
+  max-height: min(82dvh, 760px) !important;
+  overflow: hidden !important;
+  border-radius: 28px !important;
+  background: rgba(255,255,255,.98) !important;
+  padding: 0 !important;
+  color: #171717 !important;
+  box-shadow: 0 18px 55px rgba(0,0,0,.18) !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
+html.platform-ios #reminderTimeDialog .familyDialogHeader {
+  padding: 18px 22px 14px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #e8e8e8 !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogTitle,
+html.platform-ios #reminderTimeDialog .familyDialogTitle {
+  color: #202124 !important;
+  font-size: 21px !important;
+  font-weight: 650 !important;
+  letter-spacing: -.3px !important;
+}
+html.platform-ios #reminderDayDialog .androidDayOptions {
+  display: block !important;
+  height: 250px !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  padding: 94px 18px !important;
+  margin: 0 !important;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,.2) 22%, rgba(255,255,255,.2) 78%, #fff 100%);
+}
+html.platform-ios #reminderDayDialog .androidDayOptions::-webkit-scrollbar,
+html.platform-ios #reminderTimeDialog .iosWheelColumn::-webkit-scrollbar { display:none; }
+html.platform-ios #reminderDayDialog .androidDayOptions button {
+  display: block !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  height: 52px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #8b8b8b !important;
+  text-align: center !important;
+  font-size: 21px !important;
+  font-weight: 400 !important;
+  scroll-snap-align: center;
+}
+html.platform-ios #reminderDayDialog .androidDayOptions button.selected {
+  background: #f0f0f2 !important;
+  color: #202124 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogActions,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions {
+  margin: 0 !important;
+  padding: 12px 18px 18px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  border-top: 1px solid #f0f0f0 !important;
+}
+html.platform-ios #reminderDayDialog .androidDialogTextButton,
+html.platform-ios #reminderTimeDialog .androidDialogTextButton {
+  background: transparent !important;
+  color: #4f83c2 !important;
+  border-radius: 10px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+}
+html.platform-ios #reminderDayDialog .androidDialogPrimaryButton,
+html.platform-ios #reminderTimeDialog .androidDialogPrimaryButton {
+  background: transparent !important;
+  color: #4f83c2 !important;
+  border-radius: 10px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  box-shadow: none !important;
+}
+html.platform-ios #reminderTimeDialog .familyDialogBody {
+  padding: 12px 18px 16px !important;
+}
+html.platform-ios #reminderTimeDialog .androidTimePreview {
+  font-size: 34px !important;
+  color: #202124 !important;
+  margin: 0 0 12px !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+}
+html.platform-ios #reminderTimeDialog .androidTimeLabel { display:none !important; }
+html.platform-ios #reminderTimeDialog .androidTimeGrid,
+html.platform-ios #reminderTimeDialog .androidMinuteGrid {
+  display: inline-flex !important;
+  vertical-align: top !important;
+  width: calc(50% - 5px) !important;
+  height: 220px !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  padding: 84px 6px !important;
+  gap: 0 !important;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,.2) 22%, rgba(255,255,255,.2) 78%, #fff 100%);
+}
+html.platform-ios #reminderTimeDialog .androidTimeGrid button,
+html.platform-ios #reminderTimeDialog .androidMinuteGrid button {
+  flex: 0 0 52px !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  height: 52px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #888 !important;
+  font-size: 20px !important;
+  scroll-snap-align: center;
+}
+html.platform-ios #reminderTimeDialog .androidTimeGrid button.selected,
+html.platform-ios #reminderTimeDialog .androidMinuteGrid button.selected {
+  background: #f0f0f2 !important;
+  color: #202124 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+html.platform-ios #reminderTimeDialog .androidTimeGrid::before {
+  content: "UUR";
+}
+html.platform-ios #reminderTimeDialog .androidMinuteGrid::before {
+  content: "MIN";
+}
+html.platform-ios #reminderTimeDialog .androidTimeGrid::before,
+html.platform-ios #reminderTimeDialog .androidMinuteGrid::before {
+  position: sticky;
+  top: -84px;
+  z-index: 2;
+  flex: 0 0 32px;
+  color: #858585;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  padding-top: 8px;
+  background: rgba(255,255,255,.95);
+}
+html.platform-ios #reminderTimeDialog .familyDialogActions { padding-top: 8px !important; }
+</style>
+
+
+<style id="ios-reminder-wheel-styles">
+html.platform-ios .ios-wheel-wrap{display:flex;justify-content:center;gap:18px;margin:18px auto 24px;position:relative;max-width:320px}
+html.platform-ios .ios-wheel-wrap:before{content:"";position:absolute;left:0;right:0;top:calc(50% - 24px);height:48px;border-radius:12px;background:#f0f0f2;pointer-events:none}
+html.platform-ios .ios-wheel{height:240px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;position:relative;z-index:1;flex:1;text-align:center; scrollbar-width:none}
+html.platform-ios .ios-wheel::-webkit-scrollbar{display:none}
+html.platform-ios .ios-wheel:before,html.platform-ios .ios-wheel:after{content:"";display:block;height:96px}
+html.platform-ios .ios-wheel button{display:block;width:100%;height:48px;border:0;background:transparent;color:#888;font-size:22px;font-weight:400;scroll-snap-align:center}
+html.platform-ios .ios-wheel button.is-current{color:#202124;font-size:25px;font-weight:500}
+html.platform-ios .ios-wheel-caption{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#78877c;text-align:center;margin:8px 0 -10px}
+html.platform-ios #reminderDayDialog .androidDayOptions,html.platform-ios #reminderTimeDialog .androidTimeGrid,html.platform-ios #reminderTimeDialog .androidMinuteGrid{display:none!important}
+html.platform-ios #reminderTimeDialog .androidTimeLabel{display:none!important}
+html.platform-ios #reminderDayDialog .androidReminderDialogCard,html.platform-ios #reminderTimeDialog .androidReminderDialogCard{width:min(390px,calc(100vw - 32px));max-height:85dvh;overflow:auto}
+html.platform-ios #reminderTimeDialog .androidTimePreview{font-size:32px!important;margin:0 0 10px!important}
+html.platform-ios .ios-wheel-actions-label{display:flex;justify-content:space-between;color:#5b8cc9;font-size:18px;margin-bottom:18px}
+html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
 </style>
 </head>
 
@@ -5729,6 +5906,7 @@ function openReminderDayPicker(event){
     if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
     dialog.hidden = false;
     dialog.setAttribute("aria-hidden","false");
+    if (window.centerIOSReminderWheels) setTimeout(function(){ window.centerIOSReminderWheels(document.getElementById("androidDayOptions"), "button.selected"); }, 30);
   }
 }
 function closeReminderDayPicker(){
@@ -5785,6 +5963,10 @@ function openReminderTimePicker(event){
     if (notificationFamilyDialog) notificationFamilyDialog.classList.add("picker-child-open");
     dialog.hidden=false;
     dialog.setAttribute("aria-hidden","false");
+    if (window.centerIOSReminderWheels) setTimeout(function(){
+      window.centerIOSReminderWheels(document.getElementById("androidHourGrid"), "button.selected");
+      window.centerIOSReminderWheels(document.getElementById("androidMinuteGrid"), "button.selected");
+    }, 30);
   }
 }
 function closeReminderTimePicker(){
@@ -12334,6 +12516,119 @@ body.dark-theme .app.more-active #familyMenu {
   box-shadow: none !important;
 }
 </style>
+
+
+<script id="ios-reminder-wheel-behaviour">
+(function(){
+  function isIOS(){ return document.documentElement.dataset.platform === "ios"; }
+  function centerSelected(container, selector) {
+    if (!container || !isIOS()) return;
+    var selected = container.querySelector(selector);
+    if (selected) selected.scrollIntoView({block:"center", behavior:"auto"});
+  }
+  function syncDayFromScroll(){
+    var box=document.getElementById("androidDayOptions");
+    if(!box || !isIOS()) return;
+    var buttons=Array.from(box.querySelectorAll("button"));
+    var center=box.getBoundingClientRect().top+box.clientHeight/2;
+    var nearest=null, distance=Infinity;
+    buttons.forEach(function(b){
+      var r=b.getBoundingClientRect(), d=Math.abs((r.top+r.height/2)-center);
+      if(d<distance){distance=d;nearest=b;}
+    });
+    if(nearest){
+      reminderDraftDay=nearest.dataset.day;
+      buttons.forEach(function(b){b.classList.toggle("selected",b===nearest);});
+    }
+  }
+  function syncTimeWheel(container, type){
+    if(!container || !isIOS()) return;
+    var buttons=Array.from(container.querySelectorAll("button"));
+    var center=container.getBoundingClientRect().top+container.clientHeight/2;
+    var nearest=null, distance=Infinity;
+    buttons.forEach(function(b){
+      var r=b.getBoundingClientRect(), d=Math.abs((r.top+r.height/2)-center);
+      if(d<distance){distance=d;nearest=b;}
+    });
+    if(nearest){
+      var parts=String(reminderDraftTime||"18:00").split(":");
+      if(type==="hour") reminderDraftTime=nearest.dataset.hour+":"+(parts[1]||"00");
+      else reminderDraftTime=(parts[0]||"18")+":"+nearest.dataset.minute;
+      updateReminderTimeDraftUI();
+    }
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    var days=document.getElementById("androidDayOptions");
+    if(days) days.addEventListener("scroll",function(){ if(isIOS()) window.requestAnimationFrame(syncDayFromScroll); },{passive:true});
+    var hours=document.getElementById("androidHourGrid"), mins=document.getElementById("androidMinuteGrid");
+    if(hours) hours.addEventListener("scroll",function(){ if(isIOS()) window.requestAnimationFrame(function(){syncTimeWheel(hours,"hour");}); },{passive:true});
+    if(mins) mins.addEventListener("scroll",function(){ if(isIOS()) window.requestAnimationFrame(function(){syncTimeWheel(mins,"minute");}); },{passive:true});
+  });
+  window.centerIOSReminderWheels=centerSelected;
+})();
+</script>
+
+
+<script id="ios-reminder-wheel-behavior">
+(function(){
+  const days = [
+    ["2","Maandag"],["3","Dinsdag"],["4","Woensdag"],["5","Donderdag"],
+    ["6","Vrijdag"],["7","Zaterdag"],["1","Zondag"]
+  ];
+  function makeWheel(items, selected, onPick, label){
+    const wrap=document.createElement("div");
+    wrap.className="ios-wheel-wrap";
+    if(label){ const cap=document.createElement("div"); cap.className="ios-wheel-caption"; cap.textContent=label; }
+    const wheel=document.createElement("div"); wheel.className="ios-wheel";
+    items.forEach(item=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=item.label; b.dataset.value=item.value;
+      if(String(item.value)===String(selected)) b.classList.add("is-current");
+      b.addEventListener("click",()=>{ onPick(String(item.value)); b.scrollIntoView({block:"center",behavior:"smooth"}); mark(); });
+      wheel.appendChild(b);
+    });
+    function mark(){
+      const mid=wheel.getBoundingClientRect().top+wheel.clientHeight/2;
+      let best=null,dist=Infinity;
+      wheel.querySelectorAll("button").forEach(b=>{const r=b.getBoundingClientRect();const d=Math.abs(r.top+r.height/2-mid);if(d<dist){dist=d;best=b;}});
+      if(best){wheel.querySelectorAll("button").forEach(b=>b.classList.toggle("is-current",b===best));onPick(best.dataset.value);}
+    }
+    wheel.addEventListener("scroll",()=>{window.clearTimeout(wheel._snapTimer);wheel._snapTimer=window.setTimeout(mark,80);});
+    wrap.appendChild(wheel);
+    const initial=wheel.querySelector('button[data-value="'+String(selected)+'"]');
+    requestAnimationFrame(()=>{if(initial)initial.scrollIntoView({block:"center"});});
+    return wrap;
+  }
+  function isIOS(){return document.documentElement.classList.contains("platform-ios");}
+  const oldOpenDay=window.openReminderDayPicker;
+  window.openReminderDayPicker=function(event){
+    oldOpenDay.call(this,event);
+    if(!isIOS())return;
+    const card=document.querySelector("#reminderDayDialog .androidReminderDialogCard");
+    const options=document.getElementById("androidDayOptions");
+    if(!card||!options)return;
+    let wheel=card.querySelector(".ios-wheel-wrap");if(wheel)wheel.remove();
+    wheel=makeWheel(days.map(d=>({value:d[0],label:d[1]})),reminderDraftDay,v=>{reminderDraftDay=v;}, "Dag");
+    options.insertAdjacentElement("afterend",wheel);
+  };
+  const oldOpenTime=window.openReminderTimePicker;
+  window.openReminderTimePicker=function(event){
+    oldOpenTime.call(this,event);
+    if(!isIOS())return;
+    const card=document.querySelector("#reminderTimeDialog .androidReminderDialogCard");
+    const hourGrid=document.getElementById("androidHourGrid"), minuteGrid=document.getElementById("androidMinuteGrid");
+    if(!card||!hourGrid||!minuteGrid)return;
+    card.querySelectorAll(".ios-wheel-wrap").forEach(n=>n.remove());
+    const parts=String(reminderDraftTime||"18:00").split(":");
+    const hourItems=Array.from({length:24},(_,h)=>({value:String(h).padStart(2,"0"),label:String(h).padStart(2,"0")}));
+    const minItems=Array.from({length:12},(_,i)=>({value:String(i*5).padStart(2,"0"),label:String(i*5).padStart(2,"0")}));
+    const row=document.createElement("div");row.className="ios-wheel-wrap";
+    const hours=makeWheel(hourItems,parts[0],v=>{const p=String(reminderDraftTime||"18:00").split(":");reminderDraftTime=v+":"+(p[1]||"00");updateReminderTimeDraftUI();},"Uur");
+    const mins=makeWheel(minItems,parts[1],v=>{const p=String(reminderDraftTime||"18:00").split(":");reminderDraftTime=(p[0]||"18")+":"+v;updateReminderTimeDraftUI();},"Minuten");
+    row.appendChild(hours.firstElementChild);row.appendChild(mins.firstElementChild);
+    minuteGrid.insertAdjacentElement("afterend",row);
+  };
+})();
+</script>
 
 </body>
 
