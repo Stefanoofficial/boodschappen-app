@@ -6005,7 +6005,14 @@ function saveNotificationSettings() {
   localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
 
   if (!window.AndroidApp) {
-    setNotificationStatus("Meldingen werken in de Android-app.", true);
+    // Op iPhone geen Android-melding tonen; de melding blijft alleen in de Android-app.
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent || "") ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (!isIOSDevice) {
+      setNotificationStatus("Meldingen werken in de Android-app.", true);
+    } else {
+      setNotificationStatus("", false);
+    }
     return;
   }
 
