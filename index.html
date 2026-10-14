@@ -12560,6 +12560,57 @@ body.dark-theme .app.more-active #familyMenu {
   box-shadow: none !important;
 }
 </style>
+<style id="ios-reminder-dialog-button-polish">
+/* iOS dag- en tijdkiezer: Android-geïnspireerde knoppen met voelbare drukfeedback. */
+.platform-ios .androidReminderDialogActions .androidDialogTextButton,
+html.platform-ios .androidReminderDialogActions .androidDialogTextButton,
+.platform-ios .androidTimeDialogCard .androidDialogTextButton {
+  min-height:44px;
+  padding:0 20px;
+  border:1px solid #d2d9d3;
+  border-radius:13px;
+  background:#fff;
+  color:#3F5B45;
+  box-shadow:0 1px 1px rgba(20,35,25,.04);
+  transition:transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton,
+html.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton,
+.platform-ios .androidTimeDialogCard .androidDialogPrimaryButton {
+  min-height:44px;
+  padding:0 22px;
+  border:1px solid #3F5B45;
+  border-radius:13px;
+  background:#3F5B45;
+  color:#fff;
+  box-shadow:0 2px 5px rgba(35,65,43,.18);
+  transition:transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.platform-ios .androidReminderDialogActions .androidDialogTextButton:active,
+html.platform-ios .androidReminderDialogActions .androidDialogTextButton:active,
+.platform-ios .androidTimeDialogCard .androidDialogTextButton:active {
+  transform:scale(.96);
+  background:#edf3ee;
+  box-shadow:inset 0 1px 2px rgba(35,65,43,.08);
+}
+.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton:active,
+html.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton:active,
+.platform-ios .androidTimeDialogCard .androidDialogPrimaryButton:active {
+  transform:scale(.96);
+  background:#304936;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.16);
+}
+@media (prefers-reduced-motion:reduce) {
+  .platform-ios .androidReminderDialogActions .androidDialogTextButton,
+  .platform-ios .androidReminderDialogActions .androidDialogPrimaryButton,
+  .platform-ios .androidTimeDialogCard .androidDialogTextButton,
+  .platform-ios .androidTimeDialogCard .androidDialogPrimaryButton { transition:none; }
+}
+</style>
 
 
 <script id="ios-reminder-wheel-behaviour">
