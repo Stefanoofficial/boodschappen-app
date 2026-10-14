@@ -9830,13 +9830,13 @@ async function showFamilyMembers() {
         avatar.tabIndex = 0;
         const openPhoto = () => {
           const lightbox = document.createElement("div");
-          lightbox.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box";
+          lightbox.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.76);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box";
           lightbox.setAttribute("role", "dialog");
           lightbox.setAttribute("aria-modal", "true");
           lightbox.setAttribute("aria-label", "Profielfoto van " + name);
           const large = document.createElement("img");
           large.src = photoURL; large.alt = "Profielfoto van " + name;
-          large.style.cssText = "display:block;width:min(72vw, 360px);height:min(72vw, 360px);max-width:78vw;max-height:70vh;object-fit:cover;border-radius:50%;box-shadow:0 12px 40px rgba(0,0,0,.35)";
+          large.style.cssText = "display:block;width:min(62vw, 310px);height:min(62vw, 310px);max-width:72vw;max-height:64vh;object-fit:cover;border-radius:50%;box-shadow:0 12px 40px rgba(0,0,0,.35)";
           const close = document.createElement("button");
           close.type = "button"; close.textContent = "";
           close.setAttribute("aria-label", "Foto sluiten");
