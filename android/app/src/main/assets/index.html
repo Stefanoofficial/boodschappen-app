@@ -4957,55 +4957,53 @@ html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
   document.addEventListener("DOMContentLoaded", function(){ if (isIOS) document.body.classList.add("ios-device"); });
 })();
 </script>
-<style id="ios-reminder-button-style-fix">\n
-/* Correctie iOS-stijl voor de knoppen van Dag kiezen en Tijd kiezen */
-@media (max-width: 900px) {
-  #reminderDayDialog .androidReminderDialogActions .androidDialogTextButton,
-  #reminderTimeDialog .androidReminderDialogActions .androidDialogTextButton {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    color: #405f49 !important;
-    background: #ffffff !important;
-    border: 1.5px solid #d4ddd6 !important;
-    border-radius: 18px !important;
-    box-shadow: 0 1px 2px rgba(25, 50, 32, .10) !important;
-    font: inherit !important;
-    font-weight: 650 !important;
-    text-decoration: none !important;
-    transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease !important;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #reminderDayDialog .androidReminderDialogActions .androidDialogPrimaryButton,
-  #reminderTimeDialog .androidReminderDialogActions .androidDialogPrimaryButton {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    color: #ffffff !important;
-    background: #405f49 !important;
-    border: 1.5px solid #405f49 !important;
-    border-radius: 18px !important;
-    box-shadow: 0 2px 4px rgba(25, 50, 32, .16) !important;
-    font: inherit !important;
-    font-weight: 700 !important;
-    text-decoration: none !important;
-    transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease !important;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #reminderDayDialog .androidReminderDialogActions button:active,
-  #reminderTimeDialog .androidReminderDialogActions button:active {
-    transform: scale(.96) !important;
-    box-shadow: 0 0 0 rgba(0,0,0,0) !important;
-  }
-  #reminderDayDialog .androidReminderDialogActions .androidDialogTextButton:active,
-  #reminderTimeDialog .androidReminderDialogActions .androidDialogTextButton:active {
-    background: #edf4ef !important;
-  }
-  #reminderDayDialog .androidReminderDialogActions .androidDialogPrimaryButton:active,
-  #reminderTimeDialog .androidReminderDialogActions .androidDialogPrimaryButton:active {
-    background: #304a37 !important;
-    border-color: #304a37 !important;
-  }
+
+<style id="FINAL-ios-reminder-button-overrides">
+/* Laatste, hoogste-prioriteit regels voor de iOS Dag/Tijd-kiezer */
+html.platform-ios #reminderDayDialog .androidReminderDialogActions button.androidDialogTextButton,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions button.androidDialogTextButton {
+  -webkit-appearance: none !important; appearance: none !important;
+  background: #ffffff !important; color: #405f49 !important;
+  border: 1.5px solid #d4ddd6 !important; border-radius: 16px !important;
+  min-height: 50px !important; padding: 0 20px !important;
+  box-shadow: 0 1px 2px rgba(25,50,32,.10) !important;
+  font-weight: 650 !important; text-decoration: none !important;
+  transform: none;
+  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
 }
-\n</style>\n</head>
+html.platform-ios #reminderDayDialog .androidReminderDialogActions button.androidDialogPrimaryButton,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions button.androidDialogPrimaryButton {
+  -webkit-appearance: none !important; appearance: none !important;
+  background: #405f49 !important; color: #ffffff !important;
+  border: 1.5px solid #405f49 !important; border-radius: 16px !important;
+  min-height: 50px !important; padding: 0 22px !important;
+  box-shadow: 0 2px 4px rgba(25,50,32,.16) !important;
+  font-weight: 700 !important; text-decoration: none !important;
+  transform: none;
+  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogActions button.androidDialogTextButton:active,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions button.androidDialogTextButton:active {
+  transform: scale(.96) !important; background: #edf4ef !important;
+  color: #304936 !important; box-shadow: inset 0 1px 2px rgba(35,65,43,.10) !important;
+}
+html.platform-ios #reminderDayDialog .androidReminderDialogActions button.androidDialogPrimaryButton:active,
+html.platform-ios #reminderTimeDialog .androidReminderDialogActions button.androidDialogPrimaryButton:active {
+  transform: scale(.96) !important; background: #304936 !important;
+  color: #ffffff !important; border-color: #304936 !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.16) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+ html.platform-ios #reminderDayDialog .androidReminderDialogActions button,
+ html.platform-ios #reminderTimeDialog .androidReminderDialogActions button { transition: none !important; }
+}
+</style>
+
+</head>
 
 <body>
 <div id="loginScreen">
