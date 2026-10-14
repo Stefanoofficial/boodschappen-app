@@ -6,10 +6,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +31,7 @@ public class MainActivity extends Activity {
     private PermissionRequest pendingPermissionRequest;
 
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
+    private static final int BACKGROUND_COLOR = Color.rgb(238, 248, 241);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +39,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-        window.setStatusBarColor(Color.rgb(238, 248, 241));
-        window.setNavigationBarColor(Color.rgb(238, 248, 241));
+        window.setStatusBarColor(BACKGROUND_COLOR);
+        window.setNavigationBarColor(BACKGROUND_COLOR);
         window.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR |
-                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                        | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         );
 
         webView = new WebView(this);
@@ -82,7 +81,7 @@ public class MainActivity extends Activity {
         });
 
         webView.addJavascriptInterface(new AppBridge(), "AndroidApp");
-        webView.setBackgroundColor(Color.rgb(238, 248, 241));
+        webView.setBackgroundColor(BACKGROUND_COLOR);
         webView.setVerticalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         webView.loadUrl("file:///android_asset/index.html");
@@ -123,13 +122,7 @@ public class MainActivity extends Activity {
 
     private void showAppSplash(final FrameLayout root) {
         final FrameLayout splash = new FrameLayout(this);
-        splash.setBackgroundColor(Color.rgb(238, 248, 241));
-
-        SplashPattern pattern = new SplashPattern(this);
-        splash.addView(pattern, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
+        splash.setBackgroundColor(BACKGROUND_COLOR);
 
         ImageView icon = new ImageView(this);
         icon.setImageResource(R.drawable.splash_icon);
@@ -173,6 +166,7 @@ public class MainActivity extends Activity {
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
+                        ring.stop();
                         root.removeView(splash);
                     }
                 })
@@ -185,246 +179,6 @@ public class MainActivity extends Activity {
         );
     }
 
-    // =========================================================
-    // NIEUWE ACHTERGROND: verfijnde boodschappenillustraties
-    // =========================================================
-
-    private static class SplashPattern extends View {
-
-        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Path path = new Path();
-        private final float density;
-
-        private final int green = Color.rgb(69, 160, 94);
-        private final int paleGreen = Color.rgb(183, 220, 190);
-        private final int softGreen = Color.rgb(218, 239, 222);
-
-        SplashPattern(android.content.Context context) {
-            super(context);
-            density = getResources().getDisplayMetrics().density;
-        }
-
-        private float d(float value) {
-            return value * density;
-        }
-
-        private void stroke(int color, float width) {
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(d(width));
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeJoin(Paint.Join.ROUND);
-            paint.setColor(color);
-            paint.setAlpha(150);
-        }
-
-        private void fill(int color) {
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(color);
-            paint.setAlpha(125);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-
-            float w = getWidth();
-            float h = getHeight();
-
-            // Zachte decoratieve ringen achter het centrale icoon.
-            stroke(softGreen, 2f);
-            canvas.drawCircle(
-                    w / 2f, h / 2f,
-                    Math.min(w, h) * 0.34f, paint
-            );
-            canvas.drawCircle(
-                    w / 2f, h / 2f,
-                    Math.min(w, h) * 0.39f, paint
-            );
-
-            // Boodschappen rondom het midden.
-            drawApple(canvas, w * 0.15f, h * 0.22f, d(22));
-            drawMilk(canvas, w * 0.83f, h * 0.20f, d(21));
-            drawCarrot(canvas, w * 0.12f, h * 0.52f, d(24));
-            drawCheese(canvas, w * 0.86f, h * 0.48f, d(24));
-            drawBread(canvas, w * 0.17f, h * 0.78f, d(24));
-            drawBroccoli(canvas, w * 0.82f, h * 0.78f, d(24));
-
-            // Kleine decoratieve blaadjes.
-            drawLeaf(canvas, w * 0.28f, h * 0.12f, d(9), -35f);
-            drawLeaf(canvas, w * 0.72f, h * 0.34f, d(8), 35f);
-            drawLeaf(canvas, w * 0.28f, h * 0.66f, d(8), 30f);
-            drawLeaf(canvas, w * 0.73f, h * 0.89f, d(9), -30f);
-        }
-
-        private void drawApple(Canvas c, float x, float y, float s) {
-            fill(softGreen);
-            c.drawCircle(x, y, s * 0.9f, paint);
-
-            stroke(green, 1.8f);
-            c.drawOval(new RectF(
-                    x - s * 0.55f, y - s * 0.22f,
-                    x + s * 0.55f, y + s * 0.58f
-            ), paint);
-
-            path.reset();
-            path.moveTo(x, y - s * 0.28f);
-            path.quadTo(
-                    x - s * 0.08f, y - s * 0.65f,
-                    x + s * 0.25f, y - s * 0.70f
-            );
-            c.drawPath(path, paint);
-
-            fill(paleGreen);
-            path.reset();
-            path.moveTo(x + s * 0.05f, y - s * 0.55f);
-            path.quadTo(
-                    x + s * 0.45f, y - s * 0.80f,
-                    x + s * 0.42f, y - s * 0.40f
-            );
-            path.quadTo(
-                    x + s * 0.20f, y - s * 0.32f,
-                    x + s * 0.05f, y - s * 0.55f
-            );
-            path.close();
-            c.drawPath(path, paint);
-        }
-
-        private void drawMilk(Canvas c, float x, float y, float s) {
-            fill(softGreen);
-            c.drawRoundRect(new RectF(
-                    x - s * 0.48f, y - s * 0.50f,
-                    x + s * 0.48f, y + s * 0.55f
-            ), s * 0.12f, s * 0.12f, paint);
-
-            stroke(green, 1.8f);
-            path.reset();
-            path.moveTo(x - s * 0.35f, y - s * 0.50f);
-            path.lineTo(x - s * 0.18f, y - s * 0.78f);
-            path.lineTo(x + s * 0.28f, y - s * 0.78f);
-            path.lineTo(x + s * 0.43f, y - s * 0.50f);
-            c.drawPath(path, paint);
-
-            stroke(paleGreen, 3f);
-            c.drawLine(
-                    x - s * 0.30f, y + s * 0.10f,
-                    x + s * 0.30f, y + s * 0.10f, paint
-            );
-        }
-
-        private void drawCarrot(Canvas c, float x, float y, float s) {
-            stroke(green, 2f);
-            path.reset();
-            path.moveTo(x - s * 0.38f, y - s * 0.30f);
-            path.quadTo(x, y + s * 0.45f, x + s * 0.28f, y - s * 0.32f);
-            c.drawPath(path, paint);
-
-            c.drawLine(
-                    x - s * 0.10f, y - s * 0.35f,
-                    x - s * 0.30f, y - s * 0.72f, paint
-            );
-            c.drawLine(
-                    x, y - s * 0.35f,
-                    x + s * 0.03f, y - s * 0.78f, paint
-            );
-            c.drawLine(
-                    x + s * 0.10f, y - s * 0.35f,
-                    x + s * 0.38f, y - s * 0.65f, paint
-            );
-
-            stroke(paleGreen, 1.4f);
-            c.drawLine(
-                    x - s * 0.08f, y,
-                    x + s * 0.08f, y + s * 0.20f, paint
-            );
-        }
-
-        private void drawCheese(Canvas c, float x, float y, float s) {
-            fill(softGreen);
-            path.reset();
-            path.moveTo(x - s * 0.55f, y + s * 0.38f);
-            path.lineTo(x + s * 0.55f, y + s * 0.38f);
-            path.lineTo(x + s * 0.22f, y - s * 0.48f);
-            path.close();
-            c.drawPath(path, paint);
-
-            stroke(green, 1.8f);
-            c.drawPath(path, paint);
-
-            fill(paleGreen);
-            c.drawCircle(x - s * 0.12f, y + s * 0.08f, s * 0.09f, paint);
-            c.drawCircle(x + s * 0.19f, y + s * 0.20f, s * 0.07f, paint);
-            c.drawCircle(x + s * 0.12f, y - s * 0.18f, s * 0.06f, paint);
-        }
-
-        private void drawBread(Canvas c, float x, float y, float s) {
-            fill(softGreen);
-            c.drawRoundRect(new RectF(
-                    x - s * 0.60f, y - s * 0.30f,
-                    x + s * 0.60f, y + s * 0.38f
-            ), s * 0.28f, s * 0.28f, paint);
-
-            stroke(green, 1.8f);
-            c.drawRoundRect(new RectF(
-                    x - s * 0.60f, y - s * 0.30f,
-                    x + s * 0.60f, y + s * 0.38f
-            ), s * 0.28f, s * 0.28f, paint);
-
-            stroke(paleGreen, 2f);
-            c.drawLine(
-                    x - s * 0.24f, y - s * 0.08f,
-                    x - s * 0.08f, y - s * 0.24f, paint
-            );
-            c.drawLine(
-                    x + s * 0.05f, y - s * 0.08f,
-                    x + s * 0.21f, y - s * 0.24f, paint
-            );
-        }
-
-        private void drawBroccoli(Canvas c, float x, float y, float s) {
-            fill(softGreen);
-            c.drawCircle(x - s * 0.30f, y - s * 0.12f, s * 0.28f, paint);
-            c.drawCircle(x, y - s * 0.28f, s * 0.34f, paint);
-            c.drawCircle(x + s * 0.30f, y - s * 0.10f, s * 0.28f, paint);
-
-            stroke(green, 1.8f);
-            c.drawCircle(x - s * 0.30f, y - s * 0.12f, s * 0.28f, paint);
-            c.drawCircle(x, y - s * 0.28f, s * 0.34f, paint);
-            c.drawCircle(x + s * 0.30f, y - s * 0.10f, s * 0.28f, paint);
-
-            c.drawLine(x, y + s * 0.02f, x, y + s * 0.60f, paint);
-            c.drawLine(
-                    x, y + s * 0.30f,
-                    x - s * 0.22f, y + s * 0.55f, paint
-            );
-            c.drawLine(
-                    x, y + s * 0.30f,
-                    x + s * 0.22f, y + s * 0.55f, paint
-            );
-        }
-
-        private void drawLeaf(
-                Canvas c, float x, float y, float s, float angle
-        ) {
-            c.save();
-            c.rotate(angle, x, y);
-
-            fill(softGreen);
-            path.reset();
-            path.moveTo(x, y + s);
-            path.quadTo(x - s, y, x, y - s);
-            path.quadTo(x + s, y, x, y + s);
-            path.close();
-            c.drawPath(path, paint);
-
-            stroke(green, 1.4f);
-            c.drawPath(path, paint);
-            c.drawLine(x, y + s * 0.75f, x, y - s * 0.65f, paint);
-
-            c.restore();
-        }
-    }
-
-    // De bestaande draaiende cirkel blijft ongewijzigd.
     private static class SplashRing extends View {
 
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -459,11 +213,23 @@ public class MainActivity extends Activity {
             animator.start();
         }
 
+        void stop() {
+            if (animator != null) {
+                animator.cancel();
+                animator = null;
+            }
+        }
+
         @Override
-        protected void onDraw(Canvas canvas) {
+        protected void onDraw(android.graphics.Canvas canvas) {
             super.onDraw(canvas);
             float inset = paint.getStrokeWidth() * 2.2f;
-            oval.set(inset, inset, getWidth() - inset, getHeight() - inset);
+            oval.set(
+                    inset,
+                    inset,
+                    getWidth() - inset,
+                    getHeight() - inset
+            );
             canvas.drawArc(oval, start, sweep, false, paint);
         }
     }
@@ -477,7 +243,7 @@ public class MainActivity extends Activity {
                 if (dimmed) {
                     window.setStatusBarColor(Color.rgb(200, 211, 204));
                 } else {
-                    window.setStatusBarColor(Color.rgb(238, 248, 241));
+                    window.setStatusBarColor(BACKGROUND_COLOR);
                 }
             });
         }
