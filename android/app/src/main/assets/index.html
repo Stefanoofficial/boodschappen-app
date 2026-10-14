@@ -9787,16 +9787,20 @@ async function showFamilyMembers() {
   const user = auth.currentUser;
   if (!user) return;
   try {
-    if (!currentHouseholdId) {
-      const ns = await database.ref("users/" + user.uid + "/name").once("value");
-      await familyAlert("Mijn account", "👑 " + (ns.val() || user.displayName || "Gebruiker"), "fa-user");
-      return;
+    // Toon dezelfde Familieleden-weergave op Android en iOS.
+    // Zonder gekoppelde familie tonen we de huidige gebruiker als enige familielid.
+    let household = {};
+    let members = {};
+    let ownerUid = user.uid;
+    if (currentHouseholdId) {
+      const ref = database.ref("households/" + currentHouseholdId);
+      const snap = await ref.once("value");
+      household = snap.val() || {};
+      members = household.members || {};
+      ownerUid = String(household.owner || user.uid);
+    } else {
+      members = { [user.uid]: true };
     }
-    const ref = database.ref("households/" + currentHouseholdId);
-    const snap = await ref.once("value");
-    const household = snap.val() || {};
-    const members = household.members || {};
-    const ownerUid = String(household.owner || "");
     const ids = Object.keys(members).filter(uid => members[uid] === true).sort((a, b) => a === ownerUid ? -1 : b === ownerUid ? 1 : 0);
     const wrap = document.createElement("div");
     wrap.className = "familyDialogList";
