@@ -9838,9 +9838,10 @@ async function showFamilyMembers() {
           large.src = photoURL; large.alt = "Profielfoto van " + name;
           large.style.cssText = "display:block;max-width:min(78vw, 520px);max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)";
           const close = document.createElement("button");
-          close.type = "button"; close.textContent = "×";
+          close.type = "button"; close.textContent = "";
           close.setAttribute("aria-label", "Foto sluiten");
-          close.style.cssText = "position:absolute;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:30px;line-height:44px;text-align:center;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer";
+          close.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:48px;height:48px;min-width:48px;min-height:48px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:0;line-height:1;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;appearance:none;-webkit-appearance:none";
+          const closeMark = document.createElement("span"); closeMark.textContent = "×"; closeMark.style.cssText = "display:block;font-family:Arial,sans-serif;font-size:32px;font-weight:600;line-height:1;width:100%;height:100%;text-align:center;display:flex;align-items:center;justify-content:center;padding:0;margin:0;transform:none"; close.appendChild(closeMark);
           const dismiss = () => lightbox.remove();
           close.addEventListener("click", dismiss);
           lightbox.addEventListener("click", (event) => { if (event.target === lightbox) dismiss(); });
