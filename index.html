@@ -9821,7 +9821,7 @@ async function showFamilyMembers() {
       if (photoURL) {
         const img = document.createElement("img");
         img.src = photoURL; img.alt = "Profielfoto van " + name;
-        img.style.cssText = "width:100%;height:100%;object-fit:cover";
+        img.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;border-radius:50%";
         img.onerror = () => { avatar.replaceChildren(); avatar.innerHTML = '<i class="fa-solid fa-user"></i>'; };
         avatar.appendChild(img);
         avatar.style.cursor = "pointer";
