@@ -69,8 +69,8 @@ workflows:
           source = Image.open("splash_icon.png").convert("RGBA")
           width, height = source.size
 
-          new_width = round(width * 0.55)
-          new_height = round(height * 0.55)
+          new_width = round(width * 0.50)
+          new_height = round(height * 0.50)
 
           smaller = source.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
