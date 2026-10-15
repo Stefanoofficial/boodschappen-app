@@ -4,12 +4,20 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -30,6 +38,12 @@ public class MainActivity extends Activity {
     private SplashRing ring;
     private PermissionRequest pendingPermissionRequest;
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1002;
+    private static final int REMINDER_REQUEST_CODE = 2001;
+    private static final String NOTIFICATION_CHANNEL_ID = "shopping_reminders";
+    private boolean pendingTestNotification = false;
+    private String pendingReminderDay = null;
+    private String pendingReminderTime = null;
     private static final int BACKGROUND_COLOR = Color.rgb(238, 248, 241);
     private boolean pageReady = false;
     private boolean splashRemoved = false;
@@ -182,6 +196,27 @@ public class MainActivity extends Activity {
             int[] grantResults
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+            boolean granted = grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if (granted) {
+                if (pendingTestNotification) {
+                    showNotification("Testmelding", "Meldingen van Mijn Boodschappen werken.");
+                    notifyWebStatus("Testmelding verzonden.");
+                }
+                if (pendingReminderDay != null && pendingReminderTime != null) {
+                    scheduleWeeklyReminder(pendingReminderDay, pendingReminderTime);
+                    notifyWebStatus("Boodschappenherinnering ingepland.");
+                }
+            } else {
+                notifyWebStatus("Meldingen zijn niet toegestaan. Zet meldingen aan bij de Android-instellingen.");
+            }
+            pendingTestNotification = false;
+            pendingReminderDay = null;
+            pendingReminderTime = null;
+            return;
+        }
+
         if (requestCode == CAMERA_PERMISSION_REQUEST
                 && pendingPermissionRequest != null) {
             if (grantResults.length > 0
@@ -241,7 +276,165 @@ public class MainActivity extends Activity {
             canvas.drawArc(oval, start, sweep, false, paint);
         }
     }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    "Boodschappenherinneringen",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Wekelijkse herinnering om je boodschappenlijst te bekijken.");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(channel);
+        }
+    }
+
+    private void showNotification(String title, String message) {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        createNotificationChannel();
+
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        PendingIntent contentIntent = null;
+        if (launchIntent != null) {
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            contentIntent = PendingIntent.getActivity(
+                    this, 3001, launchIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+        }
+
+        android.app.Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new android.app.Notification.Builder(this, NOTIFICATION_CHANNEL_ID);
+        } else {
+            builder = new android.app.Notification.Builder(this)
+                    .setPriority(android.app.Notification.PRIORITY_HIGH);
+        }
+        builder.setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(new android.app.Notification.BigTextStyle().bigText(message))
+                .setAutoCancel(true);
+        if (contentIntent != null) builder.setContentIntent(contentIntent);
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) manager.notify((int) (System.currentTimeMillis() & 0x7fffffff), builder.build());
+    }
+
+    private void scheduleWeeklyReminder(String day, String time) {
+        try {
+            String[] parts = (time == null ? "18:00" : time).split(":");
+            int hour = Integer.parseInt(parts[0]);
+            int minute = Integer.parseInt(parts[1]);
+            int requestedDay = Integer.parseInt(day);
+
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            calendar.set(java.util.Calendar.DAY_OF_WEEK, requestedDay);
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, hour);
+            calendar.set(java.util.Calendar.MINUTE, minute);
+            calendar.set(java.util.Calendar.SECOND, 0);
+            calendar.set(java.util.Calendar.MILLISECOND, 0);
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                calendar.add(java.util.Calendar.DAY_OF_YEAR, 7);
+            }
+
+            Intent intent = new Intent(this, NotificationReceiver.class);
+            intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, REMINDER_REQUEST_CODE, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (alarmManager != null) {
+                alarmManager.cancel(pendingIntent);
+                // Wekelijkse herinnering; Android kan deze tijdens batterijbesparing iets uitstellen.
+                alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY * 7L,
+                        pendingIntent
+                );
+            }
+        } catch (Exception e) {
+            notifyWebStatus("Herinnering kon niet worden ingepland. Controleer de gekozen dag en tijd.");
+        }
+    }
+
+    private void cancelWeeklyReminder() {
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, REMINDER_REQUEST_CODE, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (alarmManager != null) alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+    }
+
+    private void notifyWebStatus(String message) {
+        if (webView == null) return;
+        String escaped = message.replace("\\", "\\\\").replace("'", "\\'");
+        webView.evaluateJavascript(
+                "if(typeof nativeNotificationStatus==='function'){nativeNotificationStatus('" + escaped + "', false);}",
+                null
+        );
+    }
+
     private class AppBridge {
+        @JavascriptInterface
+        public void testShoppingReminder() {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33
+                        && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    pendingTestNotification = true;
+                    requestPermissions(
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            NOTIFICATION_PERMISSION_REQUEST
+                    );
+                    return;
+                }
+                showNotification(
+                        "Testmelding",
+                        "Meldingen van Mijn Boodschappen werken."
+                );
+                notifyWebStatus("Testmelding verzonden.");
+            });
+        }
+
+        @JavascriptInterface
+        public void scheduleShoppingReminder(String day, String time) {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33
+                        && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    pendingReminderDay = day;
+                    pendingReminderTime = time;
+                    requestPermissions(
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            NOTIFICATION_PERMISSION_REQUEST
+                    );
+                    return;
+                }
+                scheduleWeeklyReminder(day, time);
+                notifyWebStatus("Boodschappenherinnering ingepland.");
+            });
+        }
+
+        @JavascriptInterface
+        public void cancelShoppingReminder() {
+            runOnUiThread(() -> {
+                cancelWeeklyReminder();
+                notifyWebStatus("Boodschappenherinnering uitgeschakeld.");
+            });
+        }
+
         @JavascriptInterface
         public void setMenuDimmed(final boolean dimmed) {
             runOnUiThread(() -> {
