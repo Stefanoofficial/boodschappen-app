@@ -119,6 +119,7 @@ public class MainActivity extends Activity {
         iconParams.topMargin = dp(10);
         splash.addView(icon, iconParams);
         ring = new SplashRing(this);
+        ring.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         int ringSize = dp(230);
         FrameLayout.LayoutParams ringParams =
                 new FrameLayout.LayoutParams(ringSize, ringSize);
@@ -149,7 +150,7 @@ public class MainActivity extends Activity {
         splashRemoved = true;
         splash.animate()
                 .alpha(0f)
-                .setDuration(300)
+                .setDuration(400)
                 .setInterpolator(new LinearInterpolator())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
