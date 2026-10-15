@@ -146,17 +146,9 @@ public class MainActivity extends Activity {
                 FrameLayout.LayoutParams.MATCH_PARENT
         ));
 
-        icon.setAlpha(0f);
-        icon.setScaleX(0.92f);
-        icon.setScaleY(0.92f);
-
-        icon.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(280)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
+        icon.setAlpha(1f);
+        icon.setScaleX(1f);
+        icon.setScaleY(1f);
 
         ring.start();
 
