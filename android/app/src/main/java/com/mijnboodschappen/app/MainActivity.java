@@ -191,7 +191,7 @@ public class MainActivity extends Activity {
 
         void start() {
             animator = ValueAnimator.ofFloat(0f, 360f);
-            animator.setDuration(1000);
+            animator.setDuration(800);
             animator.setRepeatCount(ValueAnimator.INFINITE);
             animator.setInterpolator(
                     new android.view.animation.LinearInterpolator()
