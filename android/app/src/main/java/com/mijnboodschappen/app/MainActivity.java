@@ -116,6 +116,7 @@ public class MainActivity extends Activity {
         FrameLayout.LayoutParams iconParams =
                 new FrameLayout.LayoutParams(iconSize, iconSize);
         iconParams.gravity = Gravity.CENTER;
+        iconParams.topMargin = dp(8);
         splash.addView(icon, iconParams);
         ring = new SplashRing(this);
         int ringSize = dp(230);
