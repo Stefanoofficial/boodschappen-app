@@ -153,7 +153,7 @@ public class MainActivity extends Activity {
         splashRemoved = true;
         splash.animate()
                 .alpha(0f)
-                .setDuration(400)
+                .setDuration(180)
                 .setInterpolator(new LinearInterpolator())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
