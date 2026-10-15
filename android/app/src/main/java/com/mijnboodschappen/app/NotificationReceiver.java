@@ -51,7 +51,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             builder = new android.app.Notification.Builder(context)
                     .setPriority(android.app.Notification.PRIORITY_HIGH);
         }
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(com.mijnboodschappen.app.R.mipmap.ic_launcher)
                 .setContentTitle("Tijd voor je boodschappen")
                 .setContentText("Bekijk je boodschappenlijst en werk deze bij.")
                 .setAutoCancel(true);
