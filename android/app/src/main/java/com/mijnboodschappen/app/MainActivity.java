@@ -127,11 +127,12 @@ public class MainActivity extends Activity {
                 new FrameLayout.LayoutParams(ringSize, ringSize);
         ringParams.gravity = Gravity.CENTER;
         splash.addView(ring, ringParams);
-        root.addView(splash, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
         ring.start();
+
+        root.addView(splash, new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+        ));
     }
     private void tryRemoveSplash() {
         if (!pageReady || splashRemoved) {
