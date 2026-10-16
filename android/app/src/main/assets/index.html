@@ -4,7 +4,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Boodschappenlijst</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -1753,23 +1753,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
 
 
 /* Reminder messaging adapts to the detected device; never hide it on iOS. */
-
-/* Receptenkaarten: volledig responsive, geen afgesneden knoppen of tekst. */
-.plannerRecipeFilters{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 12px;}
-.plannerRecipeFilter{border:1px solid #cbded0;border-radius:999px;padding:8px 11px;background:#fff;color:#294b34;font:inherit;font-size:13px;font-weight:700;white-space:nowrap;}
-.plannerRecipeFilter.active{background:#285e39;color:#fff;border-color:#285e39;}
-.plannerRecipeCard{display:grid!important;grid-template-columns:88px minmax(0,1fr);align-items:start!important;gap:10px;padding:12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;}
-.plannerRecipePhoto{display:block;width:88px;height:88px;object-fit:cover;border-radius:12px;grid-column:1;grid-row:1;background:#e4eee6;}
-.plannerRecipeCard .plannerRecipeContent{min-width:0;width:100%;max-width:100%;grid-column:2;grid-row:1;overflow-wrap:anywhere;}
-.plannerRecipeCard .proPlannerButton{grid-column:1 / -1;grid-row:2;width:100%;max-width:100%;box-sizing:border-box;white-space:normal;min-height:42px;}
-.plannerRecipeCard strong{font-size:15px;line-height:1.35;overflow-wrap:anywhere;}
-.plannerRecipeCard p{font-size:13px;line-height:1.4;}
-.plannerRecipeHero{display:block;width:100%;max-height:230px;object-fit:cover;border-radius:13px;margin:10px 0 12px;background:#e4eee6;}
-.plannerRecipeCard details[open] .plannerRecipeHero{max-width:100%;}
-@media(max-width:420px){.plannerRecipeCard{grid-template-columns:76px minmax(0,1fr);gap:9px;padding:10px}.plannerRecipePhoto{width:76px;height:76px}.plannerRecipeFilter{font-size:12px;padding:7px 9px}}
-body.dark-theme .plannerRecipePhoto,body.dark-theme .plannerRecipeHero{background:#34443a}
-body.dark-theme .plannerRecipeFilter{background:#202923;color:#e5f0e7;border-color:#43564a}body.dark-theme .plannerRecipeFilter.active{background:#2f6840;color:#fff}
-
 </style>
 <style>
 /* Zoekbalk: kruisje alleen zichtbaar wanneer er tekst is */
@@ -5003,73 +4986,7 @@ body.dark-theme .itemProductContent .quantityValue {
 </style>
 
 <style id="free-recipe-catalog">
-.plannerRecipeBox{margin:14px 0;padding:14px;border-radius:18px;background:var(--card-bg,#fff);border:1px solid #dce9df}.plannerRecipeBox h3{margin:0 0 6px}.plannerRecipeCatalog{display:grid;gap:9px;margin-top:10px}.plannerRecipeCard{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:#f2f7f3;color:#26392d}.plannerRecipeCard>div{min-width:0;flex:1}.plannerRecipeCard strong{display:block;font-size:14px;color:#26392d}.plannerRecipeCard details,.plannerRecipeCard li{color:#26392d}.plannerRecipeCard p{color:#53665a}.plannerRecipeCard summary{color:#285e39}.plannerRecipeCard p{margin:5px 0;color:#718178;font-size:12px;line-height:1.45}.plannerRecipeCard .proPlannerButton{flex-shrink:0;padding:9px 11px;font-size:12px}.plannerRecipeCard details{font-size:13px;line-height:1.5}.plannerRecipeCard summary{cursor:pointer;color:#477d55;font-weight:700}.plannerRecipeCard ul{padding-left:19px}.plannerRecipeCard details p{font-size:13px;color:var(--text-color,#405047)}
-.plannerRecipeCard h4{font-size:13px;color:#26392d;margin:12px 0 5px}.plannerRecipeCard ol{padding-left:22px;margin:6px 0}.plannerRecipeCard ol li{padding:0 0 7px 2px;line-height:1.5;color:#26392d}.plannerRecipeCard ul li{padding:2px 0;line-height:1.45;color:#26392d}.plannerRecipeCard summary i{margin-right:5px}.plannerRecipeCard strong{color:#26392d!important}.plannerRecipeCard details{color:#26392d}
-body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
-</style>
-
-<style id="planner-recipe-mobile-fix">
-.planner-recipe-card,.recipe-item,.planner-recipe-item{box-sizing:border-box;max-width:100%;min-width:0;}
-.planner-recipe-card img,.recipe-item img,.planner-recipe-item img{max-width:100%;object-fit:cover;}
-@media(max-width:520px){
- .planner-recipe-card,.recipe-item,.planner-recipe-item{width:100%;overflow:hidden;}
- .planner-recipe-card button,.recipe-item button,.planner-recipe-item button{max-width:100%;white-space:normal;}
-}
-</style>
-
-<style id="planner-recipe-dark-contrast-fix">
-/* Leesbare receptkaarten in nachtmodus */
-body.dark-theme .plannerRecipeCard,
-body.dark-theme .plannerRecipeCard strong,
-body.dark-theme .plannerRecipeCard h4,
-body.dark-theme .plannerRecipeCard details,
-body.dark-theme .plannerRecipeCard li,
-body.dark-theme .plannerRecipeCard .plannerRecipeContent { color: #edf5ef !important; }
-body.dark-theme .plannerRecipeCard strong { color: #edf5ef !important; }
-body.dark-theme .plannerRecipeCard p { color: #c0cdc4 !important; }
-body.dark-theme .plannerRecipeCard summary { color: #9bd6a9 !important; }
-body.dark-theme .plannerRecipeCard h4 { color: #d9eadf !important; }
-body.dark-theme .plannerRecipeCard details[open] { color: #edf5ef !important; }
-body.dark-theme .plannerRecipeCard details[open] li { color: #e4eee7 !important; }
-body.dark-theme .plannerRecipeCard .proPlannerButton { color: #234a30 !important; background: #dff1e3 !important; }
-body.dark-theme .plannerRecipeCard { background: #29352d !important; border-color: #3d5143 !important; }
-</style>
-
-<style id="mobile-bottom-navigation-fix">
-/* Gerichte fix voor de onderste navigatie op geïnstalleerde mobiele webapps.
-   Houd de balk aan de onderkant en reserveer ruimte voor de iPhone-veilige zone. */
-html, body { width:100%; max-width:100%; }
-.bottomNav {
-  position: fixed !important;
-  left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important;
-  width: 100% !important;
-  height: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
-  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-around !important;
-  z-index: 99999 !important;
-  transform: none !important;
-  -webkit-transform: none !important;
-}
-.bottomNavBtn {
-  min-width: 0 !important;
-  flex: 1 1 0 !important;
-  width: auto !important;
-  max-width: 150px !important;
-  height: 62px !important;
-  align-self: center !important;
-  box-sizing: border-box !important;
-}
-.app {
-  min-height: 0 !important;
-  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
-}
-@supports (height: 100dvh) {
-  body.logged-in { height: 100dvh !important; }
-  .app { height: 100dvh !important; }
-}
+.plannerRecipeBox{margin:14px 0;padding:14px;border-radius:18px;background:var(--card-bg,#fff);border:1px solid #dce9df}.plannerRecipeBox h3{margin:0 0 6px}.plannerRecipeCatalog{display:grid;gap:9px;margin-top:10px}.plannerRecipeCard{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:#f2f7f3}.plannerRecipeCard>div{min-width:0;flex:1}.plannerRecipeCard strong{display:block;font-size:14px}.plannerRecipeCard p{margin:5px 0;color:#718178;font-size:12px;line-height:1.45}.plannerRecipeCard .proPlannerButton{flex-shrink:0;padding:9px 11px;font-size:12px}.plannerRecipeCard details{font-size:13px;line-height:1.5}.plannerRecipeCard summary{cursor:pointer;color:#477d55;font-weight:700}.plannerRecipeCard ul{padding-left:19px}.plannerRecipeCard details p{font-size:13px;color:var(--text-color,#405047)}body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
 </style>
 </head>
 
@@ -5272,7 +5189,6 @@ html, body { width:100%; max-width:100%; }
         <h3>Recepten kiezen</h3>
         <p class="plannerHelp">Kies een recept uit deze gratis, zelf samengestelde receptenverzameling. De ingrediënten worden ingevuld zodat je ze aan je weekplanning kunt toevoegen.</p>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
-        <div class="plannerRecipeFilters" role="group" aria-label="Filter recepten"><button type="button" class="plannerRecipeFilter active" data-recipe-filter="alle" onclick="setPlannerRecipeFilter('alle',this)">Alle 50</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="snel" onclick="setPlannerRecipeFilter('snel',this)">Snel klaar</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="vegetarisch" onclick="setPlannerRecipeFilter('vegetarisch',this)">Vegetarisch</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="budget" onclick="setPlannerRecipeFilter('budget',this)">Budget</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="nederlands" onclick="setPlannerRecipeFilter('nederlands',this)">Nederlands</button></div>
         <div id="plannerRecipeCatalog" class="plannerRecipeCatalog"></div>
       </div>
       <label for="plannerDay">Dag</label>
@@ -5294,7 +5210,7 @@ html, body { width:100%; max-width:100%; }
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
     <div class="proFeatureCard">
-      <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Volgende stap</span></div>
+      <i class="fa-solid fa-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Volgende stap</span></div>
     </div>
     <p class="proFootnote">De Pro-functies worden stap voor stap ontwikkeld. Er is op dit moment geen betaald abonnement nodig.</p>
   </div>
@@ -8224,7 +8140,7 @@ async function fetchOnlineProductSuggestions(query) {
 
 function renderOnlineProductSuggestion(button, product) {
   const photo = product.imageUrl
-    ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.hidden=true">`
+    ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : `<span class="productSuggestionIcon">${productIconMarkup(getProductIcon(product.name))}</span>`;
 
   button.innerHTML =
@@ -12976,99 +12892,33 @@ body.dark-theme .overviewInsightCard{background:#202620;border-color:#354238;col
 #overviewActionOverlay.is-open .overviewActionSheet{transform:translate3d(0,0,0)!important}
 #overviewActionOverlay.is-closing .overviewActionSheet{transform:translate3d(0,18px,0)!important}
 @media(max-width:430px){#overviewActionOverlay.overviewActionOverlay{padding:18px!important}.overviewInsightCard{padding:16px}}
-
-/* Voorkom per ongeluk inzoomen met dubbel tikken of knijpen in navigatie en lijsten. */
-.bottomNav,.bottom-navigation,nav,.nav-list,.navigation-list,.menu-list,.menuPage,.menu-page,.listScreen,.list-screen,.plannerRecipeBox,.plannerRecipeCatalog{touch-action:pan-y!important; -ms-touch-action:pan-y!important;}
-html,body{touch-action:pan-y; -webkit-text-size-adjust:100%;}
-button,a,[role="button"],input,select,textarea{touch-action:manipulation;}
 </style>
 <script>
 (function(){
 const KEY="boodschappen_pro_smart_weekplanner_v1";
 const days=["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
-
-window.plannerRecipePhotoUrl=function(r){
- // Kies foto's op basis van het soort gerecht, niet op basis van een willekeurig receptnummer.
- // Als een gerecht niet betrouwbaar in een fotocategorie past, tonen we een neutrale passende categorieafbeelding.
- const n=(r.name||"").toLocaleLowerCase("nl");
- const ing=(r.ingredients||[]).join(" ").toLocaleLowerCase("nl");
- const has=(re)=>re.test(n+" "+ing);
- let id;
- if(has(/pasta|spaghetti|macaroni|lasagne|bolognese|pesto|carbonara|noedel/)) id="photo-1473093295043-cdd812d0e601";
- else if(has(/wrap|quesadilla|tortilla|burrito|pita|falafel/)) id="photo-1626700051175-6818013e1d4f";
- else if(has(/rijst|nasi|risotto|curry|chili|kikkererwt|linzen|bonen/)) id="photo-1512058564366-18510be2db19";
- else if(has(/aardappel|stamppot|hutspot|ovenschotel/)) id="photo-1518977676601-b53f82aba655";
- else if(has(/zalm|vis|tonijn/)) id="photo-1519708227418-c8fd9a32b7a2";
- else if(has(/soep/)) id="photo-1547592180-85f173990554";
- else if(has(/omelet|ei|eieren/)) id="photo-1525351484163-7529414344d8";
- else if(has(/salade|couscous|groente|broccoli|courgette|spinazie/)) id="photo-1512621776951-a57141f2eefd";
- else id="photo-1540420773420-3366772f4999";
- return "https://images.unsplash.com/"+id+"?auto=format&fit=crop&w=640&q=78";
-};
-
 const recipes=[
-{id:"recipe-01",name:"Pasta met tomaat en basilicum",time:25,servings:2,ingredients:["200 g pasta", "400 g tomatenblokjes", "1 ui", "2 tenen knoflook", "1 el olijfolie", "Verse basilicum", "Geraspte kaas"],steps:"Kook de pasta volgens de verpakking en bewaar een kopje kookwater. Snipper de ui en hak de knoflook fijn. Fruit de ui 4 minuten in olie en bak de knoflook 30 seconden mee. Voeg tomatenblokjes toe en laat 12–15 minuten zacht pruttelen. Breng op smaak met peper en zout. Meng de saus met de pasta en wat kookwater. Serveer met basilicum en kaas."},
-{id:"recipe-02",name:"Groentewraps met bonen",time:20,servings:2,ingredients:["4 wraps", "400 g kidneybonen, uitgelekt", "1 paprika", "150 g mais", "100 g sla", "4 el yoghurt", "1 tl paprikapoeder"],steps:"Spoel de bonen en mais af en laat uitlekken. Snijd de paprika in blokjes. Bak de paprika 5 minuten in een beetje olie. Voeg bonen, mais en paprikapoeder toe en verwarm 4 minuten. Verwarm de wraps volgens de verpakking. Verdeel sla en het warme mengsel over de wraps, schep er yoghurt op en rol ze op."},
-{id:"recipe-03",name:"Gebakken rijst met ei",time:20,servings:2,ingredients:["150 g rijst", "2 eieren", "300 g roerbakgroente", "2 el sojasaus", "1 el olie", "1 bosui"],steps:"Kook de rijst volgens de verpakking en laat goed uitdampen; koude rijst werkt het best. Snijd de bosui in ringetjes. Verhit olie in een ruime koekenpan en roerbak de groenten 5–6 minuten. Schuif de groenten opzij, breek de eieren in de pan en roerbak tot ze gestold zijn. Voeg rijst en sojasaus toe en bak al omscheppend 3 minuten. Strooi de bosui erover."},
-{id:"recipe-04",name:"Aardappel-wortelstamppot",time:35,servings:2,ingredients:["500 g aardappelen", "300 g wortels", "1 ui", "100 ml melk", "15 g boter", "Peper en zout"],steps:"Schil de aardappelen en snijd ze in gelijke stukken. Schil de wortels en snijd ze in plakjes; snipper de ui. Kook alles in een pan met water in 20–25 minuten gaar. Giet af en laat een minuut uitdampen. Verwarm de melk met de boter. Stamp de groenten grof of fijn en voeg beetje bij beetje melk toe. Breng op smaak met peper en zout."},
-{id:"recipe-05",name:"Milde kikkererwtencurry",time:25,servings:2,ingredients:["150 g rijst", "400 g kikkererwten, uitgelekt", "200 ml kokosmelk", "200 g spinazie", "1 ui", "2 tl currypoeder"],steps:"Kook de rijst volgens de verpakking. Snipper de ui en fruit 3 minuten in een beetje olie. Voeg currypoeder toe en bak 30 seconden mee. Voeg kikkererwten en kokosmelk toe en laat 10 minuten zacht koken. Roer de spinazie in delen erdoor tot deze geslonken is. Proef en voeg naar wens peper en zout toe. Serveer met rijst."},
-{id:"recipe-06",name:"Ovenschotel met zalm en groente",time:35,servings:2,ingredients:["2 zalmfilets", "400 g broccoli", "400 g aardappelen", "1 citroen", "1 el olijfolie", "Dille, peper en zout"],steps:"Verwarm de oven voor op 200 °C. Snijd aardappelen in kleine blokjes en broccoli in roosjes. Meng met olie, peper en zout en spreid uit over een bakplaat. Bak 15 minuten. Leg de zalm erbij, rasp er wat citroenschil over en voeg dille toe. Bak nog 12–15 minuten, tot de zalm gaar is en de aardappelen zacht zijn. Serveer met partjes citroen."},
-{id:"recipe-07",name:"Tomaten-linzensoep",time:30,servings:3,ingredients:["150 g rode linzen", "400 g tomatenblokjes", "1 ui", "1 wortel", "750 ml groentebouillon", "1 tl komijn"],steps:"Spoel de linzen in een zeef. Snipper de ui en snijd de wortel in kleine blokjes. Fruit de ui 3 minuten in een soeppan en bak de wortel nog 2 minuten mee. Voeg linzen, tomaten, bouillon en komijn toe. Breng aan de kook en laat 18–22 minuten zacht koken tot de linzen zacht zijn. Roer regelmatig en voeg water toe als de soep te dik wordt. Breng op smaak."},
-{id:"recipe-08",name:"Kip met paprika uit de oven",time:35,servings:2,ingredients:["300 g kipfilet", "2 paprika’s", "1 courgette", "400 g aardappelen", "1 el olie", "1 tl Italiaanse kruiden"],steps:"Verwarm de oven voor op 200 °C. Snijd aardappelen, paprika en courgette in hapklare stukken en snijd de kip in blokjes. Meng alles op een bakplaat met olie, Italiaanse kruiden, peper en zout. Verdeel in één laag. Bak 25–30 minuten en schep halverwege om. Controleer dat de kip vanbinnen helemaal gaar is en serveer direct."},
-{id:"recipe-09",name:"Pasta pesto met spinazie",time:15,servings:2,ingredients:["200 g pasta", "3 el pesto", "150 g spinazie", "150 g cherrytomaten", "30 g geraspte kaas"],steps:"Kook de pasta volgens de verpakking en bewaar een kopje kookwater. Halveer de cherrytomaten. Giet de pasta af en zet de pan terug op laag vuur. Roer pesto en een scheutje kookwater door de pasta. Voeg spinazie toe en roer tot deze slinkt. Schep de tomaten erdoor en warm kort mee. Serveer met geraspte kaas."},
-{id:"recipe-10",name:"Snelle chili sin carne",time:25,servings:2,ingredients:["150 g rijst", "400 g kidneybonen, uitgelekt", "400 g zwarte bonen, uitgelekt", "400 g tomatenblokjes", "1 paprika", "1 ui", "1 tl komijn"],steps:"Kook de rijst. Spoel de bonen af en laat uitlekken. Snipper de ui en snijd de paprika in blokjes. Bak de ui en paprika 5 minuten in een pan met olie. Voeg komijn, bonen en tomaten toe. Laat 15 minuten zonder deksel zacht sudderen en roer af en toe. Breng op smaak met peper en zout en serveer met rijst."},
-{id:"recipe-11",name:"Groenteomelet met brood",time:15,servings:2,ingredients:["4 eieren", "1 paprika", "100 g champignons", "1 hand spinazie", "4 sneetjes volkorenbrood", "1 el olie"],steps:"Snijd paprika en champignons klein. Verhit olie in een koekenpan en bak de groenten 5 minuten. Voeg spinazie toe en laat slinken. Klop de eieren los met peper en een beetje zout en giet over de groenten. Bak op laag vuur 5–7 minuten tot de onderkant stevig is; doe eventueel een deksel op de pan. Serveer met volkorenbrood."},
-{id:"recipe-12",name:"Couscous met geroosterde groente",time:25,servings:2,ingredients:["150 g couscous", "1 courgette", "1 paprika", "1 rode ui", "150 g kikkererwten", "1 el olijfolie", "1 citroen"],steps:"Verwarm de oven voor op 200 °C. Snijd courgette, paprika en ui in stukken. Spoel de kikkererwten af. Meng alles met olie, peper en zout en rooster 20 minuten. Doe de couscous in een kom, schenk er kokend water over volgens de verpakking en dek 5 minuten af. Maak los met een vork, meng met citroensap en schep de geroosterde groenten erdoor."},
-{id:"recipe-13",name:"Volkoren spaghetti bolognese",time:30,servings:2,ingredients:["180 g volkoren spaghetti", "250 g mager rundergehakt", "1 ui", "1 wortel", "400 g tomatenblokjes", "1 el tomatenpuree"],steps:"Kook de spaghetti volgens de verpakking. Snipper de ui en snijd de wortel klein. Bak het gehakt rul in een pan. Voeg ui en wortel toe en bak 5 minuten. Roer de tomatenpuree erdoor en bak 1 minuut. Voeg tomatenblokjes toe en laat 15 minuten zacht koken. Breng op smaak en serveer met de spaghetti."},
-{id:"recipe-14",name:"Macaroni met groenten",time:25,servings:2,ingredients:["180 g macaroni", "1 courgette", "1 paprika", "200 g passata", "1 tl Italiaanse kruiden", "30 g kaas"],steps:"Kook de macaroni beetgaar. Snijd courgette en paprika in blokjes. Bak de groenten 6 minuten in olie. Voeg passata en Italiaanse kruiden toe en laat 5 minuten pruttelen. Giet de macaroni af en meng door de saus. Strooi kaas erover en laat kort smelten."},
-{id:"recipe-15",name:"Romige champignonpasta",time:20,servings:2,ingredients:["200 g pasta", "250 g champignons", "1 teen knoflook", "100 ml kookroom", "1 el olie", "30 g Parmezaanse kaas"],steps:"Kook de pasta en bewaar wat kookwater. Snijd champignons in plakjes en hak de knoflook fijn. Bak champignons in olie op hoog vuur goudbruin. Voeg knoflook toe en bak 30 seconden. Schenk de room erbij en laat 3 minuten inkoken. Meng met pasta en een scheutje kookwater. Serveer met kaas en peper."},
-{id:"recipe-16",name:"Pasta met tonijn en tomaat",time:20,servings:2,ingredients:["200 g pasta", "1 blik tonijn op water", "250 g passata", "1 kleine ui", "1 tl oregano", "1 el olijfolie"],steps:"Kook de pasta. Snipper de ui en fruit in olie 4 minuten. Voeg passata en oregano toe en laat 8 minuten pruttelen. Laat de tonijn uitlekken en roer door de saus. Warm 2 minuten door, breng op smaak en meng met de pasta."},
-{id:"recipe-17",name:"Lasagne met spinazie",time:45,servings:3,ingredients:["6 lasagnebladen", "400 g spinazie", "250 g ricotta", "400 g passata", "100 g geraspte kaas", "1 teen knoflook"],steps:"Verwarm de oven voor op 190 °C. Laat spinazie slinken in een pan en knijp overtollig vocht eruit. Meng met ricotta, knoflook en peper. Schep een laag passata in een ovenschaal, leg er lasagnebladen op en verdeel spinazievulling. Herhaal en eindig met passata en kaas. Bak 30–35 minuten tot de bladen zacht zijn."},
-{id:"recipe-18",name:"Aardappelen met sperziebonen en gehaktbal",time:35,servings:2,ingredients:["500 g aardappelen", "300 g sperziebonen", "250 g gehakt", "1 el paneermeel", "1 tl mosterd", "1 el olie"],steps:"Schil aardappelen en kook ze in 20 minuten gaar. Verwijder de puntjes van de bonen en kook ze in 10–12 minuten beetgaar. Meng gehakt met paneermeel, mosterd, peper en zout en vorm twee ballen. Bak rondom bruin in olie en gaar met deksel op laag vuur in 15 minuten. Controleer dat het gehakt gaar is. Serveer samen."},
-{id:"recipe-19",name:"Hollandse groentesoep",time:30,servings:3,ingredients:["1 liter groentebouillon", "250 g soepgroente", "100 g vermicelli", "1 laurierblad", "Peper en peterselie"],steps:"Breng de bouillon met laurier aan de kook. Voeg soepgroente toe en laat 10 minuten zacht koken. Doe de vermicelli erbij en kook volgens de verpakking. Verwijder het laurierblad. Proef en breng op smaak met peper. Garneer met peterselie."},
-{id:"recipe-20",name:"Pannenkoeken met appel",time:25,servings:2,ingredients:["150 g bloem", "2 eieren", "300 ml melk", "1 appel", "1 tl kaneel", "Boter om te bakken"],steps:"Klop bloem, eieren en melk tot een glad beslag. Laat 5 minuten rusten. Snijd de appel in dunne plakjes en meng met kaneel. Verhit een beetje boter in een koekenpan, giet een dunne laag beslag in de pan en leg er appel op. Bak tot de onderkant goudbruin is, keer om en bak de andere kant gaar."},
-{id:"recipe-21",name:"Ovenschotel aardappel en broccoli",time:40,servings:2,ingredients:["500 g aardappelschijfjes", "350 g broccoli", "150 ml kookroom", "75 g geraspte kaas", "1 tl mosterd"],steps:"Verwarm de oven voor op 200 °C. Kook de broccoli 4 minuten voor en giet af. Verdeel aardappelschijfjes en broccoli in een ovenschaal. Meng kookroom met mosterd, peper en zout en schenk erover. Bestrooi met kaas. Bak 25–30 minuten tot de aardappelen gaar zijn en de bovenkant goudbruin is."},
-{id:"recipe-22",name:"Gevulde paprika met rijst",time:35,servings:2,ingredients:["2 grote paprika’s", "120 g rijst", "200 g kidneybonen", "200 g tomatenblokjes", "1 kleine ui", "40 g geraspte kaas"],steps:"Verwarm de oven voor op 190 °C. Kook de rijst bijna gaar. Halveer de paprika’s en verwijder zaadlijsten. Snipper de ui en bak 3 minuten. Meng met rijst, afgespoelde bonen en tomaten. Vul de paprikahelften en zet in een ovenschaal met een klein laagje water. Bestrooi met kaas en bak 25 minuten."},
-{id:"recipe-23",name:"Mexicaanse rijstpan",time:25,servings:2,ingredients:["150 g rijst", "1 paprika", "150 g mais", "200 g zwarte bonen", "200 g tomatenblokjes", "1 tl paprikapoeder"],steps:"Kook de rijst. Snijd de paprika in blokjes en bak 5 minuten in een ruime pan. Voeg mais, afgespoelde bonen, tomatenblokjes en paprikapoeder toe. Laat 8 minuten sudderen. Schep de rijst erdoor en verwarm nog 2 minuten. Breng op smaak met peper en zout."},
-{id:"recipe-24",name:"Risotto met champignons",time:35,servings:2,ingredients:["160 g risottorijst", "250 g champignons", "700 ml warme bouillon", "1 ui", "30 g Parmezaanse kaas", "1 el olie"],steps:"Snipper de ui en snijd champignons in plakjes. Bak de ui glazig in olie en voeg champignons toe. Roer de rijst erdoor en bak 1 minuut. Voeg steeds een soeplepel warme bouillon toe en roer tot die is opgenomen voordat je meer toevoegt. Ga 18–22 minuten door tot de rijst romig en gaar is. Roer kaas erdoor en serveer."},
-{id:"recipe-25",name:"Shakshuka met brood",time:25,servings:2,ingredients:["1 blik tomatenblokjes", "1 rode paprika", "1 ui", "4 eieren", "1 tl komijn", "4 sneetjes brood"],steps:"Snipper ui en snijd paprika in blokjes. Bak 5 minuten in een koekenpan. Voeg komijn en tomaten toe en laat 8 minuten indikken. Maak vier kuiltjes in de saus en breek in elk een ei. Doe een deksel op de pan en laat 6–8 minuten garen tot het eiwit gestold is. Serveer met brood."},
-{id:"recipe-26",name:"Gebakken aardappelen met roerbakgroente",time:25,servings:2,ingredients:["500 g voorgekookte aardappelschijfjes", "300 g roerbakgroente", "1 el olie", "1 tl paprikapoeder", "2 el yoghurt"],steps:"Verhit olie in een grote koekenpan. Bak aardappelschijfjes in 12–15 minuten goudbruin en keer regelmatig. Voeg roerbakgroente en paprikapoeder toe en bak nog 6–8 minuten tot de groente gaar maar knapperig is. Serveer met yoghurt als frisse saus."},
-{id:"recipe-27",name:"Kip teriyaki met rijst",time:25,servings:2,ingredients:["150 g rijst", "300 g kipfilet", "300 g broccoli", "3 el teriyakisaus", "1 tl olie"],steps:"Kook de rijst. Snijd kip in kleine stukjes en broccoli in roosjes. Bak de kip in olie 6–8 minuten tot deze gaar is. Kook of stoom broccoli in 5 minuten beetgaar. Voeg teriyakisaus en een eetlepel water aan de kip toe en laat 1–2 minuten kleven. Serveer met rijst en broccoli."},
-{id:"recipe-28",name:"Wraps met kip en paprika",time:20,servings:2,ingredients:["4 wraps", "250 g kipfilet", "1 paprika", "100 g sla", "4 el yoghurt", "1 tl paprikapoeder"],steps:"Snijd kip en paprika in reepjes. Bak de kip in olie 6–8 minuten en voeg paprika en paprikapoeder toe. Bak verder tot kip volledig gaar is. Verwarm de wraps. Verdeel sla, kip en paprika over de wraps en voeg yoghurt toe. Rol op en serveer."},
-{id:"recipe-29",name:"Kip kerrie met rijst",time:25,servings:2,ingredients:["150 g rijst", "300 g kipfilet", "1 ui", "150 ml kookroom", "2 tl kerriepoeder", "150 g doperwten"],steps:"Kook de rijst. Snipper de ui en snijd kip in blokjes. Bak de kip in een pan met olie tot deze rondom goudbruin en gaar is. Voeg ui en kerrie toe en bak 3 minuten. Schenk room erbij, voeg doperwten toe en laat 5 minuten zacht koken. Serveer met rijst."},
-{id:"recipe-30",name:"Vissticks met aardappelpuree",time:25,servings:2,ingredients:["6 vissticks", "500 g aardappelen", "150 ml melk", "15 g boter", "200 g doperwten"],steps:"Schil aardappelen, snijd in stukken en kook 18–20 minuten. Bereid vissticks volgens de verpakking, in oven of pan. Kook doperwten volgens de verpakking. Giet aardappelen af en stamp met warme melk en boter tot puree. Breng op smaak met peper en zout en serveer."},
-{id:"recipe-31",name:"Zalm met couscous en komkommer",time:20,servings:2,ingredients:["2 zalmfilets", "150 g couscous", "1 komkommer", "1 citroen", "2 el yoghurt", "1 tl olie"],steps:"Bereid couscous volgens de verpakking en maak los met een vork. Snijd komkommer in blokjes en meng met yoghurt en citroensap. Bak zalm in olie 3–4 minuten per kant, afhankelijk van de dikte, tot deze gaar is. Breng op smaak met peper en serveer met couscous en komkommersalade."},
-{id:"recipe-32",name:"Omelet met champignons en kaas",time:15,servings:2,ingredients:["4 eieren", "150 g champignons", "40 g geraspte kaas", "1 el olie", "4 sneetjes brood"],steps:"Snijd champignons in plakjes en bak ze 5 minuten in olie tot het vocht verdampt is. Klop eieren los met peper en een beetje zout en giet in de pan. Bak op laag vuur tot de onderkant stevig begint te worden. Strooi kaas erover, vouw de omelet dubbel en bak tot het ei helemaal gestold is. Serveer met brood."},
-{id:"recipe-33",name:"Kikkererwtensalade",time:15,servings:2,ingredients:["400 g kikkererwten, uitgelekt", "1 komkommer", "200 g cherrytomaten", "100 g feta", "1 el olijfolie", "1 citroen"],steps:"Spoel kikkererwten af en laat uitlekken. Snijd komkommer en tomaten in stukjes en verkruimel feta. Meng alles in een schaal. Klop olijfolie met citroensap, peper en een beetje zout tot dressing. Schep door de salade en serveer direct."},
-{id:"recipe-34",name:"Vegetarische taco’s",time:25,servings:2,ingredients:["6 kleine tortilla’s", "300 g zwarte bonen", "1 paprika", "150 g mais", "1 avocado", "1 tl komijn"],steps:"Spoel bonen af. Snijd paprika in blokjes en bak 5 minuten. Voeg bonen, mais en komijn toe en verwarm 4 minuten. Snijd avocado in plakjes. Verwarm tortilla’s volgens de verpakking en vul met het bonenmengsel en avocado. Voeg naar wens yoghurt of salsa toe."},
-{id:"recipe-35",name:"Linzenstoof met wortel",time:35,servings:2,ingredients:["150 g groene linzen", "2 wortels", "1 ui", "400 g tomatenblokjes", "500 ml groentebouillon", "1 tl tijm"],steps:"Spoel de linzen af. Snipper de ui en snijd wortels in plakjes. Fruit ui 3 minuten, voeg wortel toe en bak 2 minuten. Voeg linzen, tomaten, bouillon en tijm toe. Laat 25–30 minuten zacht koken tot de linzen gaar zijn. Roer regelmatig en voeg zo nodig water toe. Breng op smaak."},
-{id:"recipe-36",name:"Tofu met broccoli en noedels",time:25,servings:2,ingredients:["150 g noedels", "200 g stevige tofu", "300 g broccoli", "2 el sojasaus", "1 tl olie", "1 teen knoflook"],steps:"Kook de noedels volgens de verpakking. Dep tofu droog en snijd in blokjes. Bak in olie rondom goudbruin. Snijd broccoli klein en voeg met een scheutje water toe; dek 4 minuten af om te stomen. Voeg knoflook en sojasaus toe en bak 1 minuut. Meng met de noedels."},
-{id:"recipe-37",name:"Zoete aardappel uit de oven",time:35,servings:2,ingredients:["2 middelgrote zoete aardappelen", "200 g kikkererwten", "100 g yoghurt", "1 tl paprikapoeder", "1 el olijfolie", "1 citroen"],steps:"Verwarm de oven voor op 200 °C. Halveer zoete aardappelen in de lengte en prik de schil in. Bestrijk met olie en bak met de snijkant omlaag 25–30 minuten. Spoel kikkererwten af, meng met paprikapoeder en rooster de laatste 15 minuten mee. Serveer met yoghurt gemengd met citroensap."},
-{id:"recipe-38",name:"Bulgursalade met feta",time:20,servings:2,ingredients:["150 g bulgur", "1 komkommer", "200 g tomaten", "100 g feta", "1 citroen", "1 el olijfolie"],steps:"Bereid bulgur volgens de verpakking en laat afkoelen. Snijd komkommer en tomaten klein en verkruimel feta. Meng alles in een kom. Klop citroensap met olijfolie, peper en zout en schep door de salade. Laat 5 minuten staan zodat de smaken intrekken."},
-{id:"recipe-39",name:"Bonenburger met salade",time:25,servings:2,ingredients:["2 volkorenbroodjes", "1 blik zwarte bonen", "40 g havermout", "1 tl paprikapoeder", "2 tomaten", "sla"],steps:"Spoel bonen af en prak ze grof. Meng met havermout, paprikapoeder, peper en zout. Vorm twee burgers en bak in een beetje olie 4–5 minuten per kant tot ze stevig en warm zijn. Snijd tomaten in plakjes. Serveer op broodjes met sla en tomaat."},
-{id:"recipe-40",name:"Groene curry met tofu",time:25,servings:2,ingredients:["150 g rijst", "200 g tofu", "300 g roerbakgroente", "200 ml kokosmelk", "1–2 el groene currypasta"],steps:"Kook de rijst. Snijd tofu in blokjes en bak rondom goudbruin. Voeg roerbakgroente toe en bak 4 minuten. Roer currypasta erdoor en voeg kokosmelk toe. Laat 8–10 minuten zacht koken tot de groente gaar is. Proef de saus voordat je extra currypasta toevoegt. Serveer met rijst."},
-{id:"recipe-41",name:"Havermoutpannenkoekjes",time:15,servings:2,ingredients:["100 g havermout", "2 eieren", "1 rijpe banaan", "100 ml melk", "1 tl olie"],steps:"Prak de banaan fijn en meng met eieren, havermout en melk. Laat 3 minuten staan zodat de havermout vocht opneemt. Verhit een beetje olie in een koekenpan. Schep kleine hoopjes beslag in de pan en bak 2–3 minuten per kant op middellaag vuur. Serveer warm met fruit."},
-{id:"recipe-42",name:"Tomatensoep met tosti",time:20,servings:2,ingredients:["500 ml passata", "300 ml groentebouillon", "1 ui", "1 tl oregano", "4 sneetjes brood", "60 g kaas"],steps:"Snipper de ui en fruit 3 minuten in een soeppan. Voeg passata, bouillon en oregano toe. Laat 10 minuten zacht koken en pureer indien gewenst. Beleg brood met kaas en bak in een koekenpan of tosti-ijzer goudbruin. Snijd de tosti doormidden en serveer bij de soep."},
-{id:"recipe-43",name:"Snelle noedels met groenten",time:15,servings:2,ingredients:["150 g eiernoedels", "300 g roerbakgroente", "2 el sojasaus", "1 el olie", "1 teen knoflook"],steps:"Kook de noedels volgens de verpakking en giet af. Verhit olie in een wok en roerbak de groenten 5–6 minuten. Hak knoflook fijn en bak 30 seconden mee. Voeg noedels en sojasaus toe en schep 2 minuten om tot alles heet is. Voeg zo nodig een scheutje water toe."},
-{id:"recipe-44",name:"Aardappel-preisoep",time:30,servings:3,ingredients:["500 g aardappelen", "2 preien", "1 ui", "900 ml groentebouillon", "100 ml kookroom"],steps:"Snijd prei in ringen en spoel goed schoon. Snipper de ui en snijd aardappelen in blokjes. Fruit ui en prei 5 minuten in een soeppan. Voeg aardappelen en bouillon toe en kook 18–20 minuten tot alles zacht is. Pureer glad met een staafmixer. Roer room erdoor en breng op smaak met peper."},
-{id:"recipe-45",name:"Broccoli-kaasrijst",time:20,servings:2,ingredients:["150 g rijst", "300 g broccoli", "60 g geraspte kaas", "100 ml melk", "1 tl mosterd"],steps:"Kook de rijst. Verdeel broccoli in kleine roosjes en kook of stoom in 5–6 minuten beetgaar. Verwarm melk met mosterd in een pannetje en roer kaas erdoor tot een saus ontstaat; laat niet hard koken. Meng rijst en broccoli en schep de kaassaus erdoor. Breng op smaak met peper."},
-{id:"recipe-46",name:"Gehaktballetjes in tomatensaus",time:30,servings:2,ingredients:["250 g gehakt", "1 el paneermeel", "400 g passata", "1 ui", "150 g pasta", "1 tl oregano"],steps:"Kook de pasta. Meng gehakt met paneermeel, peper en zout en draai kleine balletjes. Bak de balletjes rondom bruin in een pan en haal ze even uit de pan. Fruit de gesnipperde ui 3 minuten, voeg passata en oregano toe. Leg de balletjes terug en laat 12–15 minuten zacht garen tot ze volledig gaar zijn. Serveer met pasta."},
-{id:"recipe-47",name:"Knapperige quesadilla met kaas en bonen",time:15,servings:2,ingredients:["4 tortilla’s", "200 g kidneybonen", "100 g geraspte kaas", "1 paprika", "1 tl komijn"],steps:"Spoel bonen af en prak ze grof. Snijd paprika klein en bak 4 minuten. Meng met bonen en komijn. Verdeel vulling en kaas over twee tortilla’s en dek af met de andere tortilla’s. Bak één voor één in een droge koekenpan 2–3 minuten per kant tot ze goudbruin zijn en de kaas smelt. Snijd in punten."},
-{id:"recipe-48",name:"Bietensalade met appel en geitenkaas",time:15,servings:2,ingredients:["400 g gekookte rode bieten", "1 appel", "75 g zachte geitenkaas", "50 g walnoten", "1 el olijfolie", "1 el balsamico"],steps:"Snijd de bieten en appel in blokjes. Hak walnoten grof. Meng olijfolie en balsamico met peper tot dressing. Schep bieten en appel met de dressing om. Verdeel geitenkaas en walnoten erover en serveer. Gebruik eventueel brood erbij."},
-{id:"recipe-49",name:"Courgettesoep met witte bonen",time:25,servings:3,ingredients:["2 courgettes", "1 ui", "1 blik witte bonen", "750 ml groentebouillon", "1 el olijfolie", "1 tl Italiaanse kruiden"],steps:"Snipper de ui en snijd courgettes in blokjes. Fruit ui in olie 3 minuten en voeg courgette toe. Bak 4 minuten. Voeg afgespoelde witte bonen, bouillon en kruiden toe. Laat 12 minuten koken tot de courgette zacht is. Pureer glad en breng op smaak met peper en zout."},
-{id:"recipe-50",name:"Pita falafel met yoghurtsaus",time:20,servings:2,ingredients:["4 pitabroodjes", "200 g falafel", "1 komkommer", "100 g tomaten", "100 g yoghurt", "1 citroen"],steps:"Bereid falafel volgens de verpakking. Verwarm de pitabroodjes. Snijd komkommer en tomaat klein. Meng yoghurt met citroensap, peper en een beetje zout. Snijd de broodjes open, vul met falafel en groenten en schep de yoghurtsaus erop."}
+{id:"tomato-pasta",name:"Pasta met tomaat en basilicum",time:25,servings:2,ingredients:["200 g pasta","1 blik tomatenblokjes (400 g)","1 ui","2 tenen knoflook","1 el olijfolie","Verse basilicum","Geraspte kaas"] ,steps:"Kook de pasta. Fruit ui en knoflook in olie, voeg tomaten toe en laat 15 minuten pruttelen. Meng met de pasta en basilicum."},
+{id:"veggie-wraps",name:"Groentewraps met bonen",time:20,servings:2,ingredients:["4 wraps","1 blik kidneybonen (400 g)","1 paprika","1 kleine maisblik","100 g sla","4 el yoghurt","Paprikapoeder"],steps:"Spoel bonen en mais af. Bak paprika met paprikapoeder en bonen. Vul de wraps met het mengsel, sla en yoghurt."},
+{id:"fried-rice",name:"Gebakken rijst met ei",time:20,servings:2,ingredients:["150 g rijst","2 eieren","200 g roerbakgroente","2 el sojasaus","1 el olie","1 bosui"],steps:"Kook de rijst en laat kort uitdampen. Bak de groente, voeg rijst toe en roerbak. Bak het ei mee en breng op smaak met sojasaus en bosui."},
+{id:"potato-carrot",name:"Aardappel-wortelstamppot",time:35,servings:2,ingredients:["500 g aardappelen","300 g wortels","1 ui","100 ml melk","1 klontje boter","Peper en zout"],steps:"Kook aardappelen en wortel met ui gaar. Giet af, stamp met melk en boter en breng op smaak."},
+{id:"chickpea-curry",name:"Milde kikkererwtencurry",time:25,servings:2,ingredients:["1 blik kikkererwten (400 g)","1 blik kokosmelk (400 ml)","200 g spinazie","1 ui","2 tl currypoeder","150 g rijst"],steps:"Kook de rijst. Fruit ui met curry, voeg kikkererwten en kokosmelk toe en laat 12 minuten zacht koken. Roer spinazie erdoor tot die slinkt."},
+{id:"salmon-veg",name:"Ovenschotel met zalm en groente",time:30,servings:2,ingredients:["2 zalmfilets","400 g broccoli","400 g aardappelen","1 citroen","1 el olijfolie","Dille, peper en zout"],steps:"Verwarm de oven voor op 200 °C. Snijd aardappelen en broccoli, meng met olie en kruiden en bak 15 minuten. Leg zalm erbij en bak nog 12–15 minuten."},
+{id:"lentil-soup",name:"Tomaten-linzensoep",time:30,servings:3,ingredients:["150 g rode linzen","1 blik tomatenblokjes (400 g)","1 ui","1 wortel","750 ml groentebouillon","1 tl komijn"],steps:"Snipper ui en snijd wortel. Bak kort, voeg linzen, tomaat, bouillon en komijn toe. Laat 20 minuten koken tot de linzen zacht zijn."},
+{id:"chicken-traybake",name:"Kip met paprika uit de oven",time:35,servings:2,ingredients:["300 g kipfilet","2 paprika's","1 courgette","400 g aardappelen","1 el olie","1 tl Italiaanse kruiden"],steps:"Verwarm de oven voor op 200 °C. Snijd alles in stukken, meng met olie en kruiden en verdeel over een bakplaat. Bak 25–30 minuten en controleer of de kip gaar is."},
+{id:"pesto-pasta",name:"Pasta pesto met spinazie",time:15,servings:2,ingredients:["200 g pasta","3 el groene pesto","150 g spinazie","150 g cherrytomaten","30 g geraspte kaas"],steps:"Kook de pasta. Halveer de tomaten en laat de spinazie kort slinken. Meng alles met pesto en een scheutje kookwater en strooi kaas erover."},
+{id:"bean-chili",name:"Snelle chili sin carne",time:25,servings:2,ingredients:["1 blik kidneybonen (400 g)","1 blik zwarte bonen (400 g)","1 blik tomatenblokjes (400 g)","1 paprika","1 ui","1 tl komijn","150 g rijst"],steps:"Kook de rijst. Bak ui en paprika, voeg bonen, tomaat en komijn toe en laat 15 minuten sudderen."},
+{id:"omelette",name:"Groenteomelet met brood",time:15,servings:2,ingredients:["4 eieren","1 paprika","100 g champignons","1 hand spinazie","4 sneetjes volkorenbrood","1 el olie"],steps:"Snijd de groente en bak 5 minuten. Klop de eieren, giet erbij en laat op laag vuur stollen. Serveer met brood."},
+{id:"couscous",name:"Couscous met geroosterde groente",time:25,servings:2,ingredients:["150 g couscous","1 courgette","1 paprika","1 rode ui","150 g kikkererwten","1 el olijfolie","1 citroen"],steps:"Rooster gesneden groente en kikkererwten met olie 20 minuten op 200 °C. Bereid couscous volgens de verpakking en meng met citroensap en de groente."}
 ];
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
 function write(items){localStorage.setItem(KEY,JSON.stringify(items))}
-let plannerRecipeFilter="alle";
-window.setPlannerRecipeFilter=function(filter,button){plannerRecipeFilter=filter;document.querySelectorAll(".plannerRecipeFilter").forEach(b=>b.classList.toggle("active",b===button));window.renderRecipeCatalog();};
-function recipeMatchesCategory(r,filter){if(filter==="alle")return true;const text=(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl");if(filter==="snel")return r.time<=25;if(filter==="vegetarisch")return !/kip|gehakt|rundvlees|vlees|zalm|vissticks|tonijn|spek|ham|varkensvlees|worst/i.test(text);if(filter==="budget")return /aardappel|rijst|pasta|macaroni|ei|eieren|bonen|linzen|kikkererwten|soep|havermout|groente|wrap/i.test(text);if(filter==="nederlands")return /stamppot|aardappel|hutspot|gehaktbal|erwtensoep|preisoep|vissticks|stamppot/i.test(text);return true;}
 window.renderRecipeCatalog=function(){
  const box=document.getElementById("plannerRecipeCatalog");if(!box)return;
  const q=(document.getElementById("plannerRecipeSearch")?.value||"").trim().toLocaleLowerCase("nl");
- const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl").includes(q)&&recipeMatchesCategory(r,plannerRecipeFilter));
- if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden in deze categorie. Kies een andere categorie of zoekterm.</p>';return}
- box.innerHTML=found.map(r=>{const photo=window.plannerRecipePhotoUrl(r);return '<article class="plannerRecipeCard"><img class="plannerRecipePhoto" src="'+photo+'" alt="Gerecht: '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><div class="plannerRecipeContent"><strong>'+esc(r.name)+'</strong><p>'+r.time+' min · '+r.servings+' porties</p><details><summary><i class="fa-solid fa-list-check"></i> Ingrediënten en bereiding</summary><img class="plannerRecipeHero" src="'+photo+'" alt="Foto van '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><h4>Ingrediënten ('+r.servings+' porties)</h4><ul>'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><h4>Bereidingswijze</h4><ol>'+r.steps.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚ])/).filter(Boolean).map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></details></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>';}).join('');
+ const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl").includes(q));
+ if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
+ box.innerHTML=found.map(r=>'<article class="plannerRecipeCard"><div><strong>'+esc(r.name)+'</strong><p>'+r.time+' min · '+r.servings+' porties</p><details><summary>Ingrediënten en bereiding</summary><ul>'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><p>'+esc(r.steps)+'</p></details></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('');
 };
 window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
 window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
@@ -13089,17 +12939,8 @@ window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  document.getElementById("plannerMeal").value="";document.getElementById("plannerIngredients").value="";
  status.textContent="Maaltijd opgeslagen.";render();
 };
-window.removeSmartMeal=function(id){
- write(read().filter(x=>x.id!==id));
- const status=document.getElementById("smartPlannerStatus");
- if(status)status.textContent="";
- render();
-};
-document.addEventListener("input",function(event){
- if(event.target&&["plannerMeal","plannerIngredients"].includes(event.target.id)){
-  const status=document.getElementById("smartPlannerStatus");if(status)status.textContent="";
- }
-},{passive:true});\nfunction render(){
+window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));render()};
+function render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
  const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
  box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
@@ -13114,29 +12955,11 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
  if(!input||typeof window.addProduct!=="function"){status.textContent="De boodschappenlijst kon niet automatisch worden geopend. Kopieer de ingrediënten handmatig naar je lijst.";return}
  let added=0;
  for(const item of all){input.value=item;try{await window.addProduct();added++}catch(e){}}
- const confirmation=added+" ingrediënten verwerkt. Controleer je boodschappenlijst.";
- status.textContent=confirmation;
- window.setTimeout(()=>{if(status&&status.textContent===confirmation)status.textContent=""},4500);
+ status.textContent=added+" ingrediënten verwerkt. Controleer je boodschappenlijst.";
 };
 })();
 </script>
-<style id="planner-feedback-fix"> 
-/* Duidelijke tik-feedback voor de weekplannerknoppen */
-.smartPlannerPanel .proPlannerButton{
- transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
- -webkit-tap-highlight-color:transparent;
- touch-action:manipulation;
-}
-.smartPlannerPanel .proPlannerButton:active{
- transform:scale(.975);
- filter:brightness(.94);
- box-shadow:inset 0 2px 5px rgba(30,70,45,.18);
-}
-.smartPlannerPanel .proPlannerButton:focus-visible{
- outline:3px solid #5b9b73;
- outline-offset:2px;
-}
-</style>\n</body>
+</body>
 
 <style id="overview-dashboard-final">
 .overview-dashboard-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:15px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
@@ -13918,7 +13741,7 @@ body.dark-theme .proFeatureCard strong { color:#e5eee7; }
 .plannerStatus{font-size:12px;color:#39754b;margin-top:8px}
 .plannerMealRow{padding:10px 0;border-bottom:1px solid #e5eee7}
 .plannerMealRow strong{display:block;font-size:13px;color:var(--text-color,#344d3b)}
-.plannerMealRow p{font-size:12px;color:#748278;margin:5px 0 0;white-space:pre-line;line-height:1.65;overflow-wrap:anywhere}
+.plannerMealRow p{font-size:12px;color:#748278;margin:5px 0 0;white-space:pre-line}
 .plannerMealRemove{border:0;background:transparent;color:#a34848;font-size:12px;padding:8px 0}
 body.dark-theme .smartPlannerPanel{background:#222a24;border-color:#38453b}
 body.dark-theme .plannerInput{background:#1d241f;border-color:#3c4b40;color:#e5eee7}
