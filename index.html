@@ -5195,7 +5195,7 @@ body.dark-theme .itemProductContent .quantityValue {
       <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
       <label for="plannerMeal">Maaltijd</label>
       <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
-      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
+      <label for="plannerIngredients">Ingrediënten</label>
       <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
       <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
       <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
@@ -13745,4 +13745,13 @@ body.dark-theme .proFeatureCard strong { color:#e5eee7; }
 .plannerMealRemove{border:0;background:transparent;color:#a34848;font-size:12px;padding:8px 0}
 body.dark-theme .smartPlannerPanel{background:#222a24;border-color:#38453b}
 body.dark-theme .plannerInput{background:#1d241f;border-color:#3c4b40;color:#e5eee7}
+/* Weekplanner: voldoende contrast in nachtmodus */
+body.dark-theme .smartPlannerPanel h3,
+body.dark-theme .smartPlannerPanel label,
+body.dark-theme .smartPlannerPanel .plannerMealRow strong { color:#edf5ef !important; }
+body.dark-theme .smartPlannerPanel .plannerHelp,
+body.dark-theme .smartPlannerPanel .plannerEmpty,
+body.dark-theme .smartPlannerPanel .plannerMealRow p { color:#c0cec4 !important; }
+body.dark-theme .smartPlannerPanel .plannerStatus { color:#a8e0b5 !important; }
+
 </style>
