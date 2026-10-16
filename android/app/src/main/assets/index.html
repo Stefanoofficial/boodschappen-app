@@ -11008,7 +11008,8 @@ async function openShoppingHistoryFromOverview(){
   var entries=history;
   body.innerHTML="";
   if(!entries.length){
-    body.innerHTML='<div class="overviewActionMuted">Je hebt nog geen eerdere boodschappen.</div>';
+    overlay.classList.add("overview-history-empty");
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><strong>Nog geen boodschappenhistorie</strong><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
