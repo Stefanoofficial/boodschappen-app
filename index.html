@@ -5225,7 +5225,7 @@ body.dark-theme .plannerRecipeCard { background: #29352d !important; border-colo
       <p>Slimmer plannen, meer overzicht en grip op je boodschappen.</p>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
-      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="return toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="smartPlannerPanel" class="smartPlannerPanel" hidden onclick="event.stopPropagation()">
       <h3>Mijn weekplanning</h3>
@@ -13034,12 +13034,20 @@ window.renderRecipeCatalog=function(){
  box.innerHTML=found.map(r=>{const photo=window.plannerRecipePhotoUrl(r);return '<article class="plannerRecipeCard"><img class="plannerRecipePhoto" src="'+photo+'" alt="Gerecht: '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><div class="plannerRecipeContent"><strong>'+esc(r.name)+'</strong><p>'+r.time+' min · '+r.servings+' porties</p><details><summary><i class="fa-solid fa-list-check"></i> Ingrediënten en bereiding</summary><img class="plannerRecipeHero" src="'+photo+'" alt="Foto van '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><h4>Ingrediënten ('+r.servings+' porties)</h4><ul>'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><h4>Bereidingswijze</h4><ol>'+r.steps.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚ])/).filter(Boolean).map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></details></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>';}).join('');
 };
 window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
-window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
- const panel=document.getElementById("smartPlannerPanel"); if(!panel)return;
- panel.hidden=!panel.hidden;
+window.toggleSmartPlanner=function(event){
+ if(event){event.preventDefault();event.stopPropagation();}
+ const panel=document.getElementById("smartPlannerPanel");
+ if(!panel)return false;
+ panel.hidden = !panel.hidden;
  const btn=document.querySelector(".proPlannerLaunch .proPlannerButton");
- if(btn)btn.innerHTML=panel.hidden?'Open weekplanner <i class="fa-solid fa-chevron-down"></i>':'Weekplanner sluiten <i class="fa-solid fa-chevron-up"></i>';
- if(!panel.hidden){render();renderRecipeCatalog();}
+ if(btn) btn.innerHTML = panel.hidden
+   ? 'Open weekplanner <i class="fa-solid fa-chevron-down"></i>'
+   : 'Weekplanner sluiten <i class="fa-solid fa-chevron-up"></i>';
+ if(!panel.hidden){
+   if(typeof render === "function") render();
+   if(typeof renderRecipeCatalog === "function") renderRecipeCatalog();
+ }
+ return false;
 };
 window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  const day=document.getElementById("plannerDay").value;
