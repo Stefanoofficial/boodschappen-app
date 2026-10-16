@@ -5612,6 +5612,22 @@ body.dark-theme .itemProductContent .quantityValue {
       </div>
     </button>
 
+    <button type="button" class="overview-more-insights-btn" aria-expanded="false" onclick="toggleMoreInsights(this)">
+      <span>Meer inzichten</span><i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div id="overviewMoreInsights" class="overviewMoreInsights" hidden>
+      <section class="overviewInsightCard">
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Jouw boodschappengewoonten</h3></div>
+        <p class="overviewInsightLead">Kijk welke producten regelmatig terugkomen in je bewaarde boodschappenrondes.</p>
+        <div id="overviewHabitInsights" class="overviewHabitInsights"><p class="overviewInsightEmpty">Je inzichten verschijnen zodra je boodschappenrondes hebt bewaard.</p></div>
+      </section>
+      <section class="overviewInsightCard">
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>Jouw historie in het kort</h3></div>
+        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>bewaarde boodschappenrondes</span></div>
+        <p id="overviewHistoryInsightText" class="overviewInsightLead">Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.</p>
+      </section>
+    </div>
+
   </div>
   </div>
 </section>
@@ -10151,6 +10167,7 @@ function toggleMoreInsights(button){
   const nextExpanded=!expanded;
   button.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
   panel.hidden=!nextExpanded;
+  if(nextExpanded && typeof renderOverviewInsights === "function") renderOverviewInsights();
 
   const label=button.querySelector("span");
   const icon=button.querySelector("i");
@@ -10159,6 +10176,22 @@ function toggleMoreInsights(button){
     icon.classList.toggle("fa-chevron-down", !nextExpanded);
     icon.classList.toggle("fa-chevron-up", nextExpanded);
   }
+}
+
+async function renderOverviewInsights(){
+  var history=await readOverviewHistory();
+  var count=document.getElementById("overviewHistoryRoundCount");
+  var text=document.getElementById("overviewHistoryInsightText");
+  var list=document.getElementById("overviewHabitInsights");
+  if(count) count.textContent=String(history.length);
+  if(text) text.textContent=history.length ? "Gebaseerd op je bewaarde boodschappenrondes." : "Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.";
+  if(!list) return;
+  var counts={};
+  history.forEach(function(round){(round.items||[]).forEach(function(item){var name=String(typeof item==="string"?item:(item&&item.text)||"").trim(); if(name) counts[name]=(counts[name]||0)+1;});});
+  var top=Object.keys(counts).map(function(name){return {name:name,count:counts[name]};}).sort(function(a,b){return b.count-a.count || a.name.localeCompare(b.name,"nl");}).slice(0,4);
+  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Je vaak gekochte producten verschijnen hier nadat je meerdere boodschappenrondes hebt bewaard.</p>';return;}
+  list.innerHTML="";
+  top.forEach(function(item,index){var row=document.createElement("div");row.className="overviewHabitRow";row.innerHTML='<span class="overviewHabitRank">'+(index+1)+'</span><span class="overviewHabitName"></span><span class="overviewHabitCount"></span>';row.querySelector('.overviewHabitName').textContent=item.name;row.querySelector('.overviewHabitCount').textContent=item.count+'×';list.appendChild(row);});
 }
 
 function openUseModeModal() {
@@ -12762,6 +12795,31 @@ html.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton:acti
 })();
 </script>
 
+
+<style id="overview-insights-and-centered-sheet-fix">
+#overviewScrollArea .overview-more-insights-btn{width:100%;margin:8px 0 12px;padding:14px 8px;display:flex;align-items:center;justify-content:center;gap:9px;background:transparent;border:0;color:#4f9360;font-size:15px;font-weight:750;cursor:pointer}
+#overviewScrollArea .overview-more-insights-btn i{font-size:15px;transition:transform .18s ease}
+#overviewScrollArea .overview-more-insights-btn[aria-expanded="true"] i{transform:rotate(180deg)}
+#overviewMoreInsights[hidden]{display:none!important}
+#overviewMoreInsights{display:grid;gap:14px;padding:0 0 18px}
+.overviewInsightCard{background:var(--card-bg,#fff);border:1px solid #dfebe2;border-radius:24px;padding:18px;box-shadow:0 5px 16px rgba(49,78,58,.05);color:var(--text-color,#314338)}
+.overviewInsightHeading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.overviewInsightHeading h3{font-size:18px;margin:0;font-weight:750}
+.overviewInsightIcon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.overviewInsightIcon.insight-purple{background:#fff0ca;color:#b78117}.overviewInsightIcon.insight-blue{background:#e7efff;color:#5078b5}
+.overviewInsightLead,.overviewInsightEmpty{margin:0;color:#718178;font-size:14px;line-height:1.5}
+.overviewHabitInsights{margin-top:12px;display:grid;gap:8px}.overviewHabitRow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#f2f7f3}
+.overviewHabitRank{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#deeee2;color:#3e7650;font-weight:750;font-size:13px}
+.overviewHabitName{flex:1;min-width:0;font-weight:650;overflow-wrap:anywhere}.overviewHabitCount{color:#477d55;font-weight:750}
+.overviewInsightSummary{display:flex;align-items:baseline;gap:9px;margin:10px 0}.overviewInsightSummary strong{font-size:30px;color:#477d55}.overviewInsightSummary span{color:#66776d;font-weight:600}
+body.dark-theme .overviewInsightCard{background:#202620;border-color:#354238;color:#e4eee7}body.dark-theme .overviewInsightLead,body.dark-theme .overviewInsightEmpty{color:#b8c6bc}body.dark-theme .overviewHabitRow{background:#29352d}body.dark-theme .overviewHabitRank{background:#344c3a;color:#c6e4cc}
+/* Center the history sheet vertically instead of presenting it as a bottom drawer. */
+#overviewActionOverlay.overviewActionOverlay{align-items:center!important;justify-content:center!important;padding:20px!important}
+#overviewActionOverlay .overviewActionSheet{width:min(520px,100%)!important;max-height:min(78vh,720px)!important;border-radius:28px!important;transform:translate3d(0,18px,0);}
+#overviewActionOverlay.is-open .overviewActionSheet{transform:translate3d(0,0,0)!important}
+#overviewActionOverlay.is-closing .overviewActionSheet{transform:translate3d(0,18px,0)!important}
+@media(max-width:430px){#overviewActionOverlay.overviewActionOverlay{padding:18px!important}.overviewInsightCard{padding:16px}}
+</style>
 </body>
 
 <style id="overview-dashboard-final">
