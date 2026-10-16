@@ -11042,7 +11042,7 @@ async function openShoppingHistoryFromOverview(){
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyIcon"><i class="fa-solid fa-clock-rotate-left"></i></div><strong>Nog geen boodschappenhistorie</strong><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><span class="overviewHistoryEmptyIcon"><i class="fa-solid fa-clock-rotate-left"></i></span><strong>Nog geen boodschappenhistorie</strong></div><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -13451,4 +13451,59 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 <style id="scrollable-product-suggestions-fix">
 #productSuggestions.productSuggestions { position: relative !important; max-height: min(62vh, 560px) !important; overflow-x: hidden !important; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain; touch-action: pan-y !important; pointer-events: auto !important; }
 #productSuggestions.productSuggestions .productSuggestion { touch-action: pan-y !important; }
+</style>
+
+
+<style id="overview-final-layout-fix">
+/* Centreer de historie-pop-up op het scherm, ook op smalle telefoons. */
+#overviewActionOverlay{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+  box-sizing:border-box!important;
+}
+#overviewActionOverlay .overviewActionSheet{
+  width:min(100%, 560px)!important;
+  max-width:560px!important;
+  max-height:calc(100dvh - 40px)!important;
+  overflow-y:auto!important;
+  margin:auto!important;
+  box-sizing:border-box!important;
+}
+#overviewActionOverlay.is-open .overviewActionSheet{
+  transform:translate3d(0,0,0)!important;
+}
+#overviewActionOverlay.is-closing .overviewActionSheet{
+  transform:translate3d(0,0,0)!important;
+}
+.overviewHistoryEmptyContent{width:100%;box-sizing:border-box}
+.overviewHistoryEmptyTitle{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 0 14px;
+}
+.overviewHistoryEmptyTitle strong{
+  display:block;
+  line-height:1.25;
+}
+.overviewHistoryEmptyTitle .overviewHistoryEmptyIcon{
+  display:flex;
+  flex:0 0 38px;
+  width:38px;
+  height:38px;
+  align-items:center;
+  justify-content:center;
+  margin:0;
+}
+#overview-more-insights-btn[aria-expanded="true"] i{
+  transform:rotate(180deg);
+}
+#overview-more-insights-btn[aria-expanded="false"] i{
+  transform:rotate(0deg);
+}
+#overview-more-insights-btn i{
+  transition:transform .18s ease;
+}
 </style>
