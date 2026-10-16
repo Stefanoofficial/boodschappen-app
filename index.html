@@ -5034,6 +5034,43 @@ body.dark-theme .plannerRecipeCard details[open] li { color: #e4eee7 !important;
 body.dark-theme .plannerRecipeCard .proPlannerButton { color: #234a30 !important; background: #dff1e3 !important; }
 body.dark-theme .plannerRecipeCard { background: #29352d !important; border-color: #3d5143 !important; }
 </style>
+
+<style id="mobile-bottom-navigation-fix">
+/* Gerichte fix voor de onderste navigatie op geïnstalleerde mobiele webapps.
+   Houd de balk aan de onderkant en reserveer ruimte voor de iPhone-veilige zone. */
+html, body { width:100%; max-width:100%; }
+.bottomNav {
+  position: fixed !important;
+  left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important;
+  width: 100% !important;
+  height: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  z-index: 99999 !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+.bottomNavBtn {
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+  width: auto !important;
+  max-width: 150px !important;
+  height: 62px !important;
+  align-self: center !important;
+  box-sizing: border-box !important;
+}
+.app {
+  min-height: 0 !important;
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@supports (height: 100dvh) {
+  body.logged-in { height: 100dvh !important; }
+  .app { height: 100dvh !important; }
+}
+</style>
 </head>
 
 <body>
