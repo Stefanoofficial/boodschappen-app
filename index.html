@@ -1754,14 +1754,21 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
 
 /* Reminder messaging adapts to the detected device; never hide it on iOS. */
 
-/* Recipe photos: responsive thumbnails and a larger photo in expanded recipe details. */
-.plannerRecipeCard{align-items:flex-start!important;}
-.plannerRecipePhoto{display:block;width:92px;height:92px;object-fit:cover;border-radius:12px;flex:0 0 92px;background:#e4eee6;}
-.plannerRecipeCard .plannerRecipeContent{min-width:0;flex:1;}
+/* Receptenkaarten: volledig responsive, geen afgesneden knoppen of tekst. */
+.plannerRecipeFilters{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 12px;}
+.plannerRecipeFilter{border:1px solid #cbded0;border-radius:999px;padding:8px 11px;background:#fff;color:#294b34;font:inherit;font-size:13px;font-weight:700;white-space:nowrap;}
+.plannerRecipeFilter.active{background:#285e39;color:#fff;border-color:#285e39;}
+.plannerRecipeCard{display:grid!important;grid-template-columns:88px minmax(0,1fr);align-items:start!important;gap:10px;padding:12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;}
+.plannerRecipePhoto{display:block;width:88px;height:88px;object-fit:cover;border-radius:12px;grid-column:1;grid-row:1;background:#e4eee6;}
+.plannerRecipeCard .plannerRecipeContent{min-width:0;width:100%;max-width:100%;grid-column:2;grid-row:1;overflow-wrap:anywhere;}
+.plannerRecipeCard .proPlannerButton{grid-column:1 / -1;grid-row:2;width:100%;max-width:100%;box-sizing:border-box;white-space:normal;min-height:42px;}
+.plannerRecipeCard strong{font-size:15px;line-height:1.35;overflow-wrap:anywhere;}
+.plannerRecipeCard p{font-size:13px;line-height:1.4;}
 .plannerRecipeHero{display:block;width:100%;max-height:230px;object-fit:cover;border-radius:13px;margin:10px 0 12px;background:#e4eee6;}
 .plannerRecipeCard details[open] .plannerRecipeHero{max-width:100%;}
-@media(max-width:380px){.plannerRecipePhoto{width:76px;height:76px;flex-basis:76px}.plannerRecipeCard{flex-direction:row!important}.plannerRecipeCard .proPlannerButton{width:auto!important;flex-shrink:0}}
+@media(max-width:420px){.plannerRecipeCard{grid-template-columns:76px minmax(0,1fr);gap:9px;padding:10px}.plannerRecipePhoto{width:76px;height:76px}.plannerRecipeFilter{font-size:12px;padding:7px 9px}}
 body.dark-theme .plannerRecipePhoto,body.dark-theme .plannerRecipeHero{background:#34443a}
+body.dark-theme .plannerRecipeFilter{background:#202923;color:#e5f0e7;border-color:#43564a}body.dark-theme .plannerRecipeFilter.active{background:#2f6840;color:#fff}
 
 </style>
 <style>
@@ -5000,6 +5007,15 @@ body.dark-theme .itemProductContent .quantityValue {
 .plannerRecipeCard h4{font-size:13px;color:#26392d;margin:12px 0 5px}.plannerRecipeCard ol{padding-left:22px;margin:6px 0}.plannerRecipeCard ol li{padding:0 0 7px 2px;line-height:1.5;color:#26392d}.plannerRecipeCard ul li{padding:2px 0;line-height:1.45;color:#26392d}.plannerRecipeCard summary i{margin-right:5px}.plannerRecipeCard strong{color:#26392d!important}.plannerRecipeCard details{color:#26392d}
 body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
 </style>
+
+<style id="planner-recipe-mobile-fix">
+.planner-recipe-card,.recipe-item,.planner-recipe-item{box-sizing:border-box;max-width:100%;min-width:0;}
+.planner-recipe-card img,.recipe-item img,.planner-recipe-item img{max-width:100%;object-fit:cover;}
+@media(max-width:520px){
+ .planner-recipe-card,.recipe-item,.planner-recipe-item{width:100%;overflow:hidden;}
+ .planner-recipe-card button,.recipe-item button,.planner-recipe-item button{max-width:100%;white-space:normal;}
+}
+</style>
 </head>
 
 <body>
@@ -5201,6 +5217,7 @@ body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.d
         <h3>Recepten kiezen</h3>
         <p class="plannerHelp">Kies een recept uit deze gratis, zelf samengestelde receptenverzameling. De ingrediënten worden ingevuld zodat je ze aan je weekplanning kunt toevoegen.</p>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
+        <div class="plannerRecipeFilters" role="group" aria-label="Filter recepten"><button type="button" class="plannerRecipeFilter active" data-recipe-filter="alle" onclick="setPlannerRecipeFilter('alle',this)">Alle 50</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="snel" onclick="setPlannerRecipeFilter('snel',this)">Snel klaar</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="vegetarisch" onclick="setPlannerRecipeFilter('vegetarisch',this)">Vegetarisch</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="budget" onclick="setPlannerRecipeFilter('budget',this)">Budget</button><button type="button" class="plannerRecipeFilter" data-recipe-filter="nederlands" onclick="setPlannerRecipeFilter('nederlands',this)">Nederlands</button></div>
         <div id="plannerRecipeCatalog" class="plannerRecipeCatalog"></div>
       </div>
       <label for="plannerDay">Dag</label>
@@ -12911,20 +12928,19 @@ const KEY="boodschappen_pro_smart_weekplanner_v1";
 const days=["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
 
 window.plannerRecipePhotoUrl=function(r){
- const n=(r.name||'').toLocaleLowerCase('nl');
- const photos=[
-  {keys:['pasta','lasagne','spaghetti','macaroni','bolognese'],id:'photo-1473093295043-cdd812d0e601'},
-  {keys:['wrap','quesadilla','pita','falafel','burger'],id:'photo-1626700051175-6818013e1d4f'},
-  {keys:['rijst','curry','noedel','wok','teriyaki'],id:'photo-1512058564366-18510be2db19'},
-  {keys:['stamppot','aardappel','gehaktbal','ovenschotel','gratin'],id:'photo-1518977676601-b53f82aba655'},
-  {keys:['soep','linzen','tomaten'],id:'photo-1547592180-85f173990554'},
-  {keys:['zalm','vis','tonijn'],id:'photo-1519708227418-c8fd9a32b7a2'},
-  {keys:['salade','biet','geitenkaas'],id:'photo-1512621776951-a57141f2eefd'},
-  {keys:['pannenkoek','havermout','ontbijt'],id:'photo-1528207776546-365bb710ee93'},
-  {keys:['groente','broccoli','courgette','spinazie','bonen','kikkererwt'],id:'photo-1540420773420-3366772f4999'}
- ];
- const match=photos.find(p=>p.keys.some(k=>n.includes(k)));
- const id=(match||{id:'photo-1547592180-85f173990554'}).id;
+ // Gebruik per recept een eigen afbeelding-ID zodat niet alle gerechten dezelfde categorie-foto delen.
+ const photoIds={
+ 'recipe-01':'photo-1473093295043-cdd812d0e601','recipe-02':'photo-1626700051175-6818013e1d4f','recipe-03':'photo-1512058564366-18510be2db19','recipe-04':'photo-1518977676601-b53f82aba655','recipe-05':'photo-1547592180-85f173990554',
+ 'recipe-06':'photo-1519708227418-c8fd9a32b7a2','recipe-07':'photo-1512621776951-a57141f2eefd','recipe-08':'photo-1528207776546-365bb710ee93','recipe-09':'photo-1540420773420-3366772f4999','recipe-10':'photo-1547592180-85f173990554',
+ 'recipe-11':'photo-1512621776951-a57141f2eefd','recipe-12':'photo-1473093295043-cdd812d0e601','recipe-13':'photo-1626700051175-6818013e1d4f','recipe-14':'photo-1512058564366-18510be2db19','recipe-15':'photo-1540420773420-3366772f4999',
+ 'recipe-16':'photo-1518977676601-b53f82aba655','recipe-17':'photo-1547592180-85f173990554','recipe-18':'photo-1519708227418-c8fd9a32b7a2','recipe-19':'photo-1528207776546-365bb710ee93','recipe-20':'photo-1512621776951-a57141f2eefd',
+ 'recipe-21':'photo-1473093295043-cdd812d0e601','recipe-22':'photo-1626700051175-6818013e1d4f','recipe-23':'photo-1512058564366-18510be2db19','recipe-24':'photo-1540420773420-3366772f4999','recipe-25':'photo-1518977676601-b53f82aba655',
+ 'recipe-26':'photo-1547592180-85f173990554','recipe-27':'photo-1519708227418-c8fd9a32b7a2','recipe-28':'photo-1512621776951-a57141f2eefd','recipe-29':'photo-1528207776546-365bb710ee93','recipe-30':'photo-1473093295043-cdd812d0e601',
+ 'recipe-31':'photo-1626700051175-6818013e1d4f','recipe-32':'photo-1512058564366-18510be2db19','recipe-33':'photo-1518977676601-b53f82aba655','recipe-34':'photo-1547592180-85f173990554','recipe-35':'photo-1519708227418-c8fd9a32b7a2',
+ 'recipe-36':'photo-1512621776951-a57141f2eefd','recipe-37':'photo-1528207776546-365bb710ee93','recipe-38':'photo-1540420773420-3366772f4999','recipe-39':'photo-1473093295043-cdd812d0e601','recipe-40':'photo-1626700051175-6818013e1d4f',
+ 'recipe-41':'photo-1512058564366-18510be2db19','recipe-42':'photo-1518977676601-b53f82aba655','recipe-43':'photo-1547592180-85f173990554','recipe-44':'photo-1519708227418-c8fd9a32b7a2','recipe-45':'photo-1512621776951-a57141f2eefd',
+ 'recipe-46':'photo-1528207776546-365bb710ee93','recipe-47':'photo-1540420773420-3366772f4999','recipe-48':'photo-1473093295043-cdd812d0e601','recipe-49':'photo-1626700051175-6818013e1d4f','recipe-50':'photo-1512058564366-18510be2db19'};
+ const id=photoIds[r.id]||'photo-1547592180-85f173990554';
  return 'https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=640&q=78';
 };
 
@@ -12982,11 +12998,14 @@ const recipes=[
 ];
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
 function write(items){localStorage.setItem(KEY,JSON.stringify(items))}
+let plannerRecipeFilter="alle";
+window.setPlannerRecipeFilter=function(filter,button){plannerRecipeFilter=filter;document.querySelectorAll(".plannerRecipeFilter").forEach(b=>b.classList.toggle("active",b===button));window.renderRecipeCatalog();};
+function recipeMatchesCategory(r,filter){if(filter==="alle")return true;const text=(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl");if(filter==="snel")return r.time<=25;if(filter==="vegetarisch")return !/kip|gehakt|rundvlees|vlees|zalm|vissticks|tonijn|spek|ham|varkensvlees|worst/i.test(text);if(filter==="budget")return /aardappel|rijst|pasta|macaroni|ei|eieren|bonen|linzen|kikkererwten|soep|havermout|groente|wrap/i.test(text);if(filter==="nederlands")return /stamppot|aardappel|hutspot|gehaktbal|erwtensoep|preisoep|vissticks|stamppot/i.test(text);return true;}
 window.renderRecipeCatalog=function(){
  const box=document.getElementById("plannerRecipeCatalog");if(!box)return;
  const q=(document.getElementById("plannerRecipeSearch")?.value||"").trim().toLocaleLowerCase("nl");
- const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl").includes(q));
- if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
+ const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl").includes(q)&&recipeMatchesCategory(r,plannerRecipeFilter));
+ if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden in deze categorie. Kies een andere categorie of zoekterm.</p>';return}
  box.innerHTML=found.map(r=>{const photo=window.plannerRecipePhotoUrl(r);return '<article class="plannerRecipeCard"><img class="plannerRecipePhoto" src="'+photo+'" alt="Gerecht: '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><div class="plannerRecipeContent"><strong>'+esc(r.name)+'</strong><p>'+r.time+' min · '+r.servings+' porties</p><details><summary><i class="fa-solid fa-list-check"></i> Ingrediënten en bereiding</summary><img class="plannerRecipeHero" src="'+photo+'" alt="Foto van '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><h4>Ingrediënten ('+r.servings+' porties)</h4><ul>'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><h4>Bereidingswijze</h4><ol>'+r.steps.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚ])/).filter(Boolean).map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></details></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>';}).join('');
 };
 window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
