@@ -4988,6 +4988,49 @@ body.dark-theme .itemProductContent .quantityValue {
 <style id="free-recipe-catalog">
 .plannerRecipeBox{margin:14px 0;padding:14px;border-radius:18px;background:var(--card-bg,#fff);border:1px solid #dce9df}.plannerRecipeBox h3{margin:0 0 6px}.plannerRecipeCatalog{display:grid;gap:9px;margin-top:10px}.plannerRecipeCard{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:#f2f7f3}.plannerRecipeCard>div{min-width:0;flex:1}.plannerRecipeCard strong{display:block;font-size:14px;color:#2f4a38}.plannerRecipeBox .plannerRecipeCard strong{color:#2f4a38!important}.plannerRecipeCard p{margin:5px 0;color:#718178;font-size:12px;line-height:1.45}.plannerRecipeCard .proPlannerButton{flex-shrink:0;padding:9px 11px;font-size:12px}.plannerRecipeCard details{font-size:13px;line-height:1.5}.plannerRecipeCard summary{cursor:pointer;color:#477d55;font-weight:700}.plannerRecipeCard ul{padding-left:19px}.plannerRecipeCard details p{font-size:13px;color:var(--text-color,#405047)}body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}body.dark-theme .plannerRecipeBox .plannerRecipeCard strong{color:#e8f1ea!important}.plannerRecipeCard p{color:#5f7066}body.dark-theme .plannerRecipeCard p{color:#b8c6bc}.plannerRecipeCard .recipeSectionTitle{margin:12px 0 4px;font-size:13px;color:#2f4a38}body.dark-theme .plannerRecipeCard .recipeSectionTitle{color:#e8f1ea}.plannerRecipeCard .recipeIngredientList{margin:0 0 4px;padding-left:19px}.plannerRecipeCard .recipeStepList{margin:0;padding-left:20px}.plannerRecipeCard .recipeStepList li{margin-bottom:6px;padding-left:2px}.plannerRecipeCard .recipeTip{margin:10px 0 2px;padding:8px 10px;border-radius:10px;background:#e3f0e6;color:#2f4a38}body.dark-theme .plannerRecipeCard .recipeTip{background:#344c3a;color:#e8f1ea}body.dark-theme .plannerRecipeCard summary{color:#9fd3ac}.plannerRecipeBox .plannerRecipeCard{flex-direction:column;align-items:stretch;gap:10px}.plannerRecipeCard .recipeTop{display:flex;gap:12px;align-items:flex-start}.plannerRecipeCard .recipeThumb{position:relative;flex:0 0 84px;width:84px;height:84px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center}.plannerRecipeCard .recipeThumbEmoji{font-size:36px;line-height:1}.plannerRecipeCard .recipeThumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.plannerRecipeCard .recipeHead{flex:1;min-width:0}.plannerRecipeCard .recipeHead strong{font-size:15px;line-height:1.25}.plannerRecipeCard .recipeMeta{margin:4px 0 2px;font-size:12px}.plannerRecipeCard .recipeDesc{margin:2px 0 6px;font-size:12px;line-height:1.4}.plannerRecipeCard .recipeTags{display:flex;flex-wrap:wrap;gap:5px}.plannerRecipeCard .recipeTags span{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:650;background:#dcefe0;color:#2f6a40}.plannerRecipeCard .recipeTags span:nth-child(2){background:#fff0cc;color:#8a6410}.plannerRecipeCard .recipeTags span:nth-child(3){background:#e1ebfb;color:#3b5f99}body.dark-theme .plannerRecipeCard .recipeTags span{background:#344c3a;color:#d3ecd9}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(2){background:#4a4126;color:#f1dfa6}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(3){background:#2d3d57;color:#cfdcf5}body.dark-theme .plannerRecipeCard .recipeThumb{background:linear-gradient(135deg,#34503b,#2a4031)}.plannerRecipeBox .plannerRecipeCard>.proPlannerButton{width:100%}.plannerRecipeBox .plannerRecipeCard li,.plannerRecipeBox .plannerRecipeCard ul,.plannerRecipeBox .plannerRecipeCard ol{color:#33463a!important}.plannerRecipeBox .plannerRecipeCard li::marker{color:#477d55}body.dark-theme .plannerRecipeBox .plannerRecipeCard li,body.dark-theme .plannerRecipeBox .plannerRecipeCard ul,body.dark-theme .plannerRecipeBox .plannerRecipeCard ol{color:#e4eee7!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard li::marker{color:#9fd3ac}.plannerRecipeBox .plannerRecipeCard .recipeTip,.plannerRecipeBox .plannerRecipeCard .recipeTip strong{color:#2f4a38!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeTip,body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeTip strong{color:#e8f1ea!important}.plannerRecipeBox .plannerRecipeCard .recipeSectionTitle{color:#2f4a38!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeSectionTitle{color:#e8f1ea!important}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
 </style>
+
+<style id="recipe-sheet-style">
+.plannerRecipeCard .recipeTop{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.plannerRecipeCard .recipeMore{display:inline-block;margin-top:6px;font-size:12px;font-weight:750;color:#477d55}
+body.dark-theme .plannerRecipeCard .recipeMore{color:#9fd3ac}
+.recipeSheetOverlay{position:fixed;inset:0;z-index:100000;background:rgba(20,30,24,.55);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease}
+.recipeSheetOverlay.open{opacity:1}
+.recipeSheetPanel{--rs-bg:#ffffff;--rs-card:#f2f7f3;--rs-text:#33463a;--rs-head:#2f4a38;--rs-muted:#66776d;--rs-accent:#3e7650;--rs-tipbg:#fdf3d6;--rs-tiptext:#6d5513;
+ position:relative;width:min(560px,100%);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--rs-bg);border-radius:26px 26px 0 0;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(28px);transition:transform .22s ease}
+.recipeSheetOverlay.open .recipeSheetPanel{transform:translateY(0)}
+body.dark-theme .recipeSheetPanel{--rs-bg:#1d241f;--rs-card:#29352d;--rs-text:#e4eee7;--rs-head:#f0f7f2;--rs-muted:#b8c6bc;--rs-accent:#9fd3ac;--rs-tipbg:#4a4126;--rs-tiptext:#f1dfa6}
+.recipeSheetClose{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2f4a38;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.recipeSheetHero{position:relative;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center;border-radius:26px 26px 0 0;overflow:hidden}
+body.dark-theme .recipeSheetHero{background:linear-gradient(135deg,#34503b,#2a4031)}
+.recipeSheetHero .recipeThumbEmoji{font-size:72px;line-height:1}
+.recipeSheetHero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.recipeSheetBody{padding:16px 18px 0}
+.recipeSheetBody h3{margin:0 0 6px;font-size:22px;line-height:1.2;color:var(--rs-head)!important}
+.recipeSheetBody .rsMeta{margin:0 0 8px;font-size:14px;color:var(--rs-muted)!important}
+.recipeSheetBody .rsDesc{margin:10px 0 14px;font-size:14px;line-height:1.5;color:var(--rs-text)!important}
+.recipeSheetPanel .recipeTags{display:flex;flex-wrap:wrap;gap:6px}
+.recipeSheetPanel .recipeTags span{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:650;background:#dcefe0;color:#2f6a40}
+.recipeSheetPanel .recipeTags span:nth-child(2){background:#fff0cc;color:#8a6410}
+.recipeSheetPanel .recipeTags span:nth-child(3){background:#e1ebfb;color:#3b5f99}
+body.dark-theme .recipeSheetPanel .recipeTags span{background:#344c3a;color:#d3ecd9}
+body.dark-theme .recipeSheetPanel .recipeTags span:nth-child(2){background:#4a4126;color:#f1dfa6}
+body.dark-theme .recipeSheetPanel .recipeTags span:nth-child(3){background:#2d3d57;color:#cfdcf5}
+.recipeSheetChoose{width:100%;border:none;border-radius:16px;padding:14px;font-size:15px;font-weight:750;background:#2f5a3d;color:#fff!important;margin-bottom:14px}
+body.dark-theme .recipeSheetChoose{background:#4f8a62}
+.recipeSheetPanel .rsCard{background:var(--rs-card);border-radius:18px;padding:14px 16px;margin-bottom:12px}
+.recipeSheetPanel .rsCard h4{margin:0 0 10px;font-size:16px;color:var(--rs-head)!important;display:flex;align-items:center;gap:8px}
+.recipeSheetPanel .rsCard h4 i{color:var(--rs-accent)!important}
+.recipeSheetPanel .rsIngredients{margin:0;padding-left:20px}
+.recipeSheetPanel .rsIngredients li{margin-bottom:6px;font-size:14px;line-height:1.45;color:var(--rs-text)!important}
+.recipeSheetPanel .rsIngredients li::marker{color:var(--rs-accent)}
+.recipeSheetPanel .rsSteps{list-style:none;margin:0;padding:0;counter-reset:rsstep}
+.recipeSheetPanel .rsSteps li{position:relative;counter-increment:rsstep;padding:2px 0 12px 38px;font-size:14px;line-height:1.5;color:var(--rs-text)!important}
+.recipeSheetPanel .rsSteps li::before{content:counter(rsstep);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:#2f5a3d;color:#fff;font-size:13px;font-weight:750;display:flex;align-items:center;justify-content:center}
+body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
+.recipeSheetPanel .rsTip{display:flex;flex-direction:column;gap:2px;margin-top:2px;padding:10px 12px;border-radius:14px;background:var(--rs-tipbg);font-size:13px;line-height:1.45}
+.recipeSheetPanel .rsTip strong,.recipeSheetPanel .rsTip span{color:var(--rs-tiptext)!important}
+.recipeSheetPanel .rsTip strong{font-size:14px}
+</style>
 </head>
 
 <body>
@@ -12918,7 +12961,37 @@ window.renderRecipeCatalog=function(){
  const q=(document.getElementById("plannerRecipeSearch")?.value||"").trim().toLocaleLowerCase("nl");
  const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")).toLocaleLowerCase("nl").includes(q));
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
- box.innerHTML=found.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button><details><summary>Ingrediënten en bereiding</summary><h4 class="recipeSectionTitle">Ingrediënten ('+r.servings+' porties)</h4><ul class="recipeIngredientList">'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><h4 class="recipeSectionTitle">Bereiding</h4><ol class="recipeStepList">'+(Array.isArray(r.steps)?r.steps:[r.steps]).map(st=>'<li>'+esc(st)+'</li>').join('')+'</ol>'+(r.tip?'<p class="recipeTip"><strong>Tip:</strong> '+esc(r.tip)+'</p>':'')+'</details></article>').join('');
+ box.innerHTML=found.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('');
+};
+window.openRecipeSheet=function(id){
+ const r=recipes.find(x=>x.id===id);if(!r)return;
+ closeRecipeSheet(true);
+ const ov=document.createElement("div");ov.id="recipeSheetOverlay";ov.className="recipeSheetOverlay";
+ ov.addEventListener("click",function(e){if(e.target===ov)closeRecipeSheet();});
+ const steps=Array.isArray(r.steps)?r.steps:[r.steps];
+ ov.innerHTML='<div class="recipeSheetPanel" role="dialog" aria-modal="true" aria-label="'+esc(r.name)+'">'
+ +'<button type="button" class="recipeSheetClose" onclick="closeRecipeSheet()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>'
+ +'<div class="recipeSheetHero"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||"🍽️")+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" onerror="this.remove()"></div>'
+ +'<div class="recipeSheetBody"><h3>'+esc(r.name)+'</h3>'
+ +'<p class="rsMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p>'
+ +'<div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>'
+ +'<p class="rsDesc">'+esc(r.desc||"")+'</p>'
+ +'<button type="button" class="recipeSheetChoose" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;);closeRecipeSheet();">Kies dit recept</button>'
+ +'<section class="rsCard"><h4><i class="fa-solid fa-basket-shopping"></i> Ingrediënten ('+r.servings+' porties)</h4><ul class="rsIngredients">'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul></section>'
+ +'<section class="rsCard"><h4><i class="fa-solid fa-utensils"></i> Bereidingswijze</h4><ol class="rsSteps">'+steps.map(st=>'<li>'+esc(st)+'</li>').join('')+'</ol>'
+ +(r.tip?'<div class="rsTip"><strong>Tip</strong><span>'+esc(r.tip)+'</span></div>':'')+'</section>'
+ +'</div></div>';
+ document.body.appendChild(ov);
+ document.body.style.overflow="hidden";
+ requestAnimationFrame(function(){ov.classList.add("open");});
+};
+window.closeRecipeSheet=function(immediate){
+ const ov=document.getElementById("recipeSheetOverlay");
+ document.body.style.overflow="";
+ if(!ov)return;
+ if(immediate===true){ov.remove();return;}
+ ov.classList.remove("open");
+ setTimeout(function(){ov.remove();},220);
 };
 window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
 window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
