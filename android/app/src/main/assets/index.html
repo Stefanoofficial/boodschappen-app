@@ -5099,6 +5099,11 @@ body.dark-theme .itemProductContent .quantityValue {
     </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
+    <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
+      <i class="fa-solid fa-crown"></i>
+      <span><strong>Boodschappenlijst Pro</strong><small>Slimmer plannen, budget beheren en meer.</small></span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <div class="moreMenuSectionLabel">SAMEN</div>
     <button type="button" class="familyMenuItem familyMenuPrimary" onclick="openFamilySubmenu(event)">
       <i class="fa-solid fa-users"></i>
@@ -5158,6 +5163,31 @@ body.dark-theme .itemProductContent .quantityValue {
         <span>Uitloggen</span>
       </button>
     </div>
+  </div>
+
+  <div id="proMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
+    <button type="button" class="familyMenuBack" onclick="closeProSubmenu(event)">
+      <i class="fa-solid fa-chevron-left"></i>
+      <span>Boodschappenlijst Pro</span>
+    </button>
+    <div class="proHero">
+      <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
+      <h2>Boodschappenlijst Pro</h2>
+      <p>Slimmer plannen, meer overzicht en grip op je boodschappen.</p>
+    </div>
+    <div class="proFeatureCard">
+      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme boodschappenplanner</strong><p>Plan je boodschappen overzichtelijk vooruit.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    </div>
+    <div class="proFeatureCard">
+      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    </div>
+    <div class="proFeatureCard">
+      <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    </div>
+    <div class="proFeatureCard">
+      <i class="fa-solid fa-users"></i><div><strong>Extra gezinsfuncties</strong><p>Werk samen aan boodschappen en planning.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    </div>
+    <p class="proFootnote">De Pro-functies worden stap voor stap ontwikkeld. Er is op dit moment geen betaald abonnement nodig.</p>
   </div>
 
   <div id="familyMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
@@ -5854,6 +5884,12 @@ function closeOpenMenusOnOutsideClick(event) {
 }
 
 document.addEventListener("click", closeOpenMenusOnOutsideClick);
+
+function openProSubmenu(event) {
+  if (event) event.stopPropagation();
+  switchMenuPage("proMenuSub", event);
+}
+function closeProSubmenu(event) { returnMenuToMain("proMenuSub", event); }
 
 function openFamilySubmenu(event) {
   if (event) event.stopPropagation();
@@ -13566,4 +13602,39 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
   #overviewActionOverlay .overviewActionTitle h3{font-size:clamp(17px, 4.8vw, 22px)!important;}
   #overviewActionOverlay .overviewActionClose{width:40px!important;min-width:40px!important;flex-basis:40px!important;height:40px!important;min-height:40px!important;}
 }
+
+
+/* Boodschappenlijst Pro: subtiele goudkleurige kaart in het menu Meer */
+.proMenuCard {
+  min-height: 76px !important;
+  margin: 0 0 16px !important;
+  padding: 12px !important;
+  border: 1px solid #f2dfaa !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #fff9e9, #fff0c7) !important;
+  color: #344d3b !important;
+  box-shadow: 0 4px 14px rgba(150, 112, 35, .08);
+}
+.proMenuCard > i:first-child {
+  background: #ffedbd !important;
+  color: #a97917 !important;
+}
+.proMenuCard span { display:flex; flex-direction:column; gap:4px; flex:1; min-width:0; }
+.proMenuCard span strong { font-size:14px; font-weight:750; line-height:1.2; }
+.proMenuCard span small { color:#68766b; font-size:11.5px; font-weight:500; line-height:1.35; white-space:normal; }
+.proHero { text-align:center; padding:18px 12px 20px; }
+.proHeroIcon { width:66px; height:66px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; border-radius:22px; background:#fff0c7; color:#a97917; font-size:28px; }
+.proHero h2 { margin:0 0 8px; color:var(--text-color, #344d3b); font-size:22px; }
+.proHero p { margin:0; color:#718177; font-size:13px; line-height:1.5; }
+.proFeatureCard { display:flex; gap:12px; align-items:flex-start; padding:14px; margin:0 0 10px; border:1px solid var(--border-color, #e0ebe3); border-radius:16px; background:var(--card-bg, #fff); }
+.proFeatureCard > i { flex:0 0 38px; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:#e3f4e7; color:#42634b; font-size:17px; }
+.proFeatureCard div { flex:1; min-width:0; }
+.proFeatureCard strong { display:block; font-size:14px; color:var(--text-color, #344d3b); }
+.proFeatureCard p { margin:5px 0 8px; font-size:12px; line-height:1.4; color:#718177; }
+.proComingSoon { display:inline-block; border-radius:999px; padding:4px 8px; background:#fff2d0; color:#916719; font-size:10px; font-weight:700; }
+.proFootnote { text-align:center; color:#78857c; font-size:11px; line-height:1.5; padding:8px 12px 16px; }
+body.dark-theme .proMenuCard { background:linear-gradient(135deg,#3c3627,#4a402b) !important; border-color:#6a5730 !important; color:#f2e6c5 !important; }
+body.dark-theme .proMenuCard span small { color:#d0c5a8; }
+body.dark-theme .proFeatureCard { background:#222a24; border-color:#38453b; }
+body.dark-theme .proFeatureCard strong { color:#e5eee7; }
 </style>
