@@ -1634,8 +1634,8 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
 }
 .notificationTestButton i{margin-right:7px;}
 .notificationSettingsStatus{
-  min-height:18px;
-  margin-top:10px;
+  min-height:0;
+  margin-top:0;
   font-size:12px;
   text-align:center;
   color:#4f7658;
@@ -5270,11 +5270,6 @@ html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
         </button>
       </div>
 
-      <button type="button" class="notificationTestButton" onclick="testShoppingReminder()">
-        <i class="fa-solid fa-paper-plane"></i>
-        Testmelding sturen
-      </button>
-
       <div id="notificationSettingsStatus" class="notificationSettingsStatus" aria-live="polite"></div>
 
       <div id="reminderDayDialog" class="androidReminderDialog" hidden aria-hidden="true">
@@ -5515,7 +5510,7 @@ html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
-      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je kunt daar ook een testmelding sturen.</p>
+      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. </p>
       <p id="helpReminderPlatform">De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
     </div>
   </div>
