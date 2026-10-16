@@ -4993,14 +4993,14 @@ body.dark-theme .itemProductContent .quantityValue {
 .plannerRecipeCard .recipeTop{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .plannerRecipeCard .recipeMore{display:inline-block;margin-top:6px;font-size:12px;font-weight:750;color:#477d55}
 body.dark-theme .plannerRecipeCard .recipeMore{color:#9fd3ac}
-.recipeSheetOverlay{position:fixed;inset:0;z-index:100000;background:rgba(20,30,24,.55);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease}
+.recipeSheetOverlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:100000;background:#ffffff;display:flex;align-items:stretch;justify-content:center;opacity:0;transition:opacity .2s ease}body.dark-theme .recipeSheetOverlay{background:#1d241f}
 .recipeSheetOverlay.open{opacity:1}
 .recipeSheetPanel{--rs-bg:#ffffff;--rs-card:#f2f7f3;--rs-text:#33463a;--rs-head:#2f4a38;--rs-muted:#66776d;--rs-accent:#3e7650;--rs-tipbg:#fdf3d6;--rs-tiptext:#6d5513;
- position:relative;width:min(560px,100%);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--rs-bg);border-radius:26px 26px 0 0;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(28px);transition:transform .22s ease}
+ position:relative;width:100%;max-width:640px;height:100%;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--rs-bg);border-radius:0;padding-bottom:calc(32px + env(safe-area-inset-bottom,0px));transform:translateY(40px);transition:transform .22s ease}
 .recipeSheetOverlay.open .recipeSheetPanel{transform:translateY(0)}
 body.dark-theme .recipeSheetPanel{--rs-bg:#1d241f;--rs-card:#29352d;--rs-text:#e4eee7;--rs-head:#f0f7f2;--rs-muted:#b8c6bc;--rs-accent:#9fd3ac;--rs-tipbg:#4a4126;--rs-tiptext:#f1dfa6}
-.recipeSheetClose{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2f4a38;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.recipeSheetHero{position:relative;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center;border-radius:26px 26px 0 0;overflow:hidden}
+.recipeSheetClose{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:3;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2f4a38;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.recipeSheetHero{position:relative;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center;border-radius:0 0 26px 26px;overflow:hidden}
 body.dark-theme .recipeSheetHero{background:linear-gradient(135deg,#34503b,#2a4031)}
 .recipeSheetHero .recipeThumbEmoji{font-size:72px;line-height:1}
 .recipeSheetHero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -12967,7 +12967,7 @@ window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
  closeRecipeSheet(true);
  const ov=document.createElement("div");ov.id="recipeSheetOverlay";ov.className="recipeSheetOverlay";
- ov.addEventListener("click",function(e){if(e.target===ov)closeRecipeSheet();});
+ ov.addEventListener("click",function(e){e.stopPropagation();if(e.target===ov)closeRecipeSheet();});
  const steps=Array.isArray(r.steps)?r.steps:[r.steps];
  ov.innerHTML='<div class="recipeSheetPanel" role="dialog" aria-modal="true" aria-label="'+esc(r.name)+'">'
  +'<button type="button" class="recipeSheetClose" onclick="closeRecipeSheet()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>'
