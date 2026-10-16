@@ -5592,51 +5592,19 @@ body.dark-theme .itemProductContent .quantityValue {
       </div>
     </div>
 
+    <button type="button" class="overview-new-card overview-click-card" onclick="openSavedListsFromOverview()">
+      <div class="overview-new-title"><i class="fa-solid fa-bookmark overview-new-lists"></i><span>Opgeslagen lijsten</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
+      <div class="overview-new-row">
+        <div><strong>Jouw bewaarde boodschappenlijsten</strong><div class="overview-new-muted">Open een lijst en gebruik deze opnieuw.</div></div>
+      </div>
+    </button>
+
     <button type="button" class="overview-new-card overview-click-card" onclick="openShoppingHistoryFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-clock-rotate-left overview-new-history"></i><span>Boodschappenhistorie</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
       <div class="overview-new-row">
-        <div><strong>Eerdere boodschappen</strong><div id="overviewHistorySummary" class="overview-new-muted">Bekijk je vorige boodschappen.</div></div>
+        <div><strong>Eerdere boodschappenrondes</strong><div id="overviewHistorySummary" class="overview-new-muted">Bekijk wat je eerder hebt gekocht.</div></div>
       </div>
     </button>
-
-    <button type="button" class="overview-more-insights-btn" onclick="toggleMoreInsights(this)" aria-expanded="false">
-      <span>Meer inzichten</span><i class="fa-solid fa-chevron-down"></i>
-    </button>
-    <div id="overviewMoreInsights" class="overview-more-insights" hidden>
-    <section class="overview-dashboard-card smart-overview-card" aria-label="Slimme inzichten">
-      <h3 class="overview-dashboard-heading"><i class="fa-solid fa-lightbulb"></i> Slimme inzichten</h3>
-      <div class="smartInsightsIntro">
-        <strong id="smartInsightMain">Je boodschappen in één oogopslag.</strong>
-        <span id="smartInsightSub">Je voortgang en recente activiteit worden hier slim samengevat.</span>
-      </div>
-      <div class="smartInsightsGrid">
-        <div class="smartInsightsItem">
-          <i class="fa-solid fa-basket-shopping siIcon"></i>
-          <strong id="smartInsightRemaining">0</strong>
-          <span>Nog op je lijst</span>
-        </div>
-        <div class="smartInsightsItem">
-          <i class="fa-solid fa-check siIcon"></i>
-          <strong id="smartInsightCompleted">0%</strong>
-          <span>Voltooid</span>
-        </div>
-        <div class="smartInsightsItem">
-          <i class="fa-solid fa-calendar-week siIcon"></i>
-          <strong id="smartInsightWeek">0</strong>
-          <span>Deze week</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="overview-dashboard-card overview-week-card" aria-label="Deze week">
-      <h3 class="overview-dashboard-heading"><i class="fa-solid fa-calendar-week"></i> Deze week</h3>
-      <div class="overview-dashboard-stats">
-        <button type="button" class="overview-dashboard-stat overview-stat-clickable" onclick="openWeekLists()" aria-label="Bekijk lijsten van deze week"><strong id="overviewWeekLists">0</strong><span>Lijsten</span><i class="fa-solid fa-chevron-right"></i></button>
-        <button type="button" class="overview-dashboard-stat overview-stat-clickable" onclick="openWeekProducts()" aria-label="Bekijk producten van deze week"><strong id="overviewWeekProducts">0</strong><span>Producten</span><i class="fa-solid fa-chevron-right"></i></button>
-        <button type="button" class="overview-dashboard-stat overview-stat-clickable" onclick="openWeekCompleted()" aria-label="Bekijk voltooide boodschappen van deze week"><strong id="overviewWeekCompleted">0</strong><span>Voltooid</span><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </section>
-    </div>
 
   </div>
   </div>
@@ -11015,14 +10983,23 @@ async function openQuickAddFromOverview(){
   __overviewOpenSheet(overlay);
 }
 
+function openSavedListsFromOverview(){
+  // Open de bestaande pagina onder Meer, zodat opgeslagen lijsten op één plek beheerd worden.
+  showMoreView();
+  setTimeout(function(){
+    try {
+      if(typeof openSavedListsSubmenu === 'function') {
+        openSavedListsSubmenu({preventDefault:function(){}, stopPropagation:function(){}});
+      }
+    } catch(e) { console.error('Opgeslagen lijsten openen mislukt:', e); }
+  }, 60);
+}
+
 async function openShoppingHistoryFromOverview(){
   var overlay=__overviewOverlay("Boodschappenhistorie");
   var body=overlay.querySelector(".overviewActionBody");
   var history=await readOverviewHistory();
-  var saved=[];
-  try{saved=await readSavedLists();}catch(_){}
-
-  var entries=history.length ? history : saved.map(function(x){return {savedAt:x.savedAt,items:x.items,name:x.name};});
+  var entries=history;
   body.innerHTML="";
   if(!entries.length){
     body.innerHTML='<div class="overviewActionMuted">Je hebt nog geen eerdere boodschappen.</div>';
