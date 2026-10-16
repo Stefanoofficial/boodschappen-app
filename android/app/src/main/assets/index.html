@@ -5175,9 +5175,24 @@ body.dark-theme .itemProductContent .quantityValue {
       <h2>Boodschappenlijst Pro</h2>
       <p>Slimmer plannen, meer overzicht en grip op je boodschappen.</p>
     </div>
-    <div class="proFeatureCard">
-      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme boodschappenplanner</strong><p>Plan je boodschappen overzichtelijk vooruit.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    <div class="proFeatureCard proPlannerLaunch">
+      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="toggleSmartPlanner()">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
+    <section id="smartPlannerPanel" class="smartPlannerPanel" hidden>
+      <h3>Mijn weekplanning</h3>
+      <p class="plannerHelp">Voeg per dag een maaltijd toe. Zet de ingrediënten op aparte regels, bijvoorbeeld: tomaten, pasta, kaas.</p>
+      <label for="plannerDay">Dag</label>
+      <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
+      <label for="plannerMeal">Maaltijd</label>
+      <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
+      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
+      <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
+      <button type="button" class="proPlannerButton plannerSaveButton" onclick="saveSmartMeal()">Maaltijd opslaan</button>
+      <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
+      <h3>Geplande maaltijden</h3>
+      <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
+      <button type="button" class="proPlannerButton plannerAddListButton" onclick="addPlannerIngredientsToShoppingList()">Ingrediënten aan boodschappenlijst toevoegen</button>
+    </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
@@ -5185,7 +5200,7 @@ body.dark-theme .itemProductContent .quantityValue {
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
     <div class="proFeatureCard">
-      <i class="fa-solid fa-users"></i><div><strong>Extra gezinsfuncties</strong><p>Werk samen aan boodschappen en planning.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+      <i class="fa-solid fa-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Volgende stap</span></div>
     </div>
     <p class="proFootnote">De Pro-functies worden stap voor stap ontwikkeld. Er is op dit moment geen betaald abonnement nodig.</p>
   </div>
@@ -12868,6 +12883,50 @@ body.dark-theme .overviewInsightCard{background:#202620;border-color:#354238;col
 #overviewActionOverlay.is-closing .overviewActionSheet{transform:translate3d(0,18px,0)!important}
 @media(max-width:430px){#overviewActionOverlay.overviewActionOverlay{padding:18px!important}.overviewInsightCard{padding:16px}}
 </style>
+<script>
+(function(){
+const KEY="boodschappen_pro_smart_weekplanner_v1";
+const days=["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
+function read(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
+function write(items){localStorage.setItem(KEY,JSON.stringify(items))}
+window.toggleSmartPlanner=function(){
+ const panel=document.getElementById("smartPlannerPanel"); if(!panel)return;
+ panel.hidden=!panel.hidden;
+ const btn=document.querySelector(".proPlannerLaunch .proPlannerButton");
+ if(btn)btn.innerHTML=panel.hidden?'Open weekplanner <i class="fa-solid fa-chevron-down"></i>':'Weekplanner sluiten <i class="fa-solid fa-chevron-up"></i>';
+ if(!panel.hidden)render();
+};
+window.saveSmartMeal=function(){
+ const day=document.getElementById("plannerDay").value;
+ const meal=document.getElementById("plannerMeal").value.trim();
+ const ingredients=document.getElementById("plannerIngredients").value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+ const status=document.getElementById("smartPlannerStatus");
+ if(!meal){status.textContent="Vul eerst de naam van de maaltijd in.";return}
+ if(!ingredients.length){status.textContent="Vul minimaal één ingrediënt in.";return}
+ const items=read();items.push({id:Date.now(),day,meal,ingredients});items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);
+ document.getElementById("plannerMeal").value="";document.getElementById("plannerIngredients").value="";
+ status.textContent="Maaltijd opgeslagen.";render();
+};
+window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));render()};
+function render(){
+ const box=document.getElementById("smartPlannerMeals");if(!box)return;
+ const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
+ box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+window.addPlannerIngredientsToShoppingList=async function(){
+ const items=read();const all=[];const seen=new Set();
+ items.forEach(x=>x.ingredients.forEach(v=>{const k=v.trim().toLocaleLowerCase("nl");if(k&&!seen.has(k)){seen.add(k);all.push(v.trim())}}));
+ const status=document.getElementById("smartPlannerStatus");
+ if(!all.length){status.textContent="Voeg eerst een maaltijd met ingrediënten toe.";return}
+ const input=document.getElementById("product");
+ if(!input||typeof window.addProduct!=="function"){status.textContent="De boodschappenlijst kon niet automatisch worden geopend. Kopieer de ingrediënten handmatig naar je lijst.";return}
+ let added=0;
+ for(const item of all){input.value=item;try{await window.addProduct();added++}catch(e){}}
+ status.textContent=added+" ingrediënten verwerkt. Controleer je boodschappenlijst.";
+};
+})();
+</script>
 </body>
 
 <style id="overview-dashboard-final">
@@ -13638,4 +13697,20 @@ body.dark-theme .proMenuCard { background:linear-gradient(135deg,#3c3627,#4a402b
 body.dark-theme .proMenuCard span small { color:#d0c5a8; }
 body.dark-theme .proFeatureCard { background:#222a24; border-color:#38453b; }
 body.dark-theme .proFeatureCard strong { color:#e5eee7; }
+ 
+.smartPlannerPanel{margin:0 0 14px;padding:16px;border:1px solid #dcebe0;border-radius:16px;background:var(--card-bg,#fff)}
+.smartPlannerPanel[hidden]{display:none!important}
+.smartPlannerPanel h3{font-size:16px;margin:8px 0 10px;color:var(--text-color,#344d3b)}
+.plannerHelp,.plannerEmpty{font-size:12px;line-height:1.45;color:#748278;margin:0 0 12px}
+.smartPlannerPanel label{display:block;font-size:12px;font-weight:700;color:var(--text-color,#344d3b);margin:10px 0 5px}
+.plannerInput{display:block;width:100%;box-sizing:border-box;border:1px solid #d7e4da;border-radius:10px;background:var(--input-bg,#fff);color:var(--text-color,#344d3b);padding:10px;font:inherit;font-size:14px}
+.proPlannerButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:11px 14px;background:#e1f1e5;color:#2e6942;font-weight:700;font-size:13px;margin-top:10px}
+.plannerSaveButton,.plannerAddListButton{width:100%}
+.plannerStatus{font-size:12px;color:#39754b;margin-top:8px}
+.plannerMealRow{padding:10px 0;border-bottom:1px solid #e5eee7}
+.plannerMealRow strong{display:block;font-size:13px;color:var(--text-color,#344d3b)}
+.plannerMealRow p{font-size:12px;color:#748278;margin:5px 0 0;white-space:pre-line}
+.plannerMealRemove{border:0;background:transparent;color:#a34848;font-size:12px;padding:8px 0}
+body.dark-theme .smartPlannerPanel{background:#222a24;border-color:#38453b}
+body.dark-theme .plannerInput{background:#1d241f;border-color:#3c4b40;color:#e5eee7}
 </style>
