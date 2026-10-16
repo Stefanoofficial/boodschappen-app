@@ -10910,8 +10910,9 @@ function __overviewOverlay(title){
   var overlay=document.createElement("div");
   overlay.id="overviewActionOverlay";
   overlay.className="overviewActionOverlay";
-  overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><h3></h3><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
+  overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
+  if(title==="Boodschappenhistorie"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -11042,7 +11043,7 @@ async function openShoppingHistoryFromOverview(){
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><span class="overviewHistoryEmptyIcon"><i class="fa-solid fa-clock-rotate-left"></i></span><strong>Nog geen boodschappenhistorie</strong></div><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen boodschappenhistorie</strong></div><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11322,6 +11323,14 @@ async function updateOverviewView(){
 .overviewActionOverlay{position:fixed;inset:0;z-index:120000;background:rgba(24,37,29,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:18px;box-sizing:border-box}
 .overviewActionSheet{width:min(520px,100%);max-height:min(78vh,720px);overflow:auto;background:#fff;border-radius:26px;padding:18px 16px 22px;box-shadow:0 20px 55px rgba(0,0,0,.2);color:#314338}
 .overviewActionHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.overviewActionTitle{display:flex;align-items:center;gap:12px;min-width:0}
+.overviewActionTitle h3{margin:0}
+.overviewActionTitleIcon{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#e5f3e9;color:#397651;display:flex;align-items:center;justify-content:center;font-size:19px}
+.overviewActionTitleIcon[hidden]{display:none}
+.overviewActionTitle{display:flex;align-items:center;gap:12px;min-width:0}
+.overviewActionTitle h3{margin:0}
+.overviewActionTitleIcon{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#e5f3e9;color:#397651;display:flex;align-items:center;justify-content:center;font-size:19px}
+.overviewActionTitleIcon[hidden]{display:none}
 .overviewActionHeader h3{margin:0;font-size:22px;font-weight:850}
 .overviewActionClose{width:40px;height:40px;border:0;border-radius:50%;background:#eef5ef;color:#405c48;position:relative;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;flex:0 0 40px}
 .overviewActionClose{font-size:0}
