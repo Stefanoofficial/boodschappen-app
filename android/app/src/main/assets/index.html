@@ -5016,6 +5016,24 @@ body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.d
  .planner-recipe-card button,.recipe-item button,.planner-recipe-item button{max-width:100%;white-space:normal;}
 }
 </style>
+
+<style id="planner-recipe-dark-contrast-fix">
+/* Leesbare receptkaarten in nachtmodus */
+body.dark-theme .plannerRecipeCard,
+body.dark-theme .plannerRecipeCard strong,
+body.dark-theme .plannerRecipeCard h4,
+body.dark-theme .plannerRecipeCard details,
+body.dark-theme .plannerRecipeCard li,
+body.dark-theme .plannerRecipeCard .plannerRecipeContent { color: #edf5ef !important; }
+body.dark-theme .plannerRecipeCard strong { color: #edf5ef !important; }
+body.dark-theme .plannerRecipeCard p { color: #c0cdc4 !important; }
+body.dark-theme .plannerRecipeCard summary { color: #9bd6a9 !important; }
+body.dark-theme .plannerRecipeCard h4 { color: #d9eadf !important; }
+body.dark-theme .plannerRecipeCard details[open] { color: #edf5ef !important; }
+body.dark-theme .plannerRecipeCard details[open] li { color: #e4eee7 !important; }
+body.dark-theme .plannerRecipeCard .proPlannerButton { color: #234a30 !important; background: #dff1e3 !important; }
+body.dark-theme .plannerRecipeCard { background: #29352d !important; border-color: #3d5143 !important; }
+</style>
 </head>
 
 <body>
@@ -5207,7 +5225,7 @@ body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.d
       <p>Slimmer plannen, meer overzicht en grip op je boodschappen.</p>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
-      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="return toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="smartPlannerPanel" class="smartPlannerPanel" hidden onclick="event.stopPropagation()">
       <h3>Mijn weekplanning</h3>
@@ -5224,7 +5242,7 @@ body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.d
       <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
       <label for="plannerMeal">Maaltijd</label>
       <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
-      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
+      <label for="plannerIngredients">Ingrediënten</label>
       <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
       <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
       <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
@@ -13016,12 +13034,20 @@ window.renderRecipeCatalog=function(){
  box.innerHTML=found.map(r=>{const photo=window.plannerRecipePhotoUrl(r);return '<article class="plannerRecipeCard"><img class="plannerRecipePhoto" src="'+photo+'" alt="Gerecht: '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><div class="plannerRecipeContent"><strong>'+esc(r.name)+'</strong><p>'+r.time+' min · '+r.servings+' porties</p><details><summary><i class="fa-solid fa-list-check"></i> Ingrediënten en bereiding</summary><img class="plannerRecipeHero" src="'+photo+'" alt="Foto van '+esc(r.name)+'" loading="lazy" onerror="this.hidden=true"><h4>Ingrediënten ('+r.servings+' porties)</h4><ul>'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul><h4>Bereidingswijze</h4><ol>'+r.steps.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚ])/).filter(Boolean).map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></details></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>';}).join('');
 };
 window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
-window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
- const panel=document.getElementById("smartPlannerPanel"); if(!panel)return;
- panel.hidden=!panel.hidden;
+window.toggleSmartPlanner=function(event){
+ if(event){event.preventDefault();event.stopPropagation();}
+ const panel=document.getElementById("smartPlannerPanel");
+ if(!panel)return false;
+ panel.hidden = !panel.hidden;
  const btn=document.querySelector(".proPlannerLaunch .proPlannerButton");
- if(btn)btn.innerHTML=panel.hidden?'Open weekplanner <i class="fa-solid fa-chevron-down"></i>':'Weekplanner sluiten <i class="fa-solid fa-chevron-up"></i>';
- if(!panel.hidden){render();renderRecipeCatalog();}
+ if(btn) btn.innerHTML = panel.hidden
+   ? 'Open weekplanner <i class="fa-solid fa-chevron-down"></i>'
+   : 'Weekplanner sluiten <i class="fa-solid fa-chevron-up"></i>';
+ if(!panel.hidden){
+   if(typeof render === "function") render();
+   if(typeof renderRecipeCatalog === "function") renderRecipeCatalog();
+ }
+ return false;
 };
 window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  const day=document.getElementById("plannerDay").value;
@@ -13034,8 +13060,17 @@ window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  document.getElementById("plannerMeal").value="";document.getElementById("plannerIngredients").value="";
  status.textContent="Maaltijd opgeslagen.";render();
 };
-window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));render()};
-function render(){
+window.removeSmartMeal=function(id){
+ write(read().filter(x=>x.id!==id));
+ const status=document.getElementById("smartPlannerStatus");
+ if(status)status.textContent="";
+ render();
+};
+document.addEventListener("input",function(event){
+ if(event.target&&["plannerMeal","plannerIngredients"].includes(event.target.id)){
+  const status=document.getElementById("smartPlannerStatus");if(status)status.textContent="";
+ }
+},{passive:true});\nfunction render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
  const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
  box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
@@ -13050,11 +13085,29 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
  if(!input||typeof window.addProduct!=="function"){status.textContent="De boodschappenlijst kon niet automatisch worden geopend. Kopieer de ingrediënten handmatig naar je lijst.";return}
  let added=0;
  for(const item of all){input.value=item;try{await window.addProduct();added++}catch(e){}}
- status.textContent=added+" ingrediënten verwerkt. Controleer je boodschappenlijst.";
+ const confirmation=added+" ingrediënten verwerkt. Controleer je boodschappenlijst.";
+ status.textContent=confirmation;
+ window.setTimeout(()=>{if(status&&status.textContent===confirmation)status.textContent=""},4500);
 };
 })();
 </script>
-</body>
+<style id="planner-feedback-fix"> 
+/* Duidelijke tik-feedback voor de weekplannerknoppen */
+.smartPlannerPanel .proPlannerButton{
+ transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+ -webkit-tap-highlight-color:transparent;
+ touch-action:manipulation;
+}
+.smartPlannerPanel .proPlannerButton:active{
+ transform:scale(.975);
+ filter:brightness(.94);
+ box-shadow:inset 0 2px 5px rgba(30,70,45,.18);
+}
+.smartPlannerPanel .proPlannerButton:focus-visible{
+ outline:3px solid #5b9b73;
+ outline-offset:2px;
+}
+</style>\n</body>
 
 <style id="overview-dashboard-final">
 .overview-dashboard-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:15px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
@@ -13836,7 +13889,7 @@ body.dark-theme .proFeatureCard strong { color:#e5eee7; }
 .plannerStatus{font-size:12px;color:#39754b;margin-top:8px}
 .plannerMealRow{padding:10px 0;border-bottom:1px solid #e5eee7}
 .plannerMealRow strong{display:block;font-size:13px;color:var(--text-color,#344d3b)}
-.plannerMealRow p{font-size:12px;color:#748278;margin:5px 0 0;white-space:pre-line}
+.plannerMealRow p{font-size:12px;color:#748278;margin:5px 0 0;white-space:pre-line;line-height:1.65;overflow-wrap:anywhere}
 .plannerMealRemove{border:0;background:transparent;color:#a34848;font-size:12px;padding:8px 0}
 body.dark-theme .smartPlannerPanel{background:#222a24;border-color:#38453b}
 body.dark-theme .plannerInput{background:#1d241f;border-color:#3c4b40;color:#e5eee7}
