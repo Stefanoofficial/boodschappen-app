@@ -4,7 +4,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Boodschappenlijst</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -12921,6 +12921,11 @@ body.dark-theme .overviewInsightCard{background:#202620;border-color:#354238;col
 #overviewActionOverlay.is-open .overviewActionSheet{transform:translate3d(0,0,0)!important}
 #overviewActionOverlay.is-closing .overviewActionSheet{transform:translate3d(0,18px,0)!important}
 @media(max-width:430px){#overviewActionOverlay.overviewActionOverlay{padding:18px!important}.overviewInsightCard{padding:16px}}
+
+/* Voorkom per ongeluk inzoomen met dubbel tikken of knijpen in navigatie en lijsten. */
+.bottomNav,.bottom-navigation,nav,.nav-list,.navigation-list,.menu-list,.menuPage,.menu-page,.listScreen,.list-screen,.plannerRecipeBox,.plannerRecipeCatalog{touch-action:pan-y!important; -ms-touch-action:pan-y!important;}
+html,body{touch-action:pan-y; -webkit-text-size-adjust:100%;}
+button,a,[role="button"],input,select,textarea{touch-action:manipulation;}
 </style>
 <script>
 (function(){
@@ -12928,20 +12933,22 @@ const KEY="boodschappen_pro_smart_weekplanner_v1";
 const days=["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
 
 window.plannerRecipePhotoUrl=function(r){
- // Gebruik per recept een eigen afbeelding-ID zodat niet alle gerechten dezelfde categorie-foto delen.
- const photoIds={
- 'recipe-01':'photo-1473093295043-cdd812d0e601','recipe-02':'photo-1626700051175-6818013e1d4f','recipe-03':'photo-1512058564366-18510be2db19','recipe-04':'photo-1518977676601-b53f82aba655','recipe-05':'photo-1547592180-85f173990554',
- 'recipe-06':'photo-1519708227418-c8fd9a32b7a2','recipe-07':'photo-1512621776951-a57141f2eefd','recipe-08':'photo-1528207776546-365bb710ee93','recipe-09':'photo-1540420773420-3366772f4999','recipe-10':'photo-1547592180-85f173990554',
- 'recipe-11':'photo-1512621776951-a57141f2eefd','recipe-12':'photo-1473093295043-cdd812d0e601','recipe-13':'photo-1626700051175-6818013e1d4f','recipe-14':'photo-1512058564366-18510be2db19','recipe-15':'photo-1540420773420-3366772f4999',
- 'recipe-16':'photo-1518977676601-b53f82aba655','recipe-17':'photo-1547592180-85f173990554','recipe-18':'photo-1519708227418-c8fd9a32b7a2','recipe-19':'photo-1528207776546-365bb710ee93','recipe-20':'photo-1512621776951-a57141f2eefd',
- 'recipe-21':'photo-1473093295043-cdd812d0e601','recipe-22':'photo-1626700051175-6818013e1d4f','recipe-23':'photo-1512058564366-18510be2db19','recipe-24':'photo-1540420773420-3366772f4999','recipe-25':'photo-1518977676601-b53f82aba655',
- 'recipe-26':'photo-1547592180-85f173990554','recipe-27':'photo-1519708227418-c8fd9a32b7a2','recipe-28':'photo-1512621776951-a57141f2eefd','recipe-29':'photo-1528207776546-365bb710ee93','recipe-30':'photo-1473093295043-cdd812d0e601',
- 'recipe-31':'photo-1626700051175-6818013e1d4f','recipe-32':'photo-1512058564366-18510be2db19','recipe-33':'photo-1518977676601-b53f82aba655','recipe-34':'photo-1547592180-85f173990554','recipe-35':'photo-1519708227418-c8fd9a32b7a2',
- 'recipe-36':'photo-1512621776951-a57141f2eefd','recipe-37':'photo-1528207776546-365bb710ee93','recipe-38':'photo-1540420773420-3366772f4999','recipe-39':'photo-1473093295043-cdd812d0e601','recipe-40':'photo-1626700051175-6818013e1d4f',
- 'recipe-41':'photo-1512058564366-18510be2db19','recipe-42':'photo-1518977676601-b53f82aba655','recipe-43':'photo-1547592180-85f173990554','recipe-44':'photo-1519708227418-c8fd9a32b7a2','recipe-45':'photo-1512621776951-a57141f2eefd',
- 'recipe-46':'photo-1528207776546-365bb710ee93','recipe-47':'photo-1540420773420-3366772f4999','recipe-48':'photo-1473093295043-cdd812d0e601','recipe-49':'photo-1626700051175-6818013e1d4f','recipe-50':'photo-1512058564366-18510be2db19'};
- const id=photoIds[r.id]||'photo-1547592180-85f173990554';
- return 'https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=640&q=78';
+ // Kies foto's op basis van het soort gerecht, niet op basis van een willekeurig receptnummer.
+ // Als een gerecht niet betrouwbaar in een fotocategorie past, tonen we een neutrale passende categorieafbeelding.
+ const n=(r.name||"").toLocaleLowerCase("nl");
+ const ing=(r.ingredients||[]).join(" ").toLocaleLowerCase("nl");
+ const has=(re)=>re.test(n+" "+ing);
+ let id;
+ if(has(/pasta|spaghetti|macaroni|lasagne|bolognese|pesto|carbonara|noedel/)) id="photo-1473093295043-cdd812d0e601";
+ else if(has(/wrap|quesadilla|tortilla|burrito|pita|falafel/)) id="photo-1626700051175-6818013e1d4f";
+ else if(has(/rijst|nasi|risotto|curry|chili|kikkererwt|linzen|bonen/)) id="photo-1512058564366-18510be2db19";
+ else if(has(/aardappel|stamppot|hutspot|ovenschotel/)) id="photo-1518977676601-b53f82aba655";
+ else if(has(/zalm|vis|tonijn/)) id="photo-1519708227418-c8fd9a32b7a2";
+ else if(has(/soep/)) id="photo-1547592180-85f173990554";
+ else if(has(/omelet|ei|eieren/)) id="photo-1525351484163-7529414344d8";
+ else if(has(/salade|couscous|groente|broccoli|courgette|spinazie/)) id="photo-1512621776951-a57141f2eefd";
+ else id="photo-1540420773420-3366772f4999";
+ return "https://images.unsplash.com/"+id+"?auto=format&fit=crop&w=640&q=78";
 };
 
 const recipes=[
