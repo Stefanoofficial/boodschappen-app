@@ -5274,6 +5274,16 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <option value="other">Andere supermarkt</option>
       </select>
       <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard. Prijsgegevens worden pas getoond wanneer er betrouwbare prijzen voor deze winkel beschikbaar zijn.</p>
+      <div class="budgetLivePrices" style="margin:14px 0;padding:14px;border:1px solid var(--border-color, #dce9e2);border-radius:14px;">
+        <h4 style="margin:0 0 8px;">Actuele aanbiedingen zoeken</h4>
+        <p style="margin:0 0 10px;font-size:.92em;">Zoek bijvoorbeeld op melk, pasta of appels. Alleen aanbiedingen die bij je gekozen supermarkt horen worden getoond.</p>
+        <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;">
+          <input id="budgetLiveSearch" class="budgetInput" type="search" placeholder="Zoek een product…" style="flex:1;min-width:150px;">
+          <button type="button" class="budgetActionButton" onclick="searchBudgetLivePrices()">Zoeken</button>
+        </div>
+        <div id="budgetLivePriceResults" aria-live="polite" style="margin-top:10px;"></div>
+        <p style="font-size:.8em;margin:10px 0 0;">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
+      </div>
       <label for="budgetAmount">Budget per week (€)</label>
       <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
       <div class="budgetSummaryCard">
@@ -13295,6 +13305,47 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
   window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
+
+  const budgetRetailerSlugs={ah:"albert-heijn",jumbo:"jumbo",lidl:"lidl",aldi:"aldi",plus:"plus",dirk:"dirk",vomar:"vomar"};
+  window.searchBudgetLivePrices=async function(){
+    const input=document.getElementById("budgetLiveSearch"),results=document.getElementById("budgetLivePriceResults");
+    const term=(input&&input.value||"").trim();
+    if(!results)return;
+    if(term.length<2){results.textContent="Vul minimaal twee letters in.";return;}
+    const selected=(document.getElementById("budgetSupermarket")||{}).value||"ah";
+    const retailer=budgetRetailerSlugs[selected];
+    results.textContent="Aanbiedingen ophalen…";
+    try{
+      const url="https://www.prijsprofeet.nl/api/v1/search?q="+encodeURIComponent(term)+"&page_size=30";
+      const response=await fetch(url,{headers:{"Accept":"application/json","User-Agent":"BoodschappenPlanner/1.0"}});
+      if(!response.ok)throw new Error("API-status "+response.status);
+      const payload=await response.json();
+      const rows=Array.isArray(payload)?payload:(payload.results||payload.products||payload.items||payload.data||[]);
+      const today=new Date().toISOString().slice(0,10);
+      const matched=rows.filter(p=>{
+        const store=String(p.retailer||p.supermarket||p.chain||"").toLowerCase().replace(/_/g,"-");
+        const start=p.valid_from||"",end=p.valid_until||"";
+        const current=(!start||start<=today)&&(!end||end>=today);
+        return retailer && (store===retailer||store.replace(/-/g,"")===retailer.replace(/-/g,"")) && current;
+      });
+      if(!retailer){results.textContent="Deze supermarkt heeft in de gratis zoekresultaten mogelijk geen betrouwbare productdekking. Kies AH, Jumbo, Lidl, Aldi, PLUS, Dirk of Vomar.";return;}
+      if(!matched.length){results.textContent="Geen actuele aanbieding gevonden voor "+(document.getElementById("budgetSupermarket").selectedOptions[0].text)+". Dit betekent niet dat de winkel het product niet verkoopt; reguliere schapprijzen zijn niet volledig beschikbaar via de gratis API.";return;}
+      results.replaceChildren();
+      matched.slice(0,10).forEach(p=>{
+        const card=document.createElement("div");
+        card.style.cssText="padding:10px 0;border-bottom:1px solid var(--border-color, #dce9e2);";
+        const name=document.createElement("strong");name.textContent=p.name||p.product_name||p.title||"Product";
+        const price=document.createElement("div");
+        const amount=Number(p.price);
+        price.textContent=Number.isFinite(amount)?"€ "+amount.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2}):"Prijs niet beschikbaar";
+        if(p.original_price&&Number(p.original_price)>amount)price.textContent+=" (was € "+Number(p.original_price).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2})+")";
+        const validity=document.createElement("small");validity.textContent=(p.valid_from||p.valid_until)?("Geldig: "+(p.valid_from||"onbekend")+" t/m "+(p.valid_until||"onbekend")):"Geldigheid niet opgegeven";
+        card.append(name,price,validity);results.appendChild(card);
+      });
+    }catch(err){results.textContent="De live prijzen konden niet worden opgehaald. Controleer je internetverbinding of probeer later opnieuw.";}
+  };
+  const liveSearchInput=document.getElementById("budgetLiveSearch");
+  if(liveSearchInput)liveSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();window.searchBudgetLivePrices();}});
   function renderBudget(){
     const d=read(),spent=d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),remaining=d.budget-spent,pct=d.budget>0?Math.min(100,spent/d.budget*100):0;
     const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
