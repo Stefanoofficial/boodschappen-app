@@ -5262,6 +5262,18 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <div><h3>Mijn boodschappenbudget</h3><p>Houd je uitgaven bij en zie wat je nog over hebt.</p></div>
         <i class="fa-solid fa-wallet" aria-hidden="true"></i>
       </div>
+      <label for="budgetSupermarket">Mijn vaste supermarkt</label>
+      <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
+        <option value="ah">Albert Heijn</option>
+        <option value="jumbo">Jumbo</option>
+        <option value="lidl">Lidl</option>
+        <option value="aldi">Aldi</option>
+        <option value="plus">PLUS</option>
+        <option value="dirk">Dirk</option>
+        <option value="vomar">Vomar</option>
+        <option value="other">Andere supermarkt</option>
+      </select>
+      <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard. Prijsgegevens worden pas getoond wanneer er betrouwbare prijzen voor deze winkel beschikbaar zijn.</p>
       <label for="budgetAmount">Budget per week (€)</label>
       <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
       <div class="budgetSummaryCard">
@@ -13250,8 +13262,15 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
 (function(){
   const KEY="boodschappen_budgetplanner_v1";
   const euro=n=>new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"}).format(Number(n)||0);
-  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[]}}catch(e){return {budget:0,expenses:[]}}};
+  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[],supermarket:typeof d.supermarket==="string"?d.supermarket:"ah"}}catch(e){return {budget:0,expenses:[],supermarket:"ah"}}};
   const write=d=>localStorage.setItem(KEY,JSON.stringify(d));
+  window.saveBudgetSupermarket=function(){
+    const select=document.getElementById("budgetSupermarket");
+    if(!select)return;
+    const d=read();d.supermarket=select.value;write(d);
+    const note=document.getElementById("budgetSupermarketNote");
+    if(note)note.textContent="Keuze opgeslagen: "+select.options[select.selectedIndex].text+". Prijsgegevens zijn nog niet live gekoppeld.";
+  };
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   window.toggleBudgetPlanner=function(event){
     if(event)event.stopPropagation();
@@ -13259,7 +13278,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     panel.hidden=!panel.hidden;
     const btn=document.querySelector(".budgetLaunchButton");
     if(btn)btn.innerHTML=(panel.hidden?'Open budgetplanner <i class="fa-solid fa-chevron-down"></i>':'Budgetplanner sluiten <i class="fa-solid fa-chevron-up"></i>');
-    if(!panel.hidden){const d=read();document.getElementById("budgetAmount").value=d.budget||"";renderBudget();setTimeout(()=>panel.scrollIntoView({behavior:"smooth",block:"nearest"}),60);}
+    if(!panel.hidden){const d=read();document.getElementById("budgetAmount").value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";renderBudget();setTimeout(()=>panel.scrollIntoView({behavior:"smooth",block:"nearest"}),60);}
   };
   window.saveBudgetAmount=function(){
     const input=document.getElementById("budgetAmount"),value=Number(input.value);
@@ -13287,7 +13306,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Je categorieën verschijnen zodra je uitgaven toevoegt.</p>';}
     const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(x.category||"Overig")} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
-  document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";renderBudget();});
+  document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";renderBudget();});
 })();
 </script>
 
