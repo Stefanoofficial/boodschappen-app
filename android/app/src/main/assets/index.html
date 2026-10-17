@@ -5273,7 +5273,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <option value="vomar">Vomar</option>
         <option value="other">Andere supermarkt</option>
       </select>
-      <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard. Prijsgegevens worden pas getoond wanneer er betrouwbare prijzen voor deze winkel beschikbaar zijn.</p>
+      <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard en gebruikt om aanbiedingen te zoeken.</p>
       <div class="budgetLivePrices" style="margin:14px 0;padding:14px;border:1px solid var(--border-color, #dce9e2);border-radius:14px;">
         <h4 style="margin:0 0 8px;">Actuele aanbiedingen zoeken</h4>
         <p style="margin:0 0 10px;font-size:.92em;">Zoek bijvoorbeeld op melk, pasta of appels. Alleen aanbiedingen die bij je gekozen supermarkt horen worden getoond.</p>
@@ -5282,6 +5282,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
           <button type="button" class="budgetActionButton" onclick="searchBudgetLivePrices()">Zoeken</button>
         </div>
         <div id="budgetLivePriceResults" aria-live="polite" style="margin-top:10px;"></div>
+        <p style="font-size:.8em;margin:10px 0 0;">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
+      </div>
+      <div class="budgetLivePrices" style="margin:14px 0;padding:14px;border:1px solid var(--border-color, #dce9e2);border-radius:14px;">
+        <h4 style="margin:0 0 8px;">Aanbiedingen voor mijn weekplanning</h4>
+        <p style="margin:0 0 10px;font-size:.92em;">Zoekt bij je vaste supermarkt welke producten uit je weekplanning nu in de aanbieding zijn.</p>
+        <button type="button" class="budgetActionButton" onclick="searchWeekplanDeals()">Zoek aanbiedingen voor mijn week</button>
+        <div id="weekplanDealsResults" aria-live="polite" style="margin-top:10px;"></div>
         <p style="font-size:.8em;margin:10px 0 0;">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
       </div>
       <label for="budgetAmount">Budget per week (€)</label>
@@ -5304,7 +5311,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="budgetCategories" class="budgetCategories"></div>
       <h3 class="budgetSectionTitle">Recente uitgaven</h3>
       <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
-      <p class="budgetPrivacyNote">Je budget en uitgaven worden lokaal op dit apparaat opgeslagen. Prijzen worden niet automatisch bij supermarkten opgehaald.</p>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden lokaal op dit apparaat opgeslagen. Aanbiedingen worden opgehaald via PrijsProfeet; gewone schapprijzen zijn niet beschikbaar.</p>
     </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
@@ -13255,11 +13262,12 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 .budgetExpenseDetails{min-width:0}.budgetExpenseDetails strong{display:block;font-size:13px;color:var(--text-color,#344d3b);overflow-wrap:anywhere}.budgetExpenseDetails small{display:block;margin-top:4px;color:var(--muted-text,#718177);font-size:11px}
 .budgetExpenseAmount{font-size:13px;font-weight:750;color:var(--text-color,#344d3b);white-space:nowrap}
 .budgetExpenseDelete{display:block;border:0;background:transparent;color:#a34848;font-size:11px;padding:5px 0 0;cursor:pointer}
+.dealRow{padding:10px 0;border-bottom:1px solid var(--border-color,#dce9e2)}.dealRow strong{display:block;font-size:13px;overflow-wrap:anywhere}.dealRow div{font-size:13px;margin-top:2px}.dealRow small{display:block;margin-top:2px;color:var(--muted-text,#718177);font-size:11px}
 .budgetEmpty,.budgetPrivacyNote{font-size:12px;line-height:1.5;color:var(--muted-text,#718177)}
 .budgetPrivacyNote{margin:16px 0 0}
 body.dark-theme .budgetPlannerPanel{background:#222a24;border-color:#38453b;color:#edf5ef}
 body.dark-theme .budgetPlannerPanel label,body.dark-theme .budgetPanelHeading h3,body.dark-theme .budgetSectionTitle,body.dark-theme .budgetCategoryTop,body.dark-theme .budgetExpenseDetails strong,body.dark-theme .budgetExpenseAmount,body.dark-theme .budgetStats strong{color:#edf5ef}
-body.dark-theme .budgetPanelHeading p,body.dark-theme .budgetStats span,body.dark-theme .budgetRingInner span,body.dark-theme .budgetRingInner small,body.dark-theme .budgetStatus,body.dark-theme .budgetEmpty,body.dark-theme .budgetPrivacyNote,body.dark-theme .budgetExpenseDetails small{color:#c0cec4}
+body.dark-theme .dealRow small,body.dark-theme .budgetPanelHeading p,body.dark-theme .budgetStats span,body.dark-theme .budgetRingInner span,body.dark-theme .budgetRingInner small,body.dark-theme .budgetStatus,body.dark-theme .budgetEmpty,body.dark-theme .budgetPrivacyNote,body.dark-theme .budgetExpenseDetails small{color:#c0cec4}
 body.dark-theme .budgetInput{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
 body.dark-theme .budgetSummaryCard{background:#1d241f;border-color:#38453b}
 body.dark-theme .budgetRing:before{background:#1d241f}
@@ -13279,7 +13287,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(!select)return;
     const d=read();d.supermarket=select.value;write(d);
     const note=document.getElementById("budgetSupermarketNote");
-    if(note)note.textContent="Keuze opgeslagen: "+select.options[select.selectedIndex].text+". Prijsgegevens zijn nog niet live gekoppeld.";
+    if(note)note.textContent="Keuze opgeslagen: "+select.options[select.selectedIndex].text+".";
   };
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   window.toggleBudgetPlanner=function(event){
@@ -13306,43 +13314,106 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
   window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
 
-  const budgetRetailerSlugs={ah:"albert-heijn",jumbo:"jumbo",lidl:"lidl",aldi:"aldi",plus:"plus",dirk:"dirk",vomar:"vomar"};
+  const budgetRetailerSlugs={ah:"albert_heijn",jumbo:"jumbo",lidl:"lidl",aldi:"aldi",plus:"plus",dirk:"dirk",vomar:"vomar"};
+  const retailerName=()=>{const s=document.getElementById("budgetSupermarket");return s&&s.selectedOptions[0]?s.selectedOptions[0].text:"je supermarkt"};
+  const money=n=>"€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const shortDate=iso=>{if(!iso)return"";const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"-"+m[2]:""};
+  async function fetchBudgetDeals(term,selected){
+    const retailer=budgetRetailerSlugs[selected];
+    if(!retailer)return null;
+    const url="https://www.prijsprofeet.nl/api/v1/search?q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=20";
+    const response=await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!response.ok){const e=new Error("API-status "+response.status);e.status=response.status;throw e;}
+    const payload=await response.json();
+    const rows=Array.isArray(payload)?payload:(payload.results||payload.products||payload.items||payload.data||[]);
+    const today=new Date().toISOString().slice(0,10);
+    return rows.filter(p=>{
+      const store=String(p.retailer||"").toLowerCase().replace(/-/g,"_");
+      const start=p.valid_from||"",end=p.valid_until||"";
+      return store===retailer&&Number.isFinite(Number(p.price))&&(!start||start<=today)&&(!end||end>=today);
+    });
+  }
+  function dealError(err){
+    console.error("PrijsProfeet:",err);
+    if(err&&err.status===429)return"Je hebt te vaak gezocht. Wacht een minuut en probeer het opnieuw.";
+    if(err&&err.status>=500)return"PrijsProfeet reageert nu niet. Probeer het later opnieuw.";
+    if(err&&err.status)return"De aanbiedingen konden niet worden opgehaald (fout "+err.status+").";
+    return"Geen verbinding met PrijsProfeet. Controleer je internetverbinding en probeer het opnieuw.";
+  }
+  function bestDeal(rows){
+    return rows.slice().sort((a,b)=>(Number(b.savings_percentage)||0)-(Number(a.savings_percentage)||0)||Number(a.price)-Number(b.price))[0];
+  }
   window.searchBudgetLivePrices=async function(){
     const input=document.getElementById("budgetLiveSearch"),results=document.getElementById("budgetLivePriceResults");
     const term=(input&&input.value||"").trim();
     if(!results)return;
     if(term.length<2){results.textContent="Vul minimaal twee letters in.";return;}
     const selected=(document.getElementById("budgetSupermarket")||{}).value||"ah";
-    const retailer=budgetRetailerSlugs[selected];
+    if(!budgetRetailerSlugs[selected]){results.textContent="Voor deze supermarkt zijn geen aanbiedingen beschikbaar. Kies AH, Jumbo, Lidl, Aldi, PLUS, Dirk of Vomar.";return;}
     results.textContent="Aanbiedingen ophalen…";
     try{
-      const url="https://www.prijsprofeet.nl/api/v1/search?q="+encodeURIComponent(term)+"&page_size=30";
-      const response=await fetch(url,{headers:{"Accept":"application/json","User-Agent":"BoodschappenPlanner/1.0"}});
-      if(!response.ok)throw new Error("API-status "+response.status);
-      const payload=await response.json();
-      const rows=Array.isArray(payload)?payload:(payload.results||payload.products||payload.items||payload.data||[]);
-      const today=new Date().toISOString().slice(0,10);
-      const matched=rows.filter(p=>{
-        const store=String(p.retailer||p.supermarket||p.chain||"").toLowerCase().replace(/_/g,"-");
-        const start=p.valid_from||"",end=p.valid_until||"";
-        const current=(!start||start<=today)&&(!end||end>=today);
-        return retailer && (store===retailer||store.replace(/-/g,"")===retailer.replace(/-/g,"")) && current;
-      });
-      if(!retailer){results.textContent="Deze supermarkt heeft in de gratis zoekresultaten mogelijk geen betrouwbare productdekking. Kies AH, Jumbo, Lidl, Aldi, PLUS, Dirk of Vomar.";return;}
-      if(!matched.length){results.textContent="Geen actuele aanbieding gevonden voor "+(document.getElementById("budgetSupermarket").selectedOptions[0].text)+". Dit betekent niet dat de winkel het product niet verkoopt; reguliere schapprijzen zijn niet volledig beschikbaar via de gratis API.";return;}
+      const rows=await fetchBudgetDeals(term,selected);
+      if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Dat betekent niet dat het product niet te koop is: alleen aanbiedingen zijn beschikbaar, geen gewone schapprijzen.";return;}
       results.replaceChildren();
-      matched.slice(0,10).forEach(p=>{
-        const card=document.createElement("div");
-        card.style.cssText="padding:10px 0;border-bottom:1px solid var(--border-color, #dce9e2);";
+      rows.slice(0,10).forEach(p=>{
+        const card=document.createElement("div");card.className="dealRow";
         const name=document.createElement("strong");name.textContent=p.name||p.product_name||p.title||"Product";
         const price=document.createElement("div");
         const amount=Number(p.price);
-        price.textContent=Number.isFinite(amount)?"€ "+amount.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2}):"Prijs niet beschikbaar";
-        if(p.original_price&&Number(p.original_price)>amount)price.textContent+=" (was € "+Number(p.original_price).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2})+")";
-        const validity=document.createElement("small");validity.textContent=(p.valid_from||p.valid_until)?("Geldig: "+(p.valid_from||"onbekend")+" t/m "+(p.valid_until||"onbekend")):"Geldigheid niet opgegeven";
+        price.textContent=money(amount)+(p.quantity?" · "+p.quantity:"");
+        if(p.original_price&&Number(p.original_price)>amount)price.textContent+=" (was "+money(p.original_price)+")";
+        const validity=document.createElement("small");
+        validity.textContent=[p.promotion||(p.promotional_keywords||[])[0]||"",p.valid_until?"t/m "+shortDate(p.valid_until):""].filter(Boolean).join(" · ");
         card.append(name,price,validity);results.appendChild(card);
       });
-    }catch(err){results.textContent="De live prijzen konden niet worden opgehaald. Controleer je internetverbinding of probeer later opnieuw.";}
+    }catch(err){results.textContent=dealError(err);}
+  };
+  const STAPLES=/\b(zout|peper|water|nootmuskaat|optioneel)\b/i;
+  function searchTermFor(text){
+    return String(text).replace(/\([^)]*\)/g," ").replace(/^\s*[\d.,]+\s*(kg|g|ml|l|dl|cl|el|tl|blik|pak|zak|potje|bosje)?\s*/i,"").replace(/^(blik|pak|zak|potje|bosje)\s+/i,"").replace(/\s+/g," ").trim().toLowerCase();
+  }
+  window.searchWeekplanDeals=async function(){
+    const out=document.getElementById("weekplanDealsResults");if(!out)return;
+    let meals=[];try{meals=JSON.parse(localStorage.getItem("boodschappen_pro_smart_weekplanner_v1")||"[]")}catch(e){}
+    if(!Array.isArray(meals)||!meals.length){out.textContent="Je hebt nog geen maaltijden gepland. Plan eerst maaltijden in de slimme weekplanner.";return;}
+    const selected=(document.getElementById("budgetSupermarket")||{}).value||"ah";
+    if(!budgetRetailerSlugs[selected]){out.textContent="Kies eerst AH, Jumbo, Lidl, Aldi, PLUS, Dirk of Vomar als vaste supermarkt.";return;}
+    let lines=[];
+    if(typeof window.mergePlannerIngredients==="function"){lines=window.mergePlannerIngredients(meals).items.map(i=>i.text)}
+    else{meals.forEach(m=>(Array.isArray(m.ingredients)?m.ingredients:String(m.ingredients||"").split("\n")).forEach(x=>lines.push(x)))}
+    const terms=[];const seen=new Set();
+    lines.forEach(l=>{const t=searchTermFor(l);if(t.length<2||STAPLES.test(t)||seen.has(t))return;seen.add(t);terms.push(t)});
+    const list=terms.slice(0,15);
+    if(!list.length){out.textContent="Er zijn geen producten om te zoeken in je weekplanning.";return;}
+    out.textContent="Aanbiedingen zoeken voor "+list.length+" producten…";
+    const found=[],missing=[];let failed=null;
+    for(const term of list){
+      try{
+        let rows=await fetchBudgetDeals(term,selected);
+        if(term.length<=3){const re=new RegExp("\\b"+term+"(en|s)?\\b","i");rows=rows.filter(r=>re.test(r.name||r.product_name||""));}
+        const best=rows.length?bestDeal(rows):null;
+        if(best)found.push({term:term,deal:best});else missing.push(term);
+      }catch(err){failed=err;break;}
+      await new Promise(r=>setTimeout(r,200));
+    }
+    if(failed){out.textContent=dealError(failed);return;}
+    out.replaceChildren();
+    const head=document.createElement("p");head.style.cssText="margin:0 0 8px;font-weight:700;";
+    head.textContent=found.length+" van "+list.length+" producten uit je weekplanning zijn nu in de aanbieding bij "+retailerName()+".";
+    out.appendChild(head);
+    let saving=0;
+    found.forEach(f=>{
+      const p=f.deal,amount=Number(p.price);
+      const row=document.createElement("div");row.className="dealRow";
+      const t=document.createElement("strong");t.textContent=f.term.charAt(0).toUpperCase()+f.term.slice(1)+": "+(p.name||"Product");
+      const pr=document.createElement("div");pr.textContent=money(amount)+(p.quantity?" · "+p.quantity:"");
+      if(p.original_price&&Number(p.original_price)>amount){pr.textContent+=" (was "+money(p.original_price)+")";saving+=Number(p.original_price)-amount;}
+      const v=document.createElement("small");v.textContent=[p.promotion||(p.promotional_keywords||[])[0]||"",p.valid_until?"t/m "+shortDate(p.valid_until):""].filter(Boolean).join(" · ");
+      row.append(t,pr,v);out.appendChild(row);
+    });
+    if(saving>0){const sv=document.createElement("p");sv.style.cssText="margin:10px 0 0;font-weight:700;";sv.textContent="Mogelijke besparing: ongeveer "+money(saving)+" (indicatie, per verpakking).";out.appendChild(sv);}
+    if(missing.length){const ms=document.createElement("p");ms.className="budgetStatus";ms.textContent="Geen aanbieding gevonden voor: "+missing.join(", ")+".";out.appendChild(ms);}
+    const note=document.createElement("p");note.className="budgetStatus";note.textContent="Alleen aanbiedingen worden getoond, geen gewone schapprijzen. Een product zonder aanbieding is dus niet per se duurder.";out.appendChild(note);
   };
   const liveSearchInput=document.getElementById("budgetLiveSearch");
   if(liveSearchInput)liveSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();window.searchBudgetLivePrices();}});
