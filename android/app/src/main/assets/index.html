@@ -5274,22 +5274,17 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <option value="other">Andere supermarkt</option>
       </select>
       <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard en gebruikt om aanbiedingen te zoeken.</p>
-      <div class="budgetLivePrices" style="margin:14px 0;padding:14px;border:1px solid var(--border-color, #dce9e2);border-radius:14px;">
-        <h4 style="margin:0 0 8px;">Actuele aanbiedingen zoeken</h4>
-        <p style="margin:0 0 10px;font-size:.92em;">Zoek bijvoorbeeld op melk, pasta of appels. Alleen aanbiedingen die bij je gekozen supermarkt horen worden getoond.</p>
-        <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;">
-          <input id="budgetLiveSearch" class="budgetInput" type="search" placeholder="Zoek een product…" style="flex:1;min-width:150px;">
+      <div class="budgetDealsCard">
+        <h4>Aanbiedingen bij je supermarkt</h4>
+        <p class="budgetStatus">Zoek een product, of bekijk welke producten uit je weekplanning nu in de aanbieding zijn.</p>
+        <div class="budgetDealsSearch">
+          <input id="budgetLiveSearch" class="budgetInput" type="search" placeholder="Zoek een product, bijv. melk">
           <button type="button" class="budgetActionButton" onclick="searchBudgetLivePrices()">Zoeken</button>
         </div>
-        <div id="budgetLivePriceResults" aria-live="polite" style="margin-top:10px;"></div>
-        <p style="font-size:.8em;margin:10px 0 0;">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
-      </div>
-      <div class="budgetLivePrices" style="margin:14px 0;padding:14px;border:1px solid var(--border-color, #dce9e2);border-radius:14px;">
-        <h4 style="margin:0 0 8px;">Aanbiedingen voor mijn weekplanning</h4>
-        <p style="margin:0 0 10px;font-size:.92em;">Zoekt bij je vaste supermarkt welke producten uit je weekplanning nu in de aanbieding zijn.</p>
-        <button type="button" class="budgetActionButton" onclick="searchWeekplanDeals()">Zoek aanbiedingen voor mijn week</button>
-        <div id="weekplanDealsResults" aria-live="polite" style="margin-top:10px;"></div>
-        <p style="font-size:.8em;margin:10px 0 0;">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
+        <div id="budgetLivePriceResults" aria-live="polite"></div>
+        <button type="button" class="budgetActionButton budgetWeekButton" onclick="searchWeekplanDeals()">Zoek aanbiedingen voor mijn week</button>
+        <div id="weekplanDealsResults" aria-live="polite"></div>
+        <p class="budgetStatus budgetSource">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
       </div>
       <label for="budgetAmount">Budget per week (€)</label>
       <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
@@ -13263,6 +13258,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 .budgetExpenseAmount{font-size:13px;font-weight:750;color:var(--text-color,#344d3b);white-space:nowrap}
 .budgetExpenseDelete{display:block;border:0;background:transparent;color:#a34848;font-size:11px;padding:5px 0 0;cursor:pointer}
 .dealRow{padding:10px 0;border-bottom:1px solid var(--border-color,#dce9e2)}.dealRow strong{display:block;font-size:13px;overflow-wrap:anywhere}.dealRow div{font-size:13px;margin-top:2px}.dealRow small{display:block;margin-top:2px;color:var(--muted-text,#718177);font-size:11px}
+.budgetDealsCard{margin:16px 0;padding:14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}.budgetDealsCard h4{margin:0 0 4px;font-size:16px;color:var(--text-color,#344d3b)}.budgetDealsCard>.budgetStatus{margin:0 0 10px}.budgetDealsSearch{display:flex;gap:8px;align-items:stretch}.budgetDealsSearch .budgetInput{flex:1}#budgetLivePriceResults:not(:empty),#weekplanDealsResults:not(:empty){margin:10px 0;font-size:13px;line-height:1.45}.budgetWeekButton{width:100%;margin-top:8px}.budgetSource{margin-top:12px!important}.budgetSource a{color:#3e7650;font-weight:700;text-decoration:underline}body.dark-theme .budgetDealsCard{background:#1d241f}body.dark-theme .budgetDealsCard h4{color:#edf5ef}body.dark-theme .budgetSource a{color:#9fd3ac}body.dark-theme #budgetLivePriceResults,body.dark-theme #weekplanDealsResults{color:#edf5ef}
 .budgetEmpty,.budgetPrivacyNote{font-size:12px;line-height:1.5;color:var(--muted-text,#718177)}
 .budgetPrivacyNote{margin:16px 0 0}
 body.dark-theme .budgetPlannerPanel{background:#222a24;border-color:#38453b;color:#edf5ef}
