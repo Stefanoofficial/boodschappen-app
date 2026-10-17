@@ -5254,9 +5254,36 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
       <button type="button" class="proPlannerButton plannerAddListButton" onclick="event.stopPropagation(); addPlannerIngredientsToShoppingList(event)">Ingrediënten aan boodschappenlijst toevoegen</button>
     </section>
-    <div class="proFeatureCard">
-      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    <div class="proFeatureCard budgetPlannerLaunch" onclick="toggleBudgetPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBudgetPlanner(event)}">
+      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
+    <section id="budgetPlannerPanel" class="budgetPlannerPanel" hidden aria-label="Prijs- en budgetplanner">
+      <div class="budgetPanelHeading">
+        <div><h3>Mijn boodschappenbudget</h3><p>Houd je uitgaven bij en zie wat je nog over hebt.</p></div>
+        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+      </div>
+      <label for="budgetAmount">Budget per week (€)</label>
+      <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
+      <div class="budgetSummaryCard">
+        <div class="budgetRing" id="budgetRing" role="img" aria-label="Uitgaven als deel van het budget"><div class="budgetRingInner"><span>Uitgegeven</span><strong id="budgetSpent">€ 0,00</strong><small id="budgetOf">van € 0,00</small></div></div>
+        <div class="budgetStats"><div><span>Uitgegeven</span><strong id="budgetSpentSmall">€ 0,00</strong></div><div><span>Nog beschikbaar</span><strong id="budgetRemaining">€ 0,00</strong></div></div>
+        <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
+        <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
+      </div>
+      <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
+      <label for="budgetExpenseName">Product of omschrijving</label>
+      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. boodschappen bij supermarkt">
+      <div class="budgetFormRow">
+        <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
+        <div><label for="budgetExpenseCategory">Categorie</label><select id="budgetExpenseCategory" class="budgetInput"><option value="Groente en fruit">Groente en fruit</option><option value="Zuivel en eieren">Zuivel en eieren</option><option value="Brood en voorraad">Brood en voorraad</option><option value="Vlees, vis en vega">Vlees, vis en vega</option><option value="Huishouden">Huishouden</option><option value="Overig">Overig</option></select></div>
+      </div>
+      <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
+      <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
+      <div id="budgetCategories" class="budgetCategories"></div>
+      <h3 class="budgetSectionTitle">Recente uitgaven</h3>
+      <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden lokaal op dit apparaat opgeslagen. Prijzen worden niet automatisch bij supermarkten opgehaald.</p>
+    </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
@@ -13165,6 +13192,105 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 </script>
 <script>document.addEventListener("touchstart",function(){},{passive:true});</script>
 <script>(function(){var stop=function(e){e.preventDefault();};["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,stop,{passive:false});});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});var last=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-last<300&&!(e.target.closest&&e.target.closest("input,textarea,select")))e.preventDefault();last=now;},{passive:false});})();</script>
+
+<style id="budgetPlannerStyles">
+.budgetPlannerLaunch{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.budgetPlannerLaunch:active,.budgetLaunchButton:active,.budgetActionButton:active{transform:scale(.985)}
+.budgetLaunchButton{display:inline-flex;align-items:center;gap:9px;margin-top:5px;padding:10px 14px;border:0;border-radius:12px;background:#e1f1e5;color:#326b46;font-size:13px;font-weight:700;cursor:pointer}
+.budgetPlannerPanel{margin:0 0 14px;padding:16px;border:1px solid var(--border-color,#e0ebe3);border-radius:18px;background:var(--card-bg,#fff);color:var(--text-color,#344d3b)}
+.budgetPlannerPanel[hidden]{display:none!important}
+.budgetPanelHeading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:15px}
+.budgetPanelHeading h3{font-size:19px;margin:0 0 5px;color:var(--text-color,#344d3b)}
+.budgetPanelHeading p{font-size:13px;line-height:1.45;margin:0;color:var(--muted-text,#718177)}
+.budgetPanelHeading>i{display:flex;align-items:center;justify-content:center;flex:0 0 44px;height:44px;border-radius:14px;background:#e3f4e7;color:#42634b;font-size:19px}
+.budgetPlannerPanel label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:var(--text-color,#344d3b)}
+.budgetInput{box-sizing:border-box;width:100%;min-width:0;padding:12px;border:1px solid var(--border-color,#dce6df);border-radius:11px;background:var(--input-bg,#fff);color:var(--text-color,#344d3b);font:inherit;font-size:14px}
+.budgetSetRow{display:flex;gap:8px;align-items:center}.budgetSetRow .budgetInput{flex:1}
+.budgetActionButton{border:0;border-radius:11px;background:#e1f1e5;color:#326b46;font-size:13px;font-weight:750;padding:12px 14px;cursor:pointer;transition:transform .15s ease,filter .15s ease}
+.budgetSummaryCard{margin-top:15px;padding:15px;border:1px solid var(--border-color,#e0ebe3);border-radius:16px;background:var(--subtle-card-bg,#f7faf8)}
+.budgetRing{width:190px;height:190px;max-width:100%;margin:2px auto 15px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#57956c 0deg,#57956c 0deg,#83b8e8 0deg,#83b8e8 360deg);position:relative}
+.budgetRing:before{content:"";position:absolute;inset:15px;border-radius:50%;background:var(--card-bg,#fff)}
+.budgetRingInner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.budgetRingInner span,.budgetRingInner small{font-size:12px;color:var(--muted-text,#718177)}
+.budgetRingInner strong{font-size:23px;line-height:1.2;color:var(--text-color,#344d3b)}
+.budgetStats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+.budgetStats>div{display:flex;flex-direction:column;gap:4px}.budgetStats span{font-size:12px;color:var(--muted-text,#718177)}.budgetStats strong{font-size:16px;color:var(--text-color,#344d3b)}
+.budgetProgressTrack,.budgetCategoryTrack{height:8px;border-radius:99px;background:var(--border-color,#e1e8e3);overflow:hidden}
+.budgetProgress{height:100%;width:0;background:#57956c;border-radius:99px;transition:width .2s ease}
+.budgetStatus{margin:10px 0 0;font-size:12px;line-height:1.45;color:var(--muted-text,#718177)}
+.budgetSectionTitle{font-size:16px;margin:18px 0 9px;color:var(--text-color,#344d3b)}
+.budgetFullInput{display:block}
+.budgetFormRow{display:grid;grid-template-columns:1fr 1.3fr;gap:9px}
+.budgetAddButton{width:100%;margin-top:12px}
+.budgetCategoryHeader{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.budgetCategoryHeader .budgetSectionTitle{margin-bottom:9px}
+.budgetTextButton{border:0;background:transparent;color:#4c8760;font-weight:700;font-size:12px;padding:8px 0;cursor:pointer}
+.budgetCategoryRow{padding:12px 0;border-bottom:1px solid var(--border-color,#e7eee9)}
+.budgetCategoryTop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;color:var(--text-color,#344d3b)}
+.budgetCategoryTop strong{white-space:nowrap}
+.budgetCategoryFill{height:8px;border-radius:99px;background:#57956c;max-width:100%}
+.budgetExpenseRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-color,#e7eee9)}
+.budgetExpenseDetails{min-width:0}.budgetExpenseDetails strong{display:block;font-size:13px;color:var(--text-color,#344d3b);overflow-wrap:anywhere}.budgetExpenseDetails small{display:block;margin-top:4px;color:var(--muted-text,#718177);font-size:11px}
+.budgetExpenseAmount{font-size:13px;font-weight:750;color:var(--text-color,#344d3b);white-space:nowrap}
+.budgetExpenseDelete{display:block;border:0;background:transparent;color:#a34848;font-size:11px;padding:5px 0 0;cursor:pointer}
+.budgetEmpty,.budgetPrivacyNote{font-size:12px;line-height:1.5;color:var(--muted-text,#718177)}
+.budgetPrivacyNote{margin:16px 0 0}
+body.dark-theme .budgetPlannerPanel{background:#222a24;border-color:#38453b;color:#edf5ef}
+body.dark-theme .budgetPlannerPanel label,body.dark-theme .budgetPanelHeading h3,body.dark-theme .budgetSectionTitle,body.dark-theme .budgetCategoryTop,body.dark-theme .budgetExpenseDetails strong,body.dark-theme .budgetExpenseAmount,body.dark-theme .budgetStats strong{color:#edf5ef}
+body.dark-theme .budgetPanelHeading p,body.dark-theme .budgetStats span,body.dark-theme .budgetRingInner span,body.dark-theme .budgetRingInner small,body.dark-theme .budgetStatus,body.dark-theme .budgetEmpty,body.dark-theme .budgetPrivacyNote,body.dark-theme .budgetExpenseDetails small{color:#c0cec4}
+body.dark-theme .budgetInput{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
+body.dark-theme .budgetSummaryCard{background:#1d241f;border-color:#38453b}
+body.dark-theme .budgetRing:before{background:#1d241f}
+body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{background:#dff1e4;color:#285d3b}
+@media(max-width:390px){.budgetSetRow{flex-direction:column;align-items:stretch}.budgetFormRow{grid-template-columns:1fr}.budgetRing{width:170px;height:170px}.budgetRingInner strong{font-size:21px}}
+</style>
+
+
+<script id="budgetPlannerLogic">
+(function(){
+  const KEY="boodschappen_budgetplanner_v1";
+  const euro=n=>new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"}).format(Number(n)||0);
+  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[]}}catch(e){return {budget:0,expenses:[]}}};
+  const write=d=>localStorage.setItem(KEY,JSON.stringify(d));
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  window.toggleBudgetPlanner=function(event){
+    if(event)event.stopPropagation();
+    const panel=document.getElementById("budgetPlannerPanel");if(!panel)return;
+    panel.hidden=!panel.hidden;
+    const btn=document.querySelector(".budgetLaunchButton");
+    if(btn)btn.innerHTML=(panel.hidden?'Open budgetplanner <i class="fa-solid fa-chevron-down"></i>':'Budgetplanner sluiten <i class="fa-solid fa-chevron-up"></i>');
+    if(!panel.hidden){const d=read();document.getElementById("budgetAmount").value=d.budget||"";renderBudget();setTimeout(()=>panel.scrollIntoView({behavior:"smooth",block:"nearest"}),60);}
+  };
+  window.saveBudgetAmount=function(){
+    const input=document.getElementById("budgetAmount"),value=Number(input.value);
+    if(!input.value.trim()||!Number.isFinite(value)||value<=0){document.getElementById("budgetStatus").textContent="Vul een weekbudget groter dan € 0 in.";return;}
+    const d=read();d.budget=Math.round(value*100)/100;write(d);renderBudget();document.getElementById("budgetStatus").textContent="Je weekbudget is opgeslagen.";
+  };
+  window.addBudgetExpense=function(){
+    const name=document.getElementById("budgetExpenseName"),price=document.getElementById("budgetExpensePrice"),category=document.getElementById("budgetExpenseCategory");
+    const label=name.value.trim(),amount=Number(price.value);
+    if(!label){name.focus();document.getElementById("budgetStatus").textContent="Vul een omschrijving in voor deze uitgave.";return;}
+    if(!price.value.trim()||!Number.isFinite(amount)||amount<=0){price.focus();document.getElementById("budgetStatus").textContent="Vul een bedrag groter dan € 0 in.";return;}
+    const d=read();d.expenses.unshift({id:Date.now()+Math.random(),name:label,amount:Math.round(amount*100)/100,category:category.value,date:new Date().toISOString()});write(d);
+    name.value="";price.value="";renderBudget();document.getElementById("budgetStatus").textContent="Uitgave toegevoegd.";
+  };
+  window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
+  window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
+  function renderBudget(){
+    const d=read(),spent=d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),remaining=d.budget-spent,pct=d.budget>0?Math.min(100,spent/d.budget*100):0;
+    const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+    put("budgetSpent",euro(spent));put("budgetSpentSmall",euro(spent));put("budgetOf","van "+euro(d.budget));put("budgetRemaining",euro(Math.max(0,remaining)));
+    const progress=document.getElementById("budgetProgress");if(progress)progress.style.width=pct+"%";
+    const ring=document.getElementById("budgetRing");if(ring){const over=d.budget>0&&spent>d.budget;ring.style.background=d.budget>0?`conic-gradient(${over?"#c95b52":"#57956c"} 0 ${pct}%, #83b8e8 ${pct}% 100%)`:"conic-gradient(#dfe9e2 0 100%)";ring.setAttribute("aria-label",`Uitgegeven ${euro(spent)} van ${euro(d.budget)}`);}
+    const status=document.getElementById("budgetStatus");if(status){if(!d.budget)status.textContent="Stel je weekbudget in en voeg je uitgaven toe.";else if(spent>d.budget)status.textContent="Je zit "+euro(spent-d.budget)+" boven je weekbudget.";else if(pct>=80)status.textContent="Let op: je hebt al "+Math.round(pct)+"% van je weekbudget gebruikt.";else status.textContent="Je hebt nog "+euro(remaining)+" van je weekbudget over.";}
+    const totals={};d.expenses.forEach(x=>{const cat=x.category||"Overig";totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
+    const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Je categorieën verschijnen zodra je uitgaven toevoegt.</p>';}
+    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(x.category||"Overig")} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
+  }
+  document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";renderBudget();});
+})();
+</script>
+
 </body>
 
 <style id="overview-dashboard-final">
