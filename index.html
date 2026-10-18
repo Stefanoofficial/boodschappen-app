@@ -5699,7 +5699,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg.</p>
+      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
       <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het komt niet in je geschiedenis.</p>
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
@@ -5781,15 +5781,18 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <span>Meer inzichten</span><i class="fa-solid fa-chevron-down"></i>
     </button>
     <div id="overviewMoreInsights" class="overviewMoreInsights" hidden>
-      <section class="overviewInsightCard">
-        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Jouw boodschappengewoonten</h3></div>
-        <p class="overviewInsightLead">Zie welke producten je vaak koopt, op basis van je geschiedenis.</p>
+      <section id="overviewInsightsEmpty" class="overviewInsightCard overviewInsightsEmptyCard">
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-seedling"></i></span><h3>Nog geen inzichten</h3></div>
+        <p class="overviewInsightLead">Je inzichten verschijnen na een paar boodschappenrondes. Vink na het boodschappen doen alles af en bewaar de ronde.</p>
+      </section>
+      <section id="overviewInsightHabits" class="overviewInsightCard" hidden>
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Vaak gekocht</h3></div>
         <div id="overviewHabitInsights" class="overviewHabitInsights"><p class="overviewInsightEmpty">Je inzichten verschijnen zodra er lijsten in je geschiedenis staan.</p></div>
       </section>
-      <section class="overviewInsightCard">
-        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>Je geschiedenis in het kort</h3></div>
-        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>lijsten in je geschiedenis</span></div>
-        <p id="overviewHistoryInsightText" class="overviewInsightLead">Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.</p>
+      <section id="overviewInsightSummaryCard" class="overviewInsightCard" hidden>
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>In het kort</h3></div>
+        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>boodschappenrondes bewaard</span></div>
+        <p id="overviewHistoryInsightText" class="overviewInsightLead"></p>
       </section>
     </div>
 
@@ -10615,13 +10618,28 @@ async function renderOverviewInsights(){
   var count=document.getElementById("overviewHistoryRoundCount");
   var text=document.getElementById("overviewHistoryInsightText");
   var list=document.getElementById("overviewHabitInsights");
+  var hasData=history.length>0;
+  var emptyCard=document.getElementById("overviewInsightsEmpty"), habitsCard=document.getElementById("overviewInsightHabits"), sumCard=document.getElementById("overviewInsightSummaryCard");
+  if(emptyCard) emptyCard.hidden=hasData;
+  if(habitsCard) habitsCard.hidden=!hasData;
+  if(sumCard) sumCard.hidden=!hasData;
   if(count) count.textContent=String(history.length);
-  if(text) text.textContent=history.length ? "Gebaseerd op je geschiedenis." : "Wis je volledige lijst via de prullenbak bovenaan; die wordt dan automatisch bewaard in je geschiedenis.";
+  if(count && count.nextElementSibling) count.nextElementSibling.textContent=history.length===1?"boodschappenronde bewaard":"boodschappenrondes bewaard";
+  if(text){
+    if(!hasData){ text.textContent=""; }
+    else{
+      var totalItems=history.reduce(function(n,r){return n+((r.items||[]).length);},0);
+      var avg=Math.round(totalItems/history.length);
+      var last=new Date(Number(history[0].savedAt||0));
+      var months=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+      text.textContent="Gemiddeld "+avg+" product"+(avg===1?"":"en")+" per ronde"+(history[0].savedAt?" · laatste ronde op "+last.getDate()+" "+months[last.getMonth()]:"")+".";
+    }
+  }
   if(!list) return;
   var counts={};
   history.forEach(function(round){(round.items||[]).forEach(function(item){var name=String(typeof item==="string"?item:(item&&item.text)||"").trim(); if(name) counts[name]=(counts[name]||0)+1;});});
   var top=Object.keys(counts).map(function(name){return {name:name,count:counts[name]};}).sort(function(a,b){return b.count-a.count || a.name.localeCompare(b.name,"nl");}).slice(0,4);
-  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Je vaak gekochte producten verschijnen hier zodra er een paar lijsten in je geschiedenis staan.</p>';return;}
+  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Nog geen producten.</p>';return;}
   list.innerHTML="";
   top.forEach(function(item,index){var row=document.createElement("div");row.className="overviewHabitRow";row.innerHTML='<span class="overviewHabitRank">'+(index+1)+'</span><span class="overviewHabitName"></span><span class="overviewHabitCount"></span>';row.querySelector('.overviewHabitName').textContent=item.name;row.querySelector('.overviewHabitCount').textContent=item.count+'×';list.appendChild(row);});
 }
@@ -11475,7 +11493,7 @@ async function openShoppingHistoryFromOverview(){
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier. Vink na het boodschappen doen alles af en bewaar de ronde, of wis je lijst met de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -13986,6 +14004,55 @@ body.dark-theme .search-clear-btn::before{background:#5d6a61}
 #overviewActionOverlay .overviewHistoryEmptyContent p{margin:6px 0 0!important;font-size:15px;line-height:1.5;color:#5f6f65}
 #overviewActionOverlay .overviewHistoryEmptyTitle strong{font-size:16px}
 body.dark-theme #overviewActionOverlay .overviewHistoryEmptyContent p{color:#b8c6bc}
+</style>
+<script id="round-complete-prompt">
+/* Alles afgevinkt? Bied aan om de ronde in de geschiedenis te bewaren en met een lege lijst te beginnen. */
+(function(){
+  if(typeof showList!=="function") return;
+  var KEY="boodschappenRoundPromptDismissed";
+  function signature(items){ return items.map(function(i){return String(i&&(i.text||i.name)||"").toLowerCase()+":"+(i&&i.quantity||1);}).sort().join("|"); }
+  function onListView(){ var app=document.querySelector(".app"); return !!app && !app.classList.contains("overview-active") && !app.classList.contains("more-active") && document.body.classList.contains("logged-in"); }
+  function removeBar(){ var b=document.getElementById("roundCompleteBar"); if(b) b.remove(); }
+  function check(){
+    try{
+      var items=Array.isArray(boodschappen)?boodschappen:[];
+      if(!items.length || !items.every(function(i){return i && i.completed;}) || !onListView()){ removeBar(); return; }
+      var sig=signature(items);
+      var dismissed=""; try{dismissed=sessionStorage.getItem(KEY)||"";}catch(_){}
+      if(dismissed===sig || document.getElementById("roundCompleteBar")) return;
+      var bar=document.createElement("div");
+      bar.id="roundCompleteBar"; bar.className="roundCompleteBar"; bar.setAttribute("role","status");
+      bar.innerHTML='<div class="roundCompleteText"><strong>Alles afgevinkt 🎉</strong><span>Bewaar deze ronde in je geschiedenis en begin met een lege lijst.</span></div>'+
+        '<div class="roundCompleteActions"><button type="button" class="roundLater">Nog niet</button><button type="button" class="roundSave">Bewaren en nieuwe lijst</button></div>';
+      ["click","pointerdown","touchstart"].forEach(function(t){bar.addEventListener(t,function(e){e.stopPropagation();});});
+      bar.querySelector(".roundLater").addEventListener("click",function(){ try{sessionStorage.setItem(KEY,sig);}catch(_){} removeBar(); });
+      bar.querySelector(".roundSave").addEventListener("click",async function(){
+        this.disabled=true; removeBar();
+        try{ if(typeof clearList==="function") await clearList(); if(typeof updateOverviewDashboard==="function") updateOverviewDashboard(); }catch(e){ console.error("Ronde bewaren mislukt",e); }
+      });
+      document.body.appendChild(bar);
+    }catch(e){}
+  }
+  var orig=showList;
+  showList=function(){ var r=orig.apply(this,arguments); setTimeout(check,350); return r; };
+  document.addEventListener("click",function(){ setTimeout(function(){ if(!onListView()) removeBar(); },60); },true);
+})();
+</script>
+<style id="round-complete-style">
+.roundCompleteBar{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:9000;max-width:560px;margin:0 auto;background:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(35,55,43,.18);border:1px solid #dfebe2;display:flex;flex-direction:column;gap:10px;animation:roundBarIn .25s ease}
+@keyframes roundBarIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.roundCompleteText{display:flex;flex-direction:column;gap:3px}
+.roundCompleteText strong{font-size:15px;color:#2f4a38}
+.roundCompleteText span{font-size:14px;line-height:1.4;color:#66766c}
+.roundCompleteActions{display:flex;gap:8px}
+.roundCompleteActions button{min-height:44px;border:0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;padding:0 12px}
+.roundLater{flex:0 0 auto;background:#eef3ef;color:#2f4a38}
+.roundSave{flex:1;background:#3F5B45;color:#fff}
+body.dark-theme .roundCompleteBar{background:#222a24;border-color:#38453b}
+body.dark-theme .roundCompleteText strong{color:#edf5ef}
+body.dark-theme .roundCompleteText span{color:#b8c6bc}
+body.dark-theme .roundLater{background:#323d35;color:#edf5ef}
+.overviewInsightsEmptyCard .overviewInsightHeading h3{font-size:17px}
 </style>
 </body>
 
