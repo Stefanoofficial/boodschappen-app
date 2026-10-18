@@ -5807,7 +5807,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div id="sortOptionsPanel" class="listOptionsPanel sortOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <button type="button" class="listOptionBack" onclick="closeSortOptions()"><i class="fa-solid fa-chevron-left"></i><span>Lijst sorteren</span></button>
+      <div class="listOptionTitle">Lijst sorteren</div>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('alpha')"><i class="fa-solid fa-arrow-down-a-z"></i><span>Alfabetisch</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('category')"><i class="fa-solid fa-layer-group"></i><span>Per categorie</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('newest')"><i class="fa-solid fa-clock"></i><span>Nieuwste eerst</span></button>
@@ -6648,6 +6648,80 @@ async function shareFeedback(event) {
     }
   }
 }
+/* Profielfoto bijsnijden: slepen om te verplaatsen, knijpen of schuifbalk om te zoomen. */
+function cropProfilePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("De foto kon niet worden gelezen."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Dit afbeeldingsbestand kan niet worden geopend."));
+      img.onload = () => openCropper(img);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+
+    function openCropper(img) {
+      const SIZE = Math.min(280, window.innerWidth - 64);
+      const ov = document.createElement("div");
+      ov.className = "photoCropOverlay";
+      ov.innerHTML =
+        '<div class="photoCropBox" role="dialog" aria-modal="true" aria-label="Profielfoto aanpassen">' +
+          '<div class="photoCropTitle">Foto aanpassen</div>' +
+          '<div class="photoCropHint">Sleep de foto en zoom in tot je goed in de cirkel staat.</div>' +
+          '<div class="photoCropStage" style="width:' + SIZE + 'px;height:' + SIZE + 'px"><img alt="" draggable="false"><div class="photoCropMask"></div></div>' +
+          '<div class="photoCropZoom"><i class="fa-solid fa-magnifying-glass-minus"></i><input type="range" min="1" max="4" step="0.01" value="1" aria-label="Zoomen"><i class="fa-solid fa-magnifying-glass-plus"></i></div>' +
+          '<div class="photoCropActions"><button type="button" class="photoCropCancel">Annuleren</button><button type="button" class="photoCropSave">Gebruiken</button></div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      ["click","pointerdown","touchstart","mousedown"].forEach(t => ov.addEventListener(t, e => e.stopPropagation()));
+      const stage = ov.querySelector(".photoCropStage"), el = stage.querySelector("img"), range = ov.querySelector("input");
+      el.src = img.src;
+      const base = Math.max(SIZE / img.naturalWidth, SIZE / img.naturalHeight); // vult de cirkel precies
+      let zoom = 1, x = 0, y = 0;
+      const clamp = () => {
+        const w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        const mx = Math.max(0, (w - SIZE) / 2), my = Math.max(0, (h - SIZE) / 2);
+        x = Math.min(mx, Math.max(-mx, x)); y = Math.min(my, Math.max(-my, y));
+      };
+      const draw = () => {
+        clamp();
+        const w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        el.style.width = w + "px"; el.style.height = h + "px";
+        el.style.transform = "translate(" + (SIZE / 2 - w / 2 + x) + "px," + (SIZE / 2 - h / 2 + y) + "px)";
+      };
+      draw();
+      const pts = new Map(); let last = null, pinch = null;
+      stage.addEventListener("pointerdown", e => { stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, {x:e.clientX, y:e.clientY}); last = {x:e.clientX, y:e.clientY};
+        if (pts.size === 2) { const [a,b] = [...pts.values()]; pinch = {d:Math.hypot(a.x-b.x, a.y-b.y), z:zoom}; } });
+      stage.addEventListener("pointermove", e => {
+        if (!pts.has(e.pointerId)) return;
+        pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+        if (pts.size >= 2 && pinch) { const [a,b] = [...pts.values()]; zoom = Math.min(4, Math.max(1, pinch.z * Math.hypot(a.x-b.x, a.y-b.y) / pinch.d)); range.value = zoom; }
+        else if (last) { x += e.clientX - last.x; y += e.clientY - last.y; last = {x:e.clientX, y:e.clientY}; }
+        draw();
+      });
+      const up = e => { pts.delete(e.pointerId); pinch = null; const r = [...pts.values()][0]; last = r ? {x:r.x, y:r.y} : null; };
+      stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+      stage.addEventListener("wheel", e => { e.preventDefault(); zoom = Math.min(4, Math.max(1, zoom * (e.deltaY < 0 ? 1.08 : 0.92))); range.value = zoom; draw(); }, {passive:false});
+      range.addEventListener("input", () => { zoom = Number(range.value); draw(); });
+      const close = v => { ov.remove(); resolve(v); };
+      ov.querySelector(".photoCropCancel").addEventListener("click", () => close(null));
+      ov.querySelector(".photoCropSave").addEventListener("click", () => {
+        const OUT = 320, f = OUT / SIZE, w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        const c = document.createElement("canvas"); c.width = c.height = OUT;
+        const ctx = c.getContext("2d", {alpha:false});
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, OUT, OUT);
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, (SIZE / 2 - w / 2 + x) * f, (SIZE / 2 - h / 2 + y) * f, w * f, h * f);
+        let q = 0.82, out = c.toDataURL("image/jpeg", q);
+        while (out.length > 110000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
+        close(out);
+      });
+    }
+  });
+}
+
 async function manageProfilePhoto() {
   const user = auth && auth.currentUser;
   if (!user) return;
@@ -6713,7 +6787,8 @@ async function manageProfilePhoto() {
     chooseButton.disabled = true;
     chooseButton.textContent = "Foto verwerken…";
     try {
-      const dataURL = await makeSmallPhotoDataURL(file);
+      const dataURL = await cropProfilePhoto(file);
+      if (!dataURL) { chooseButton.disabled = false; chooseButton.textContent = "Foto kiezen"; return; }
       if (dataURL.length > 300000) {
         throw new Error("De verkleinde foto is nog te groot. Kies een andere foto.");
       }
@@ -8053,6 +8128,31 @@ function getProductIcon(text) {
   return GENERIC_PRODUCT_ICON;
 }
 
+// Volgorde zoals je meestal door de supermarkt loopt.
+const AISLE_GROUPS = [
+  ["🍎🍐🍊🍋🍇🍓🫐🥝🍍🥭🍑🍒🍉🍈🥑🥥🥔🍠🥒🥕🧅🧄🫑🥬🥦🍆🌽🫛🍄🫜🌱🎃🫚🥗", ["apple","banana","tomatoes","red-bell-pepper"]],
+  ["🥖🥐🥯🍞🍘🥣🌯🥙🫓", ["bread-loaf"]],
+  ["🍗🥩🥓🌭🐟🦐🦪🍔🍤", []],
+  ["", ["milk-carton","quark-cup","cheese-block","butter-pack","egg-carton"]],
+  ["🍯🍫", ["peanut-butter-jar","jam-jar"]],
+  ["🍝🍚🍜🥫🧂🌾🫒🍶🌿🫘🫙🟡🌶️", ["mayonnaise-bottle","ketchup-bottle"]],
+  ["🍪🍬🍭🧇🥜🍿🍰🎂", ["chips-bag"]],
+  ["🥤🧃💧☕🍵🍺🍷🥂🍾", []],
+  ["🧊🍕🍟🍦", []],
+  ["🧴🪥🧼", []],
+  ["🧽🧻🧺🗑️🛒🕯️🔋", []],
+  ["🍼🐾🐱🐶", []]
+];
+function productAisle(text) {
+  const icon = getProductIcon(text);
+  if (isLooseProduce(text)) return 0;
+  for (let i = 0; i < AISLE_GROUPS.length; i++) {
+    const [emojis, keys] = AISLE_GROUPS[i];
+    if (keys.indexOf(icon) !== -1 || (icon && !/^[a-z0-9-]+$/i.test(icon) && emojis.indexOf(icon) !== -1)) return i;
+  }
+  return 99;
+}
+
 function productPhotosEnabled() {
   try { return localStorage.getItem("boodschappenProductPhotos") !== "false"; } catch (_) { return true; }
 }
@@ -8910,6 +9010,7 @@ async function addProduct() {
     completedBy: "",
     completedAt: null,
     quantity: 1,
+    createdAt: Date.now(),
     barcode: selected && selected.barcode ? selected.barcode : "",
     imageUrl: selected && selected.imageUrl ? selected.imageUrl : "",
     brand: selected && selected.brand ? selected.brand : ""
@@ -13839,6 +13940,27 @@ body.dark-theme .aboutProBadge{background:#4a3d1c;color:#f3d48a}
 .aboutSources{display:flex;flex-direction:column;gap:3px}
 .aboutSources .nowrap{white-space:nowrap}
 </style>
+<style id="photo-crop-and-sort">
+.photoCropOverlay{position:fixed;inset:0;z-index:2147483000;background:rgba(18,26,21,.72);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.photoCropBox{width:min(360px,100%);background:#fff;border-radius:24px;padding:20px 16px 16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.photoCropTitle{font-size:18px;font-weight:800;color:#2f4a38}
+.photoCropHint{font-size:14px;line-height:1.4;color:#66766c;text-align:center;margin-top:-6px}
+.photoCropStage{position:relative;overflow:hidden;border-radius:18px;background:#1b221e;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.photoCropStage img{position:absolute;left:0;top:0;max-width:none!important;pointer-events:none;transform-origin:0 0}
+.photoCropMask{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 999px rgba(0,0,0,.55);outline:2px solid rgba(255,255,255,.9);outline-offset:-2px;pointer-events:none}
+.photoCropZoom{display:flex;align-items:center;gap:10px;width:100%;max-width:280px;color:#5f7166}
+.photoCropZoom input{flex:1;accent-color:#3F5B45}
+.photoCropActions{display:flex;gap:10px;width:100%;margin-top:4px}
+.photoCropActions button{flex:1;min-height:48px;border:0;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
+.photoCropCancel{background:#eef1ef;color:#2f4a38}
+.photoCropSave{background:#3F5B45;color:#fff}
+body.dark-theme .photoCropBox{background:#222a24}
+body.dark-theme .photoCropTitle{color:#edf5ef}
+body.dark-theme .photoCropHint,body.dark-theme .photoCropZoom{color:#b8c6bc}
+body.dark-theme .photoCropCancel{background:#323d35;color:#edf5ef}
+.listOptionTitle{padding:10px 12px 6px;font-size:13px;font-weight:700;letter-spacing:.03em;color:#7b8a80}
+body.dark-theme .listOptionTitle{color:#aab8ae}
+</style>
 </body>
 
 <style id="overview-dashboard-final">
@@ -13908,10 +14030,11 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
 
   window.toggleListOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
-    var p=panel('listOptionsPanel');
+    // Het menu bevat alleen nog sorteren: open de sorteeropties meteen.
+    var p=panel('sortOptionsPanel');
     var open=p ? !p.classList.contains('open') : false;
-    setPanel('sortOptionsPanel', false);
-    setPanel('listOptionsPanel', open);
+    setPanel('listOptionsPanel', false);
+    setPanel('sortOptionsPanel', open);
     if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
       window.AndroidApp.setMenuDimmed(open);
     }
@@ -13954,6 +14077,7 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
   window.closeSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('sortOptionsPanel', false);
+    var lb=panel('listOptionsButton'); if(lb) lb.setAttribute('aria-expanded','false');
     if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
       window.AndroidApp.setMenuDimmed(false);
     }
@@ -13971,15 +14095,16 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
             .localeCompare(String(b && (b.name ?? b.text) || ''),'nl',{sensitivity:'base'});
         });
       } else if(mode==='newest'){
+        // Oudere producten hebben geen tijdstip; die staan in volgorde van toevoegen, dus achteraan = nieuwst.
+        var pos=new Map(items.map(function(it,i){return [it,i];}));
         items.sort(function(a,b){
-          return Number((b && (b.createdAt ?? b.addedAt)) || 0) -
-                 Number((a && (a.createdAt ?? a.addedAt)) || 0);
+          var ta=Number((a && (a.createdAt ?? a.addedAt)) || 0), tb=Number((b && (b.createdAt ?? b.addedAt)) || 0);
+          return (tb-ta) || (pos.get(b)-pos.get(a));
         });
       } else if(mode==='category'){
+        var cat=function(it){ return (typeof productAisle==='function') ? productAisle(String(it && (it.name ?? it.text) || '')) : 99; };
         items.sort(function(a,b){
-          var ca=String(a && a.category || 'Overig');
-          var cb=String(b && b.category || 'Overig');
-          return ca.localeCompare(cb,'nl',{sensitivity:'base'}) ||
+          return (cat(a)-cat(b)) ||
             String(a && (a.name ?? a.text) || '').localeCompare(
               String(b && (b.name ?? b.text) || ''),'nl',{sensitivity:'base'});
         });
