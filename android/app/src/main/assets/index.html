@@ -5587,7 +5587,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken.</span></div>
     </div>
-    <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
+    <div class="aboutMenuHint">Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (CC BY-SA). Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>.</div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -5627,6 +5627,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
         <li><strong>Planning en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
         <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard.</li>
+        <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
@@ -5635,6 +5636,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
+      <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
       <h4>Bewaren en verwijderen</h4>
@@ -5797,9 +5799,6 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div id="listOptionsPanel" class="listOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <button type="button" class="listOptionItem listOptionDanger" onclick="openClearListConfirm(event); closeListOptions();">
-        <i class="fa-solid fa-trash-can"></i><span>Lijst wissen</span>
-      </button>
       <button type="button" class="listOptionItem" onclick="openSortOptions()">
         <i class="fa-solid fa-arrow-down-a-z"></i><span>Lijst sorteren</span><i class="fa-solid fa-chevron-right listOptionArrow"></i>
       </button>
@@ -7278,10 +7277,10 @@ function openProductSuggestionSettings() {
   const enabled = localStorage.getItem("boodschappenSuggestionsEnabled") !== "false";
   const overlay = familyDialogBase(
     "fa-wand-magic-sparkles", "Suggesties",
-    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div>',
+    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Productfoto\'s tonen</span><button type="button" class="settingsToggle photosToggle ' + (productPhotosEnabled() ? 'on' : '') + '" aria-label="Productfoto\'s tonen"></button></div><div class="familyDialogText" style="margin-top:8px;font-size:13px;opacity:.8;">Staat dit uit, dan zie je bij elk product een icoon in plaats van een foto.</div>',
     '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
   );
-  const toggle = overlay.querySelector(".settingsToggle");
+  const toggle = overlay.querySelector(".settingsToggle:not(.photosToggle)");
   toggle.addEventListener("click", e => {
     e.stopPropagation();
     const next = !toggle.classList.contains("on");
@@ -7289,6 +7288,14 @@ function openProductSuggestionSettings() {
     localStorage.setItem("boodschappenSuggestionsEnabled", next ? "true" : "false");
     const box = document.getElementById("productSuggestions");
     if (!next && box) box.classList.remove("open");
+  });
+  const photosToggle = overlay.querySelector(".photosToggle");
+  if (photosToggle) photosToggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !photosToggle.classList.contains("on");
+    photosToggle.classList.toggle("on", next);
+    try { localStorage.setItem("boodschappenProductPhotos", next ? "true" : "false"); } catch (_) {}
+    if (typeof showList === "function") showList();
   });
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
@@ -7883,26 +7890,171 @@ function productIconMarkup(icon) {
 }
 
 // Single product-icon resolver.
+/* ===== Producticonen: betere herkenning, soort-iconen en nooit een leeg vakje ===== */
+const EXTRA_PRODUCE = [
+  ["grapefruit","🍊"],["granaatappel","🍎"],["vijgen","🍇"],["vijg","🍇"],["dadels","🌴"],["abrikoos","🍑"],["abrikozen","🍑"],
+  ["bramen","🫐"],["bessen","🫐"],["clementine","🍊"],["clementines","🍊"],["papaja","🥭"],["passievrucht","🥭"],["lychee","🍒"],["rabarber","🥬"],
+  ["andijvie","🥬"],["witlof","🥬"],["spitskool","🥬"],["rode kool","🥬"],["rodekool","🥬"],["witte kool","🥬"],["kool","🥬"],["savooiekool","🥬"],
+  ["snijbonen","🫛"],["tuinbonen","🫛"],["peultjes","🫛"],["sugarsnaps","🫛"],["knolselderij","🥬"],["selderij","🥬"],["bleekselderij","🥬"],
+  ["venkel","🥬"],["pompoen","🎃"],["pastinaak","🥕"],["rucola","🥬"],["veldsla","🥬"],["ijsbergsla","🥬"],["kropsla","🥬"],["slamix","🥬"],
+  ["taugé","🌱"],["tauge","🌱"],["paksoi","🥬"],["bosui","🧅"],["lente-ui","🧅"],["lenteui","🧅"],["sjalot","🧅"],["sjalotten","🧅"],["gember","🫚"],
+  ["peterselie","🌿"],["basilicum","🌿"],["dille","🌿"],["bieslook","🌿"],["koriander","🌿"],["munt","🌿"],["rozemarijn","🌿"],["tijm","🌿"],["verse kruiden","🌿"],
+  ["cherrytomaten","tomatoes"],["snoeptomaten","tomatoes"],["trostomaten","tomatoes"],["roerbakgroente","🥬"],["soepgroente","🥬"],["groente","🥬"],["groenten","🥬"],
+  ["rauwkost","🥗"],["kastanjechampignons","🍄"],["paddenstoelen","🍄"],["bietjes","🫜"],["rode biet","🫜"],["rode bieten","🫜"],["radijsjes","🌱"],
+  ["prei","🥬"],["spinazie","🥬"],["citroenen","🍋"],["limoenen","🍋"],["mango's","🥭"],["avocado's","🥑"],["paprika's","🫑"],["kiwi's","🥝"],
+  ["fruit","🍎"],["courgettes","🥒"],["komkommers","🥒"],["aubergines","🍆"],["aardappels","🥔"],["krieltjes","🥔"],["zoete aardappelen","🍠"]
+];
+const EXTRA_OTHER = [
+  ["skyr","quark-cup"],["griekse yoghurt","quark-cup"],["roomboter","butter-pack"],["kookroom","quark-cup"],["zure room","quark-cup"],["mascarpone","quark-cup"],
+  ["mozzarella","cheese-block"],["feta","cheese-block"],["parmezaan","cheese-block"],["geraspte kaas","cheese-block"],["smeerkaas","cheese-block"],["roomkaas","cheese-block"],
+  ["cottage cheese","quark-cup"],["havermelk","milk-carton"],["sojamelk","milk-carton"],["amandelmelk","milk-carton"],["koffiemelk","milk-carton"],["chocomel","milk-carton"],["fristi","milk-carton"],
+  ["pistolets","🥖"],["krentenbollen","🥯"],["ontbijtkoek","🍞"],["wraps","🌯"],["wrap","🌯"],["tortilla","🌯"],["tortillas","🌯"],["pita","🥙"],["naan","🫓"],["toast","🍞"],
+  ["rijstwafels","🍘"],["muesli","🥣"],["cruesli","🥣"],["havermout","🥣"],["cornflakes","🥣"],["granola","🥣"],["ontbijtgranen","🥣"],
+  ["kipdijen","🍗"],["kippendijen","🍗"],["drumsticks","🍗"],["kipschnitzel","🍗"],["shoarma","🥙"],["hamburger","🍔"],["hamburgers","🍔"],["rookworst","🌭"],
+  ["slavink","🥩"],["gehaktballen","🥩"],["bacon","🥓"],["ontbijtspek","🥓"],["kalkoen","🍗"],["lamsvlees","🥩"],["frikandel","🌭"],["frikandellen","🌭"],
+  ["kroket","🍤"],["kroketten","🍤"],["bitterballen","🍤"],["filet americain","🥩"],["rosbief","🥩"],["vegaburger","🍔"],["vegetarisch gehakt","🌱"],
+  ["kabeljauw","🐟"],["pangasius","🐟"],["tilapia","🐟"],["haring","🐟"],["makreel","🐟"],["sardines","🐟"],["mosselen","🦪"],["kibbeling","🐟"],["vissticks","🐟"],["scampi","🦐"],
+  ["bier","🍺"],["wijn","🍷"],["rode wijn","🍷"],["witte wijn","🥂"],["rosé","🍷"],["prosecco","🥂"],["champagne","🍾"],["spa","💧"],["ice tea","🍵"],
+  ["smoothie","🧃"],["kokoswater","🥥"],["tonic","🥤"],["ranja","🧃"],["siroop","🧃"],["ginger ale","🥤"],
+  ["tomatenblokjes","🥫"],["passata","🥫"],["tomatenpuree","🥫"],["kokosmelk","🥥"],["kidneybonen","🫘"],["kikkererwten","🫘"],["linzen","🫘"],["rode linzen","🫘"],["zwarte bonen","🫘"],
+  ["bouillonblokjes","🥣"],["groentebouillon","🥣"],["couscous","🍚"],["bulgur","🍚"],["quinoa","🍚"],["aardappelpuree","🥔"],["gnocchi","🍝"],["tortellini","🍝"],
+  ["ravioli","🍝"],["penne","🍝"],["fusilli","🍝"],["tagliatelle","🍝"],["sojasaus","🥫"],["ketjap","🥫"],["sambal","🌶️"],["sriracha","🌶️"],["currypasta","🥫"],
+  ["kaneel","🧂"],["paprikapoeder","🧂"],["currypoeder","🧂"],["komijn","🧂"],["oregano","🌿"],["italiaanse kruiden","🌿"],["kruiden","🌿"],["bakpoeder","🧂"],["gist","🧂"],
+  ["vanillesuiker","🧂"],["cacaopoeder","🍫"],["chocoladestukjes","🍫"],["maizena","🌾"],["paneermeel","🌾"],["pinda's","🥜"],["pindas","🥜"],["cashewnoten","🥜"],
+  ["amandelen","🥜"],["walnoten","🥜"],["stroopwafels","🧇"],["wafels","🧇"],["reep","🍫"],["winegums","🍬"],["groene pesto","🌿"],["sla dressing","🥗"],["dressing","🥗"],["salade","🥗"],["salades","🥗"],
+  ["diepvriespizza","🍕"],["friet","🍟"],["patat","🍟"],["ijsblokjes","🧊"],["ei","egg-carton"],["eieren","egg-carton"],["scharreleieren","egg-carton"]
+];
+try { productCatalog.push(...EXTRA_PRODUCE, ...EXTRA_OTHER); } catch (_) {}
+
+// Losse groente en fruit: daarvoor tonen we altijd het icoon, ook als er een foto bekend is.
+const LOOSE_PRODUCE = new Set([
+  "appel","appels","peer","peren","banaan","bananen","sinaasappel","sinaasappels","mandarijn","mandarijnen","citroen","citroenen","limoen","limoenen",
+  "druif","druiven","aardbei","aardbeien","framboos","frambozen","blauwe bessen","kiwi","kiwi's","ananas","mango","mango's","perzik","nectarine","pruim",
+  "kers","kersen","watermeloen","meloen","avocado","avocado's","kokosnoot","aardappel","aardappelen","aardappels","krieltjes","zoete aardappel","zoete aardappelen",
+  "tomaat","tomaten","cherrytomaten","snoeptomaten","trostomaten","komkommer","komkommers","wortel","wortels","ui","uien","rode ui","rode uien","knoflook",
+  "paprika","paprika's","rode paprika","groene paprika","gele paprika","sla","spinazie","broccoli","bloemkool","courgette","courgettes","aubergine","aubergines",
+  "prei","boerenkool","spruitjes","asperges","champignons","champignon","biet","bietjes","rode biet","radijs","radijsjes","andijvie","witlof","spitskool",
+  "rode kool","rodekool","witte kool","kool","snijbonen","sperziebonen","peultjes","knolselderij","bleekselderij","venkel","pompoen","pastinaak","rucola",
+  "veldsla","ijsbergsla","bosui","lente-ui","sjalot","sjalotten","gember","peterselie","basilicum","dille","bieslook","koriander","munt","grapefruit",
+  "granaatappel","clementine","clementines","fruit","groente","groenten"
+]);
+
+const CATEGORY_ICONS = [
+  [/(diepvries|bevroren)/, "🧊"],
+  [/(shampoo|conditioner|zeep|douche|deo|tandpasta|tandenborstel|scheer|creme|crème|bodylotion|zonnebrand|haar|make-?up|parfum)/, "🧴"],
+  [/(reinig|schoonmaak|afwas|wasmiddel|wasverzachter|bleek|ontkalk|vaatwas|spons|doekjes|dweil|stofzuig)/, "🧽"],
+  [/(papier|tissue|zakdoek|servet|keukenrol)/, "🧻"],
+  [/(baby|luier|billendoek)/, "🍼"],
+  [/(katten|honden|dieren|vogelzaad|kattenbak)/, "🐾"],
+  [/(batterij|lamp|kaars|lucifer|aansteker|folie|zak(ken)?$)/, "🛒"],
+  [/(fruit|bessen|appel|peer)/, "🍎"],
+  [/(groente|sla$|kool$|bonen|wortel|knol|paprika|tomaat|tomaten)/, "🥬"],
+  [/(melk|yoghurt|kwark|vla|room|zuivel)/, "milk-carton"],
+  [/(kaas)/, "cheese-block"],
+  [/(boter)/, "butter-pack"],
+  [/(brood|bolletje|broodje|pistolet|croissant|beschuit)/, "bread-loaf"],
+  [/(kip|kalkoen)/, "🍗"],
+  [/(vlees|worst|gehakt|burger|schnitzel|filet|biefstuk|spek|ham)/, "🥩"],
+  [/(vis|zalm|tonijn|garnaal|garnalen|haring|kabeljauw)/, "🐟"],
+  [/(bier|wijn)/, "🍷"],
+  [/(sap|drank|water|thee|koffie|limonade|cola|frisdrank)/, "🥤"],
+  [/(koek|chocola|snoep|chips|drop|taart|wafel|cake|ijs$)/, "🍪"],
+  [/(pasta|rijst|noedel|mie)/, "🍝"],
+  [/(saus|blik|pot|soep|bouillon|kruiden|poeder|olie|azijn)/, "🥫"]
+];
+const GENERIC_PRODUCT_ICON = "🛍️";
+
+// Nieuwere emoji worden op oudere telefoons als een leeg vakje getoond: vervang die dan.
+const NEWER_EMOJI_FALLBACK = {"🫜":"🥕","🫛":"🥬","🫘":"🥫","🫙":"🥫","🫚":"🌿","🫓":"🍞","🫑":"🥬","🫐":"🍇","🫒":"🥫","🦪":"🐟"};
+const __emojiSupportCache = {};
+function __emojiSupported(emoji) {
+  if (emoji in __emojiSupportCache) return __emojiSupportCache[emoji];
+  let ok = true;
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 24;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    const draw = ch => { ctx.clearRect(0,0,24,24); ctx.textBaseline = "top"; ctx.font = "20px sans-serif"; ctx.fillText(ch, 0, 0); return ctx.getImageData(0,0,24,24).data.join(","); };
+    ok = draw(emoji) !== draw("￿");
+  } catch (_) { ok = true; }
+  __emojiSupportCache[emoji] = ok;
+  return ok;
+}
+function __safeIcon(icon) {
+  if (!icon) return icon;
+  if (/^[a-z0-9-]+$/i.test(icon)) return icon;          // eigen getekende iconen (svg)
+  if (NEWER_EMOJI_FALLBACK[icon] && !__emojiSupported(icon)) return NEWER_EMOJI_FALLBACK[icon];
+  return icon;
+}
+
+function __cleanProductText(text) {
+  return String(text || "").toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\b\d+([.,]\d+)?\s*(x|kg|gr|g|gram|ml|cl|dl|l|liter|stuks?|st)\b/g, " ")
+    .replace(/^\s*\d+([.,]\d+)?\s*/, " ")
+    .replace(/[^a-zà-ÿ0-9'’\- ]/g, " ")
+    .replace(/’/g, "'")
+    .replace(/\s+/g, " ").trim();
+}
+const __catalogMap = () => {
+  if (!window.__productCatalogMap || window.__productCatalogMap.size !== productCatalog.length) {
+    const m = new Map();
+    productCatalog.forEach(([name, icon]) => { if (!m.has(name)) m.set(name, icon); });
+    window.__productCatalogMap = m;
+  }
+  return window.__productCatalogMap;
+};
+
+function isLooseProduce(text) {
+  const v = __cleanProductText(text);
+  return LOOSE_PRODUCE.has(v);
+}
+
 function getProductIcon(text) {
-  const value = normalizeProductName(text);
-  if (!value) return "";
+  const value = __cleanProductText(text);
+  if (!value) return GENERIC_PRODUCT_ICON;
+  const map = __catalogMap();
 
-  // Explicit fallbacks for common products.
-  // This also catches variants such as "keukenzout" or "zout fijn".
-  if (value === "zout" || value.includes("zout")) return "🧂";
-  if (value === "zwarte peper" || value === "witte peper" ||
-      value.includes("zwarte peper") || value.includes("witte peper")) return "🫙";
-  if (value === "peper" || value === "peperkorrels" || value === "gemalen peper") return "🌶️";
-  if (value === "koffie" || value === "coffee" || value.includes("koffie") || value.includes("coffee")) return "☕";
+  // Vaste uitzonderingen
+  if (/\bzout\b|keukenzout|zeezout/.test(value)) return "🧂";
+  if (/(zwarte|witte) peper/.test(value)) return __safeIcon("🫙");
+  if (/koffie|coffee/.test(value)) return "☕";
 
-  const exact = productCatalog.find(([name]) => value === name);
-  if (exact) return exact[1];
+  // 1. Precies dezelfde naam
+  if (map.has(value)) return __safeIcon(map.get(value));
 
-  // Match common compound names such as "volle melk" or "bruin brood".
-  const contains = productCatalog
-    .filter(([name]) => value.includes(name))
-    .sort((a, b) => b[0].length - a[0].length)[0];
-  return contains ? contains[1] : "";
+  const words = value.split(" ");
+  // 2. Meerdere woorden achter elkaar, zoals "halfvolle melk" in "campina halfvolle melk"
+  let best = null;
+  map.forEach((icon, name) => {
+    if (name.indexOf(" ") === -1) return;
+    if ((" " + value + " ").indexOf(" " + name + " ") !== -1 && (!best || name.length > best[0].length)) best = [name, icon];
+  });
+  if (best) return __safeIcon(best[1]);
+
+  // 3. Losse woorden, van achter naar voren (in het Nederlands staat het hoofdwoord meestal achteraan)
+  const stems = w => [w, w.replace(/'s$/, ""), w.replace(/en$/, ""), w.replace(/s$/, ""), w.replace(/jes$/, ""), w.replace(/tjes$/, "")];
+  for (let i = words.length - 1; i >= 0; i--) {
+    for (const w of stems(words[i])) {
+      if (w.length >= 2 && map.has(w)) return __safeIcon(map.get(w));
+    }
+  }
+  // 4. Samengestelde woorden: "geitenkaas" eindigt op "kaas", "kippenbouillon" op "bouillon"
+  for (let i = words.length - 1; i >= 0; i--) {
+    const w = words[i];
+    let hit = null;
+    map.forEach((icon, name) => {
+      if (name.length >= 4 && name.indexOf(" ") === -1 && w.length > name.length && w.endsWith(name) && (!hit || name.length > hit[0].length)) hit = [name, icon];
+    });
+    if (hit) return __safeIcon(hit[1]);
+  }
+  // 5. Soort product
+  for (const [re, icon] of CATEGORY_ICONS) if (re.test(value)) return __safeIcon(icon);
+  // 6. Altijd iets tonen
+  return GENERIC_PRODUCT_ICON;
+}
+
+function productPhotosEnabled() {
+  try { return localStorage.getItem("boodschappenProductPhotos") !== "false"; } catch (_) { return true; }
 }
 
 
@@ -8247,7 +8399,7 @@ async function fetchOnlineProductSuggestions(query) {
 }
 
 function renderOnlineProductSuggestion(button, product) {
-  const photo = product.imageUrl
+  const photo = product.imageUrl && productPhotosEnabled() && !isLooseProduce(product.name)
     ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : `<span class="productSuggestionIcon">${productIconMarkup(getProductIcon(product.name))}</span>`;
 
@@ -8536,7 +8688,8 @@ function showList(animationType = "") {
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
-    if (item.imageUrl) {
+    if (item.imageUrl && productPhotosEnabled() && !isLooseProduce(productText)) {
+      icon.classList.add("hasPhoto");
       const img = document.createElement("img");
       img.className = "productRealImage productBarcodeImage";
       img.src = item.imageUrl;
@@ -11090,7 +11243,7 @@ function __overviewOverlay(title){
   overlay.className="overviewActionOverlay";
   overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
-  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
+  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=true; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -13665,6 +13818,19 @@ input,select,textarea{font-size:16px}
   auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
+<style id="history-icon-off">#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}</style>
+<style id="product-icon-tile">
+/* Eén vast vakje voor productfoto's én iconen, zodat de lijst rustig oogt. */
+.itemProductContent .productIcon{background:#f1f6f2!important;border-radius:10px!important;visibility:visible!important}
+.itemProductContent .productIcon.hasPhoto{background:transparent!important;box-shadow:none!important;border:0!important}
+.itemProductContent .productIcon.hasPhoto img{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;max-height:30px!important;flex:0 0 30px!important;border-radius:6px!important}
+.itemProductContent .productIcon img,.itemProductContent .productRealImage,.itemProductContent .productBarcodeImage{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;flex:0 0 26px!important;border-radius:5px!important;object-fit:contain!important}
+.itemProductContent .productIcon .productInlineIcon,.itemProductContent .productIcon svg{width:24px!important;height:24px!important}
+.itemProductContent .productIcon{font-size:19px!important;line-height:1!important}
+body.dark-theme .itemProductContent .productIcon{background:#2a352e!important}
+body.dark-theme .itemProductContent .productIcon.hasPhoto{background:transparent!important}
+.aboutMenuHint a{color:inherit;text-decoration:underline}
+</style>
 </body>
 
 <style id="overview-dashboard-final">
