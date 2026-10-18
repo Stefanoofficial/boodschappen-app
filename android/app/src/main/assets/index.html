@@ -5306,7 +5306,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="budgetCategories" class="budgetCategories"></div>
       <h3 class="budgetSectionTitle">Recente uitgaven</h3>
       <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
-      <p class="budgetPrivacyNote">Je budget en uitgaven worden alleen op dit apparaat bewaard.</p>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
     </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
@@ -5625,14 +5625,15 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Gegevens op je apparaat:</strong> je weekplanning, je budget en uitgaven, je gekozen supermarkt en instellingen zoals thema en meldingen. Deze gegevens worden alleen op je eigen apparaat bewaard en niet naar ons verstuurd.</li>
+        <li><strong>Planning en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
+        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
-      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan en delen van je lijsten.</p>
+      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
@@ -13102,6 +13103,7 @@ window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  status.textContent="Maaltijd opgeslagen.";render();
 };
 window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));const st=document.getElementById("smartPlannerStatus");if(st)st.textContent="";render()};
+window.__refreshPlannerUI=function(){try{render();}catch(e){console.warn(e);}};
 function render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
  const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
@@ -13526,6 +13528,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Je categorieën verschijnen zodra je uitgaven toevoegt.</p>';}
     const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(x.category||"Overig")} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
+  window.__refreshBudgetUI=function(){try{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";renderBudget();}catch(e){console.warn(e);}};
   document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";renderBudget();});
 })();
 </script>
@@ -13574,6 +13577,92 @@ input,select,textarea{font-size:16px}
     });
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mark);else mark();
+})();
+</script>
+<script id="accountCloudSync">
+/* Koppelt persoonlijke gegevens aan het account in Firebase (users/{uid}/...).
+   De telefoon houdt een kopie (werkt ook offline); de nieuwste versie wint. */
+(function(){
+  try{ if(typeof auth==="undefined"||typeof database==="undefined"||!auth||!database)return; }catch(e){ return; }
+  var ITEMS=[
+    {path:"privateList", key:function(uid){return "boodschappenPrivate_"+uid;}, scoped:true,
+     refresh:function(){try{if(typeof isPrivateMode==="function"&&isPrivateMode()&&typeof loadPrivateList==="function")loadPrivateList();}catch(e){}}},
+    {path:"weekPlanner", key:function(){return "boodschappen_pro_smart_weekplanner_v1";}, scoped:false,
+     refresh:function(){if(window.__refreshPlannerUI)window.__refreshPlannerUI();}},
+    {path:"budget", key:function(){return "boodschappen_budgetplanner_v1";}, scoped:false,
+     refresh:function(){if(window.__refreshBudgetUI)window.__refreshBudgetUI();}}
+  ];
+  var uid=null, applying=false, timers={}, listeners=[];
+  var proto=Storage.prototype, origSet=proto.setItem, origRemove=proto.removeItem;
+  function ts(k){return k+"__updatedAt";}
+  function owner(k){return k+"__uid";}
+  function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function rawSet(k,v){try{origSet.call(localStorage,k,v);}catch(e){}}
+  function rawRemove(k){try{origRemove.call(localStorage,k);}catch(e){}}
+  function itemForKey(k){
+    if(!uid)return null;
+    for(var i=0;i<ITEMS.length;i++){if(ITEMS[i].key(uid)===k)return ITEMS[i];}
+    return null;
+  }
+  function push(item){
+    if(!uid)return;
+    var k=item.key(uid), u=uid;
+    clearTimeout(timers[item.path]);
+    timers[item.path]=setTimeout(function(){
+      var val=get(k);
+      var stamp=Number(get(ts(k)))||Date.now();
+      var ref=database.ref("users/"+u+"/"+item.path);
+      (val==null?ref.remove():ref.set({json:val,updatedAt:stamp})).catch(function(e){console.warn("Synchroniseren mislukt ("+item.path+"):",e);});
+    },700);
+  }
+  // Elke lokale wijziging van een gekoppeld onderdeel ook naar het account sturen.
+  proto.setItem=function(k,v){
+    origSet.apply(this,arguments);
+    if(this!==window.localStorage||applying)return;
+    var item=itemForKey(k); if(!item)return;
+    rawSet(ts(k),String(Date.now())); rawSet(owner(k),uid);
+    push(item);
+  };
+  proto.removeItem=function(k){
+    origRemove.apply(this,arguments);
+    if(this!==window.localStorage||applying)return;
+    var item=itemForKey(k); if(!item)return;
+    rawSet(ts(k),String(Date.now()));
+    push(item);
+  };
+  function applyRemote(item,k,remote){
+    applying=true;
+    try{
+      if(remote&&typeof remote.json==="string")rawSet(k,remote.json);else rawRemove(k);
+      rawSet(ts(k),String(remote&&remote.updatedAt||0)); rawSet(owner(k),uid);
+    }finally{applying=false;}
+    item.refresh();
+  }
+  function start(u){
+    stop(); uid=u;
+    ITEMS.forEach(function(item){
+      var k=item.key(uid), first=true;
+      var ref=database.ref("users/"+uid+"/"+item.path);
+      var cb=function(snap){
+        var remote=snap.val();
+        var localTs=Number(get(ts(k)))||0, localOwner=get(owner(k)), localVal=get(k);
+        var foreign=!item.scoped&&localOwner&&localOwner!==uid;
+        if(foreign){ // gegevens van een ander account op deze telefoon: niet uploaden
+          applyRemote(item,k,remote); first=false; return;
+        }
+        if(remote&&Number(remote.updatedAt)>localTs){ applyRemote(item,k,remote); }
+        else if(first&&localVal!=null&&(!remote||Number(remote.updatedAt)<localTs||!localTs)){
+          if(!localTs)rawSet(ts(k),String(Date.now()));
+          rawSet(owner(k),uid); push(item);  // bestaande gegevens van deze telefoon overzetten
+        }
+        first=false;
+      };
+      ref.on("value",cb,function(e){console.warn("Ophalen mislukt ("+item.path+"):",e);});
+      listeners.push(function(){ref.off("value",cb);});
+    });
+  }
+  function stop(){listeners.forEach(function(f){try{f();}catch(e){}});listeners=[];uid=null;}
+  auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
 </body>
