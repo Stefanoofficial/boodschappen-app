@@ -11090,7 +11090,7 @@ function __overviewOverlay(title){
   overlay.className="overviewActionOverlay";
   overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
-  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
+  overlay.querySelector(".overviewActionTitleIcon").hidden=true;
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -13665,6 +13665,12 @@ input,select,textarea{font-size:16px}
   auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
+<style id="ios-top-edge-fix">
+/* iPhone: een effen strook bovenin, zodat iOS de kopbalk niet meer half wazig maakt tijdens scrollen. */
+html.platform-ios body::before{content:"";position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 16px);background:#eef8f1;z-index:60;pointer-events:none}
+html.platform-ios body.dark-theme::before{background:#121612}
+#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}
+</style>
 </body>
 
 <style id="overview-dashboard-final">
