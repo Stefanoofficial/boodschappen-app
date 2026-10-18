@@ -13310,6 +13310,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
   window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
 
+  // Adres van je eigen tussenstap (Cloudflare Worker). Vervang JOUW-NAAM door jouw workers.dev-adres.
+  const PRIJZEN_PROXY="https://boodschappen-prijzen.stefanoofficialgraanoogst.workers.dev";
   const budgetRetailerSlugs={ah:"albert_heijn",jumbo:"jumbo",lidl:"lidl",aldi:"aldi",plus:"plus",dirk:"dirk",vomar:"vomar"};
   const retailerName=()=>{const s=document.getElementById("budgetSupermarket");return s&&s.selectedOptions[0]?s.selectedOptions[0].text:"je supermarkt"};
   const money=n=>"€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -13317,10 +13319,24 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   async function fetchBudgetDeals(term,selected){
     const retailer=budgetRetailerSlugs[selected];
     if(!retailer)return null;
-    const url="https://www.prijsprofeet.nl/api/v1/search?q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=20";
-    const response=await fetch(url,{headers:{"Accept":"application/json"}});
-    if(!response.ok){const e=new Error("API-status "+response.status);e.status=response.status;throw e;}
-    const payload=await response.json();
+    const query="q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=20";
+    const bases=[];
+    if(PRIJZEN_PROXY&&!/JOUW-NAAM/.test(PRIJZEN_PROXY))bases.push(PRIJZEN_PROXY.replace(/\/+$/,"")+"/search?");
+    bases.push("https://www.prijsprofeet.nl/api/v1/search?");
+    let lastErr=null;
+    for(const base of bases){
+      let response;
+      try{
+        const ctrl=typeof AbortController!=="undefined"?new AbortController():null;
+        const timer=ctrl?setTimeout(()=>ctrl.abort(),12000):null;
+        response=await fetch(base+query,{headers:{"Accept":"application/json"},signal:ctrl?ctrl.signal:undefined});
+        if(timer)clearTimeout(timer);
+      }catch(netErr){lastErr=netErr;continue;}
+      if(!response.ok){const e=new Error("API-status "+response.status);e.status=response.status;throw e;}
+      var payload=await response.json();
+      lastErr=null;break;
+    }
+    if(lastErr)throw lastErr;
     const rows=Array.isArray(payload)?payload:(payload.results||payload.products||payload.items||payload.data||[]);
     const today=new Date().toISOString().slice(0,10);
     return rows.filter(p=>{
