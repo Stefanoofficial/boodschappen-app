@@ -71,6 +71,11 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
+        // Volg de lettergrootte die de gebruiker in Android heeft gekozen (Instellingen > Weergave > Lettergrootte),
+        // maar begrens die zodat de indeling van de app niet breekt.
+        float fontScale = getResources().getConfiguration().fontScale;
+        int textZoom = Math.round(Math.max(0.85f, Math.min(fontScale, 1.3f)) * 100);
+        settings.setTextZoom(textZoom);
         webView.setBackgroundColor(BACKGROUND_COLOR);
         webView.setVerticalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
@@ -314,7 +319,7 @@ public class MainActivity extends Activity {
             builder = new android.app.Notification.Builder(this)
                     .setPriority(android.app.Notification.PRIORITY_HIGH);
         }
-         builder.setSmallIcon(com.mijnboodschappen.app.R.mipmap.ic_launcher)
+        builder.setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new android.app.Notification.BigTextStyle().bigText(message))
