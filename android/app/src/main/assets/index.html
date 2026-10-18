@@ -13663,6 +13663,11 @@ input,select,textarea{font-size:16px}
   auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
+<script>
+(function(){try{var standalone=window.navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(standalone&&ios)document.documentElement.classList.add("ios-standalone");}catch(e){}})();
+</script>
 <style id="ios-top-edge-fix">
 #overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}
 .app{overscroll-behavior-y:contain!important}
@@ -13672,6 +13677,10 @@ input,select,textarea{font-size:16px}
 .clearListBackdrop:not(.show){backdrop-filter:none!important;-webkit-backdrop-filter:none!important;visibility:hidden!important}
 .clearListBackdrop.show{visibility:visible!important}
 .listOptionsPanel:not(.open){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* Alleen als app op het beginscherm van de iPhone: iOS legt daar een zachte vervaging over de bovenste ±40px
+   van het scrollgebied. Laat dat stuk leeg, zodat de kopbalk eronder scherp blijft. In Safari verandert niets. */
+html.ios-standalone .app{padding-top:46px!important}
 </style>
 </body>
 
