@@ -13259,6 +13259,28 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 .budgetExpenseDelete{display:block;border:0;background:transparent;color:#a34848;font-size:11px;padding:5px 0 0;cursor:pointer}
 .dealRow{padding:10px 0;border-bottom:1px solid var(--border-color,#dce9e2)}.dealRow strong{display:block;font-size:13px;overflow-wrap:anywhere}.dealRow div{font-size:13px;margin-top:2px}.dealRow small{display:block;margin-top:2px;color:var(--muted-text,#718177);font-size:11px}
 .budgetDealsCard{margin:16px 0;padding:14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}.budgetDealsCard h4{margin:0 0 4px;font-size:16px;color:var(--text-color,#344d3b)}.budgetDealsCard>.budgetStatus{margin:0 0 10px}.budgetDealsSearch{display:flex;gap:8px;align-items:stretch}.budgetDealsSearch .budgetInput{flex:1}#budgetLivePriceResults:not(:empty),#weekplanDealsResults:not(:empty){margin:10px 0;font-size:13px;line-height:1.45}.budgetWeekButton{width:100%;margin-top:8px}.budgetSource{margin-top:12px!important}.budgetSource a{color:#3e7650;font-weight:700;text-decoration:underline}body.dark-theme .budgetDealsCard{background:#1d241f}body.dark-theme .budgetDealsCard h4{color:#edf5ef}body.dark-theme .budgetSource a{color:#9fd3ac}body.dark-theme #budgetLivePriceResults,body.dark-theme #weekplanDealsResults{color:#edf5ef}
+.budgetDealsCard .dealList{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}
+.budgetDealsCard .dealItem{background:#fff;border-radius:14px;padding:11px 13px;box-shadow:0 1px 4px rgba(47,90,61,.08)}
+.budgetDealsCard .dealLabel{display:inline-block;margin:0 0 5px;padding:2px 8px;border-radius:999px;background:#e4efe7;color:#3e7650;font-size:11px!important;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.budgetDealsCard .dealName{font-size:14px!important;font-weight:600!important;line-height:1.3;color:#2f4a38;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.budgetDealsCard .dealPriceRow{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:5px}
+.budgetDealsCard .dealPrice{font-size:16px!important;font-weight:800!important;color:#2f5a3d}
+.budgetDealsCard .dealWas{font-size:12px!important;color:#8a988f;text-decoration:line-through}
+.budgetDealsCard .dealBadge{font-size:11px!important;font-weight:800;color:#fff;background:#d9534f;border-radius:999px;padding:1px 7px}
+.budgetDealsCard .dealMeta{margin-top:4px;font-size:12px!important;line-height:1.35;color:#718177}
+.budgetDealsCard .dealMore{display:block;width:100%;margin:4px 0 8px;padding:9px;border:0;border-radius:12px;background:transparent;color:#3e7650;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.budgetDealsCard .dealMore:active{background:#e4efe7}
+.budgetDealsCard .dealSummary{display:flex;flex-direction:column;gap:2px;margin:12px 0 4px;padding:11px 13px;border-radius:14px;background:#e4efe7}
+.budgetDealsCard .dealSummary strong{font-size:14px!important;font-weight:700!important;color:#2f4a38}
+.budgetDealsCard .dealSummary span{font-size:13px!important;color:#3e7650}
+.budgetDealsCard .dealFootnote{margin:8px 0 0;font-size:12px!important;line-height:1.45;color:#718177}
+body.dark-theme .budgetDealsCard .dealItem{background:#29352d;box-shadow:none}
+body.dark-theme .budgetDealsCard .dealName,body.dark-theme .budgetDealsCard .dealSummary strong{color:#edf5ef}
+body.dark-theme .budgetDealsCard .dealPrice{color:#9fd3ac}
+body.dark-theme .budgetDealsCard .dealWas,body.dark-theme .budgetDealsCard .dealMeta,body.dark-theme .budgetDealsCard .dealFootnote{color:#b8c6bc}
+body.dark-theme .budgetDealsCard .dealLabel,body.dark-theme .budgetDealsCard .dealSummary{background:#34443a;color:#cfe6d5}
+body.dark-theme .budgetDealsCard .dealSummary span{color:#cfe6d5}
+body.dark-theme .budgetDealsCard .dealMore{color:#9fd3ac}
 .budgetEmpty,.budgetPrivacyNote{font-size:12px;line-height:1.5;color:var(--muted-text,#718177)}
 .budgetPrivacyNote{margin:16px 0 0}
 body.dark-theme .budgetPlannerPanel{background:#222a24;border-color:#38453b;color:#edf5ef}
@@ -13353,7 +13375,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     return"Geen verbinding met PrijsProfeet. Controleer je internetverbinding en probeer het opnieuw.";
   }
   // Relevantie: laat producten weg die het zoekwoord alleen als smaak of bijzaak in de naam hebben (kaaschips, chocoladevlokken melk).
-  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker"];
+  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker","hagelslag","muisjes","gevuld","pinda","kokos","chocomel","limonade","siroop"];
+  const CAT_HINTS=[[/^(melk|halfvolle melk|volle melk|yoghurt|boter|eieren|kwark|slagroom|room)$/,/zuivel/],[/\b(kipfilet|gehakt|rookworst|ham|spek|zalm|zalmfilet|vis|vlees)\b/,/vlees|vis|kip/],[/(ui|uien|paprika|wortel|broccoli|spinazie|courgette|sla|witlof|boerenkool|champignons|aardappelen|citroen|tomaten|knoflook|bosui)$/,/groente|aardappel|fruit/]];
   const NON_FOOD=/drogist|verzorg|huishoud|schoonmaak|baby|dier|cosmetic|was-|wasmiddel|gezondheid/;
   const SNACK_TERMS=/chips|koek|snoep|chocola|drop|snack/;
   const escRe=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
@@ -13374,6 +13397,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(!head)return -1;
     let score=words.reduce((n,w)=>n+wordHit(w),0)/words.length;
     if(cat&&words.some(w=>cat.includes(w)))score+=3;
+    CAT_HINTS.forEach(([re,catRe])=>{if(re.test(t)&&catRe.test(cat))score+=2;});
     // "Roomboter met olie", "Salade met mosterd": het zoekwoord staat pas na met/in/op, dus het is bijzaak.
     const mainPart=name.split(/\s(?:met|in|op)\s/)[0];
     const headWord=words[words.length-1];
@@ -13390,6 +13414,24 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   function bestDeal(rows,term){
     return rankDeals(rows,term)[0]||null;
   }
+  const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+  const niceDate=iso=>{const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return"";const d=new Date(+m[1],+m[2]-1,+m[3]);return LONG_DAYS[d.getDay()]+" "+(+m[3])+" "+MONTHS[+m[2]-1];};
+  function dealCard(p,label){
+    const card=document.createElement("div");card.className="dealItem";
+    if(label){const l=document.createElement("span");l.className="dealLabel";l.textContent=label;card.appendChild(l);}
+    const name=document.createElement("div");name.className="dealName";name.textContent=p.name||p.product_name||p.title||"Product";card.appendChild(name);
+    const priceRow=document.createElement("div");priceRow.className="dealPriceRow";
+    const amount=Number(p.price),orig=Number(p.original_price);
+    const now=document.createElement("span");now.className="dealPrice";now.textContent=money(amount);priceRow.appendChild(now);
+    if(orig>amount){const was=document.createElement("span");was.className="dealWas";was.textContent=money(orig);priceRow.appendChild(was);
+      const pct=Math.round((1-amount/orig)*100);if(pct>0){const b=document.createElement("span");b.className="dealBadge";b.textContent="-"+pct+"%";priceRow.appendChild(b);}}
+    card.appendChild(priceRow);
+    const promo=p.promotion||(p.promotional_keywords||[])[0]||"";
+    const meta=document.createElement("div");meta.className="dealMeta";
+    meta.textContent=[promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
+    if(meta.textContent)card.appendChild(meta);
+    return card;
+  }
   window.searchBudgetLivePrices=async function(){
     const input=document.getElementById("budgetLiveSearch"),results=document.getElementById("budgetLivePriceResults");
     const term=(input&&input.value||"").trim();
@@ -13404,17 +13446,16 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
       if(!rows.length&&all.length){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Er zijn wel "+all.length+" andere producten met “"+term+"” in de naam in de aanbieding (zoals snacks of producten met die smaak), maar die passen niet bij je zoekopdracht.";return;}
       if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Dat betekent niet dat het product niet te koop is: alleen aanbiedingen zijn beschikbaar, geen gewone schapprijzen.";return;}
       results.replaceChildren();
-      rows.slice(0,10).forEach(p=>{
-        const card=document.createElement("div");card.className="dealRow";
-        const name=document.createElement("strong");name.textContent=p.name||p.product_name||p.title||"Product";
-        const price=document.createElement("div");
-        const amount=Number(p.price);
-        price.textContent=money(amount)+(p.quantity?" · "+p.quantity:"");
-        if(p.original_price&&Number(p.original_price)>amount)price.textContent+=" (was "+money(p.original_price)+")";
-        const validity=document.createElement("small");
-        validity.textContent=[p.promotion||(p.promotional_keywords||[])[0]||"",p.valid_until?"t/m "+shortDate(p.valid_until):""].filter(Boolean).join(" · ");
-        card.append(name,price,validity);results.appendChild(card);
-      });
+      const list=document.createElement("div");list.className="dealList";results.appendChild(list);
+      const FIRST=4;
+      rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p)));
+      if(rows.length>FIRST){
+        const more=document.createElement("button");more.type="button";more.className="dealMore";
+        const rest=Math.min(rows.length,12)-FIRST;
+        more.textContent="Toon "+rest+" meer";
+        more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p)));more.remove();});
+        results.appendChild(more);
+      }
     }catch(err){results.textContent=dealError(err);}
   };
   const STAPLES=/\b(zout|peper|water|nootmuskaat|optioneel)\b/i;
@@ -13451,22 +13492,15 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     }
     if(failed){out.textContent=dealError(failed);return;}
     out.replaceChildren();
-    const head=document.createElement("p");head.style.cssText="margin:0 0 8px;font-weight:700;";
-    head.textContent=found.length+" van "+list.length+" producten uit je weekplanning zijn nu in de aanbieding bij "+retailerName()+".";
-    out.appendChild(head);
     let saving=0;
-    found.forEach(f=>{
-      const p=f.deal,amount=Number(p.price);
-      const row=document.createElement("div");row.className="dealRow";
-      const t=document.createElement("strong");t.textContent=f.term.charAt(0).toUpperCase()+f.term.slice(1)+": "+(p.name||"Product");
-      const pr=document.createElement("div");pr.textContent=money(amount)+(p.quantity?" · "+p.quantity:"");
-      if(p.original_price&&Number(p.original_price)>amount){pr.textContent+=" (was "+money(p.original_price)+")";saving+=Number(p.original_price)-amount;}
-      const v=document.createElement("small");v.textContent=[p.promotion||(p.promotional_keywords||[])[0]||"",p.valid_until?"t/m "+shortDate(p.valid_until):""].filter(Boolean).join(" · ");
-      row.append(t,pr,v);out.appendChild(row);
-    });
-    if(saving>0){const sv=document.createElement("p");sv.style.cssText="margin:10px 0 0;font-weight:700;";sv.textContent="Mogelijke besparing: ongeveer "+money(saving)+" (indicatie, per verpakking).";out.appendChild(sv);}
-    if(missing.length){const ms=document.createElement("p");ms.className="budgetStatus";ms.textContent="Geen aanbieding gevonden voor: "+missing.join(", ")+".";out.appendChild(ms);}
-    const note=document.createElement("p");note.className="budgetStatus";note.textContent="Alleen aanbiedingen worden getoond, geen gewone schapprijzen. Een product zonder aanbieding is dus niet per se duurder.";out.appendChild(note);
+    found.forEach(f=>{const a=Number(f.deal.price),o=Number(f.deal.original_price);if(o>a)saving+=o-a;});
+    const sum=document.createElement("div");sum.className="dealSummary";
+    const st=document.createElement("strong");st.textContent=found.length?found.length+" van "+list.length+" producten in de aanbieding":"Geen van je "+list.length+" producten is nu in de aanbieding";
+    const ss=document.createElement("span");ss.textContent=found.length?(saving>0?"Je bespaart ongeveer "+money(saving)+" bij "+retailerName():"bij "+retailerName()):"bij "+retailerName()+". Probeer het later deze week nog eens.";
+    sum.append(st,ss);out.appendChild(sum);
+    if(found.length){const listEl=document.createElement("div");listEl.className="dealList";found.forEach(f=>listEl.appendChild(dealCard(f.deal,f.term)));out.appendChild(listEl);}
+    if(missing.length){const ms=document.createElement("p");ms.className="dealFootnote";ms.textContent="Geen aanbieding voor: "+missing.join(", ")+".";out.appendChild(ms);}
+    const note=document.createElement("p");note.className="dealFootnote";note.textContent="De besparing is een indicatie per verpakking. Alleen aanbiedingen worden getoond, geen gewone schapprijzen.";out.appendChild(note);
   };
   const liveSearchInput=document.getElementById("budgetLiveSearch");
   if(liveSearchInput)liveSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();window.searchBudgetLivePrices();}});
