@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Boodschappenlijst</title>
+<title>Mijn Boodschappen</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 * {
@@ -5038,7 +5038,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div class="loginBox">
     <div class="welcome">
   <h2>Welkom bij</h2>
-  <h2>Boodschappenlijst</h2>
+  <h2>Mijn Boodschappen</h2>
   <p>Jouw lijst, altijd bij de hand</p>
 </div>
 <div class="inputBox">
@@ -5111,7 +5111,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </button>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('code')">
-      <i class="fa-solid fa-keyboard"></i><span>Aansluiten met familiecode</span>
+      <i class="fa-solid fa-keyboard"></i><span>Meedoen met een familiecode</span>
     </button>
 
     <button type="button" class="useModeButton" onclick="chooseUseMode('private')">
@@ -5147,7 +5147,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div id="familyMenuMain" class="familyMenuPage">
     <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
       <i class="fa-solid fa-crown"></i>
-      <span><strong>Boodschappenlijst Pro</strong><small>Slimmer plannen, budget beheren en meer.</small></span>
+      <span><strong>Mijn Boodschappen Pro</strong><small>Weekplanner, budget en aanbiedingen.</small></span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
     <div class="moreMenuSectionLabel">SAMEN</div>
@@ -5214,12 +5214,12 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div id="proMenuSub" class="familyMenuPage familyMenuSub" style="display:none;">
     <button type="button" class="familyMenuBack" onclick="closeProSubmenu(event)">
       <i class="fa-solid fa-chevron-left"></i>
-      <span>Boodschappenlijst Pro</span>
+      <span>Mijn Boodschappen Pro</span>
     </button>
     <div class="proHero">
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
-      <h2>Boodschappenlijst Pro</h2>
-      <p>Slimmer plannen, meer overzicht en grip op je boodschappen.</p>
+      <h2>Mijn Boodschappen Pro</h2>
+      <p>Plan je maaltijden, houd je budget bij en vind aanbiedingen bij je supermarkt.</p>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5306,13 +5306,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="budgetCategories" class="budgetCategories"></div>
       <h3 class="budgetSectionTitle">Recente uitgaven</h3>
       <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
-      <p class="budgetPrivacyNote">Je budget en uitgaven worden lokaal op dit apparaat opgeslagen. Aanbiedingen worden opgehaald via PrijsProfeet; gewone schapprijzen zijn niet beschikbaar.</p>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden alleen op dit apparaat bewaard.</p>
     </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
     <div class="proFeatureCard">
-      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Volgende stap</span></div>
+      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
     <p class="proFootnote">De Pro-functies worden stap voor stap ontwikkeld. Er is op dit moment geen betaald abonnement nodig.</p>
   </div>
@@ -5361,7 +5361,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <i class="fa-solid fa-plus"></i>
       <span>Nieuwe lijst</span>
     </button>
-    <div class="familyMenuSubTitle refreshableMenuTitle"><span>Mijn deellijsten</span><button type="button" class="silentRefreshBtn" id="refreshSharedListsBtn" aria-label="Gedeelde lijsten verversen" title="Verversen" onclick="refreshSharedListsSilently(event)"><i class="fa-solid fa-rotate"></i></button></div>
+    <div class="familyMenuSubTitle refreshableMenuTitle"><span>Mijn gedeelde lijsten</span><button type="button" class="silentRefreshBtn" id="refreshSharedListsBtn" aria-label="Gedeelde lijsten verversen" title="Verversen" onclick="refreshSharedListsSilently(event)"><i class="fa-solid fa-rotate"></i></button></div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
   </div>
 
@@ -5498,8 +5498,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
       <div class="notificationInfo">
         <strong>Over deze functie</strong>
-        <p>De herinnering wordt lokaal op je Android-telefoon ingesteld. Er is geen account of server nodig om de melding te ontvangen.</p>
-        <p>Als je meldingen voor de app in Android hebt geblokkeerd, moet je ze eerst toestaan in de Android-instellingen.</p>
+        <p>De herinnering wordt op je telefoon zelf ingesteld. Je hebt er geen internet voor nodig.</p>
+        <p>Krijg je geen melding? Controleer dan of meldingen voor Mijn Boodschappen aan staan in de instellingen van je telefoon.</p>
       </div>
     </div>
   </div>
@@ -5515,7 +5515,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <span>Lijst opslaan</span>
     </button>
     <div id="savedListsContainer" class="savedListsContainer"></div>
-    <div class="settingsMenuHint">Opgeslagen lijsten worden aan je account gekoppeld. Ze blijven bewaard als je je browsergeschiedenis wist.</div>
+    <div class="settingsMenuHint">Opgeslagen lijsten zijn gekoppeld aan je account. Ze blijven bewaard, ook als je inlogt op een andere telefoon.</div>
   </div>
 
   <div id="accountMenuSub" class="familyMenuPage accountMenuPage" style="display:none;">
@@ -5558,7 +5558,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="feedbackPrompt">Vertel ons wat je vindt</div>
     <label class="feedbackLabel" for="feedbackText">Je feedback</label>
-    <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Schrijf hier je feedback..."></textarea>
+    <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Schrijf hier je feedback…"></textarea>
     <button type="button" class="familyMenuItem feedbackSendBtn" onclick="shareFeedback(event)">
       <i class="fa-solid fa-paper-plane"></i>
       <span>Feedback delen</span>
@@ -5573,8 +5573,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </button>
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
-      <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Boodschappenlijst</div>
-      <div class="aboutInfoVersion">Versie 1.2</div>
+      <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
+      <div class="aboutInfoVersion">Versie 1.3</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -5584,6 +5584,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken.</span></div>
     </div>
     <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
@@ -5616,20 +5618,22 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 1 oktober 2026</p>
+      <p><strong>Versie:</strong> 18 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
-        <li><strong>Familiegegevens:</strong> familie-/deellijstcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Lokale instellingen:</strong> bijvoorbeeld thema-, meldings- en bepaalde appvoorkeuren die op je apparaat worden opgeslagen.</li>
-        <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcode-scanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
+        <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
+        <li><strong>Gegevens op je apparaat:</strong> je weekplanning, je budget en uitgaven, je gekozen supermarkt en instellingen zoals thema en meldingen. Deze gegevens worden alleen op je eigen apparaat bewaard en niet naar ons verstuurd.</li>
+        <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
+        <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
-      <h4>Externe dienstverlener</h4>
-      <p>Voor accountbeheer en online opslag gebruikt de app Google Firebase. Daardoor worden gegevens die nodig zijn voor deze functies verwerkt via de Firebase-diensten die de app gebruikt.</p>
+      <h4>Externe dienstverleners</h4>
+      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan en delen van je lijsten.</p>
+      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
       <h4>Bewaren en verwijderen</h4>
@@ -5638,7 +5642,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <p><strong>Verantwoordelijke:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
-      <p class="legalSmall">Laatst bijgewerkt: 1 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
     </div>
   </div>
 
@@ -5650,16 +5654,17 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 1 oktober 2026</p>
+      <p><strong>Versie:</strong> 18 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
-      <h4>4. Barcode-scanner</h4><p>De barcode-scanner is een hulpmiddel om producten sneller te herkennen. Controleer altijd of het juiste product en aantal op je lijst staan.</p>
-      <h4>5. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
-      <h4>6. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
-      <h4>7. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
-      <h4>8. Contact</h4><p><strong>Aanbieder/eigenaar:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
-      <p class="legalSmall">Laatst bijgewerkt: 1 oktober 2026.</p>
+      <h4>4. Barcodescanner</h4><p>De scanner is een hulpmiddel om producten sneller te herkennen. Controleer altijd of het juiste product en aantal op je lijst staan.</p>
+      <h4>5. Recepten, prijzen en aanbiedingen</h4><p>Aanbiedingen worden geleverd door PrijsProfeet en zijn bedoeld als hulpmiddel. Prijzen en acties kunnen afwijken van die in de winkel. Bekijk bij twijfel altijd de prijs in de winkel. Recepten en hoeveelheden zijn suggesties.</p>
+      <h4>6. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
+      <h4>7. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
+      <h4>8. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
+      <h4>9. Contact</h4><p><strong>Aanbieder/eigenaar:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
+      <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
     </div>
   </div>
 
@@ -5679,7 +5684,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
-      <p>Via Mijn familie kun je later een nieuwe familie maken of met een familiecode aansluiten bij een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
+      <p>Via Mijn familie kun je een nieuwe familie maken of met een familiecode meedoen met een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
@@ -5690,10 +5695,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Bewaar een lijst om hem later opnieuw te laden. Je gewone boodschappenlijst blijft daarbij behouden.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Boodschappenhistorie</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt de huidige lijst eerst bewaard in je boodschappenhistorie. Daarna wordt je huidige lijst leeggemaakt.</p>
-      <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het wordt niet apart aan de boodschappenhistorie toegevoegd.</p>
-      <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. De boodschappenhistorie bevat eerdere lijsten die zijn bewaard bij het wissen van de volledige lijst.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
+      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg.</p>
+      <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het komt niet in je geschiedenis.</p>
+      <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
@@ -5716,14 +5721,14 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div class="input-row-wrap">
     <div class="input-row">
-      <input id="product" placeholder="Bijv. melk, brood, eieren..." autocomplete="off">
+      <input id="product" placeholder="Bijv. melk, brood, eieren…" autocomplete="off">
       <button class="add" onclick="addProduct()">+ Toevoegen</button>
     </div>
     <div id="productSuggestions" class="productSuggestions" aria-label="Suggesties"></div>
   </div>
 <div class="searchBox">
   <i class="fa-solid fa-magnifying-glass"></i>
-  <input id="searchInput" type="text" placeholder="Zoek in je lijst..." oninput="searchList()">
+  <input id="searchInput" type="text" placeholder="Zoek in je lijst…" oninput="searchList()">
   <button type="button" class="barcode-search-btn" onclick="openBarcodeScanner()" aria-label="Scan barcode" title="Barcode scannen"><i class="fa-solid fa-barcode"></i></button>
   <button type="button" class="search-clear-btn" onclick="clearSearch()">✕</button>
 </div>
@@ -5751,7 +5756,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="overview-new-card overview-click-card" onclick="openQuickAddFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-bolt overview-new-bolt"></i><span>Snel opnieuw toevoegen</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
       <div id="overviewQuickNew" class="overview-quick-content">
-        <div class="overview-new-muted">Kies een producttegel om het direct aan je lijst toe te voegen.</div>
+        <div class="overview-new-muted">Tik op een product om het meteen aan je lijst toe te voegen.</div>
       </div>
     </div>
 
@@ -5763,9 +5768,9 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </button>
 
     <button type="button" class="overview-new-card overview-click-card" onclick="openShoppingHistoryFromOverview()">
-      <div class="overview-new-title"><i class="fa-solid fa-clock-rotate-left overview-new-history"></i><span>Boodschappenhistorie</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
+      <div class="overview-new-title"><i class="fa-solid fa-clock-rotate-left overview-new-history"></i><span>Geschiedenis</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
       <div class="overview-new-row">
-        <div><strong>Eerdere boodschappenrondes</strong><div id="overviewHistorySummary" class="overview-new-muted">Bekijk wat je eerder hebt gekocht.</div></div>
+        <div><strong>Eerdere boodschappen</strong><div id="overviewHistorySummary" class="overview-new-muted">Bekijk wat je eerder hebt gekocht.</div></div>
       </div>
     </button>
 
@@ -5775,12 +5780,12 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div id="overviewMoreInsights" class="overviewMoreInsights" hidden>
       <section class="overviewInsightCard">
         <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Jouw boodschappengewoonten</h3></div>
-        <p class="overviewInsightLead">Kijk welke producten regelmatig terugkomen in je bewaarde boodschappenrondes.</p>
-        <div id="overviewHabitInsights" class="overviewHabitInsights"><p class="overviewInsightEmpty">Je inzichten verschijnen zodra je boodschappenrondes hebt bewaard.</p></div>
+        <p class="overviewInsightLead">Zie welke producten je vaak koopt, op basis van je geschiedenis.</p>
+        <div id="overviewHabitInsights" class="overviewHabitInsights"><p class="overviewInsightEmpty">Je inzichten verschijnen zodra er lijsten in je geschiedenis staan.</p></div>
       </section>
       <section class="overviewInsightCard">
-        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>Jouw historie in het kort</h3></div>
-        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>bewaarde boodschappenrondes</span></div>
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>Je geschiedenis in het kort</h3></div>
+        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>lijsten in je geschiedenis</span></div>
         <p id="overviewHistoryInsightText" class="overviewInsightLead">Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.</p>
       </section>
     </div>
@@ -6314,7 +6319,7 @@ function testShoppingReminder() {
     setNotificationStatus((/iPad|iPhone|iPod/i.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) ? "Testmelding werkt alleen in de iPhone-app." : "Testmelding werkt alleen in de Android-app.", true);
     return;
   }
-  setNotificationStatus("Testmelding wordt verzonden...");
+  setNotificationStatus("Testmelding wordt verzonden…");
   AndroidApp.testShoppingReminder();
 }
 
@@ -6402,7 +6407,7 @@ async function refreshActiveSharedListSilently(event){
       return;
     }
     boodschappen=normalizeBoodschappen(data.boodschappen||[]);
-    currentListName=String(data.name||"Deellijst");
+    currentListName=String(data.name||"Gedeelde lijst");
     try{ localStorage.setItem("activeSharedListName:" + id,currentListName); }catch(_){}
     currentSharedListInviteCode=data.inviteCode||currentSharedListInviteCode||null;
     const h=document.querySelector(".headerBar h1");
@@ -6606,7 +6611,7 @@ async function shareFeedback(event) {
   if (button) {
     button.disabled = true;
     button.style.opacity = '0.7';
-    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Versturen...</span>';
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Versturen…</span>';
   }
 
   try {
@@ -6619,9 +6624,9 @@ async function shareFeedback(event) {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: 'Nieuwe feedback — Boodschappenlijst',
+        _subject: 'Nieuwe feedback — Mijn Boodschappen',
         message: text,
-        app: 'Boodschappenlijst',
+        app: 'Mijn Boodschappen',
         version: '1.0'
       })
     });
@@ -6653,7 +6658,7 @@ async function manageProfilePhoto() {
     photoURL = String(snap.val() || "");
   } catch (error) {
     console.error("Profielfoto laden mislukt", error);
-    await familyAlert("Foto niet geladen", "De profielfoto kon niet worden geladen. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
+    await familyAlert("Foto niet geladen", "De profielfoto kon niet worden geladen. Controleer je internetverbinding en probeer het opnieuw.", "fa-triangle-exclamation");
     return;
   }
   const preview = photoURL
@@ -6706,13 +6711,13 @@ async function manageProfilePhoto() {
     }
     const chooseButton = overlay.querySelector("#chooseProfilePhoto");
     chooseButton.disabled = true;
-    chooseButton.textContent = "Foto verwerken...";
+    chooseButton.textContent = "Foto verwerken…";
     try {
       const dataURL = await makeSmallPhotoDataURL(file);
       if (dataURL.length > 300000) {
         throw new Error("De verkleinde foto is nog te groot. Kies een andere foto.");
       }
-      chooseButton.textContent = "Opslaan...";
+      chooseButton.textContent = "Opslaan…";
       await database.ref("users/" + user.uid + "/photoURL").set(dataURL);
       const previewContainer = overlay.querySelector("#profilePhotoPreview");
       if (previewContainer) {
@@ -6729,8 +6734,8 @@ async function manageProfilePhoto() {
       chooseButton.disabled = false;
       chooseButton.textContent = "Foto kiezen";
       const message = error && error.code === "PERMISSION_DENIED"
-        ? "Firebase weigert deze foto. Pas de photoURL-regel aan zodat verkleinde afbeeldingen tot 300.000 tekens zijn toegestaan."
-        : (error && error.message ? error.message : "Controleer je verbinding en Firebase-regels.");
+        ? "Deze foto kon niet worden opgeslagen. Kies een kleinere foto en probeer het opnieuw."
+        : "De foto kon niet worden opgeslagen. Controleer je internetverbinding en probeer het opnieuw.";
       await familyAlert("Foto niet opgeslagen", message, "fa-triangle-exclamation");
     } finally {
       fileInput.value = "";
@@ -6747,7 +6752,7 @@ async function manageProfilePhoto() {
       await familyAlert("Profielfoto verwijderd", "Je standaardpictogram wordt weer getoond.", "fa-circle-check");
     } catch (error) {
       console.error("Profielfoto verwijderen mislukt", error);
-      await familyAlert("Verwijderen mislukt", "De profielfoto kon niet worden verwijderd. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
+      await familyAlert("Verwijderen mislukt", "De profielfoto kon niet worden verwijderd. Controleer je internetverbinding en probeer het opnieuw.", "fa-triangle-exclamation");
     }
   });
 }
@@ -6948,9 +6953,9 @@ async function deleteAccountFromMenu() {
 
     let message = "Je account kon niet volledig worden verwijderd. Probeer het opnieuw.";
     if (error && error.code === "PERMISSION_DENIED") {
-      message = "Firebase blokkeert één van de verwijderacties. Controleer de Database Rules voor het verwijderen van een lid uit een Deellijst.";
+      message = "Je account kon niet volledig worden verwijderd. Probeer het later opnieuw of neem contact met ons op.";
     } else if (error && error.message) {
-      message = "Account verwijderen mislukt: " + error.message;
+      message = "Account verwijderen is niet gelukt. Probeer het later opnieuw.";
     }
 
     await familyAlert("Account verwijderen mislukt", message, "fa-triangle-exclamation");
@@ -9113,7 +9118,7 @@ async function createSharedList(){
   }
 
   if(!id){
-    await familyAlert("Deellijst","De deellijst kon niet worden aangemaakt. Controleer de Firebase-regels.","fa-triangle-exclamation");
+    await familyAlert("Gedeelde lijst","De gedeelde lijst kon niet worden aangemaakt. Controleer je internetverbinding en probeer het opnieuw.","fa-triangle-exclamation");
     return;
   }
   await openSharedList(id, true);
@@ -9122,20 +9127,20 @@ async function createSharedList(){
 async function joinSharedListByCode(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
-  const code=(await familyPrompt("Deellijstcode","Voer de code van 10 letters en cijfers in.","fa-key") || "").trim();
+  const code=(await familyPrompt("Deelcode","Voer de code van 10 letters en cijfers in.","fa-key") || "").trim();
   if(!code) return;
 
   try{
     const codeSnap=await database.ref("sharedListCodes/" + code).once("value");
     const id=codeSnap.val();
-    if(!id){ await familyAlert("Deellijst","Deze code bestaat niet.","fa-triangle-exclamation"); return; }
+    if(!id){ await familyAlert("Gedeelde lijst","Deze code bestaat niet.","fa-triangle-exclamation"); return; }
 
     const listSnap=await database.ref("sharedLists/" + id).once("value");
     const list=listSnap.val();
-    if(!list){ await familyAlert("Deellijst","Deze lijst bestaat niet meer.","fa-triangle-exclamation"); return; }
+    if(!list){ await familyAlert("Gedeelde lijst","Deze lijst bestaat niet meer.","fa-triangle-exclamation"); return; }
     if(list.members && list.members[user.uid]===true){ await openSharedList(id, true); return; }
 
-    const join=await familyConfirm("Deellijst","Wil je deelnemen aan de deellijst “" + (list.name||"Deellijst") + "”?");
+    const join=await familyConfirm("Gedeelde lijst","Wil je deelnemen aan de gedeelde lijst “" + (list.name||"Gedeelde lijst") + "”?");
     if(!join) return;
 
     const updates={};
@@ -9153,7 +9158,7 @@ async function joinSharedListByCode(){
     await openSharedList(id, true);
   }catch(error){
     console.error("Deellijst via code mislukt:",error);
-    await familyAlert("Deellijst","De code kon niet worden verwerkt. Controleer de Firebase-regels.","fa-triangle-exclamation");
+    await familyAlert("Gedeelde lijst","De code kon niet worden verwerkt. Controleer je internetverbinding en probeer het opnieuw.","fa-triangle-exclamation");
   }
 }
 
@@ -9171,7 +9176,7 @@ async function renderSharedLists(){
     const index=indexSnap.val()||{};
     const ids=Object.keys(index).filter(id=>index[id]===true);
     if(!ids.length){
-      box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
+      box.innerHTML='<div class="sharedListEmpty">Nog geen gedeelde lijsten. Maak hierboven je eerste lijst.</div>';
       return;
     }
     const results=await Promise.all(ids.map(async id=>{
@@ -9184,7 +9189,7 @@ async function renderSharedLists(){
     const mine=results.filter(Boolean).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
     box.innerHTML="";
     if(!mine.length){
-      box.innerHTML='<div class="sharedListEmpty">Nog geen deellijsten. Maak hierboven je eerste lijst.</div>';
+      box.innerHTML='<div class="sharedListEmpty">Nog geen gedeelde lijsten. Maak hierboven je eerste lijst.</div>';
       return;
     }
     mine.forEach(([id,v])=>{
@@ -9193,7 +9198,7 @@ async function renderSharedLists(){
       btn.type="button";
       btn.className="savedListRow";
       btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
-      btn.querySelector("span").textContent=v.name||"Deellijst";
+      btn.querySelector("span").textContent=v.name||"Gedeelde lijst";
       btn.dataset.sharedListId = id;
       btn.onclick = async function(){
         const selectedId=this.dataset.sharedListId;
@@ -9212,7 +9217,7 @@ async function renderSharedLists(){
           // De boodschappenlijst zelf wordt hier NIET geopend.
           currentSharedListId=selectedId;
           currentSharedListInviteCode=data.inviteCode || null;
-          currentListName=String(data.name || "Deellijst");
+          currentListName=String(data.name || "Gedeelde lijst");
           const members=data.members || {};
           const count=Object.keys(members).filter(uid=>members[uid]===true).length;
 
@@ -9233,7 +9238,7 @@ async function renderSharedLists(){
   }catch(e){
     if(renderGeneration !== __sharedListsRenderGeneration) return;
     console.error("Mijn deellijsten laden mislukt:",e);
-    box.innerHTML='<div class="sharedListEmpty">De deellijsten konden niet worden geladen.</div>';
+    box.innerHTML='<div class="sharedListEmpty">De gedeelde lijsten konden niet worden geladen.</div>';
   }
 }
 
@@ -9257,9 +9262,9 @@ async function showSharedListCode(){
   }
 
   const code=String((list && list.inviteCode) || currentSharedListInviteCode || "");
-  if(!list) list={name:"Deellijst"};
+  if(!list) list={name:"Gedeelde lijst"};
   if(!code){
-    await familyAlert("Deelcode","Voor deze deellijst is geen deelcode beschikbaar.","fa-link");
+    await familyAlert("Deelcode","Voor deze gedeelde lijst is geen deelcode beschikbaar.","fa-link");
     return;
   }
 
@@ -9311,8 +9316,8 @@ async function showSharedListCode(){
     try{
       if(navigator.share){
         await navigator.share({
-          title:list.name || "Deellijst",
-          text:"Doe mee met deze deellijst",
+          title:list.name || "Gedeelde lijst",
+          text:"Doe mee met deze gedeelde lijst",
           url:link
         });
       }else{
@@ -9335,7 +9340,7 @@ async function showSharedListMembers(){
     const listId=currentSharedListId;
     const snap=await database.ref("sharedLists/" + listId).once("value");
     const list=snap.val();
-    if(!list || !list.members){ await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen.","fa-users"); return; }
+    if(!list || !list.members){ await familyAlert("Personen","De personen van deze gedeelde lijst konden niet worden geladen.","fa-users"); return; }
     const ownerUid=String(list.owner || "");
     const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true).sort((a,b)=>a===ownerUid?-1:b===ownerUid?1:0);
     const names=list.memberNames || {};
@@ -9352,7 +9357,7 @@ async function showSharedListMembers(){
       if(user.uid===ownerUid && uid!==ownerUid){
         const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogRemove"; btn.textContent="Verwijderen";
         btn.addEventListener("click",async()=>{
-          const confirmed = await familyConfirm("Lid verwijderen", "Wil je " + name + " uit deze deellijst verwijderen?", true);
+          const confirmed = await familyConfirm("Lid verwijderen", "Wil je " + name + " uit deze gedeelde lijst verwijderen?", true);
           if (!confirmed) return;
           try{
             const updates={};
@@ -9362,10 +9367,10 @@ async function showSharedListMembers(){
             await database.ref().update(updates);
             closeFamilyDialog(row.closest(".familyDialogOverlay"));
             await showSharedListMembers();
-            await familyAlert("Lid verwijderd",name+" heeft geen toegang meer tot deze deellijst.","fa-user-check");
+            await familyAlert("Lid verwijderd",name+" heeft geen toegang meer tot deze gedeelde lijst.","fa-user-check");
           }catch(e){
             console.error("Lid verwijderen mislukt:",e);
-            await familyAlert("Verwijderen mislukt","Firebase heeft het verwijderen geweigerd. Controleer de beveiligingsregels.","fa-triangle-exclamation");
+            await familyAlert("Verwijderen mislukt","Je hebt geen toestemming om dit te verwijderen.","fa-triangle-exclamation");
           }
         });
         row.appendChild(btn);
@@ -9380,14 +9385,14 @@ async function showSharedListMembers(){
       const leaveBtn = document.createElement("button");
       leaveBtn.type = "button";
       leaveBtn.className = "familyDialogBtn familyDialogRemove";
-      leaveBtn.textContent = "Deellijst verlaten";
+      leaveBtn.textContent = "Gedeelde lijst verlaten";
       leaveBtn.addEventListener("click", leaveCurrentSharedList);
       footer.appendChild(leaveBtn);
     }
     overlay.addEventListener("click",e=>{if(e.target===overlay) closeFamilyDialog(overlay);});
   }catch(error){
     console.error("Personen van deellijst konden niet worden geladen:",error);
-    await familyAlert("Personen","De personen van deze deellijst konden niet worden geladen. Controleer de Firebase-regels.","fa-triangle-exclamation");
+    await familyAlert("Personen","De personen van deze gedeelde lijst konden niet worden geladen. Controleer je internetverbinding en probeer het opnieuw.","fa-triangle-exclamation");
   }
 }
 
@@ -9395,7 +9400,7 @@ async function leaveCurrentSharedList(){
   const user = auth.currentUser;
   const listId = currentSharedListId;
   if (!user || !listId) {
-    await familyAlert("Deellijst verlaten", "Er is geen actieve deellijst geselecteerd.", "fa-triangle-exclamation");
+    await familyAlert("Gedeelde lijst verlaten", "Er is geen actieve gedeelde lijst geselecteerd.", "fa-triangle-exclamation");
     return;
   }
   try {
@@ -9404,10 +9409,10 @@ async function leaveCurrentSharedList(){
     if (!list) {
       await database.ref("userSharedLists/" + user.uid + "/" + listId).remove();
     } else if (String(list.owner || "") === String(user.uid)) {
-      await familyAlert("Eigenaar van deellijst", "Als eigenaar kun je deze lijst niet verlaten terwijl hij blijft bestaan. Verwijder de deellijst als je deze wilt beëindigen. Een overdracht van eigenaarschap is nog niet beschikbaar.", "fa-crown");
+      await familyAlert("Eigenaar van gedeelde lijst", "Als eigenaar kun je deze lijst niet verlaten terwijl hij blijft bestaan. Verwijder de gedeelde lijst als je deze wilt beëindigen. Een overdracht van eigenaarschap is nog niet beschikbaar.", "fa-crown");
       return;
     } else {
-      const confirmed = await familyConfirm("Deellijst verlaten", "Wil je deze deellijst verlaten? Je verliest daarna toegang tot de gedeelde boodschappen.", true);
+      const confirmed = await familyConfirm("Gedeelde lijst verlaten", "Wil je deze gedeelde lijst verlaten? Je verliest daarna toegang tot de gedeelde boodschappen.", true);
       if (!confirmed) return;
       const updates = {};
       updates["sharedLists/" + listId + "/members/" + user.uid] = null;
@@ -9426,11 +9431,11 @@ async function leaveCurrentSharedList(){
     activeListType = "private";
     await loadPrivateList();
     await renderSharedLists();
-    await familyAlert("Deellijst verlaten", "Je hebt de deellijst verlaten. Je persoonlijke boodschappenlijst is weer geopend.", "fa-right-from-bracket");
+    await familyAlert("Gedeelde lijst verlaten", "Je hebt de gedeelde lijst verlaten. Je persoonlijke boodschappenlijst is weer geopend.", "fa-right-from-bracket");
   } catch (error) {
     console.error("Deellijst verlaten mislukt:", error);
     const detail = error && error.code ? " (" + error.code + ")" : "";
-    await familyAlert("Verlaten mislukt", "De deellijst kon niet worden verlaten. Controleer je verbinding en de Firebase-regels." + detail, "fa-triangle-exclamation");
+    await familyAlert("Verlaten mislukt", "De gedeelde lijst kon niet worden verlaten. Controleer je internetverbinding en probeer het opnieuw." + detail, "fa-triangle-exclamation");
   }
 }
 
@@ -9450,7 +9455,7 @@ async function openSharedList(id, showInvite){
   // klik alsnog "Opgeslagen Week" of "Boodschappenlijst" terugzetten.
   mainListLoadGeneration++;
   const previousSharedId = currentSharedListId;
-  setActiveListState("shared", id, "Deellijst");
+  setActiveListState("shared", id, "Gedeelde lijst");
   currentSharedListId = id;
   try { if (user) localStorage.removeItem("boodschappenActiveSavedList_" + user.uid); } catch (_) {}
 
@@ -9478,7 +9483,7 @@ async function openSharedList(id, showInvite){
       setActiveListState("family", null, "Boodschappenlijst");
       currentSharedListId = previousSharedId || null;
       if (!currentSharedListId) await loadList();
-      await familyAlert("Deellijst","Je hebt geen toegang tot deze lijst.","fa-lock");
+      await familyAlert("Gedeelde lijst","Je hebt geen toegang tot deze lijst.","fa-lock");
       return;
     }
 
@@ -9488,7 +9493,7 @@ async function openSharedList(id, showInvite){
       try{ localStorage.setItem("sharedListInviteCode:"+id,String(currentSharedListInviteCode)); }catch(_){}
     }
     showList();
-    const sharedName = String(v.name || "Deellijst");
+    const sharedName = String(v.name || "Gedeelde lijst");
      currentListName = sharedName;
      setActiveListState("shared", id, sharedName);
      try { localStorage.setItem("activeSharedListName:" + id, sharedName); } catch (_) {}
@@ -9502,7 +9507,7 @@ async function openSharedList(id, showInvite){
       activeCount.textContent=String(Object.keys(members).filter(uid=>members[uid]===true).length);
     }
     const activeTitle=document.getElementById("sharedListActiveMenuTitle");
-    if(activeTitle) activeTitle.textContent=v.name||"Deellijst";
+    if(activeTitle) activeTitle.textContent=v.name||"Gedeelde lijst";
     if (!v.memberNames || !v.memberNames[user.uid]) {
       let ownName = "";
       try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = String(ownNameSnap.val() || "").trim(); } catch (_) {}
@@ -9526,12 +9531,12 @@ async function openSharedList(id, showInvite){
       }
       boodschappen=normalizeBoodschappen(data.boodschappen||[]);
       showList();
-      const header=document.querySelector(".headerBar h1"); if(header) header.textContent=data.name||"Deellijst";
+      const header=document.querySelector(".headerBar h1"); if(header) header.textContent=data.name||"Gedeelde lijst";
       updateSharedMemberCount(data);
     });
     if(showInvite){
       const link=makeSharedListLink(v.inviteCode);
-      const overlay=familyDialogBase("fa-people-group",v.name||"Deellijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
+      const overlay=familyDialogBase("fa-people-group",v.name||"Gedeelde lijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
       const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
       overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
       overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
@@ -9543,7 +9548,7 @@ async function openSharedList(id, showInvite){
     currentSharedListId = previousSharedId || null;
     currentSharedListInviteCode = null;
     if (!currentSharedListId) await loadList();
-    await familyAlert("Deellijst","Deellijst kon niet worden geopend. Je familielijst is niet gewijzigd.","fa-triangle-exclamation");
+    await familyAlert("Gedeelde lijst","Gedeelde lijst kon niet worden geopend. Je familielijst is niet gewijzigd.","fa-triangle-exclamation");
   }
 }
 
@@ -9557,8 +9562,8 @@ function updateSharedDeleteButton(isOwner){
     // Zo ontstaat er geen tweede prullenbak in de header.
     btn.style.display = "inline-flex";
     btn.classList.add("sharedModeTrashButton");
-    btn.setAttribute("aria-label", "Deellijst verwijderen");
-    btn.setAttribute("title", "Deellijst verwijderen");
+    btn.setAttribute("aria-label", "Gedeelde lijst verwijderen");
+    btn.setAttribute("title", "Gedeelde lijst verwijderen");
     btn.onclick = deleteCurrentSharedList;
   } else {
     btn.classList.remove("sharedModeTrashButton");
@@ -9583,24 +9588,24 @@ async function deleteCurrentSharedList(){
   }catch(error){
     console.error("Deellijst lezen voor verwijderen mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
-    await familyAlert("Deellijst", "De lijst kon niet worden gecontroleerd." + detail, "fa-triangle-exclamation");
+    await familyAlert("Gedeelde lijst", "De lijst kon niet worden gecontroleerd." + detail, "fa-triangle-exclamation");
     return;
   }
 
   if(!list){
-    await familyAlert("Deellijst","Deze lijst bestaat niet meer.","fa-circle-info");
+    await familyAlert("Gedeelde lijst","Deze lijst bestaat niet meer.","fa-circle-info");
     returnToFamilyList();
     return;
   }
 
   if(String(list.owner || "") !== String(user.uid || "")){
-    await familyAlert("Deellijst","Alleen de eigenaar kan deze deellijst verwijderen.","fa-lock");
+    await familyAlert("Gedeelde lijst","Alleen de eigenaar kan deze gedeelde lijst verwijderen.","fa-lock");
     return;
   }
 
   const ok=await familyConfirm(
-    "Deellijst verwijderen",
-    "Weet je zeker dat je “" + (list.name || "Deellijst") + "” wilt verwijderen? Deze actie kan niet ongedaan worden."
+    "Gedeelde lijst verwijderen",
+    "Weet je zeker dat je “" + (list.name || "Gedeelde lijst") + "” wilt verwijderen? Deze actie kan niet ongedaan worden."
   );
   if(!ok) return;
 
@@ -9620,8 +9625,8 @@ async function deleteCurrentSharedList(){
     console.error("Deellijst en code veilig verwijderen mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
     await familyAlert(
-      "Deellijst",
-      "De deellijst kon niet volledig worden verwijderd. Er zijn geen wijzigingen bevestigd. Controleer de Firebase-regels en probeer het opnieuw." + detail,
+      "Gedeelde lijst",
+      "De gedeelde lijst kon niet volledig worden verwijderd. Er zijn geen wijzigingen bevestigd. Probeer het later opnieuw." + detail,
       "fa-triangle-exclamation"
     );
     return;
@@ -9659,7 +9664,7 @@ async function deleteCurrentSharedList(){
     console.warn("Familielijst opnieuw laden na verwijderen mislukt:", loadError);
   }
 
-  await familyAlert("Deellijst verwijderd","De deellijst is verwijderd.","fa-trash");
+  await familyAlert("Gedeelde lijst verwijderd","De gedeelde lijst is verwijderd.","fa-trash");
 }
 
 async function returnToFamilyListFromSharedMenu(event){
@@ -10064,7 +10069,7 @@ async function showFamilyMembers() {
             await familyAlert("Lid verwijderd", name + " heeft geen toegang meer via deze familielijst.", "fa-user-check");
           } catch (e) {
             console.error(e);
-            await familyAlert("Verwijderen mislukt", "Firebase heeft het verwijderen geweigerd. Controleer de beveiligingsregels.", "fa-triangle-exclamation");
+            await familyAlert("Verwijderen mislukt", "Je hebt geen toestemming om dit te verwijderen.", "fa-triangle-exclamation");
           }
         });
         row.appendChild(btn);
@@ -10084,7 +10089,7 @@ async function showFamilyMembers() {
     overlay.addEventListener("click", e => { if (e.target === overlay) closeFamilyDialog(overlay); });
   } catch (error) {
     console.error(error);
-    await familyAlert("Familieleden", "De familieleden konden niet worden geladen. Controleer je verbinding en Firebase-regels.", "fa-triangle-exclamation");
+    await familyAlert("Familieleden", "De familieleden konden niet worden geladen. Controleer je internetverbinding en probeer het opnieuw.", "fa-triangle-exclamation");
   }
 }
  async function enterFamilyCode() {
@@ -10239,7 +10244,12 @@ function togglePassword() {
     await auth.sendPasswordResetEmail(email);
     alert("Er is een e-mail gestuurd om je wachtwoord opnieuw in te stellen.");
   } catch (error) {
-    alert("Wachtwoord resetten mislukt: " + error.message);
+    let msg = "Het lukte niet om de e-mail te versturen. Probeer het later opnieuw.";
+    if (error && error.code === "auth/invalid-email") msg = "Dit e-mailadres is niet geldig.";
+    else if (error && error.code === "auth/user-not-found") msg = "Er bestaat geen account met dit e-mailadres.";
+    else if (error && error.code === "auth/network-request-failed") msg = "Geen internetverbinding. Controleer je verbinding en probeer het opnieuw.";
+    else if (error && error.code === "auth/too-many-requests") msg = "Te veel pogingen. Probeer het later opnieuw.";
+    alert(msg);
   }
 }
 async function login(){
@@ -10281,7 +10291,8 @@ async function login(){
       else if(err && err.code==="auth/wrong-password") msg="Het wachtwoord is onjuist.";
       else if(err && err.code==="auth/invalid-email") msg="Het e-mailadres is niet geldig.";
       else if(err && err.code==="auth/too-many-requests") msg="Te veel pogingen. Probeer het later opnieuw.";
-      else if(err && err.message) msg=err.message;
+      else if(err && err.code==="auth/network-request-failed") msg="Geen internetverbinding. Controleer je verbinding en probeer het opnieuw.";
+      else if(err && err.code==="auth/user-disabled") msg="Dit account is uitgeschakeld.";
       familyAlert("Inloggen",msg,"fa-triangle-exclamation");
     });
 
@@ -10350,12 +10361,12 @@ async function renderOverviewInsights(){
   var text=document.getElementById("overviewHistoryInsightText");
   var list=document.getElementById("overviewHabitInsights");
   if(count) count.textContent=String(history.length);
-  if(text) text.textContent=history.length ? "Gebaseerd op je bewaarde boodschappenrondes." : "Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.";
+  if(text) text.textContent=history.length ? "Gebaseerd op je geschiedenis." : "Wis je volledige lijst via de prullenbak bovenaan; die wordt dan automatisch bewaard in je geschiedenis.";
   if(!list) return;
   var counts={};
   history.forEach(function(round){(round.items||[]).forEach(function(item){var name=String(typeof item==="string"?item:(item&&item.text)||"").trim(); if(name) counts[name]=(counts[name]||0)+1;});});
   var top=Object.keys(counts).map(function(name){return {name:name,count:counts[name]};}).sort(function(a,b){return b.count-a.count || a.name.localeCompare(b.name,"nl");}).slice(0,4);
-  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Je vaak gekochte producten verschijnen hier nadat je meerdere boodschappenrondes hebt bewaard.</p>';return;}
+  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Je vaak gekochte producten verschijnen hier zodra er een paar lijsten in je geschiedenis staan.</p>';return;}
   list.innerHTML="";
   top.forEach(function(item,index){var row=document.createElement("div");row.className="overviewHabitRow";row.innerHTML='<span class="overviewHabitRank">'+(index+1)+'</span><span class="overviewHabitName"></span><span class="overviewHabitCount"></span>';row.querySelector('.overviewHabitName').textContent=item.name;row.querySelector('.overviewHabitCount').textContent=item.count+'×';list.appendChild(row);});
 }
@@ -10575,13 +10586,13 @@ async function register() {
     } else if (error?.code === "auth/weak-password") {
       message = "Het wachtwoord is te zwak. Gebruik minimaal 6 tekens.";
     } else if (error?.code === "auth/operation-not-allowed") {
-      message = "E-mail/wachtwoord aanmelden staat niet aan in Firebase.";
+      message = "Registreren is op dit moment niet mogelijk. Probeer het later opnieuw.";
     } else if (error?.code === "auth/network-request-failed") {
-      message = "Geen verbinding met Firebase. Controleer je internetverbinding.";
+      message = "Geen internetverbinding. Controleer je verbinding en probeer het opnieuw.";
     } else if (error?.code === "PERMISSION_DENIED") {
-      message = "Account is aangemaakt, maar de naam kon niet in Firebase worden opgeslagen. Controleer de Firebase Database Rules.";
+      message = "Je account is aangemaakt, maar je naam kon niet worden opgeslagen. Je kunt je naam later aanpassen via Meer → Mijn account.";
     } else if (error?.message) {
-      message = "Account aanmaken mislukt: " + error.message;
+      message = "Account aanmaken is niet gelukt. Probeer het later opnieuw.";
     }
 
     alert(message);
@@ -10647,20 +10658,20 @@ function toggleRegisterPassword(fieldId, button) {
       const codeSnap = await database.ref("sharedListCodes/" + code).once("value");
       const id = codeSnap.val();
       if (!id) {
-        await familyAlert("Deellijst", "Deze uitnodigingslink is niet geldig of de lijst bestaat niet meer.", "fa-triangle-exclamation");
+        await familyAlert("Gedeelde lijst", "Deze uitnodigingslink is niet geldig of de lijst bestaat niet meer.", "fa-triangle-exclamation");
         return;
       }
       const listSnap = await database.ref("sharedLists/" + id).once("value");
       const list = listSnap.val() || {};
       if (!list.name) {
-        await familyAlert("Deellijst", "Deze lijst bestaat niet meer.", "fa-triangle-exclamation");
+        await familyAlert("Gedeelde lijst", "Deze lijst bestaat niet meer.", "fa-triangle-exclamation");
         return;
       }
       if (list.members && list.members[auth.currentUser.uid] === true) {
         await openSharedList(id,false);
         return;
       }
-      const join = await familyConfirm("Deellijst", "Wil je deelnemen aan de deellijst “" + list.name + "”?" );
+      const join = await familyConfirm("Gedeelde lijst", "Wil je deelnemen aan de gedeelde lijst “" + list.name + "”?" );
       if (!join) return;
       const updates = {};
       updates["sharedLists/" + id + "/members/" + auth.currentUser.uid] = true;
@@ -10669,7 +10680,7 @@ function toggleRegisterPassword(fieldId, button) {
       await openSharedList(id,false);
     } catch(error) {
       console.error("Deellijst-uitnodiging mislukt:",error);
-      await familyAlert("Deellijst", "De uitnodiging kon niet worden verwerkt. Controleer de Firebase-regels.", "fa-triangle-exclamation");
+      await familyAlert("Gedeelde lijst", "De uitnodiging kon niet worden verwerkt. Controleer je internetverbinding en probeer het opnieuw.", "fa-triangle-exclamation");
     }
   }
   auth.onAuthStateChanged(()=>setTimeout(handle,120));
@@ -11078,7 +11089,7 @@ function __overviewOverlay(title){
   overlay.className="overviewActionOverlay";
   overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
-  if(title==="Boodschappenhistorie"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
+  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -11202,14 +11213,14 @@ function openSavedListsFromOverview(){
 }
 
 async function openShoppingHistoryFromOverview(){
-  var overlay=__overviewOverlay("Boodschappenhistorie");
+  var overlay=__overviewOverlay("Geschiedenis");
   var body=overlay.querySelector(".overviewActionBody");
   var history=await readOverviewHistory();
   var entries=history;
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen boodschappenhistorie</strong></div><p>Je eerdere boodschappenrondes verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11308,7 +11319,7 @@ async function updateOverviewDashboard(){
     var entries=[];
     (Array.isArray(history)?history:[]).slice(0,3).forEach(function(trip){
       var date=new Date(Number(trip.savedAt||Date.now()));
-      entries.push({time:date,name:(trip.items||[]).length+' product'+((trip.items||[]).length===1?'':'en')+' in historie'});
+      entries.push({time:date,name:(trip.items||[]).length+' product'+((trip.items||[]).length===1?'':'en')+' in geschiedenis'});
     });
     if(!entries.length){
       activity.innerHTML='<div class="overview-dashboard-muted">Je laatste activiteiten verschijnen hier zodra je boodschappen gebruikt.</div>';
@@ -11739,7 +11750,7 @@ function openWeekCompleted(){
   <div class="clearListIcon"><i class="fa-solid fa-trash-can"></i></div>
   <h2 id="clearListTitle">Boodschappenlijst wissen?</h2>
   <p id="clearListDescription">Weet je zeker dat je je huidige boodschappenlijst wilt wissen?</p>
-  <div class="clearListHistoryNote"><i class="fa-solid fa-circle-check"></i><span>Je huidige lijst wordt eerst bewaard in je boodschappenhistorie.</span></div>
+  <div class="clearListHistoryNote"><i class="fa-solid fa-circle-check"></i><span>Je huidige lijst wordt eerst bewaard in je geschiedenis.</span></div>
   <div class="clearListActions">
     <button type="button" class="clearListCancel" onclick="closeClearListConfirm(event)">Annuleren</button>
     <button type="button" class="clearListConfirm" onclick="confirmClearList(event)"><i class="fa-solid fa-trash-can"></i> Lijst wissen</button>
@@ -12164,11 +12175,11 @@ async function openBarcodeScanner(){
   barcodeBusy=false;
 
   if(!window.isSecureContext){
-    setBarcodeStatus('Camera werkt alleen via een beveiligde verbinding (HTTPS).');
+    setBarcodeStatus('De camera is hier niet beschikbaar. Voer de barcode hieronder in.');
     return;
   }
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    setBarcodeStatus('Deze browser ondersteunt geen cameratoegang. Voer de barcode hieronder handmatig in.');
+    setBarcodeStatus('De camera kan hier niet worden gebruikt. Voer de barcode hieronder in.');
     return;
   }
 
@@ -12311,20 +12322,20 @@ async function openBarcodeScanner(){
     barcodeScanRunning=true;
     barcodeScanBusy=false;
     barcodeLastScan=0;
-    setBarcodeStatus('Camera actief — richt een EAN-barcode binnen het kader.');
+    setBarcodeStatus('Richt de camera op de barcode van het product.');
     scheduleBarcodeScan();
   }catch(err){
     console.error('Camera:',err);
     stopBarcodeCamera();
     const name=err && err.name ? err.name : '';
     if(name==='NotAllowedError' || name==='PermissionDeniedError'){
-      setBarcodeStatus('Cameratoegang is geweigerd. Geef Safari/Chrome toegang tot de camera en probeer opnieuw.');
+      setBarcodeStatus('De app heeft geen toegang tot je camera. Sta cameratoegang toe in de instellingen van je telefoon en probeer het opnieuw.');
     }else if(name==='NotFoundError' || name==='DevicesNotFoundError'){
-      setBarcodeStatus('Geen camera gevonden. Je kunt de barcode hieronder handmatig invoeren.');
+      setBarcodeStatus('Geen camera gevonden. Voer de barcode hieronder in.');
     }else if(name==='NotReadableError' || name==='TrackStartError'){
       setBarcodeStatus('De camera wordt door een andere functie gebruikt. Sluit die functie en probeer opnieuw.');
     }else{
-      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder handmatig in.');
+      setBarcodeStatus('Camera kon niet starten. Controleer cameratoegang of voer de barcode hieronder in.');
     }
   }
 }
@@ -12342,7 +12353,7 @@ window.nativeBarcodeError = function(){
   const overlay=document.getElementById('barcodeOverlay');
   const input=document.getElementById('barcodeManualInput');
   if(overlay && !overlay.classList.contains('open')) overlay.classList.add('open');
-  setBarcodeStatus('Native camera kon niet starten. Je kunt de barcode hieronder handmatig invoeren.');
+  setBarcodeStatus('De camera kon niet starten. Voer de barcode hieronder in.');
   if(input) input.focus();
 };
 
@@ -12950,7 +12961,7 @@ html.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton:acti
   const info = document.querySelector(".notificationInfo");
   const helpReminderPlatform = document.getElementById("helpReminderPlatform");
   if (isIOS && helpReminderPlatform) {
-    helpReminderPlatform.textContent = "Op je iPhone moet de app meldingen ondersteunen. Sta meldingen toe wanneer de app daarom vraagt en controleer de meldingsinstellingen van je iPhone.";
+    helpReminderPlatform.textContent = "Op de iPhone is de boodschappenherinnering nog niet beschikbaar. Deze functie werkt nu alleen in de Android-app.";
   } else if (helpReminderPlatform) {
     helpReminderPlatform.textContent = "De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.";
   }
@@ -12959,12 +12970,12 @@ html.platform-ios .androidReminderDialogActions .androidDialogPrimaryButton:acti
     if (testButton) testButton.setAttribute("aria-label", "Testmelding voor iPhone");
     if (info) {
       const paragraphs = info.querySelectorAll("p");
-      if (paragraphs[0]) paragraphs[0].textContent = "Herinneringen via meldingen zijn afhankelijk van ondersteuning in de iPhone-app. Er is geen account nodig.";
-      if (paragraphs[1]) paragraphs[1].textContent = "Sta meldingen voor deze app toe via Instellingen op je iPhone als de app daarom vraagt.";
+      if (paragraphs[0]) paragraphs[0].textContent = "Op de iPhone is de boodschappenherinnering nog niet beschikbaar. Deze functie werkt nu alleen in de Android-app.";
+      if (paragraphs[1]) paragraphs[1].textContent = "We werken eraan om herinneringen ook op de iPhone mogelijk te maken.";
     }
     const status = document.getElementById("notificationSettingsStatus");
     if (status && /Android-app/i.test(status.textContent)) {
-      status.textContent = "Meldingen voor iPhone zijn afhankelijk van de iPhone-app.";
+      status.textContent = "Herinneringen zijn op de iPhone nog niet beschikbaar.";
     }
   }
 })();
@@ -13443,8 +13454,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     try{
       const all=await fetchBudgetDeals(term,selected);
       const rows=rankDeals(all,term);
-      if(!rows.length&&all.length){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Er zijn wel "+all.length+" andere producten met “"+term+"” in de naam in de aanbieding (zoals snacks of producten met die smaak), maar die passen niet bij je zoekopdracht.";return;}
-      if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Dat betekent niet dat het product niet te koop is: alleen aanbiedingen zijn beschikbaar, geen gewone schapprijzen.";return;}
+      if(!rows.length&&all.length){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Er zijn wel aanbiedingen voor producten met “"+term+"” als smaak of ingrediënt, zoals snacks. Die laten we weg.";return;}
+      if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Het product is waarschijnlijk gewoon te koop, alleen nu niet in de aanbieding.";return;}
       results.replaceChildren();
       const list=document.createElement("div");list.className="dealList";results.appendChild(list);
       const FIRST=4;
@@ -13519,6 +13530,52 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
 })();
 </script>
 
+<style id="type-scale-2026">
+/* Tekstschaal volgens Android (Material 3): body 14, bijschrift 12, labels 12, knoppen 14, invoer 16. 1px in de WebView = 1dp/sp. */
+.moreMenuSectionLabel{font-size:12px!important;font-weight:600!important;letter-spacing:.04em}
+.familyMenuSubTitle{font-size:12px!important;font-weight:600!important;letter-spacing:.04em}
+.familyMenuSubTitle.isDuplicateTitle{display:none!important}
+.settingsMenuHint{font-size:14px!important;line-height:1.43!important}
+.aboutInfoVersion{font-size:12px!important}
+.aboutInfoSectionTitle{font-size:12px!important;font-weight:600!important}
+.aboutMenuHint{font-size:12px!important;line-height:1.33}
+.aboutInfoLine span{font-size:14px!important;line-height:1.43}
+.proComingSoon{font-size:11px!important;font-weight:600!important}
+#familyMenuMain small{font-size:14px!important;line-height:1.35}
+.proFootnote{font-size:12px!important;line-height:1.33}
+#helpMenuSub p{font-size:14px!important;line-height:1.43!important}
+#helpMenuSub p strong{font-size:inherit!important}
+#privacyMenuSub p,#privacyMenuSub li,#termsMenuSub p,#termsMenuSub li{font-size:14px!important;line-height:1.43!important}
+#privacyMenuSub .legalSmall,#termsMenuSub .legalSmall{font-size:12px!important}
+#notificationSettingsMenuSub p{font-size:14px!important;line-height:1.43!important}
+#notificationSettingsMenuSub small{font-size:12px!important;line-height:1.33!important}
+#notificationSettingsMenuSub .notificationInfo strong{font-size:14px!important}
+#proMenuSub p{font-size:14px!important;line-height:1.43!important}
+#proMenuSub .plannerHelp,#proMenuSub .plannerEmpty,#proMenuSub .budgetStatus,#proMenuSub .budgetEmpty{font-size:14px!important;line-height:1.43!important}
+#proMenuSub .budgetPrivacyNote,#proMenuSub .budgetDealsCard .dealFootnote,#proMenuSub .budgetSource{font-size:12px!important;line-height:1.33!important}
+#proMenuSub label{font-size:14px!important;font-weight:600!important}
+#proMenuSub .budgetStats span,#proMenuSub .budgetRingInner small{font-size:12px!important}
+#proMenuSub .proPlannerButton,#proMenuSub .budgetActionButton,#proMenuSub .budgetLaunchButton{font-size:14px!important;font-weight:600!important;min-height:48px;letter-spacing:.01em}
+#proMenuSub .recipeChip{min-height:36px}
+input,select,textarea{font-size:16px}
+#status span,#status small,#status div{font-size:12px}
+</style>
+<script>
+/* Verberg het kleine grijze kopje als het precies hetzelfde zegt als de titel erboven (bijv. "Instellingen" / "INSTELLINGEN"). */
+(function(){
+  function norm(t){return String(t||"").trim().toLowerCase().replace(/\s+/g," ");}
+  function mark(){
+    document.querySelectorAll(".familyMenuPage").forEach(function(page){
+      var back=page.querySelector(".settingsMenuBack span, .familyMenuBack span, button span");
+      var title=page.querySelector(".familyMenuSubTitle");
+      if(!back||!title)return;
+      var own=title.firstElementChild&&title.firstElementChild.tagName==="SPAN"?title.firstElementChild.textContent:title.textContent;
+      if(norm(own)===norm(back.textContent)&&!title.querySelector("button"))title.classList.add("isDuplicateTitle");
+    });
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mark);else mark();
+})();
+</script>
 </body>
 
 <style id="overview-dashboard-final">
