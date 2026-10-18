@@ -13670,6 +13670,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   const liveSearchInput=document.getElementById("budgetLiveSearch");
   if(liveSearchInput)liveSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();window.searchBudgetLivePrices();}});
+  // Zoekveld leeggemaakt? Dan ook de zoekresultaten weghalen.
+  if(liveSearchInput)liveSearchInput.addEventListener("input",()=>{if(!liveSearchInput.value.trim()){const r=document.getElementById("budgetLivePriceResults");if(r)r.replaceChildren();}});
   function renderBudget(){
     const d=read(),spent=d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),remaining=d.budget-spent,pct=d.budget>0?Math.min(100,spent/d.budget*100):0;
     const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
