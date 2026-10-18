@@ -3764,6 +3764,8 @@ body.logged-in {
   to   { opacity: 0; transform: translate3d(100%,0,0); }
 }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#eef8f1">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -11088,7 +11090,7 @@ function __overviewOverlay(title){
   overlay.className="overviewActionOverlay";
   overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
-  overlay.querySelector(".overviewActionTitleIcon").hidden=true;
+  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=false; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -13663,25 +13665,6 @@ input,select,textarea{font-size:16px}
   auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
-<script>
-(function(){try{var standalone=window.navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
-var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-if(standalone&&ios)document.documentElement.classList.add("ios-standalone");}catch(e){}})();
-</script>
-<style id="ios-top-edge-fix">
-#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}
-.app{overscroll-behavior-y:contain!important}
-
-/* Onzichtbare lagen met vervaging (wis-bevestiging, lijstopties) mogen niets vervagen zolang ze dicht zijn.
-   iOS rendert backdrop-filter soms ook bij opacity 0, wat een wazige rand bovenin gaf. */
-.clearListBackdrop:not(.show){backdrop-filter:none!important;-webkit-backdrop-filter:none!important;visibility:hidden!important}
-.clearListBackdrop.show{visibility:visible!important}
-.listOptionsPanel:not(.open){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-
-/* Alleen als app op het beginscherm van de iPhone: iOS legt daar een zachte vervaging over de bovenste ±40px
-   van het scrollgebied. Laat dat stuk leeg, zodat de kopbalk eronder scherp blijft. In Safari verandert niets. */
-html.ios-standalone .app{padding-top:46px!important}
-</style>
 </body>
 
 <style id="overview-dashboard-final">
