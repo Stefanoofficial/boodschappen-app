@@ -5584,10 +5584,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten.</span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken. <b class="aboutProBadge">PRO</b></span></div>
     </div>
-    <div class="aboutMenuHint">Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (CC BY-SA). Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>.</div>
+    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -13832,6 +13832,12 @@ input,select,textarea{font-size:16px}
 body.dark-theme .itemProductContent .productIcon{background:#2a352e!important}
 body.dark-theme .itemProductContent .productIcon.hasPhoto{background:transparent!important}
 .aboutMenuHint a{color:inherit;text-decoration:underline}
+</style>
+<style id="about-pro-badge">
+.aboutProBadge{display:inline-block;vertical-align:2px;margin-left:4px;padding:2px 7px;border-radius:999px;background:#fff2d0;color:#916719;font-size:10px!important;font-weight:800;letter-spacing:.06em;line-height:1.3;white-space:nowrap}
+body.dark-theme .aboutProBadge{background:#4a3d1c;color:#f3d48a}
+.aboutSources{display:flex;flex-direction:column;gap:3px}
+.aboutSources .nowrap{white-space:nowrap}
 </style>
 </body>
 
