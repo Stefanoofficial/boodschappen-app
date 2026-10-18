@@ -13319,7 +13319,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   async function fetchBudgetDeals(term,selected){
     const retailer=budgetRetailerSlugs[selected];
     if(!retailer)return null;
-    const query="q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=20";
+    const query="q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=30";
     const bases=[];
     if(PRIJZEN_PROXY&&!/JOUW-NAAM/.test(PRIJZEN_PROXY))bases.push(PRIJZEN_PROXY.replace(/\/+$/,"")+"/search?");
     bases.push("https://www.prijsprofeet.nl/api/v1/search?");
@@ -13352,8 +13352,43 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(err&&err.status)return"De aanbiedingen konden niet worden opgehaald (fout "+err.status+").";
     return"Geen verbinding met PrijsProfeet. Controleer je internetverbinding en probeer het opnieuw.";
   }
-  function bestDeal(rows){
-    return rows.slice().sort((a,b)=>(Number(b.savings_percentage)||0)-(Number(a.savings_percentage)||0)||Number(a.price)-Number(b.price))[0];
+  // Relevantie: laat producten weg die het zoekwoord alleen als smaak of bijzaak in de naam hebben (kaaschips, chocoladevlokken melk).
+  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker"];
+  const NON_FOOD=/drogist|verzorg|huishoud|schoonmaak|baby|dier|cosmetic|was-|wasmiddel|gezondheid/;
+  const SNACK_TERMS=/chips|koek|snoep|chocola|drop|snack/;
+  const escRe=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  function dealScore(p,term){
+    const name=String(p.name||p.product_name||p.title||"").toLowerCase();
+    const cat=String(p.unified_category||"").toLowerCase();
+    const t=String(term).toLowerCase().trim();
+    if(cat==="snoep-koek-chips"&&!SNACK_TERMS.test(t))return -1;
+    if(NON_FOOD.test(cat))return -1;
+    const words=t.split(/\s+/).filter(w=>w.length>1);if(!words.length)return -1;
+    const wordHit=w=>{
+      if(new RegExp("(^|[^a-zà-ÿ])"+escRe(w)+"(en|s)?([^a-zà-ÿ]|$)","i").test(name))return 4;
+      if(w.length>=3&&new RegExp(escRe(w)+"(en|s)?([^a-zà-ÿ]|$)","i").test(name))return 3;
+      if(w.length>3&&name.includes(w))return 1;
+      return 0;
+    };
+    const head=wordHit(words[words.length-1]);
+    if(!head)return -1;
+    let score=words.reduce((n,w)=>n+wordHit(w),0)/words.length;
+    if(cat&&words.some(w=>cat.includes(w)))score+=3;
+    // "Roomboter met olie", "Salade met mosterd": het zoekwoord staat pas na met/in/op, dus het is bijzaak.
+    const mainPart=name.split(/\s(?:met|in|op)\s/)[0];
+    const headWord=words[words.length-1];
+    if(mainPart!==name&&!mainPart.includes(headWord.length>3?headWord.slice(0,-1):headWord))score-=4;
+    DEAL_SIDE_WORDS.forEach(sw=>{if(name.includes(sw)&&!t.includes(sw))score-=4;});
+    score-=name.split(/\s+/).length*0.05; // kortere, eenvoudigere productnamen iets voorrang
+    return score;
+  }
+  function rankDeals(rows,term){
+    return rows.map(p=>({p:p,s:dealScore(p,term)})).filter(x=>x.s>0)
+      .sort((a,b)=>b.s-a.s||(Number(b.p.savings_percentage)||0)-(Number(a.p.savings_percentage)||0)||Number(a.p.price)-Number(b.p.price))
+      .map(x=>x.p);
+  }
+  function bestDeal(rows,term){
+    return rankDeals(rows,term)[0]||null;
   }
   window.searchBudgetLivePrices=async function(){
     const input=document.getElementById("budgetLiveSearch"),results=document.getElementById("budgetLivePriceResults");
@@ -13364,7 +13399,9 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(!budgetRetailerSlugs[selected]){results.textContent="Voor deze supermarkt zijn geen aanbiedingen beschikbaar. Kies AH, Jumbo, Lidl, Aldi, PLUS, Dirk of Vomar.";return;}
     results.textContent="Aanbiedingen ophalen…";
     try{
-      const rows=await fetchBudgetDeals(term,selected);
+      const all=await fetchBudgetDeals(term,selected);
+      const rows=rankDeals(all,term);
+      if(!rows.length&&all.length){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Er zijn wel "+all.length+" andere producten met “"+term+"” in de naam in de aanbieding (zoals snacks of producten met die smaak), maar die passen niet bij je zoekopdracht.";return;}
       if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Dat betekent niet dat het product niet te koop is: alleen aanbiedingen zijn beschikbaar, geen gewone schapprijzen.";return;}
       results.replaceChildren();
       rows.slice(0,10).forEach(p=>{
@@ -13381,8 +13418,13 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     }catch(err){results.textContent=dealError(err);}
   };
   const STAPLES=/\b(zout|peper|water|nootmuskaat|optioneel)\b/i;
+  const TERM_ALIASES={ei:"eieren",ui:"uien","paprika's":"paprika",wortels:"wortel",zalmfilets:"zalmfilet",champignon:"champignons"};
   function searchTermFor(text){
-    return String(text).replace(/\([^)]*\)/g," ").replace(/^\s*[\d.,]+\s*(kg|g|ml|l|dl|cl|el|tl|blik|pak|zak|potje|bosje)?\s*/i,"").replace(/^(blik|pak|zak|potje|bosje)\s+/i,"").replace(/\s+/g," ").trim().toLowerCase();
+    let t=String(text).replace(/\([^)]*\)/g," ").replace(/^\s*[\d.,]+\s*(kg|g|gr|ml|l|dl|cl|el|tl|blik|blikje|pak|pakje|zak|zakje|potje|pot|bosje|stuks?)?\s*/i,"").replace(/^(blik|blikje|pak|pakje|zak|zakje|potje|pot|bosje)\s+/i,"");
+    t=t.split(/\s+of\s+|,|\s+en\s+|\s+om\s+/i)[0];
+    t=t.replace(/^(tenen|teentjes|teen|verse|vers|gesneden|sneetjes|sneden|struiken|struik|plakken|plakjes|blaadjes|takjes|handje|handvol|snufje|scheutje)\s+/i,"");
+    t=t.replace(/\s+/g," ").trim().toLowerCase();
+    return TERM_ALIASES[t]||t;
   }
   window.searchWeekplanDeals=async function(){
     const out=document.getElementById("weekplanDealsResults");if(!out)return;
@@ -13401,9 +13443,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const found=[],missing=[];let failed=null;
     for(const term of list){
       try{
-        let rows=await fetchBudgetDeals(term,selected);
-        if(term.length<=3){const re=new RegExp("\\b"+term+"(en|s)?\\b","i");rows=rows.filter(r=>re.test(r.name||r.product_name||""));}
-        const best=rows.length?bestDeal(rows):null;
+        const rows=await fetchBudgetDeals(term,selected);
+        const best=bestDeal(rows,term);
         if(best)found.push({term:term,deal:best});else missing.push(term);
       }catch(err){failed=err;break;}
       await new Promise(r=>setTimeout(r,200));
