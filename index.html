@@ -10277,8 +10277,8 @@ async function showFamilyMembers() {
           const close = document.createElement("button");
           close.type = "button"; close.textContent = "";
           close.setAttribute("aria-label", "Foto sluiten");
-          close.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:48px;height:48px;min-width:48px;min-height:48px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:0;line-height:1;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;appearance:none;-webkit-appearance:none";
-          const closeMark = document.createElement("span"); closeMark.textContent = "×"; closeMark.style.cssText = "display:block;font-family:Arial,sans-serif;font-size:32px;font-weight:600;line-height:1;width:100%;height:100%;text-align:center;display:flex;align-items:center;justify-content:center;padding:0;margin:0;transform:none"; close.appendChild(closeMark);
+          close.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;min-width:44px;min-height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:#2f4a38;font-size:0;line-height:1;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;appearance:none;-webkit-appearance:none";
+          const closeMark = document.createElement("span"); closeMark.textContent = "×"; closeMark.style.cssText = "display:block;font-family:Arial,sans-serif;font-size:26px;font-weight:400;line-height:1;width:100%;height:100%;text-align:center;display:flex;align-items:center;justify-content:center;padding:0;margin:0;transform:none"; close.appendChild(closeMark);
           const dismiss = () => lightbox.remove();
           close.addEventListener("click", dismiss);
           lightbox.addEventListener("click", (event) => { if (event.target === lightbox) dismiss(); });
@@ -11432,7 +11432,7 @@ async function openQuickAddFromOverview(){
 
   body.innerHTML="";
   if(!products.length){
-    body.innerHTML='<div class="overviewActionMuted">Er zijn nog geen producten om opnieuw toe te voegen.</div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je vaak koopt, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -13960,6 +13960,32 @@ body.dark-theme .photoCropHint,body.dark-theme .photoCropZoom{color:#b8c6bc}
 body.dark-theme .photoCropCancel{background:#323d35;color:#edf5ef}
 .listOptionTitle{padding:10px 12px 6px;font-size:13px;font-weight:700;letter-spacing:.03em;color:#7b8a80}
 body.dark-theme .listOptionTitle{color:#aab8ae}
+</style>
+<style id="close-buttons-unified">
+/* Eén rustige stijl voor alle sluitknoppen: zichtbaar rondje van 36px, tikgebied van 44px, dun kruisje. */
+.overviewActionClose,#overviewActionOverlay .overviewActionClose,.barcodeClose,.recipeSheetClose{
+  width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;flex:0 0 44px!important;
+  padding:4px!important;box-sizing:border-box!important;border:0!important;border-radius:50%!important;
+  background-clip:content-box!important;-webkit-background-clip:content-box!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease,opacity .12s ease}
+.overviewActionClose,#overviewActionOverlay .overviewActionClose,.barcodeClose{background-color:#eef3ef!important;color:#5b7262!important;margin:-4px -6px -4px 0!important}
+.overviewActionClose::before,.overviewActionClose::after{width:14px!important;height:2px!important;background:#5b7262!important}
+.barcodeClose i,.recipeSheetClose i{font-size:16px!important}
+.recipeSheetClose{background-color:rgba(255,255,255,.9)!important;color:#2f4a38!important;box-shadow:none!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))}
+.overviewActionClose:active,.barcodeClose:active,.recipeSheetClose:active{transform:scale(.92);opacity:.8}
+body.dark-theme .overviewActionClose,body.dark-theme #overviewActionOverlay .overviewActionClose,body.dark-theme .barcodeClose{background-color:#2f3a33!important;color:#c3d1c7!important}
+body.dark-theme .overviewActionClose::before,body.dark-theme .overviewActionClose::after{background:#c3d1c7!important}
+/* Wisknopje in het zoekveld: klein grijs rondje met wit kruisje, zoals gebruikelijk op iPhone en Android. */
+.search-clear-btn{font-size:0!important;opacity:1!important;width:44px;height:44px;min-width:44px;border:0;background:transparent;align-items:center;justify-content:center;padding:0;position:relative;cursor:pointer}
+.search-clear-btn::before{content:"";width:20px;height:20px;border-radius:50%;background:#b3bdb6}
+.search-clear-btn::after{content:"✕";position:absolute;font-size:11px;font-weight:700;color:#fff;line-height:1}
+body.dark-theme .search-clear-btn::before{background:#5d6a61}
+/* Lege meldingen in Overzicht: zelfde opbouw, minder lege ruimte. */
+#overviewActionOverlay .overviewHistoryEmptyContent{padding:2px 2px 4px}
+#overviewActionOverlay .overviewHistoryEmptyContent p{margin:6px 0 0!important;font-size:15px;line-height:1.5;color:#5f6f65}
+#overviewActionOverlay .overviewHistoryEmptyTitle strong{font-size:16px}
+body.dark-theme #overviewActionOverlay .overviewHistoryEmptyContent p{color:#b8c6bc}
 </style>
 </body>
 
