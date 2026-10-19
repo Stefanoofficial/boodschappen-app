@@ -5619,7 +5619,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.6</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.7</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -14005,11 +14005,17 @@ input,select,textarea{font-size:16px}
 <style id="history-icon-off">#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}</style>
 <style id="product-icon-tile">
 /* Eén vast vakje voor productfoto's én iconen, zodat de lijst rustig oogt. */
-.itemProductContent .productIcon{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:10px!important;visibility:visible!important;margin-right:0!important;transform:translateX(-5px)!important;-webkit-transform:translateX(-5px)!important}
+.itemProductContent .productIcon{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:10px!important;visibility:visible!important;margin-right:0!important;transform:none!important;-webkit-transform:none!important}
 .itemProductContent .productIcon.hasPhoto{background:transparent!important;box-shadow:none!important;border:0!important}
 .itemProductContent .productIcon.hasPhoto img{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;max-height:30px!important;flex:0 0 30px!important;border-radius:6px!important}
 .itemProductContent .productIcon img,.itemProductContent .productRealImage,.itemProductContent .productBarcodeImage{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;flex:0 0 26px!important;border-radius:5px!important;object-fit:contain!important}
-.itemProductContent .productIcon .productInlineIcon,.itemProductContent .productIcon svg{width:24px!important;height:24px!important}
+.itemProductContent .productIcon .productInlineIcon,.itemProductContent .productIcon svg{width:28px!important;height:28px!important}
+/* Icoon links in zijn vak: meer lucht naar de − toe */
+.itemProductContent .productIcon{justify-content:flex-start!important}
+.itemProductContent .productIcon.hasPhoto{justify-content:center!important}
+/* Lange namen: schuiven blijft, maar met lucht en een zachte vervaging aan de rechterkant */
+.itemProductContent .productInfo{padding-right:8px!important;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 14px),transparent)}
+.itemProductContent .productInfo.atEnd,.itemProductContent .productInfo.fits{-webkit-mask-image:none;mask-image:none}
 .itemProductContent .productIcon{font-size:19px!important;line-height:1!important}
 body.dark-theme .itemProductContent .productIcon{background:transparent!important}
 body.dark-theme .itemProductContent .productIcon.hasPhoto{background:transparent!important}
@@ -14700,6 +14706,15 @@ body.dark-theme .pantryMore summary{color:#9fd3ac}
 body.dark-theme .pantryOnList{color:#9fd3ac}
 body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
 </style>
+<script id="name-fade">
+(function(){
+  function upd(el){var fits=el.scrollWidth<=el.clientWidth+1;el.classList.toggle("fits",fits);el.classList.toggle("atEnd",!fits&&el.scrollLeft+el.clientWidth>=el.scrollWidth-2);}
+  function scan(){document.querySelectorAll(".itemProductContent .productInfo").forEach(function(el){upd(el);if(!el.__fade){el.__fade=true;el.addEventListener("scroll",function(){upd(el);},{passive:true});}});}
+  if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);setTimeout(scan,30);return r;};}
+  window.addEventListener("resize",function(){setTimeout(scan,50);});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(scan,300);});else setTimeout(scan,300);
+})();
+</script>
 <style id="step-icons">
 /* Plus en min getekend in plaats van als letter: altijd precies in het midden */
 .quantityButton,.pantryStep{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;line-height:0!important;font-size:0!important}
