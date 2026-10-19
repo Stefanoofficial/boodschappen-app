@@ -5619,7 +5619,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.4</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.6</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -14005,13 +14005,13 @@ input,select,textarea{font-size:16px}
 <style id="history-icon-off">#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}</style>
 <style id="product-icon-tile">
 /* Eén vast vakje voor productfoto's én iconen, zodat de lijst rustig oogt. */
-.itemProductContent .productIcon{background:#f1f6f2!important;border-radius:10px!important;visibility:visible!important}
+.itemProductContent .productIcon{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:10px!important;visibility:visible!important;margin-right:0!important;transform:translateX(-5px)!important;-webkit-transform:translateX(-5px)!important}
 .itemProductContent .productIcon.hasPhoto{background:transparent!important;box-shadow:none!important;border:0!important}
 .itemProductContent .productIcon.hasPhoto img{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;max-height:30px!important;flex:0 0 30px!important;border-radius:6px!important}
 .itemProductContent .productIcon img,.itemProductContent .productRealImage,.itemProductContent .productBarcodeImage{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;flex:0 0 26px!important;border-radius:5px!important;object-fit:contain!important}
 .itemProductContent .productIcon .productInlineIcon,.itemProductContent .productIcon svg{width:24px!important;height:24px!important}
 .itemProductContent .productIcon{font-size:19px!important;line-height:1!important}
-body.dark-theme .itemProductContent .productIcon{background:#2a352e!important}
+body.dark-theme .itemProductContent .productIcon{background:transparent!important}
 body.dark-theme .itemProductContent .productIcon.hasPhoto{background:transparent!important}
 .aboutMenuHint a{color:inherit;text-decoration:underline}
 </style>
@@ -14613,8 +14613,9 @@ body.dark-theme .pantryTabs .recipeChip.active{background:#4f8a62!important;colo
 .pantryRow{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5)}
 .pantryRow.isOut{opacity:.92}
 .pantryRow.isOut .pantryInfo strong{color:#7b8a80}
-.pantryIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;overflow:hidden}
-.pantryIcon .productInlineIcon,.pantryIcon svg{width:24px;height:24px}
+.pantryIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:transparent;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;overflow:hidden}
+.pantryIcon .productInlineIcon,.pantryIcon svg{width:28px;height:28px}
+.pantryIcon{font-size:24px!important}
 .pantryIcon.hasPhoto{background:transparent}
 .pantryIcon img{width:30px;height:30px;object-fit:contain;border-radius:6px}
 .pantryInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:none;border:0;padding:4px 0;color:inherit;font:inherit;cursor:pointer;min-height:44px;justify-content:center}
@@ -14684,7 +14685,7 @@ body.dark-theme .pantryDelete{color:#f08f8f}
 .restockCheck em{font-style:normal;color:var(--muted-text,#718177)}
 .restockLoc{flex:0 0 auto;font-size:14px!important;padding:8px;border-radius:10px;border:1px solid #dce6df;background:#fff;color:#2f4a38;max-width:132px}
 body.dark-theme .pantryRow,body.dark-theme .pantryEmpty,body.dark-theme .restockRow{background:#29352d}
-body.dark-theme .pantryIcon:not(.hasPhoto),body.dark-theme .pantryStep{background:#1d241f;color:#edf5ef}
+body.dark-theme .pantryStep{background:#1d241f;color:#edf5ef}
 body.dark-theme .pantryInfo strong,body.dark-theme .pantryQty,body.dark-theme .pantryEmpty strong,body.dark-theme .restockCheck span{color:#edf5ef}
 body.dark-theme .pantryInfo small,body.dark-theme .pantryEmpty span,body.dark-theme .pantryGroupTitle,body.dark-theme .restockCheck em{color:#b8c6bc}
 body.dark-theme .pantryEmpty i{background:#34443a;color:#cfe6d5}
