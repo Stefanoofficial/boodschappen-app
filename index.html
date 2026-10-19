@@ -5624,7 +5624,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.0</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.1</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -15322,6 +15322,8 @@ html body #status i{font-size:12px!important;margin-right:5px!important}
 html body #status span{display:inline!important;font-size:13px!important;font-weight:500!important;margin:0!important}
 html body #status span::before{content:" · "}
 html body #status.statusWarn{color:#b5651d!important}
+/* Alleen op het scherm Lijst tonen */
+html body .app.overview-active #status,html body .app.more-active #status,html body .app.overview-active .frequentStrip,html body .app.more-active .frequentStrip{display:none!important}
 body.dark-theme #status{color:#9fb8a6!important;background:transparent!important}
 /* Vaak gekocht */
 .frequentStrip{margin:12px 2px 0}
