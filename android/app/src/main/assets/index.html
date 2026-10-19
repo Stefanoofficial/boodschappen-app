@@ -5220,6 +5220,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
       <h2>Mijn Boodschappen Pro</h2>
       <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <button type="button" class="proUnlockHero" onclick="event.stopPropagation();showProUpsell()"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ontdek Pro</button>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5315,9 +5316,11 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="budgetPanelHeading">
         <div><h3>Mijn voorraad</h3><p>Houd bij wat je thuis hebt. Is iets op, dan zet je het met één tik op je boodschappenlijst.</p></div>
       </div>
+      <div id="pantryShare"></div>
       <div id="pantryTabs" class="pantryTabs" role="tablist" aria-label="Plek"></div>
       <div id="pantryRefill"></div>
       <div id="pantryList" class="pantryList" aria-live="polite"></div>
+      <div id="pantryInsights"></div>
 
       <h3 class="budgetSectionTitle">Product toevoegen</h3>
       <label for="pantryName">Product</label>
@@ -5440,7 +5443,18 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <i class="fa-solid fa-bell"></i>
       <span>Meldingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
-    </button>
+    </button>    <div class="devSettingsBlock" id="devSettingsBlock" hidden>
+      <div class="familyMenuSubTitle devSettingsTitle">Testinstellingen</div>
+      <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow" onclick="toggleProTestMode(event)" role="switch" aria-checked="true">
+        <i class="fa-solid fa-crown"></i>
+        <span>Pro actief<small>Zet uit om de app te zien zoals iemand zonder Pro.</small></span>
+        <span class="settingsToggle on" id="devProToggle" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="familyMenuItem settingsMenuItem devHideRow" onclick="hideDevSettings(event)">
+        <i class="fa-solid fa-eye-slash"></i>
+        <span>Testinstellingen verbergen</span>
+      </button>
+    </div>
   </div>
 
   <div id="notificationSettingsMenuSub" class="familyMenuPage settingsMenuPage notificationSettingsPage" style="display:none;">
@@ -5668,7 +5682,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
       <h4>Delen met anderen</h4>
-      <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
+      <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
       <h4>Bewaren en verwijderen</h4>
       <p>Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen.</p>
       <h4>Jouw rechten</h4>
@@ -5785,6 +5799,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div class="overview-new">
     <h2 id="overviewGreetingNew" class="overview-new-greeting">Goedendag 👋</h2>
   <div id="overviewScrollArea">
+
+    <button type="button" id="overviewExpiryCard" class="overview-new-card overview-click-card" onclick="openPantryFromOverview()" hidden>
+      <div class="overview-new-title"><i class="fa-solid fa-hourglass-half overview-new-expiry"></i><span>Bijna over de datum</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
+      <div class="overview-new-row">
+        <div><strong id="overviewExpiryNames"></strong><div id="overviewExpiryText" class="overview-new-muted"></div></div>
+      </div>
+    </button>
 
     <div class="overview-new-card overview-click-card" onclick="openQuickAddFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-bolt overview-new-bolt"></i><span>Snel opnieuw toevoegen</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
@@ -14179,17 +14200,23 @@ body.dark-theme .legalContact a{color:#9fd3a9}
 
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function read(){
-    try{var d=JSON.parse(localStorage.getItem(KEY)||"{}");return {items:Array.isArray(d.items)?d.items.filter(function(i){return i&&i.name;}):[]};}
-    catch(e){return {items:[]};}
+    try{var d=JSON.parse(localStorage.getItem(KEY)||"{}");return {items:Array.isArray(d.items)?d.items.filter(function(i){return i&&i.name;}):[],log:Array.isArray(d.log)?d.log:[],share:!!d.share};}
+    catch(e){return {items:[],log:[],share:false};}
   }
-  function write(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+  function write(d){
+    if(d.log&&d.log.length>300)d.log=d.log.slice(-300);
+    try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}
+    try{if(window.__pantryAfterWrite)window.__pantryAfterWrite(d);}catch(e){console.warn(e);}
+  }
+  // Logboek voor inzichten: in = erbij, use = gebruikt, out = op, toss = weggegooid
+  function logEv(d,item,type,qty){d.log=d.log||[];d.log.push({k:norm(item.name),n:item.name,t:type,q:qty||1,at:Date.now()});}
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
   function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
   // Bewust streng: "Kaas" is niet hetzelfde als "Pindakaas", "Melk" niet als "Hagelslag melk".
   function same(a,b){
     a=norm(a);b=norm(b);if(!a||!b)return false;
     if(a===b)return true;
-    var suf=["s","n","en","jes","tjes"];
+    var suf=["s","n","en","eren","jes","tjes"," s"];
     for(var k=0;k<suf.length;k++){if(a+suf[k]===b||b+suf[k]===a)return true;}
     return false;
   }
@@ -14293,9 +14320,10 @@ body.dark-theme .legalContact a{color:#9fd3a9}
     var shown=items.filter(function(i){return activeLoc==="all"||i.loc===activeLoc;});
     if(!items.length){
       listEl.innerHTML='<div class="pantryEmpty"><i class="fa-solid fa-cube" aria-hidden="true"></i><strong>Je voorraad is nog leeg</strong><span>Voeg hieronder producten toe of scan een barcode. Na het boodschappen doen kun je je gekochte producten ook in één keer toevoegen.</span></div>';
+      try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){}
       return;
     }
-    if(!shown.length){listEl.innerHTML='<p class="budgetEmpty pantryNone">Nog niets in de '+esc(LOC_LABEL[activeLoc]||"").toLowerCase()+'.</p>';return;}
+    if(!shown.length){listEl.innerHTML='<p class="budgetEmpty pantryNone">Nog niets in de '+esc(LOC_LABEL[activeLoc]||"").toLowerCase()+'.</p>';try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){}return;}
     var sorter=function(a,b){
       var ao=int(a.qty,0)===0,bo=int(b.qty,0)===0;if(ao!==bo)return ao?1:-1;
       var da=daysUntil(a.exp),db=daysUntil(b.exp);
@@ -14310,6 +14338,7 @@ body.dark-theme .legalContact a{color:#9fd3a9}
       b.onclick=function(e){e.stopPropagation();var id=b.closest("[data-id]").getAttribute("data-id"),act=b.getAttribute("data-act");
         if(act==="min")changeQty(id,-1);else if(act==="plus")changeQty(id,1);else if(act==="edit")editItem(id);else if(act==="tolist")putOnList(id);};
     });
+    try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){console.warn(e);}
   }
   function rowHtml(i){
     var q=int(i.qty,0),m=int(i.min,0),days=daysUntil(i.exp),meta=[],cls="pantryRow";
@@ -14343,16 +14372,29 @@ body.dark-theme .legalContact a{color:#9fd3a9}
       if(entry.barcode&&!ex.barcode)ex.barcode=entry.barcode;
       if(entry.imageUrl&&!ex.imageUrl)ex.imageUrl=entry.imageUrl;
       ex.updatedAt=Date.now();
+      logEv(d,ex,"in",Math.max(1,int(entry.qty,1)));
     }else{
       ex={id:uid(),name:niceName(entry.name),qty:Math.max(1,int(entry.qty,1)),loc:loc,exp:entry.exp||"",min:int(entry.min,0),
           barcode:entry.barcode||"",imageUrl:entry.imageUrl||"",brand:entry.brand||"",updatedAt:Date.now()};
       d.items.push(ex);
+      logEv(d,ex,"in",ex.qty);
     }
     write(d);return ex;
   }
   function changeQty(id,delta){
     var d=read(),it=d.items.find(function(i){return i.id===id;});if(!it)return;
-    var before=int(it.qty,0);it.qty=Math.max(0,before+delta);it.updatedAt=Date.now();write(d);render();
+    var before=int(it.qty,0);it.qty=Math.max(0,before+delta);it.updatedAt=Date.now();
+    if(it.qty!==before){logEv(d,it,delta>0?"in":"use",1);if(it.qty===0)logEv(d,it,"out",0);}
+    write(d);render();
+    var expired=delta<0&&before>0&&daysUntil(it.exp)!=null&&daysUntil(it.exp)<0;
+    if(expired){
+      var opToast=function(){if(it.qty===0&&!onShoppingList(it.name))toast('<strong>'+esc(it.name)+'</strong> is op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});};
+      toast('<strong>'+esc(it.name)+'</strong> was over de datum. Weggegooid?','Ja, weggegooid',function(){
+        var d2=read();for(var k=d2.log.length-1;k>=0;k--){if(d2.log[k].k===norm(it.name)&&d2.log[k].t==="use"){d2.log[k].t="toss";break;}}
+        write(d2);render();setTimeout(opToast,150);
+      });
+      return;
+    }
     if(before>0&&it.qty===0&&!onShoppingList(it.name)){
       toast('<strong>'+esc(it.name)+'</strong> is op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});
     }else if(delta<0&&int(it.min,0)>0&&it.qty<int(it.min,0)&&before>=int(it.min,0)&&!onShoppingList(it.name)){
@@ -14378,7 +14420,9 @@ body.dark-theme .legalContact a{color:#9fd3a9}
     ov.querySelector('[data-b="cancel"]').onclick=close;
     ov.addEventListener("click",function(e){if(e.target===ov)close();});
     ov.querySelector('[data-b="del"]').onclick=function(){
-      var dd=read();dd.items=dd.items.filter(function(i){return i.id!==id;});write(dd);close();render();
+      var dd=read();dd.items=dd.items.filter(function(i){return i.id!==id;});
+      if(int(it.qty,0)>0&&daysUntil(it.exp)!=null&&daysUntil(it.exp)<0)logEv(dd,it,"toss",int(it.qty,0));
+      write(dd);close();render();
       toast(esc(it.name)+' is uit je voorraad verwijderd.','Ongedaan maken',function(){var d3=read();d3.items.push(it);write(d3);render();});
     };
     ov.querySelector('[data-b="save"]').onclick=function(){
@@ -14415,6 +14459,8 @@ body.dark-theme .legalContact a{color:#9fd3a9}
   };
   window.__refreshPantryUI=function(){var p=document.getElementById("pantryPanel");if(p&&!p.hidden)render();};
   window.__pantryRead=read;
+  window.__pantryApi={read:read,write:write,render:function(){render();},toast:toast,same:same,norm:norm,esc:esc,int:int,daysUntil:daysUntil,fmtDate:fmtDate,
+    LOC_IN:LOC_IN,LOC_LABEL:LOC_LABEL,addNamesToShoppingList:addNamesToShoppingList,onShoppingList:onShoppingList,niceName:niceName};
 
   // Plek automatisch kiezen tijdens het typen (tenzij je die zelf hebt gekozen)
   function bindForm(){
@@ -14499,7 +14545,7 @@ body.dark-theme .legalContact a{color:#9fd3a9}
       }catch(e){}
       var r=await origClear.apply(this,arguments);
       // Alleen vragen als je de voorraad al gebruikt
-      if(bought.length&&read().items.length)setTimeout(function(){offerRestock(bought);},350);
+      if(bought.length&&read().items.length&&(!window.isProActive||window.isProActive()))setTimeout(function(){offerRestock(bought);},350);
       return r;
     };
   }
@@ -14509,10 +14555,15 @@ body.dark-theme .legalContact a{color:#9fd3a9}
     var origAdd=addProduct;
     addProduct=async function(){
       var input=document.getElementById("product"),text=input?input.value.trim():"";
+      // Weekplanner: ingrediënten die je al in huis hebt niet toevoegen
+      if(text&&Array.isArray(window.__pantryPlannerSkip)&&window.__pantryInHouse){
+        var hit=window.__pantryInHouse(text);
+        if(hit){window.__pantryPlannerSkip.push({text:text,have:hit});if(input)input.value="";return;}
+      }
       var r=await origAdd.apply(this,arguments);
-      if(!text)return r;
+      if(!text||Array.isArray(window.__pantryPlannerSkip))return r;
       var have=read().items.find(function(i){return int(i.qty,0)>0&&same(i.name,text);});
-      if(have){
+      if(have&&(!window.isProActive||window.isProActive())){
         toast('Je hebt nog <strong>'+int(have.qty,0)+'× '+esc(have.name)+'</strong> '+LOC_IN[have.loc]+'.','Toch niet nodig',async function(){
           for(var k=boodschappen.length-1;k>=0;k--){if(boodschappen[k]&&!boodschappen[k].completed&&boodschappen[k].text===text){boodschappen.splice(k,1);break;}}
           try{showList();}catch(e){} try{await saveList();}catch(e){}
@@ -14626,6 +14677,431 @@ body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5e
 .pantryStep .stepIcon::before,.pantryStep .stepIcon.plus::after{top:6px;width:14px}
 .pantryStep::after{content:"";position:absolute;inset:-4px}
 .pantryToList{height:36px!important}
+</style>
+<script id="pantryPhase34">
+/* Voorraad fase 3 en 4: houdbaarheid op het Overzicht, koppeling met de weekplanner,
+   voorraad delen met je familie (households/{id}/voorraad) en inzichten. */
+(function(){
+  var A=window.__pantryApi;if(!A)return;
+  var DAY=86400000;
+  function hid(){try{return (typeof currentHouseholdId!=="undefined"&&currentHouseholdId)?String(currentHouseholdId):"";}catch(e){return "";}}
+  function me(){try{return auth&&auth.currentUser?auth.currentUser.uid:"";}catch(e){return "";}}
+
+  /* ======================= Fase 3a: Overzicht ======================= */
+  function expiring(items){
+    return items.filter(function(i){var d=A.daysUntil(i.exp);return A.int(i.qty,0)>0&&d!=null&&d<=2;})
+      .sort(function(a,b){return A.daysUntil(a.exp)-A.daysUntil(b.exp);});
+  }
+  function whenText(d){return d<0?"over de datum":d===0?"vandaag":d===1?"morgen":"over "+d+" dagen";}
+  function renderExpiryCard(){
+    var card=document.getElementById("overviewExpiryCard");if(!card)return;
+    if(window.isProActive&&!window.isProActive()){card.hidden=true;return;}
+    var list=expiring(A.read().items);
+    if(!list.length){card.hidden=true;return;}
+    card.hidden=false;
+    var names=list.slice(0,3).map(function(i){return i.name;});
+    var label=names.length===1?names[0]:names.slice(0,-1).join(", ")+" en "+names[names.length-1];
+    if(list.length>3)label=names.join(", ")+" en nog "+(list.length-3);
+    document.getElementById("overviewExpiryNames").textContent=label;
+    var first=list[0],dd=A.daysUntil(first.exp);
+    var expired=list.filter(function(i){return A.daysUntil(i.exp)<0;}).length;
+    document.getElementById("overviewExpiryText").textContent=list.length===1
+      ?(dd<0?first.name+" is over de datum. Kijk of je het nog kunt gebruiken.":first.name+" is "+whenText(dd)+" over de datum. Gebruik het op tijd.")
+      :(expired?expired+" over de datum, "+(list.length-expired)+" binnenkort. Gebruik ze op tijd.":"Deze producten gaan binnen 2 dagen over de datum.");
+  }
+  window.openPantryFromOverview=function(){
+    try{showMoreView();}catch(e){}
+    try{openProSubmenu();}catch(e){}
+    setTimeout(function(){
+      var panel=document.getElementById("pantryPanel");
+      if(panel&&panel.hidden)togglePantry();else A.render();
+      setTimeout(function(){var p=document.getElementById("pantryPanel");if(p)p.scrollIntoView({behavior:"smooth",block:"start"});},120);
+    },80);
+  };
+  if(typeof updateOverviewView==="function"){
+    var origOv=updateOverviewView;
+    updateOverviewView=function(){var r=origOv.apply(this,arguments);try{renderExpiryCard();}catch(e){}return r;};
+  }
+
+  /* ======================= Fase 3b: Weekplanner ======================= */
+  var UNIT=/^\s*(?:\d+(?:[.,]\d+)?|½|¼|¾|een|één|twee|drie|vier)\s*(?:g|gr|gram|kg|ml|l|dl|cl|el|tl|eetlepels?|theelepels?|blik(?:ken|je|jes)?|pak(?:ken|je|jes)?|zak(?:ken|je|jes)?|bos(?:je|jes)?|pot(?:je|jes)?|stuks?|tenen|teentjes?|teen|plak(?:ken|jes)?|snufje|scheutje|handje|handjes)?\.?\s+/i;
+  function ingName(line){
+    var t=String(line||"").split("(")[0].split(",")[0].trim();
+    t=t.replace(UNIT,"").replace(/^(?:verse|vers|gesneden|geraspte|gehakte|bevroren)\s+/i,"").trim();
+    return t;
+  }
+  function inHouse(line){
+    var name=ingName(line);if(!name)return null;
+    var words=A.norm(name).split(" ");var last=words[words.length-1];
+    return A.read().items.find(function(i){
+      if(A.int(i.qty,0)<=0)return false;
+      if(A.same(i.name,name))return true;
+      var pn=A.norm(i.name);
+      return pn.indexOf(" ")<0&&words.length>1&&A.same(pn,last);
+    })||null;
+  }
+  window.__pantryInHouse=inHouse;
+  window.__renderExpiryCard=function(){try{renderExpiryCard();}catch(e){}};
+
+  function annotateMeals(){
+    var box=document.getElementById("smartPlannerMeals");if(!box)return;
+    var hasPantry=A.read().items.length>0;
+    box.querySelectorAll(".plannerMealRow").forEach(function(row){
+      var p=row.querySelector("p");if(!p)return;
+      var lines=p.getAttribute("data-lines");
+      if(lines==null){lines=p.textContent;p.setAttribute("data-lines",lines);}
+      var arr=lines.split("\n").map(function(l){return l.trim();}).filter(Boolean);
+      var have=0;
+      p.classList.add("ingAnnotated");
+      p.innerHTML=arr.map(function(l){
+        var h=hasPantry&&inHouse(l);if(h)have++;
+        return '<span class="ingLine'+(h?' inHouse':'')+'">'+A.esc(l)+(h?'<em><i class="fa-solid fa-check" aria-hidden="true"></i> in huis</em>':'')+'</span>';
+      }).join("");
+      var sum=row.querySelector(".ingSummary");
+      if(hasPantry&&arr.length){
+        if(!sum){sum=document.createElement("small");sum.className="ingSummary";p.parentNode.insertBefore(sum,p);}
+        sum.textContent=have===arr.length?"Alles in huis ✓":have?have+" van "+arr.length+" ingrediënten in huis":"Nog niets van in huis";
+        sum.classList.toggle("allHave",have===arr.length);
+      }else if(sum)sum.remove();
+    });
+  }
+  (function watchMeals(){
+    var box=document.getElementById("smartPlannerMeals");if(!box)return;
+    var busy=false;
+    new MutationObserver(function(){if(busy)return;busy=true;try{annotateMeals();}finally{setTimeout(function(){busy=false;},0);}})
+      .observe(box,{childList:true});
+    annotateMeals();
+  })();
+
+  if(typeof window.addPlannerIngredientsToShoppingList==="function"){
+    var origPlan=window.addPlannerIngredientsToShoppingList;
+    window.addPlannerIngredientsToShoppingList=async function(){
+      var usePantry=A.read().items.some(function(i){return A.int(i.qty,0)>0;});
+      if(!usePantry)return origPlan.apply(this,arguments);
+      var before=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen))?boodschappen.length:0;
+      window.__pantryPlannerSkip=[];
+      var r;
+      try{r=await origPlan.apply(this,arguments);}finally{
+        var skipped=window.__pantryPlannerSkip||[];window.__pantryPlannerSkip=null;
+        var after=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen))?boodschappen.length:0;
+        var st=document.getElementById("smartPlannerStatus");
+        if(skipped.length&&st){
+          var real=Math.max(0,after-before);
+          var txt=st.textContent.replace(/^\d+ (?:product|producten) toegevoegd aan je lijst/,real+(real===1?" product":" producten")+" toegevoegd aan je lijst");
+          txt=txt.replace(/\.$/,"")+", "+skipped.length+" al in huis: "+skipped.map(function(x){return x.have.name;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+".";
+          st.textContent=txt;
+          A.toast(skipped.length===1?'<strong>'+A.esc(skipped[0].have.name)+'</strong> heb je al in huis en is niet toegevoegd.':'<strong>'+skipped.length+' ingrediënten</strong> heb je al in huis en zijn niet toegevoegd.','Toch toevoegen',async function(){
+            var n=await A.addNamesToShoppingList(skipped.map(function(x){return {name:x.text};}));
+            A.toast(n===1?'1 ingrediënt toegevoegd aan je lijst.':n+' ingrediënten toegevoegd aan je lijst.');
+          });
+        }
+      }
+      return r;
+    };
+  }
+
+  /* ======================= Fase 4a: delen met je familie ======================= */
+  var ref=null,refHid="",sharedTs=0,applying=false,pushTimer=null,shareError="",firstSnap=true;
+  function stop(){if(ref){try{ref.off("value");}catch(e){}}ref=null;refHid="";firstSnap=true;}
+  function desired(){var d=A.read();return d.share&&me()?hid():"";}
+  function ensure(){
+    var h=desired();if(h===refHid)return;
+    stop();if(!h||typeof database==="undefined")return;
+    refHid=h;shareError="";
+    ref=database.ref("households/"+h+"/voorraad");
+    ref.on("value",function(snap){
+      var v=snap.val();
+      if(firstSnap){
+        firstSnap=false;
+        if(v&&typeof v.json==="string"){mergeRemote(v);}
+        push(true);
+        return;
+      }
+      if(v&&Number(v.updatedAt)>sharedTs&&typeof v.json==="string")applyRemote(v);
+    },function(err){
+      shareError="Delen lukt nog niet. In Firebase ontbreekt de regel voor de gedeelde voorraad.";
+      console.warn("Voorraad delen:",err);stop();renderShare();
+    });
+  }
+  function parse(v){try{var o=JSON.parse(v.json);return {items:Array.isArray(o.items)?o.items:[],log:Array.isArray(o.log)?o.log:[]};}catch(e){return null;}}
+  function applyRemote(v){
+    var o=parse(v);if(!o)return;
+    var d=A.read();d.items=o.items;d.log=o.log;
+    applying=true;try{A.write(d);}finally{applying=false;}
+    sharedTs=Number(v.updatedAt)||Date.now();
+    A.render();refreshAll();
+  }
+  function mergeRemote(v){
+    var o=parse(v);if(!o)return;
+    var d=A.read();
+    var items=o.items.slice();
+    d.items.forEach(function(l){if(!items.some(function(r){return r.loc===l.loc&&A.same(r.name,l.name);}))items.push(l);});
+    var seen={},log=o.log.concat(d.log).filter(function(e){var k=e.at+"|"+e.k+"|"+e.t;if(seen[k])return false;seen[k]=1;return true;}).sort(function(a,b){return a.at-b.at;});
+    d.items=items;d.log=log;
+    applying=true;try{A.write(d);}finally{applying=false;}
+    A.render();refreshAll();
+  }
+  function push(now){
+    if(!ref||applying||firstSnap)return;   // eerst de familievoorraad ophalen, nooit blind overschrijven
+    clearTimeout(pushTimer);
+    pushTimer=setTimeout(function(){
+      if(!ref)return;var d=A.read();sharedTs=Date.now();
+      ref.set({json:JSON.stringify({items:d.items,log:d.log}),updatedAt:sharedTs,by:me()}).catch(function(err){
+        shareError="Delen lukt nog niet. In Firebase ontbreekt de regel voor de gedeelde voorraad.";console.warn(err);stop();renderShare();
+      });
+    },now?0:400);
+  }
+  function renderShare(){
+    var box=document.getElementById("pantryShare");if(!box)return;
+    var h=hid(),d=A.read();
+    if(!h){box.innerHTML="";return;}
+    var on=!!d.share&&!shareError;
+    box.innerHTML='<label class="pantryShareRow"><span class="pantryShareIcon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span><span class="pantryShareText"><strong>Delen met je familie</strong><small>'+
+      (on?'Iedereen in je familie ziet en wijzigt dezelfde voorraad.':'Zet aan om samen één voorraad bij te houden.')+'</small></span>'+
+      '<input type="checkbox" class="pantrySwitch" role="switch"'+(on?' checked':'')+' aria-label="Voorraad delen met je familie"></label>'+
+      (shareError?'<p class="pantryShareError">'+A.esc(shareError)+'</p>':'');
+    var cb=box.querySelector("input");
+    ["click","pointerdown","touchstart"].forEach(function(ev){box.addEventListener(ev,function(e){e.stopPropagation();});});
+    cb.onchange=function(){
+      shareError="";var dd=A.read();dd.share=cb.checked;A.write(dd);
+      A.toast(cb.checked?'Je voorraad wordt nu gedeeld met je familie.':'Je voorraad wordt niet meer gedeeld. Je houdt je eigen kopie.');
+      renderShare();
+    };
+  }
+  setInterval(function(){try{ensure();}catch(e){}},3000);
+
+  /* ======================= Fase 4b: inzichten ======================= */
+  function insights(d){
+    var log=d.log||[];
+    var ms=new Date();ms.setDate(1);ms.setHours(0,0,0,0);var m0=ms.getTime();
+    var month=log.filter(function(e){return e.at>=m0;});
+    var used=0,tossed=0,tossNames=[];
+    month.forEach(function(e){if(e.t==="use")used+=e.q||1;if(e.t==="toss"){tossed+=e.q||1;if(tossNames.indexOf(e.n)<0)tossNames.push(e.n);}});
+    // Hoe snel gaat iets op: van eerste keer aanvullen tot "op"
+    var by={};log.forEach(function(e){(by[e.k]=by[e.k]||[]).push(e);});
+    var speed=[];
+    Object.keys(by).forEach(function(k){
+      var ev=by[k].sort(function(a,b){return a.at-b.at;}),start=null,durs=[],name=ev[ev.length-1].n;
+      ev.forEach(function(e){if(e.t==="in"&&start==null)start=e.at;if(e.t==="out"&&start!=null){durs.push((e.at-start)/DAY);start=null;}});
+      if(durs.length>=2){var avg=durs.reduce(function(a,b){return a+b;},0)/durs.length;speed.push({name:name,days:Math.max(1,Math.round(avg)),n:durs.length});}
+    });
+    speed.sort(function(a,b){return a.days-b.days;});
+    return {used:used,tossed:tossed,tossNames:tossNames,speed:speed.slice(0,3),any:log.some(function(e){return e.t!=="in";})};
+  }
+  function renderInsights(d){
+    var box=document.getElementById("pantryInsights");if(!box)return;
+    var x=insights(d);
+    if(!x.any){box.innerHTML="";return;}
+    var maand=new Date().toLocaleDateString("nl-NL",{month:"long"});
+    var lines=[];
+    lines.push('<div class="pantryInsightLine"><i class="fa-solid '+(x.tossed?'fa-trash-can':'fa-leaf')+'" aria-hidden="true"></i><span>'+
+      (x.tossed?'Weggegooid in '+maand+': '+A.esc(x.tossNames.slice(0,4).join(", "))+(x.tossNames.length>4?' en meer':'')+'.':'In '+maand+' nog niets weggegooid. Goed bezig!')+'</span></div>');
+    if(x.speed.length){
+      x.speed.forEach(function(s){lines.push('<div class="pantryInsightLine"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span><strong>'+A.esc(s.name)+'</strong> is meestal na '+s.days+(s.days===1?' dag':' dagen')+' op.</span></div>');});
+    }else{
+      lines.push('<div class="pantryInsightLine muted"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span>Na een paar keer aanvullen zie je hier hoe snel je producten opgaan.</span></div>');
+    }
+    box.innerHTML='<div class="pantryInsights"><div class="pantryInsightsHead"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><strong>Inzichten</strong><small>'+maand.charAt(0).toUpperCase()+maand.slice(1)+'</small></div>'+
+      '<div class="pantryStats"><div><b>'+x.used+'</b><span>gebruikt</span></div><div class="'+(x.tossed?'warn':'')+'"><b>'+x.tossed+'</b><span>weggegooid</span></div></div>'+
+      lines.join("")+'</div>';
+  }
+
+  /* ======================= Koppelen ======================= */
+  function refreshAll(){
+    try{renderExpiryCard();}catch(e){}
+    try{annotateMeals();}catch(e){}
+  }
+  window.__pantryAfterWrite=function(){
+    if(!applying){try{ensure();}catch(e){} push(false);}
+    refreshAll();
+  };
+  window.__pantryAfterRender=function(d){renderShare();renderInsights(d||A.read());};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",refreshAll);else refreshAll();
+  setTimeout(refreshAll,1500);
+})();
+</script>
+<style id="pantry-phase34-style">
+#overviewExpiryCard[hidden]{display:none!important}
+html body #pantryPanel .pantryShareRow{display:flex!important;align-items:center;margin:0 0 12px!important;font-size:inherit!important;font-weight:inherit!important}
+html body #pantryPanel .pantryShareText strong{font-size:16px!important;font-weight:600!important}
+html body #pantryPanel .pantryShareText small{font-size:14px!important;font-weight:400!important}
+.overview-new-expiry{background:#ffe7d6!important;color:#c0601a!important}
+body.dark-theme .overview-new-expiry{background:#4a3424!important;color:#f3b27f!important}
+.pantryShareRow{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5);cursor:pointer}
+.pantryShareIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e8f0ff;color:#4e73ad;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryShareText{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pantryShareText strong{font-size:16px;font-weight:600;color:var(--text-color,#2f4a38)}
+.pantryShareText small{font-size:14px;line-height:1.35;color:var(--muted-text,#718177)}
+.pantrySwitch{appearance:none;-webkit-appearance:none;flex:0 0 50px;width:50px;height:30px;border-radius:999px;background:#cfd9d2;position:relative;cursor:pointer;transition:background .2s ease;margin:0}
+.pantrySwitch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s ease}
+.pantrySwitch:checked{background:#3F5B45}
+.pantrySwitch:checked::after{transform:translateX(20px)}
+.pantryShareError{margin:-4px 2px 12px;font-size:14px;line-height:1.4;color:#b04545}
+.pantryInsights{margin:14px 0 4px;padding:14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryInsightsHead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pantryInsightsHead i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e8f0ff;color:#4e73ad;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryInsightsHead strong{font-size:16px;color:var(--text-color,#2f4a38);flex:1}
+.pantryInsightsHead small{font-size:14px;color:var(--muted-text,#718177)}
+.pantryStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pantryStats div{background:#fff;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.pantryStats b{font-size:21px;line-height:1.1;color:var(--text-color,#2f4a38)}
+.pantryStats span{font-size:13px;color:var(--muted-text,#718177)}
+.pantryStats .warn b{color:#b04545}
+.pantryInsightLine{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;font-size:15px;line-height:1.4;color:var(--text-color,#2f4a38)}
+.pantryInsightLine i{width:18px;text-align:center;margin-top:3px;color:#5b7a63;font-size:14px}
+.pantryInsightLine.muted{color:var(--muted-text,#718177)}
+.ingAnnotated{white-space:normal!important}
+.ingLine{display:block;line-height:1.5}
+.ingLine.inHouse{color:#3f7a50}
+.ingLine em{font-style:normal;font-size:13px;font-weight:600;margin-left:6px;padding:1px 7px;border-radius:999px;background:#e3f4e7;color:#2f6b45;white-space:nowrap}
+.ingLine em i{font-size:11px}
+.ingSummary{display:block;margin:4px 0 2px;font-size:14px;font-weight:600;color:#86703b}
+.ingSummary.allHave{color:#3f7a50}
+body.dark-theme .pantryShareRow,body.dark-theme .pantryInsights{background:#29352d}
+body.dark-theme .pantryStats div{background:#1d241f}
+body.dark-theme .pantryShareText strong,body.dark-theme .pantryInsightsHead strong,body.dark-theme .pantryStats b,body.dark-theme .pantryInsightLine{color:#edf5ef}
+body.dark-theme .pantryShareText small,body.dark-theme .pantryStats span,body.dark-theme .pantryInsightLine.muted{color:#b8c6bc}
+body.dark-theme .pantryShareIcon,body.dark-theme .pantryInsightsHead i{background:#2d3a4f;color:#a9c2ec}
+body.dark-theme .pantrySwitch{background:#45524a}
+body.dark-theme .pantrySwitch:checked{background:#4f8a62}
+body.dark-theme .ingLine.inHouse{color:#9fd3ac}
+body.dark-theme .ingLine em{background:#34443a;color:#cfe6d5}
+body.dark-theme .ingSummary{color:#d8c79c}
+body.dark-theme .ingSummary.allHave{color:#9fd3ac}
+body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f08f8f}
+</style>
+<script id="proGate">
+/* Pro-status en slotjes.
+   Er is nog geen betaling gekoppeld: iedereen heeft Pro, tenzij je het in de Testinstellingen uitzet.
+   Testinstellingen tevoorschijn halen: Meer → Over de app → tik 5× op het versienummer. */
+(function(){
+  var MODE_KEY="boodschappenProTestMode", DEV_KEY="boodschappenDevSettings";
+  function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+
+  // Later vervangen door de echte Pro-status uit Firebase (door de server gezet na een aankoop).
+  window.isProActive=function(){return get(MODE_KEY)!=="free";};
+
+  var CARDS=[
+    {card:".proPlannerLaunch",btn:".proPlannerLaunch .proPlannerButton",panel:"smartPlannerPanel",fn:"toggleSmartPlanner",label:'Open weekplanner <i class="fa-solid fa-chevron-down"></i>'},
+    {card:".budgetPlannerLaunch",btn:".budgetLaunchButton",panel:"budgetPlannerPanel",fn:"toggleBudgetPlanner",label:'Open budgetplanner <i class="fa-solid fa-chevron-down"></i>'},
+    {card:".pantryLaunch",btn:".pantryLaunchButton",panel:"pantryPanel",fn:"togglePantry",label:'Open voorraad <i class="fa-solid fa-chevron-down"></i>'}
+  ];
+
+  // Openen van een Pro-onderdeel zonder Pro → ontgrendelscherm
+  CARDS.forEach(function(c){
+    var orig=window[c.fn];if(typeof orig!=="function")return;
+    window[c.fn]=function(event){
+      if(!window.isProActive()){if(event&&event.stopPropagation)event.stopPropagation();window.showProUpsell();return;}
+      return orig.apply(this,arguments);
+    };
+  });
+
+  function hasData(){
+    try{
+      var p=JSON.parse(get("boodschappen_pantry_v1")||"{}"),w=JSON.parse(get("boodschappen_pro_smart_weekplanner_v1")||"[]"),b=JSON.parse(get("boodschappen_budgetplanner_v1")||"{}");
+      return (p.items&&p.items.length)||(Array.isArray(w)&&w.length)||(b.expenses&&b.expenses.length)||b.budget;
+    }catch(e){return false;}
+  }
+
+  window.showProUpsell=function(){
+    if(typeof familyDialogBase!=="function")return;
+    var ov=familyDialogBase("fa-crown","Ontgrendel Pro",
+      '<div class="proUpsell"><p class="familyDialogText">Haal meer uit je boodschappen met Pro.</p><ul>'+
+      '<li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span><strong>Slimme weekplanner</strong>Recepten kiezen en alle ingrediënten in één keer op je lijst.</span></li>'+
+      '<li><i class="fa-solid fa-wallet" aria-hidden="true"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de aanbiedingen bij jouw supermarkt.</span></li>'+
+      '<li><i class="fa-solid fa-cube" aria-hidden="true"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en delen met je familie.</span></li>'+
+      '</ul>'+(hasData()?'<p class="proUpsellNote"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Je gegevens blijven bewaard. Met Pro kun je ze meteen weer gebruiken.</p>':'')+
+      '<p class="proUpsellTest">Testmodus: er is nog geen betaling gekoppeld.</p></div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="later">Niet nu</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="on">Pro aanzetten</button>');
+    ov.classList.add("proUpsellDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var close=function(){closeFamilyDialog(ov);};
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    ov.querySelector('[data-b="later"]').onclick=close;
+    ov.querySelector('[data-b="on"]').onclick=function(){set(MODE_KEY,null);close();apply();note("Pro staat aan (testmodus).");};
+  };
+
+  function note(msg){
+    if(window.__pantryApi&&window.__pantryApi.toast){window.__pantryApi.toast(msg);return;}
+  }
+
+  function apply(){
+    var free=!window.isProActive();
+    document.body.classList.toggle("proFree",free);
+    CARDS.forEach(function(c){
+      var card=document.querySelector(c.card),btn=document.querySelector(c.btn),panel=document.getElementById(c.panel);
+      if(card)card.classList.toggle("proLockedCard",free);
+      if(free&&panel)panel.hidden=true;
+      if(btn)btn.innerHTML=free?'<i class="fa-solid fa-lock" aria-hidden="true"></i> Ontgrendel met Pro':(panel&&!panel.hidden?btn.innerHTML:c.label);
+    });
+    var t=document.getElementById("devProToggle"),row=document.querySelector(".devProToggleRow");
+    if(t)t.classList.toggle("on",!free);
+    if(row)row.setAttribute("aria-checked",String(!free));
+    try{if(window.__renderExpiryCard)window.__renderExpiryCard();}catch(e){}
+  }
+  window.__applyProState=apply;
+
+  window.toggleProTestMode=function(event){
+    if(event)event.stopPropagation();
+    var free=window.isProActive();
+    set(MODE_KEY,free?"free":null);
+    apply();
+    note(free?"Je ziet de app nu zonder Pro.":"Pro staat weer aan.");
+  };
+
+  // Testinstellingen verschijnen na 5× tikken op het versienummer
+  function showDev(){var b=document.getElementById("devSettingsBlock");if(b)b.hidden=get(DEV_KEY)!=="1";}
+  window.hideDevSettings=function(event){
+    if(event)event.stopPropagation();
+    set(DEV_KEY,null);set(MODE_KEY,null);showDev();apply();
+    note("Testinstellingen verborgen. Pro staat weer aan.");
+  };
+  function bindVersion(){
+    var v=document.querySelector(".aboutInfoVersion");if(!v||v.__dev)return;v.__dev=true;
+    var taps=0,timer=null;
+    v.addEventListener("click",function(e){
+      e.stopPropagation();taps++;clearTimeout(timer);timer=setTimeout(function(){taps=0;},1500);
+      if(taps>=5){taps=0;
+        if(get(DEV_KEY)==="1"){note("De testinstellingen staan al aan. Je vindt ze onder Instellingen.");return;}
+        set(DEV_KEY,"1");showDev();
+        note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");
+      }
+    });
+  }
+  // Tik op een vergrendelde kaart → ontgrendelscherm
+  document.addEventListener("click",function(e){
+    var c=e.target.closest&&e.target.closest(".proLockedCard");
+    if(c&&!window.isProActive()){e.stopPropagation();e.preventDefault();window.showProUpsell();}
+  },true);
+  function init(){bindVersion();showDev();apply();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<style id="pro-gate-style">
+.proUnlockHero{display:none;margin:12px auto 0;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+body.proFree .proUnlockHero{display:inline-flex}
+.proLockedCard > i:first-child{position:relative;overflow:visible}
+.proLockedCard > i:first-child::after{content:"\f023";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#3F5B45;color:#fff;font-size:9px;line-height:18px;text-align:center;border:2px solid var(--card-bg,#fff)}
+.proLockedCard strong,.proLockedCard p{opacity:.75}
+html body #proMenuSub .proLockedCard .proPlannerButton,html body #proMenuSub .proLockedCard .budgetLaunchButton{background:#fff2d0!important;color:#7a5a12!important}
+.proUpsell ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.proUpsell li{display:flex;gap:12px;align-items:flex-start}
+.proUpsell li i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e3f4e7;color:#42634b;display:flex;align-items:center;justify-content:center;font-size:17px}
+.proUpsell li span{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.4;color:var(--muted-text,#66766c)}
+.proUpsell li strong{font-size:16px;color:var(--text-color,#2f4a38)}
+.proUpsellNote{margin:14px 0 0;padding:10px 12px;border-radius:12px;background:#f1f6f2;font-size:14px;line-height:1.4;color:#3f6b4b}
+.proUpsellTest{margin:10px 0 0;font-size:13px;color:#a07a2a}
+.devSettingsTitle{margin-top:18px!important}
+.devProToggleRow span small{display:block;font-size:13px!important;font-weight:400!important;color:var(--muted-text,#718177);margin-top:2px;white-space:normal}
+.devProToggleRow > span:not(.settingsToggle){flex:1;display:flex;flex-direction:column;text-align:left}
+body.dark-theme .proLockedCard > i:first-child::after{background:#4f8a62;border-color:#222a24}
+body.dark-theme html body #proMenuSub .proLockedCard .proPlannerButton{background:#3a3424!important;color:#f5e6c0!important}
+body.dark-theme .proUpsell li i{background:#34443a;color:#cfe6d5}
+body.dark-theme .proUpsell li strong{color:#edf5ef}
+body.dark-theme .proUpsell li span{color:#b8c6bc}
+body.dark-theme .proUpsellNote{background:#29352d;color:#9fd3ac}
+body.dark-theme .proLockedCard .proPlannerButton,body.dark-theme .proLockedCard .budgetLaunchButton{background:#3a3424!important;color:#f5e6c0!important}
 </style>
 </body>
 
