@@ -5343,6 +5343,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <button type="button" class="budgetActionButton budgetAddButton" onclick="addPantryItem()">Toevoegen aan voorraad</button>
       <p id="pantryStatus" class="budgetStatus" aria-live="polite"></p>
       <p class="budgetPrivacyNote">Je voorraad wordt aan je account gekoppeld. Je ziet hem dus ook op een andere telefoon als je daar inlogt.</p>
+      <button type="button" class="pantryClearAll" onclick="event.stopPropagation();clearWholePantry()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Hele voorraad wissen</button>
     </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
@@ -14331,13 +14332,17 @@ body.dark-theme .legalContact a{color:#9fd3a9}
       return norm(a.name).localeCompare(norm(b.name));
     };
     var groups=activeLoc==="all"?LOCS.map(function(l){return [l[1],shown.filter(function(i){return i.loc===l[0];})];}).filter(function(g){return g[1].length;}):[[null,shown]];
-    listEl.innerHTML=groups.map(function(g){
+    var tipSeen=false;try{tipSeen=localStorage.getItem("boodschappenPantryTipSeen")==="1";}catch(e){}
+    var tip=tipSeen?'':'<div class="pantryTip" role="note"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><span>Tik op een product om het aan te passen of te verwijderen.</span><button type="button" class="pantryTipClose" aria-label="Tip sluiten"><span class="stepIcon plus" aria-hidden="true"></span></button></div>';
+    listEl.innerHTML=tip+groups.map(function(g){
       return (g[0]?'<div class="pantryGroupTitle">'+g[0]+'</div>':'')+g[1].sort(sorter).map(rowHtml).join("");
     }).join("");
     listEl.querySelectorAll("[data-act]").forEach(function(b){
       b.onclick=function(e){e.stopPropagation();var id=b.closest("[data-id]").getAttribute("data-id"),act=b.getAttribute("data-act");
-        if(act==="min")changeQty(id,-1);else if(act==="plus")changeQty(id,1);else if(act==="edit")editItem(id);else if(act==="tolist")putOnList(id);};
+        if(act==="min")changeQty(id,-1);else if(act==="plus")changeQty(id,1);else if(act==="edit"){tipDone();editItem(id);}else if(act==="tolist")putOnList(id);};
     });
+    var tc=listEl.querySelector(".pantryTipClose");
+    if(tc)tc.onclick=function(e){e.stopPropagation();tipDone();render();};
     try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){console.warn(e);}
   }
   function rowHtml(i){
@@ -14356,9 +14361,11 @@ body.dark-theme .legalContact a{color:#9fd3a9}
       ?(onList?'<span class="pantryOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst</span>':'<button type="button" class="pantryToList" data-act="tolist">Op lijst</button>')+'<button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>'
       :'<button type="button" class="pantryStep" data-act="min" aria-label="Eén '+esc(i.name)+' eraf"><span class="stepIcon" aria-hidden="true"></span></button><span class="pantryQty" aria-label="'+q+' stuks">'+q+'</span><button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>';
     return '<div class="'+cls+'" data-id="'+esc(i.id)+'">'+iconHtml(i)+
-      '<button type="button" class="pantryInfo" data-act="edit" aria-label="'+esc(i.name)+' aanpassen"><strong>'+esc(i.name)+'</strong>'+(meta.length?'<small>'+meta.join(' · ')+'</small>':'')+'</button>'+
+      '<button type="button" class="pantryInfo" data-act="edit" aria-label="'+esc(i.name)+' aanpassen"><strong>'+esc(i.name)+'<i class="fa-solid fa-pen pantryEditHint" aria-hidden="true"></i></strong>'+(meta.length?'<small>'+meta.join(' · ')+'</small>':'')+'</button>'+
       '<div class="pantryControls">'+right+'</div></div>';
   }
+
+  function tipDone(){try{localStorage.setItem("boodschappenPantryTipSeen","1");}catch(e){}var t=document.querySelector(".pantryTip");if(t)t.remove();}
 
   /* ---------- Acties ---------- */
   function upsert(entry){
@@ -14598,6 +14605,15 @@ body.dark-theme .pantryTabs .recipeChip.active{background:#4f8a62!important;colo
 .pantryInfo strong{font-size:16px;font-weight:600;line-height:1.25;color:var(--text-color,#2f4a38);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
 .pantryInfo small{font-size:14px;line-height:1.3;color:var(--muted-text,#718177)}
 .pantryTag{font-weight:600}
+.pantryEditHint{font-size:11px;margin-left:7px;color:#9aa89f;vertical-align:1px}
+.pantryTip{display:flex;align-items:center;gap:10px;padding:10px 8px 10px 12px;border-radius:14px;background:#e8f0ff;color:#2f4a6b;font-size:14px;line-height:1.4}
+.pantryTip > i{font-size:16px;color:#4e73ad;flex:0 0 auto}
+.pantryTip > span{flex:1}
+.pantryTipClose{flex:0 0 36px;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:#4e73ad;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pantryTipClose .stepIcon{transform:rotate(45deg)}
+body.dark-theme .pantryTip{background:#2d3a4f;color:#cfdcf2}
+body.dark-theme .pantryTip > i,body.dark-theme .pantryTipClose{color:#a9c2ec}
+body.dark-theme .pantryEditHint{color:#7f8f85}
 .pantryTag.low{color:#a86b12}
 .pantryTag.out{color:#b04545}
 .pantryControls{flex:0 0 auto;display:flex;align-items:center;gap:4px}
@@ -14901,10 +14917,37 @@ body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5e
     }else{
       lines.push('<div class="pantryInsightLine muted"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span>Na een paar keer aanvullen zie je hier hoe snel je producten opgaan.</span></div>');
     }
-    box.innerHTML='<div class="pantryInsights"><div class="pantryInsightsHead"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><strong>Inzichten</strong><small>'+maand.charAt(0).toUpperCase()+maand.slice(1)+'</small></div>'+
+    box.innerHTML='<div class="pantryInsights"><div class="pantryInsightsHead"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><strong>Inzichten</strong><small>'+maand.charAt(0).toUpperCase()+maand.slice(1)+'</small><button type="button" class="pantryInsightsReset" onclick="event.stopPropagation();resetPantryInsights()">Wissen</button></div>'+
       '<div class="pantryStats"><div><b>'+x.used+'</b><span>gebruikt</span></div><div class="'+(x.tossed?'warn':'')+'"><b>'+x.tossed+'</b><span>weggegooid</span></div></div>'+
       lines.join("")+'</div>';
   }
+
+  /* ======================= Wissen ======================= */
+  function ask(title,msg,okLabel){
+    return new Promise(function(resolve){
+      var ov=familyDialogBase("fa-trash-can",title,'<div class="familyDialogText">'+msg+'</div>',
+        '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="no">Annuleren</button><button type="button" class="familyDialogBtn familyDialogRemove" data-b="yes">'+okLabel+'</button>');
+      ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+      var done=function(v){closeFamilyDialog(ov,function(){resolve(v);});};
+      ov.querySelector('[data-b="no"]').onclick=function(){done(false);};
+      ov.querySelector('[data-b="yes"]').onclick=function(){done(true);};
+      ov.addEventListener("click",function(e){if(e.target===ov)done(false);});
+    });
+  }
+  function sharedNote(){var d=A.read();return d.share&&hid()?' Je voorraad is gedeeld, dus dit geldt ook voor je familie.':'';}
+  window.resetPantryInsights=async function(){
+    var ok=await ask("Inzichten wissen?","De tellingen voor gebruikt en weggegooid en hoe snel producten opgaan beginnen opnieuw. Je producten blijven staan."+sharedNote(),"Wissen");
+    if(!ok)return;
+    var d=A.read(),old=d.log.slice();d.log=[];A.write(d);A.render();
+    A.toast("Inzichten gewist.","Ongedaan maken",function(){var d2=A.read();d2.log=old.concat(d2.log);A.write(d2);A.render();});
+  };
+  window.clearWholePantry=async function(){
+    var d=A.read();if(!d.items.length&&!d.log.length){A.toast("Je voorraad is al leeg.");return;}
+    var ok=await ask("Hele voorraad wissen?","Alle "+d.items.length+(d.items.length===1?" product":" producten")+" en je inzichten worden verwijderd."+sharedNote(),"Alles wissen");
+    if(!ok)return;
+    var oldI=d.items.slice(),oldL=d.log.slice();d.items=[];d.log=[];A.write(d);A.render();
+    A.toast("Je voorraad is gewist.","Ongedaan maken",function(){var d2=A.read();d2.items=oldI.concat(d2.items);d2.log=oldL.concat(d2.log);A.write(d2);A.render();});
+  };
 
   /* ======================= Koppelen ======================= */
   function refreshAll(){
@@ -14942,6 +14985,10 @@ body.dark-theme .overview-new-expiry{background:#4a3424!important;color:#f3b27f!
 .pantryInsightsHead i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e8f0ff;color:#4e73ad;display:flex;align-items:center;justify-content:center;font-size:17px}
 .pantryInsightsHead strong{font-size:16px;color:var(--text-color,#2f4a38);flex:1}
 .pantryInsightsHead small{font-size:14px;color:var(--muted-text,#718177)}
+.pantryInsightsReset{margin-left:4px;min-height:36px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:#3f6b4b;font-size:14px;font-weight:600;cursor:pointer}
+.pantryClearAll{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:6px;border:0;border-radius:12px;background:transparent;color:#b04545;font-size:15px;font-weight:600;cursor:pointer}
+body.dark-theme .pantryInsightsReset{color:#9fd3ac}
+body.dark-theme .pantryClearAll{color:#f08f8f}
 .pantryStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .pantryStats div{background:#fff;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .pantryStats b{font-size:21px;line-height:1.1;color:var(--text-color,#2f4a38)}
