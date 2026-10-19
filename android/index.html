@@ -5219,7 +5219,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="proHero">
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
       <h2>Mijn Boodschappen Pro</h2>
-      <p>Plan je maaltijden, houd je budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <button type="button" class="proUnlockHero" onclick="event.stopPropagation();showProUpsell()"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ontdek Pro</button>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5278,7 +5279,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <h4>Aanbiedingen bij je supermarkt</h4>
         <p class="budgetStatus">Zoek een product, of bekijk welke producten uit je weekplanning nu in de aanbieding zijn.</p>
         <div class="budgetDealsSearch">
-          <input id="budgetLiveSearch" class="budgetInput" type="search" placeholder="Zoek een product, bijv. melk">
+          <input id="budgetLiveSearch" class="budgetInput" type="search" placeholder="Bijv. melk">
           <button type="button" class="budgetActionButton" onclick="searchBudgetLivePrices()">Zoeken</button>
         </div>
         <div id="budgetLivePriceResults" aria-live="polite"></div>
@@ -5308,9 +5309,42 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
       <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
     </section>
-    <div class="proFeatureCard">
-      <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    <div class="proFeatureCard pantryLaunch" onclick="togglePantry(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePantry(event)}">
+      <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis hebt en zet wat op is met één tik op je lijst.</p><button type="button" class="budgetLaunchButton pantryLaunchButton" onclick="event.stopPropagation();togglePantry(event)">Open voorraad <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
+    <section id="pantryPanel" class="budgetPlannerPanel pantryPanel" hidden aria-label="Voorraadbeheer" onclick="event.stopPropagation()">
+      <div class="budgetPanelHeading">
+        <div><h3>Mijn voorraad</h3><p>Houd bij wat je thuis hebt. Is iets op, dan zet je het met één tik op je boodschappenlijst.</p></div>
+      </div>
+      <div id="pantryShare"></div>
+      <div id="pantryTabs" class="pantryTabs" role="tablist" aria-label="Plek"></div>
+      <div id="pantryRefill"></div>
+      <div id="pantryList" class="pantryList" aria-live="polite"></div>
+      <div id="pantryInsights"></div>
+
+      <h3 class="budgetSectionTitle">Product toevoegen</h3>
+      <label for="pantryName">Product</label>
+      <div class="pantryNameRow">
+        <input id="pantryName" class="budgetInput" type="text" placeholder="Bijv. pasta" maxlength="60" autocomplete="off">
+        <button type="button" class="budgetActionButton pantryScanBtn" onclick="scanIntoPantry()" aria-label="Barcode scannen" title="Barcode scannen"><i class="fa-solid fa-barcode"></i></button>
+      </div>
+      <div class="pantryFormRow">
+        <div><label for="pantryLoc">Plek</label><select id="pantryLoc" class="budgetInput"><option value="fridge">Koelkast</option><option value="freezer">Vriezer</option><option value="pantry">Voorraadkast</option></select></div>
+        <div><label for="pantryQty">Aantal</label><input id="pantryQty" class="budgetInput" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+      </div>
+      <details class="pantryMore">
+        <summary>Houdbaarheid en minimum <span>(optioneel)</span></summary>
+        <label for="pantryExp">Houdbaar tot</label>
+        <input id="pantryExp" class="budgetInput" type="date">
+        <label for="pantryMin">Altijd minimaal in huis</label>
+        <input id="pantryMin" class="budgetInput" type="number" min="0" step="1" placeholder="Bijv. 2" inputmode="numeric">
+        <p class="budgetStatus">Heb je minder dan dit aantal, dan zie je het product bij “Aanvullen”.</p>
+      </details>
+      <button type="button" class="budgetActionButton budgetAddButton" onclick="addPantryItem()">Toevoegen aan voorraad</button>
+      <p id="pantryStatus" class="budgetStatus" aria-live="polite"></p>
+      <p class="budgetPrivacyNote">Je voorraad wordt aan je account gekoppeld. Je ziet hem dus ook op een andere telefoon als je daar inlogt.</p>
+      <button type="button" class="pantryClearAll" onclick="event.stopPropagation();clearWholePantry()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Hele voorraad wissen</button>
+    </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
@@ -5410,7 +5444,23 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <i class="fa-solid fa-bell"></i>
       <span>Meldingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
-    </button>
+    </button>    <div class="devSettingsBlock" id="devSettingsBlock" hidden>
+      <div class="familyMenuSubTitle devSettingsTitle">Testinstellingen</div>
+      <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow" onclick="toggleProTestMode(event)" role="switch" aria-checked="true">
+        <i class="fa-solid fa-crown"></i>
+        <span>Pro actief<small>Zet uit om de app te zien zoals iemand zonder Pro.</small></span>
+        <span class="settingsToggle on" id="devProToggle" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow devFamProToggleRow" onclick="toggleFamilyProTest(event)" role="switch" aria-checked="false">
+        <i class="fa-solid fa-user-group"></i>
+        <span>Iemand in mijn familie heeft Pro<small>Test hoe de gedeelde voorraad werkt voor een familielid zonder eigen Pro.</small></span>
+        <span class="settingsToggle" id="devFamProToggle" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="familyMenuItem settingsMenuItem devHideRow" onclick="hideDevSettings(event)">
+        <i class="fa-solid fa-eye-slash"></i>
+        <span>Testinstellingen verbergen</span>
+      </button>
+    </div>
   </div>
 
   <div id="notificationSettingsMenuSub" class="familyMenuPage settingsMenuPage notificationSettingsPage" style="display:none;">
@@ -5574,7 +5624,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion">Versie 1.3</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.2</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -5584,10 +5634,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten.</span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken. <b class="aboutProBadge">PRO</b></span></div>
     </div>
-    <div class="aboutMenuHint">Productsuggesties: echte productinformatie en productfoto’s wanneer beschikbaar</div>
+    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -5625,24 +5675,26 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Planning en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
+        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
         <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard.</li>
+        <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
-      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning en budget, en voor het delen van lijsten.</p>
+      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
+      <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
       <h4>Delen met anderen</h4>
-      <p>Gegevens uit een gedeelde familie- of boodschappenlijst kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst.</p>
+      <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook of jij Pro hebt.</p>
       <h4>Bewaren en verwijderen</h4>
       <p>Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen.</p>
       <h4>Jouw rechten</h4>
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
-      <p><strong>Verantwoordelijke:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
+      <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
       <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
     </div>
   </div>
@@ -5664,7 +5716,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <h4>6. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
       <h4>7. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>8. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
-      <h4>9. Contact</h4><p><strong>Aanbieder/eigenaar:</strong> Stefano Graanoogst<br><strong>E-mail:</strong> info.stefanograanoogst@gmail.com</p>
+      <h4>9. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
       <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
     </div>
   </div>
@@ -5693,17 +5745,17 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te laden. Je gewone boodschappenlijst blijft daarbij behouden.</p>
+      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg.</p>
+      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
       <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het komt niet in je geschiedenis.</p>
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
-      <p>Gebruik de lijstopties om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+      <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
@@ -5739,6 +5791,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div id="listProgress" class="listProgress" aria-live="polite"></div>
   </div>
 
+  <div id="frequentStrip" class="frequentStrip" hidden></div>
+
   <div class="saveListMainWrap">
     <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
   </div>
@@ -5753,6 +5807,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div class="overview-new">
     <h2 id="overviewGreetingNew" class="overview-new-greeting">Goedendag 👋</h2>
   <div id="overviewScrollArea">
+
+    <button type="button" id="overviewExpiryCard" class="overview-new-card overview-click-card" onclick="openPantryFromOverview()" hidden>
+      <div class="overview-new-title"><i class="fa-solid fa-hourglass-half overview-new-expiry"></i><span>Bijna over de datum</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
+      <div class="overview-new-row">
+        <div><strong id="overviewExpiryNames"></strong><div id="overviewExpiryText" class="overview-new-muted"></div></div>
+      </div>
+    </button>
 
     <div class="overview-new-card overview-click-card" onclick="openQuickAddFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-bolt overview-new-bolt"></i><span>Snel opnieuw toevoegen</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
@@ -5779,15 +5840,18 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <span>Meer inzichten</span><i class="fa-solid fa-chevron-down"></i>
     </button>
     <div id="overviewMoreInsights" class="overviewMoreInsights" hidden>
-      <section class="overviewInsightCard">
-        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Jouw boodschappengewoonten</h3></div>
-        <p class="overviewInsightLead">Zie welke producten je vaak koopt, op basis van je geschiedenis.</p>
+      <section id="overviewInsightsEmpty" class="overviewInsightCard overviewInsightsEmptyCard">
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-seedling"></i></span><h3>Nog geen inzichten</h3></div>
+        <p class="overviewInsightLead">Je inzichten verschijnen na een paar boodschappenrondes. Vink na het boodschappen doen alles af en bewaar de ronde.</p>
+      </section>
+      <section id="overviewInsightHabits" class="overviewInsightCard" hidden>
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-purple"><i class="fa-solid fa-basket-shopping"></i></span><h3>Vaak gekocht</h3></div>
         <div id="overviewHabitInsights" class="overviewHabitInsights"><p class="overviewInsightEmpty">Je inzichten verschijnen zodra er lijsten in je geschiedenis staan.</p></div>
       </section>
-      <section class="overviewInsightCard">
-        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>Je geschiedenis in het kort</h3></div>
-        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>lijsten in je geschiedenis</span></div>
-        <p id="overviewHistoryInsightText" class="overviewInsightLead">Wis een volledige boodschappenlijst via de prullenbak bovenaan om een ronde te bewaren.</p>
+      <section id="overviewInsightSummaryCard" class="overviewInsightCard" hidden>
+        <div class="overviewInsightHeading"><span class="overviewInsightIcon insight-blue"><i class="fa-solid fa-chart-line"></i></span><h3>In het kort</h3></div>
+        <div class="overviewInsightSummary"><strong id="overviewHistoryRoundCount">0</strong><span>boodschappenrondes bewaard</span></div>
+        <p id="overviewHistoryInsightText" class="overviewInsightLead"></p>
       </section>
     </div>
 
@@ -5797,9 +5861,6 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div id="listOptionsPanel" class="listOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <button type="button" class="listOptionItem listOptionDanger" onclick="openClearListConfirm(event); closeListOptions();">
-        <i class="fa-solid fa-trash-can"></i><span>Lijst wissen</span>
-      </button>
       <button type="button" class="listOptionItem" onclick="openSortOptions()">
         <i class="fa-solid fa-arrow-down-a-z"></i><span>Lijst sorteren</span><i class="fa-solid fa-chevron-right listOptionArrow"></i>
       </button>
@@ -5808,10 +5869,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div id="sortOptionsPanel" class="listOptionsPanel sortOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <button type="button" class="listOptionBack" onclick="closeSortOptions()"><i class="fa-solid fa-chevron-left"></i><span>Lijst sorteren</span></button>
+      <div class="listOptionTitle">Sorteren</div>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('alpha')"><i class="fa-solid fa-arrow-down-a-z"></i><span>Alfabetisch</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('category')"><i class="fa-solid fa-layer-group"></i><span>Per categorie</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('newest')"><i class="fa-solid fa-clock"></i><span>Nieuwste eerst</span></button>
+      <div class="listOptionDivider" aria-hidden="true"></div>
+      <div class="listOptionTitle">Bewaren</div>
+      <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
     </div>
   </div>
 
@@ -6649,6 +6713,80 @@ async function shareFeedback(event) {
     }
   }
 }
+/* Profielfoto bijsnijden: slepen om te verplaatsen, knijpen of schuifbalk om te zoomen. */
+function cropProfilePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("De foto kon niet worden gelezen."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Dit afbeeldingsbestand kan niet worden geopend."));
+      img.onload = () => openCropper(img);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+
+    function openCropper(img) {
+      const SIZE = Math.min(280, window.innerWidth - 64);
+      const ov = document.createElement("div");
+      ov.className = "photoCropOverlay";
+      ov.innerHTML =
+        '<div class="photoCropBox" role="dialog" aria-modal="true" aria-label="Profielfoto aanpassen">' +
+          '<div class="photoCropTitle">Foto aanpassen</div>' +
+          '<div class="photoCropHint">Sleep de foto en zoom in tot je goed in de cirkel staat.</div>' +
+          '<div class="photoCropStage" style="width:' + SIZE + 'px;height:' + SIZE + 'px"><img alt="" draggable="false"><div class="photoCropMask"></div></div>' +
+          '<div class="photoCropZoom"><i class="fa-solid fa-magnifying-glass-minus"></i><input type="range" min="1" max="4" step="0.01" value="1" aria-label="Zoomen"><i class="fa-solid fa-magnifying-glass-plus"></i></div>' +
+          '<div class="photoCropActions"><button type="button" class="photoCropCancel">Annuleren</button><button type="button" class="photoCropSave">Gebruiken</button></div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      ["click","pointerdown","touchstart","mousedown"].forEach(t => ov.addEventListener(t, e => e.stopPropagation()));
+      const stage = ov.querySelector(".photoCropStage"), el = stage.querySelector("img"), range = ov.querySelector("input");
+      el.src = img.src;
+      const base = Math.max(SIZE / img.naturalWidth, SIZE / img.naturalHeight); // vult de cirkel precies
+      let zoom = 1, x = 0, y = 0;
+      const clamp = () => {
+        const w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        const mx = Math.max(0, (w - SIZE) / 2), my = Math.max(0, (h - SIZE) / 2);
+        x = Math.min(mx, Math.max(-mx, x)); y = Math.min(my, Math.max(-my, y));
+      };
+      const draw = () => {
+        clamp();
+        const w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        el.style.width = w + "px"; el.style.height = h + "px";
+        el.style.transform = "translate(" + (SIZE / 2 - w / 2 + x) + "px," + (SIZE / 2 - h / 2 + y) + "px)";
+      };
+      draw();
+      const pts = new Map(); let last = null, pinch = null;
+      stage.addEventListener("pointerdown", e => { stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, {x:e.clientX, y:e.clientY}); last = {x:e.clientX, y:e.clientY};
+        if (pts.size === 2) { const [a,b] = [...pts.values()]; pinch = {d:Math.hypot(a.x-b.x, a.y-b.y), z:zoom}; } });
+      stage.addEventListener("pointermove", e => {
+        if (!pts.has(e.pointerId)) return;
+        pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+        if (pts.size >= 2 && pinch) { const [a,b] = [...pts.values()]; zoom = Math.min(4, Math.max(1, pinch.z * Math.hypot(a.x-b.x, a.y-b.y) / pinch.d)); range.value = zoom; }
+        else if (last) { x += e.clientX - last.x; y += e.clientY - last.y; last = {x:e.clientX, y:e.clientY}; }
+        draw();
+      });
+      const up = e => { pts.delete(e.pointerId); pinch = null; const r = [...pts.values()][0]; last = r ? {x:r.x, y:r.y} : null; };
+      stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+      stage.addEventListener("wheel", e => { e.preventDefault(); zoom = Math.min(4, Math.max(1, zoom * (e.deltaY < 0 ? 1.08 : 0.92))); range.value = zoom; draw(); }, {passive:false});
+      range.addEventListener("input", () => { zoom = Number(range.value); draw(); });
+      const close = v => { ov.remove(); resolve(v); };
+      ov.querySelector(".photoCropCancel").addEventListener("click", () => close(null));
+      ov.querySelector(".photoCropSave").addEventListener("click", () => {
+        const OUT = 320, f = OUT / SIZE, w = img.naturalWidth * base * zoom, h = img.naturalHeight * base * zoom;
+        const c = document.createElement("canvas"); c.width = c.height = OUT;
+        const ctx = c.getContext("2d", {alpha:false});
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, OUT, OUT);
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, (SIZE / 2 - w / 2 + x) * f, (SIZE / 2 - h / 2 + y) * f, w * f, h * f);
+        let q = 0.82, out = c.toDataURL("image/jpeg", q);
+        while (out.length > 110000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
+        close(out);
+      });
+    }
+  });
+}
+
 async function manageProfilePhoto() {
   const user = auth && auth.currentUser;
   if (!user) return;
@@ -6714,7 +6852,8 @@ async function manageProfilePhoto() {
     chooseButton.disabled = true;
     chooseButton.textContent = "Foto verwerken…";
     try {
-      const dataURL = await makeSmallPhotoDataURL(file);
+      const dataURL = await cropProfilePhoto(file);
+      if (!dataURL) { chooseButton.disabled = false; chooseButton.textContent = "Foto kiezen"; return; }
       if (dataURL.length > 300000) {
         throw new Error("De verkleinde foto is nog te groot. Kies een andere foto.");
       }
@@ -6984,7 +7123,7 @@ async function logoutFromMenu() {
     const status = document.getElementById("status");
     if (status) status.innerText = "";
 
-    await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
   } catch(error) {
     explicitLogoutInProgress = false;
     await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation");
@@ -7150,7 +7289,15 @@ function showSaveToast(name) {
   const saveWrap = document.querySelector('.saveListMainWrap');
   const saveBtn = document.querySelector('.saveListMainBtn');
   document.body.appendChild(toast);
-  if (saveBtn) {
+  const navEl = document.querySelector('.bottomNav');
+  if (saveBtn && !saveBtn.offsetParent) {
+    const navTop = navEl ? navEl.getBoundingClientRect().top : window.innerHeight - 90;
+    toast.style.left = '16px';
+    toast.style.width = 'calc(100% - 32px)';
+    toast.style.top = (navTop - 72) + 'px';
+    toast.style.height = '58px';
+    toast.style.borderRadius = '16px';
+  } else if (saveBtn) {
     const rect = saveBtn.getBoundingClientRect();
     toast.style.left = rect.left + 'px';
     toast.style.top = rect.top + 'px';
@@ -7278,10 +7425,10 @@ function openProductSuggestionSettings() {
   const enabled = localStorage.getItem("boodschappenSuggestionsEnabled") !== "false";
   const overlay = familyDialogBase(
     "fa-wand-magic-sparkles", "Suggesties",
-    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div>',
+    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Productfoto\'s tonen</span><button type="button" class="settingsToggle photosToggle ' + (productPhotosEnabled() ? 'on' : '') + '" aria-label="Productfoto\'s tonen"></button></div><div class="familyDialogText" style="margin-top:8px;font-size:13px;opacity:.8;">Staat dit uit, dan zie je bij elk product een icoon in plaats van een foto.</div>',
     '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
   );
-  const toggle = overlay.querySelector(".settingsToggle");
+  const toggle = overlay.querySelector(".settingsToggle:not(.photosToggle)");
   toggle.addEventListener("click", e => {
     e.stopPropagation();
     const next = !toggle.classList.contains("on");
@@ -7289,6 +7436,14 @@ function openProductSuggestionSettings() {
     localStorage.setItem("boodschappenSuggestionsEnabled", next ? "true" : "false");
     const box = document.getElementById("productSuggestions");
     if (!next && box) box.classList.remove("open");
+  });
+  const photosToggle = overlay.querySelector(".photosToggle");
+  if (photosToggle) photosToggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !photosToggle.classList.contains("on");
+    photosToggle.classList.toggle("on", next);
+    try { localStorage.setItem("boodschappenProductPhotos", next ? "true" : "false"); } catch (_) {}
+    if (typeof showList === "function") showList();
   });
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
@@ -7883,26 +8038,196 @@ function productIconMarkup(icon) {
 }
 
 // Single product-icon resolver.
+/* ===== Producticonen: betere herkenning, soort-iconen en nooit een leeg vakje ===== */
+const EXTRA_PRODUCE = [
+  ["grapefruit","🍊"],["granaatappel","🍎"],["vijgen","🍇"],["vijg","🍇"],["dadels","🌴"],["abrikoos","🍑"],["abrikozen","🍑"],
+  ["bramen","🫐"],["bessen","🫐"],["clementine","🍊"],["clementines","🍊"],["papaja","🥭"],["passievrucht","🥭"],["lychee","🍒"],["rabarber","🥬"],
+  ["andijvie","🥬"],["witlof","🥬"],["spitskool","🥬"],["rode kool","🥬"],["rodekool","🥬"],["witte kool","🥬"],["kool","🥬"],["savooiekool","🥬"],
+  ["snijbonen","🫛"],["tuinbonen","🫛"],["peultjes","🫛"],["sugarsnaps","🫛"],["knolselderij","🥬"],["selderij","🥬"],["bleekselderij","🥬"],
+  ["venkel","🥬"],["pompoen","🎃"],["pastinaak","🥕"],["rucola","🥬"],["veldsla","🥬"],["ijsbergsla","🥬"],["kropsla","🥬"],["slamix","🥬"],
+  ["taugé","🌱"],["tauge","🌱"],["paksoi","🥬"],["bosui","🧅"],["lente-ui","🧅"],["lenteui","🧅"],["sjalot","🧅"],["sjalotten","🧅"],["gember","🫚"],
+  ["peterselie","🌿"],["basilicum","🌿"],["dille","🌿"],["bieslook","🌿"],["koriander","🌿"],["munt","🌿"],["rozemarijn","🌿"],["tijm","🌿"],["verse kruiden","🌿"],
+  ["cherrytomaten","tomatoes"],["snoeptomaten","tomatoes"],["trostomaten","tomatoes"],["roerbakgroente","🥬"],["soepgroente","🥬"],["groente","🥬"],["groenten","🥬"],
+  ["rauwkost","🥗"],["kastanjechampignons","🍄"],["paddenstoelen","🍄"],["bietjes","🫜"],["rode biet","🫜"],["rode bieten","🫜"],["radijsjes","🌱"],
+  ["prei","🥬"],["spinazie","🥬"],["citroenen","🍋"],["limoenen","🍋"],["mango's","🥭"],["avocado's","🥑"],["paprika's","🫑"],["kiwi's","🥝"],
+  ["fruit","🍎"],["courgettes","🥒"],["komkommers","🥒"],["aubergines","🍆"],["aardappels","🥔"],["krieltjes","🥔"],["zoete aardappelen","🍠"]
+];
+const EXTRA_OTHER = [
+  ["skyr","quark-cup"],["griekse yoghurt","quark-cup"],["roomboter","butter-pack"],["kookroom","quark-cup"],["zure room","quark-cup"],["mascarpone","quark-cup"],
+  ["mozzarella","cheese-block"],["feta","cheese-block"],["parmezaan","cheese-block"],["geraspte kaas","cheese-block"],["smeerkaas","cheese-block"],["roomkaas","cheese-block"],
+  ["cottage cheese","quark-cup"],["havermelk","milk-carton"],["sojamelk","milk-carton"],["amandelmelk","milk-carton"],["koffiemelk","milk-carton"],["chocomel","milk-carton"],["fristi","milk-carton"],
+  ["pistolets","🥖"],["krentenbollen","🥯"],["ontbijtkoek","🍞"],["wraps","🌯"],["wrap","🌯"],["tortilla","🌯"],["tortillas","🌯"],["pita","🥙"],["naan","🫓"],["toast","🍞"],
+  ["rijstwafels","🍘"],["muesli","🥣"],["cruesli","🥣"],["havermout","🥣"],["cornflakes","🥣"],["granola","🥣"],["ontbijtgranen","🥣"],
+  ["kipdijen","🍗"],["kippendijen","🍗"],["drumsticks","🍗"],["kipschnitzel","🍗"],["shoarma","🥙"],["hamburger","🍔"],["hamburgers","🍔"],["rookworst","🌭"],
+  ["slavink","🥩"],["gehaktballen","🥩"],["bacon","🥓"],["ontbijtspek","🥓"],["kalkoen","🍗"],["lamsvlees","🥩"],["frikandel","🌭"],["frikandellen","🌭"],
+  ["kroket","🍤"],["kroketten","🍤"],["bitterballen","🍤"],["filet americain","🥩"],["rosbief","🥩"],["vegaburger","🍔"],["vegetarisch gehakt","🌱"],
+  ["kabeljauw","🐟"],["pangasius","🐟"],["tilapia","🐟"],["haring","🐟"],["makreel","🐟"],["sardines","🐟"],["mosselen","🦪"],["kibbeling","🐟"],["vissticks","🐟"],["scampi","🦐"],
+  ["bier","🍺"],["wijn","🍷"],["rode wijn","🍷"],["witte wijn","🥂"],["rosé","🍷"],["prosecco","🥂"],["champagne","🍾"],["spa","💧"],["ice tea","🍵"],
+  ["smoothie","🧃"],["kokoswater","🥥"],["tonic","🥤"],["ranja","🧃"],["siroop","🧃"],["ginger ale","🥤"],
+  ["tomatenblokjes","🥫"],["passata","🥫"],["tomatenpuree","🥫"],["kokosmelk","🥥"],["kidneybonen","🫘"],["kikkererwten","🫘"],["linzen","🫘"],["rode linzen","🫘"],["zwarte bonen","🫘"],
+  ["bouillonblokjes","🥣"],["groentebouillon","🥣"],["couscous","🍚"],["bulgur","🍚"],["quinoa","🍚"],["aardappelpuree","🥔"],["gnocchi","🍝"],["tortellini","🍝"],
+  ["ravioli","🍝"],["penne","🍝"],["fusilli","🍝"],["tagliatelle","🍝"],["sojasaus","🥫"],["ketjap","🥫"],["sambal","🌶️"],["sriracha","🌶️"],["currypasta","🥫"],
+  ["kaneel","🧂"],["paprikapoeder","🧂"],["currypoeder","🧂"],["komijn","🧂"],["oregano","🌿"],["italiaanse kruiden","🌿"],["kruiden","🌿"],["bakpoeder","🧂"],["gist","🧂"],
+  ["vanillesuiker","🧂"],["cacaopoeder","🍫"],["chocoladestukjes","🍫"],["maizena","🌾"],["paneermeel","🌾"],["pinda's","🥜"],["pindas","🥜"],["cashewnoten","🥜"],
+  ["amandelen","🥜"],["walnoten","🥜"],["stroopwafels","🧇"],["wafels","🧇"],["reep","🍫"],["winegums","🍬"],["groene pesto","🌿"],["sla dressing","🥗"],["dressing","🥗"],["salade","🥗"],["salades","🥗"],
+  ["diepvriespizza","🍕"],["friet","🍟"],["patat","🍟"],["ijsblokjes","🧊"],["ei","egg-carton"],["eieren","egg-carton"],["scharreleieren","egg-carton"]
+];
+try { productCatalog.push(...EXTRA_PRODUCE, ...EXTRA_OTHER); } catch (_) {}
+
+// Losse groente en fruit: daarvoor tonen we altijd het icoon, ook als er een foto bekend is.
+const LOOSE_PRODUCE = new Set([
+  "appel","appels","peer","peren","banaan","bananen","sinaasappel","sinaasappels","mandarijn","mandarijnen","citroen","citroenen","limoen","limoenen",
+  "druif","druiven","aardbei","aardbeien","framboos","frambozen","blauwe bessen","kiwi","kiwi's","ananas","mango","mango's","perzik","nectarine","pruim",
+  "kers","kersen","watermeloen","meloen","avocado","avocado's","kokosnoot","aardappel","aardappelen","aardappels","krieltjes","zoete aardappel","zoete aardappelen",
+  "tomaat","tomaten","cherrytomaten","snoeptomaten","trostomaten","komkommer","komkommers","wortel","wortels","ui","uien","rode ui","rode uien","knoflook",
+  "paprika","paprika's","rode paprika","groene paprika","gele paprika","sla","spinazie","broccoli","bloemkool","courgette","courgettes","aubergine","aubergines",
+  "prei","boerenkool","spruitjes","asperges","champignons","champignon","biet","bietjes","rode biet","radijs","radijsjes","andijvie","witlof","spitskool",
+  "rode kool","rodekool","witte kool","kool","snijbonen","sperziebonen","peultjes","knolselderij","bleekselderij","venkel","pompoen","pastinaak","rucola",
+  "veldsla","ijsbergsla","bosui","lente-ui","sjalot","sjalotten","gember","peterselie","basilicum","dille","bieslook","koriander","munt","grapefruit",
+  "granaatappel","clementine","clementines","fruit","groente","groenten"
+]);
+
+const CATEGORY_ICONS = [
+  [/(diepvries|bevroren)/, "🧊"],
+  [/(shampoo|conditioner|zeep|douche|deo|tandpasta|tandenborstel|scheer|creme|crème|bodylotion|zonnebrand|haar|make-?up|parfum)/, "🧴"],
+  [/(reinig|schoonmaak|afwas|wasmiddel|wasverzachter|bleek|ontkalk|vaatwas|spons|doekjes|dweil|stofzuig)/, "🧽"],
+  [/(papier|tissue|zakdoek|servet|keukenrol)/, "🧻"],
+  [/(baby|luier|billendoek)/, "🍼"],
+  [/(katten|honden|dieren|vogelzaad|kattenbak)/, "🐾"],
+  [/(batterij|lamp|kaars|lucifer|aansteker|folie|zak(ken)?$)/, "🛒"],
+  [/(fruit|bessen|appel|peer)/, "🍎"],
+  [/(groente|sla$|kool$|bonen|wortel|knol|paprika|tomaat|tomaten)/, "🥬"],
+  [/(melk|yoghurt|kwark|vla|room|zuivel)/, "milk-carton"],
+  [/(kaas)/, "cheese-block"],
+  [/(boter)/, "butter-pack"],
+  [/(brood|bolletje|broodje|pistolet|croissant|beschuit)/, "bread-loaf"],
+  [/(kip|kalkoen)/, "🍗"],
+  [/(vlees|worst|gehakt|burger|schnitzel|filet|biefstuk|spek|ham)/, "🥩"],
+  [/(vis|zalm|tonijn|garnaal|garnalen|haring|kabeljauw)/, "🐟"],
+  [/(bier|wijn)/, "🍷"],
+  [/(sap|drank|water|thee|koffie|limonade|cola|frisdrank)/, "🥤"],
+  [/(koek|chocola|snoep|chips|drop|taart|wafel|cake|ijs$)/, "🍪"],
+  [/(pasta|rijst|noedel|mie)/, "🍝"],
+  [/(saus|blik|pot|soep|bouillon|kruiden|poeder|olie|azijn)/, "🥫"]
+];
+const GENERIC_PRODUCT_ICON = "🛍️";
+
+// Nieuwere emoji worden op oudere telefoons als een leeg vakje getoond: vervang die dan.
+const NEWER_EMOJI_FALLBACK = {"🫜":"🥕","🫛":"🥬","🫘":"🥫","🫙":"🥫","🫚":"🌿","🫓":"🍞","🫑":"🥬","🫐":"🍇","🫒":"🥫","🦪":"🐟"};
+const __emojiSupportCache = {};
+function __emojiSupported(emoji) {
+  if (emoji in __emojiSupportCache) return __emojiSupportCache[emoji];
+  let ok = true;
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 24;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    const draw = ch => { ctx.clearRect(0,0,24,24); ctx.textBaseline = "top"; ctx.font = "20px sans-serif"; ctx.fillText(ch, 0, 0); return ctx.getImageData(0,0,24,24).data.join(","); };
+    ok = draw(emoji) !== draw("￿");
+  } catch (_) { ok = true; }
+  __emojiSupportCache[emoji] = ok;
+  return ok;
+}
+function __safeIcon(icon) {
+  if (!icon) return icon;
+  if (/^[a-z0-9-]+$/i.test(icon)) return icon;          // eigen getekende iconen (svg)
+  if (NEWER_EMOJI_FALLBACK[icon] && !__emojiSupported(icon)) return NEWER_EMOJI_FALLBACK[icon];
+  return icon;
+}
+
+function __cleanProductText(text) {
+  return String(text || "").toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\b\d+([.,]\d+)?\s*(x|kg|gr|g|gram|ml|cl|dl|l|liter|stuks?|st)\b/g, " ")
+    .replace(/^\s*\d+([.,]\d+)?\s*/, " ")
+    .replace(/[^a-zà-ÿ0-9'’\- ]/g, " ")
+    .replace(/’/g, "'")
+    .replace(/\s+/g, " ").trim();
+}
+const __catalogMap = () => {
+  if (!window.__productCatalogMap || window.__productCatalogMap.size !== productCatalog.length) {
+    const m = new Map();
+    productCatalog.forEach(([name, icon]) => { if (!m.has(name)) m.set(name, icon); });
+    window.__productCatalogMap = m;
+  }
+  return window.__productCatalogMap;
+};
+
+function isLooseProduce(text) {
+  const v = __cleanProductText(text);
+  return LOOSE_PRODUCE.has(v);
+}
+
 function getProductIcon(text) {
-  const value = normalizeProductName(text);
-  if (!value) return "";
+  const value = __cleanProductText(text);
+  if (!value) return GENERIC_PRODUCT_ICON;
+  const map = __catalogMap();
 
-  // Explicit fallbacks for common products.
-  // This also catches variants such as "keukenzout" or "zout fijn".
-  if (value === "zout" || value.includes("zout")) return "🧂";
-  if (value === "zwarte peper" || value === "witte peper" ||
-      value.includes("zwarte peper") || value.includes("witte peper")) return "🫙";
-  if (value === "peper" || value === "peperkorrels" || value === "gemalen peper") return "🌶️";
-  if (value === "koffie" || value === "coffee" || value.includes("koffie") || value.includes("coffee")) return "☕";
+  // Vaste uitzonderingen
+  if (/\bzout\b|keukenzout|zeezout/.test(value)) return "🧂";
+  if (/(zwarte|witte) peper/.test(value)) return __safeIcon("🫙");
+  if (/koffie|coffee/.test(value)) return "☕";
 
-  const exact = productCatalog.find(([name]) => value === name);
-  if (exact) return exact[1];
+  // 1. Precies dezelfde naam
+  if (map.has(value)) return __safeIcon(map.get(value));
 
-  // Match common compound names such as "volle melk" or "bruin brood".
-  const contains = productCatalog
-    .filter(([name]) => value.includes(name))
-    .sort((a, b) => b[0].length - a[0].length)[0];
-  return contains ? contains[1] : "";
+  const words = value.split(" ");
+  // 2. Meerdere woorden achter elkaar, zoals "halfvolle melk" in "campina halfvolle melk"
+  let best = null;
+  map.forEach((icon, name) => {
+    if (name.indexOf(" ") === -1) return;
+    if ((" " + value + " ").indexOf(" " + name + " ") !== -1 && (!best || name.length > best[0].length)) best = [name, icon];
+  });
+  if (best) return __safeIcon(best[1]);
+
+  // 3. Losse woorden, van achter naar voren (in het Nederlands staat het hoofdwoord meestal achteraan)
+  const stems = w => [w, w.replace(/'s$/, ""), w.replace(/en$/, ""), w.replace(/s$/, ""), w.replace(/jes$/, ""), w.replace(/tjes$/, "")];
+  for (let i = words.length - 1; i >= 0; i--) {
+    for (const w of stems(words[i])) {
+      if (w.length >= 2 && map.has(w)) return __safeIcon(map.get(w));
+    }
+  }
+  // 4. Samengestelde woorden: "geitenkaas" eindigt op "kaas", "kippenbouillon" op "bouillon"
+  for (let i = words.length - 1; i >= 0; i--) {
+    const w = words[i];
+    let hit = null;
+    map.forEach((icon, name) => {
+      if (name.length >= 4 && name.indexOf(" ") === -1 && w.length > name.length && w.endsWith(name) && (!hit || name.length > hit[0].length)) hit = [name, icon];
+    });
+    if (hit) return __safeIcon(hit[1]);
+  }
+  // 5. Soort product
+  for (const [re, icon] of CATEGORY_ICONS) if (re.test(value)) return __safeIcon(icon);
+  // 6. Altijd iets tonen
+  return GENERIC_PRODUCT_ICON;
+}
+
+// Volgorde zoals je meestal door de supermarkt loopt.
+const AISLE_GROUPS = [
+  ["🍎🍐🍊🍋🍇🍓🫐🥝🍍🥭🍑🍒🍉🍈🥑🥥🥔🍠🥒🥕🧅🧄🫑🥬🥦🍆🌽🫛🍄🫜🌱🎃🫚🥗", ["apple","banana","tomatoes","red-bell-pepper"]],
+  ["🥖🥐🥯🍞🍘🥣🌯🥙🫓", ["bread-loaf"]],
+  ["🍗🥩🥓🌭🐟🦐🦪🍔🍤", []],
+  ["", ["milk-carton","quark-cup","cheese-block","butter-pack","egg-carton"]],
+  ["🍯🍫", ["peanut-butter-jar","jam-jar"]],
+  ["🍝🍚🍜🥫🧂🌾🫒🍶🌿🫘🫙🟡🌶️", ["mayonnaise-bottle","ketchup-bottle"]],
+  ["🍪🍬🍭🧇🥜🍿🍰🎂", ["chips-bag"]],
+  ["🥤🧃💧☕🍵🍺🍷🥂🍾", []],
+  ["🧊🍕🍟🍦", []],
+  ["🧴🪥🧼", []],
+  ["🧽🧻🧺🗑️🛒🕯️🔋", []],
+  ["🍼🐾🐱🐶", []]
+];
+function productAisle(text) {
+  const icon = getProductIcon(text);
+  if (isLooseProduce(text)) return 0;
+  for (let i = 0; i < AISLE_GROUPS.length; i++) {
+    const [emojis, keys] = AISLE_GROUPS[i];
+    if (keys.indexOf(icon) !== -1 || (icon && !/^[a-z0-9-]+$/i.test(icon) && emojis.indexOf(icon) !== -1)) return i;
+  }
+  return 99;
+}
+
+function productPhotosEnabled() {
+  try { return localStorage.getItem("boodschappenProductPhotos") !== "false"; } catch (_) { return true; }
 }
 
 
@@ -8247,7 +8572,7 @@ async function fetchOnlineProductSuggestions(query) {
 }
 
 function renderOnlineProductSuggestion(button, product) {
-  const photo = product.imageUrl
+  const photo = product.imageUrl && productPhotosEnabled() && !isLooseProduce(product.name)
     ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : `<span class="productSuggestionIcon">${productIconMarkup(getProductIcon(product.name))}</span>`;
 
@@ -8536,7 +8861,8 @@ function showList(animationType = "") {
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
-    if (item.imageUrl) {
+    if (item.imageUrl && productPhotosEnabled() && !isLooseProduce(productText)) {
+      icon.classList.add("hasPhoto");
       const img = document.createElement("img");
       img.className = "productRealImage productBarcodeImage";
       img.src = item.imageUrl;
@@ -8563,7 +8889,7 @@ function showList(animationType = "") {
     const minusButton = document.createElement("button");
     minusButton.type = "button";
     minusButton.className = "quantityButton";
-    minusButton.textContent = "−";
+    minusButton.innerHTML = '<span class="stepIcon" aria-hidden="true"></span>';
     minusButton.setAttribute("aria-label", "Aantal verlagen");
     minusButton.title = "Aantal verlagen";
     minusButton.addEventListener("click", async (event) => {
@@ -8579,7 +8905,7 @@ function showList(animationType = "") {
     const plusButton = document.createElement("button");
     plusButton.type = "button";
     plusButton.className = "quantityButton";
-    plusButton.textContent = "+";
+    plusButton.innerHTML = '<span class="stepIcon plus" aria-hidden="true"></span>';
     plusButton.setAttribute("aria-label", "Aantal verhogen");
     plusButton.title = "Aantal verhogen";
     plusButton.addEventListener("click", async (event) => {
@@ -8757,6 +9083,7 @@ async function addProduct() {
     completedBy: "",
     completedAt: null,
     quantity: 1,
+    createdAt: Date.now(),
     barcode: selected && selected.barcode ? selected.barcode : "",
     imageUrl: selected && selected.imageUrl ? selected.imageUrl : "",
     brand: selected && selected.brand ? selected.brand : ""
@@ -8805,8 +9132,7 @@ function updateStatus() {
     String(now.getMinutes()).padStart(2, "0");
 
 document.getElementById("status").innerHTML =
-  "<i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen<span>Laatste update: vandaag "
-  + hour + ":" + minute + "</span>";
+  "<i class=\"fa-solid fa-check\"></i> Bijgewerkt om " + hour + ":" + minute;
 }
 
 
@@ -10023,8 +10349,8 @@ async function showFamilyMembers() {
           const close = document.createElement("button");
           close.type = "button"; close.textContent = "";
           close.setAttribute("aria-label", "Foto sluiten");
-          close.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:48px;height:48px;min-width:48px;min-height:48px;border:0;border-radius:50%;background:#fff;color:#243027;font-size:0;line-height:1;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;appearance:none;-webkit-appearance:none";
-          const closeMark = document.createElement("span"); closeMark.textContent = "×"; closeMark.style.cssText = "display:block;font-family:Arial,sans-serif;font-size:32px;font-weight:600;line-height:1;width:100%;height:100%;text-align:center;display:flex;align-items:center;justify-content:center;padding:0;margin:0;transform:none"; close.appendChild(closeMark);
+          close.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top, 0px) + 18px);right:20px;width:44px;height:44px;min-width:44px;min-height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:#2f4a38;font-size:0;line-height:1;padding:0;margin:0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;appearance:none;-webkit-appearance:none";
+          const closeMark = document.createElement("span"); closeMark.textContent = "×"; closeMark.style.cssText = "display:block;font-family:Arial,sans-serif;font-size:26px;font-weight:400;line-height:1;width:100%;height:100%;text-align:center;display:flex;align-items:center;justify-content:center;padding:0;margin:0;transform:none"; close.appendChild(closeMark);
           const dismiss = () => lightbox.remove();
           close.addEventListener("click", dismiss);
           lightbox.addEventListener("click", (event) => { if (event.target === lightbox) dismiss(); });
@@ -10045,6 +10371,14 @@ async function showFamilyMembers() {
       const nameLine = document.createElement("span");
       nameLine.style.cssText = "font-weight:600;line-height:1.3";
       nameLine.textContent = name;
+      let isPro = false;
+      try { isPro = uid === user.uid ? (window.isProActive ? window.isProActive() : false) : !!(household.proMembers && household.proMembers[uid] === true); } catch (_) {}
+      if (isPro) {
+        const badge = document.createElement("b");
+        badge.className = "aboutProBadge familyProBadge";
+        badge.textContent = "PRO";
+        nameLine.appendChild(badge);
+      }
       label.appendChild(nameLine);
 
       const subtitle = document.createElement("span");
@@ -10361,13 +10695,28 @@ async function renderOverviewInsights(){
   var count=document.getElementById("overviewHistoryRoundCount");
   var text=document.getElementById("overviewHistoryInsightText");
   var list=document.getElementById("overviewHabitInsights");
+  var hasData=history.length>0;
+  var emptyCard=document.getElementById("overviewInsightsEmpty"), habitsCard=document.getElementById("overviewInsightHabits"), sumCard=document.getElementById("overviewInsightSummaryCard");
+  if(emptyCard) emptyCard.hidden=hasData;
+  if(habitsCard) habitsCard.hidden=!hasData;
+  if(sumCard) sumCard.hidden=!hasData;
   if(count) count.textContent=String(history.length);
-  if(text) text.textContent=history.length ? "Gebaseerd op je geschiedenis." : "Wis je volledige lijst via de prullenbak bovenaan; die wordt dan automatisch bewaard in je geschiedenis.";
+  if(count && count.nextElementSibling) count.nextElementSibling.textContent=history.length===1?"boodschappenronde bewaard":"boodschappenrondes bewaard";
+  if(text){
+    if(!hasData){ text.textContent=""; }
+    else{
+      var totalItems=history.reduce(function(n,r){return n+((r.items||[]).length);},0);
+      var avg=Math.round(totalItems/history.length);
+      var last=new Date(Number(history[0].savedAt||0));
+      var months=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+      text.textContent="Gemiddeld "+avg+" product"+(avg===1?"":"en")+" per ronde"+(history[0].savedAt?" · laatste ronde op "+last.getDate()+" "+months[last.getMonth()]:"")+".";
+    }
+  }
   if(!list) return;
   var counts={};
   history.forEach(function(round){(round.items||[]).forEach(function(item){var name=String(typeof item==="string"?item:(item&&item.text)||"").trim(); if(name) counts[name]=(counts[name]||0)+1;});});
   var top=Object.keys(counts).map(function(name){return {name:name,count:counts[name]};}).sort(function(a,b){return b.count-a.count || a.name.localeCompare(b.name,"nl");}).slice(0,4);
-  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Je vaak gekochte producten verschijnen hier zodra er een paar lijsten in je geschiedenis staan.</p>';return;}
+  if(!top.length){list.innerHTML='<p class="overviewInsightEmpty">Nog geen producten.</p>';return;}
   list.innerHTML="";
   top.forEach(function(item,index){var row=document.createElement("div");row.className="overviewHabitRow";row.innerHTML='<span class="overviewHabitRank">'+(index+1)+'</span><span class="overviewHabitName"></span><span class="overviewHabitCount"></span>';row.querySelector('.overviewHabitName').textContent=item.name;row.querySelector('.overviewHabitCount').textContent=item.count+'×';list.appendChild(row);});
 }
@@ -10490,10 +10839,10 @@ function updatePrivateStatus() {
     const date = new Date(savedAt);
     const hour = String(date.getHours()).padStart(2, "0");
     const minute = String(date.getMinutes()).padStart(2, "0");
-    timeText = `<span>Laatste update: vandaag ${hour}:${minute}</span>`;
+    timeText = ` om ${hour}:${minute}`;
   }
 
-  status.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.' + timeText;
+  status.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> Bijgewerkt' + timeText + '<span>op dit apparaat</span>';
 }
 
 function openRegister() {
@@ -10553,7 +10902,7 @@ async function register() {
 
     // Een nieuw Firebase-account wordt automatisch ingelogd.
     // Direct uitloggen voorkomt dat de gebruiker onverwacht meteen binnenkomt.
-    await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
     registrationInProgress = false;
 
     document.getElementById("registerName").value = "";
@@ -10572,7 +10921,7 @@ async function register() {
     // newly created account unexpectedly signed in.
     try {
       if (auth.currentUser) {
-        await auth.signOut();
+        try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
       }
     } catch (signOutError) {
       console.error("Uitloggen na registratiefout mislukt:", signOutError);
@@ -11090,7 +11439,7 @@ function __overviewOverlay(title){
   overlay.className="overviewActionOverlay";
   overlay.innerHTML='<div class="overviewActionSheet" role="dialog" aria-modal="true"><div class="overviewActionHeader"><div class="overviewActionTitle"><span class="overviewActionTitleIcon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h3></h3></div><button type="button" class="overviewActionClose" aria-label="Sluiten">×</button></div><div class="overviewActionBody"></div></div>';
   overlay.querySelector("h3").textContent=title;
-  overlay.querySelector(".overviewActionTitleIcon").hidden=true;
+  if(title==="Geschiedenis"){ overlay.querySelector(".overviewActionTitleIcon").hidden=true; } else { overlay.querySelector(".overviewActionTitleIcon").hidden=true; }
 
   var sheet=overlay.querySelector(".overviewActionSheet");
 
@@ -11162,23 +11511,33 @@ async function openQuickAddFromOverview(){
     var history=await readOverviewHistory();
     sources=sources.concat(history.map(function(x){return x.items||[];}));
   }catch(_){}
-  sources.push(Array.isArray(boodschappen)?boodschappen:[]);
+  // Huidige lijst telt niet mee; wat er al op staat, laten we weg (net als onder de lijst).
+  var __qaNorm=function(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();};
+  var onList={};
+  (Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)onList[__qaNorm(x.text)]=1;});
 
   var counts={};
-  sources.flat().forEach(function(item){
-    var text=typeof item==="string"?item:(item&&item.text);
-    if(!text) return;
-    text=String(text).trim();
-    var key=text.toLowerCase();
-    if(!counts[key]) counts[key]={text:text,count:0};
-    counts[key].count++;
+  sources.forEach(function(list){
+    var seen={};
+    (list||[]).forEach(function(item){
+      var text=typeof item==="string"?item:(item&&item.text);
+      if(!text) return;
+      text=String(text).trim();
+      var key=__qaNorm(text);
+      if(!key||seen[key]) return; seen[key]=1;
+      if(!counts[key]) counts[key]={text:text,count:0};
+      counts[key].count++;
+    });
   });
-  var products=Object.keys(counts).map(function(k){return counts[k];})
+  var allKnown=Object.keys(counts).length;
+  var products=Object.keys(counts).filter(function(k){return !onList[k];}).map(function(k){return counts[k];})
     .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
 
   body.innerHTML="";
   if(!products.length){
-    body.innerHTML='<div class="overviewActionMuted">Er zijn nog geen producten om opnieuw toe te voegen.</div>';
+    body.innerHTML=allKnown
+      ?'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Alles staat al op je lijst</strong></div><p>De producten die je vaak koopt, staan al op je boodschappenlijst.</p></div>'
+      :'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je eerder hebt gekocht of in een vaste lijst hebt bewaard, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11190,10 +11549,11 @@ async function openQuickAddFromOverview(){
     btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
     btn.querySelector("span").textContent=p.text;
     btn.addEventListener("click",function(){
+      if(btn.classList.contains("added")) return;
       __overviewAddProduct(p.text);
       btn.classList.add("added");
+      btn.disabled=true;
       btn.querySelector("i").className="fa-solid fa-check";
-      setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
     });
     grid.appendChild(btn);
   });
@@ -11221,7 +11581,7 @@ async function openShoppingHistoryFromOverview(){
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier nadat je de volledige lijst wist via de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier. Vink na het boodschappen doen alles af en bewaar de ronde, of wis je lijst met de prullenbak bovenaan.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11374,22 +11734,31 @@ async function refreshOverviewGreeting(){
 
   var name = "";
   var user = (typeof auth !== "undefined" && auth) ? auth.currentUser : null;
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem("boodschappenGreetingName") || "null"); } catch (_) {}
 
   if (user) {
     if (__overviewNameCacheUid === user.uid && __overviewNameCache) {
       name = __overviewNameCache;
     } else {
+      // Toon direct de bekende naam, zodat de begroeting niet verspringt
+      var quick = (stored && stored.uid === user.uid && stored.name) ? stored.name : String(user.displayName || "").trim();
+      if (quick) el.textContent = greeting + ", " + quick + " 👋";
       try {
         var snap = await database.ref("users/" + user.uid + "/name").once("value");
         name = String(snap.val() || "").trim();
       } catch (_) {}
       if (!name) name = String(user.displayName || "").trim();
+      if (!name && stored && stored.uid === user.uid) name = stored.name || "";
       __overviewNameCacheUid = user.uid;
       __overviewNameCache = name;
+      try { if (name) localStorage.setItem("boodschappenGreetingName", JSON.stringify({ uid: user.uid, name: name })); } catch (_) {}
     }
   } else {
     __overviewNameCacheUid = "";
     __overviewNameCache = "";
+    // Tijdens het opstarten is het account nog niet geladen: gebruik de laatst bekende naam
+    if (stored && stored.name) name = stored.name;
   }
 
   el.textContent = name ? greeting + ", " + name + " 👋" : greeting + " 👋";
@@ -11410,7 +11779,7 @@ async function updateOverviewView(){
   } catch (_) {}
   var history=await readOverviewHistory();
   var hs=document.getElementById("overviewHistorySummary");
-  if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk je vorige boodschappen.";
+  if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk wat je eerder hebt gekocht.";
   if(typeof updateOverviewSavedLists==="function") await updateOverviewSavedLists();
   await updateOverviewDashboard();
 }
@@ -13517,6 +13886,8 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   const liveSearchInput=document.getElementById("budgetLiveSearch");
   if(liveSearchInput)liveSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();window.searchBudgetLivePrices();}});
+  // Zoekveld leeggemaakt? Dan ook de zoekresultaten weghalen.
+  if(liveSearchInput)liveSearchInput.addEventListener("input",()=>{if(!liveSearchInput.value.trim()){const r=document.getElementById("budgetLivePriceResults");if(r)r.replaceChildren();}});
   function renderBudget(){
     const d=read(),spent=d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),remaining=d.budget-spent,pct=d.budget>0?Math.min(100,spent/d.budget*100):0;
     const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
@@ -13590,7 +13961,9 @@ input,select,textarea{font-size:16px}
     {path:"weekPlanner", key:function(){return "boodschappen_pro_smart_weekplanner_v1";}, scoped:false,
      refresh:function(){if(window.__refreshPlannerUI)window.__refreshPlannerUI();}},
     {path:"budget", key:function(){return "boodschappen_budgetplanner_v1";}, scoped:false,
-     refresh:function(){if(window.__refreshBudgetUI)window.__refreshBudgetUI();}}
+     refresh:function(){if(window.__refreshBudgetUI)window.__refreshBudgetUI();}},
+    {path:"pantry", key:function(){return "boodschappen_pantry_v1";}, scoped:false,
+     refresh:function(){if(window.__refreshPantryUI)window.__refreshPantryUI();}}
   ];
   var uid=null, applying=false, timers={}, listeners=[];
   var proto=Storage.prototype, origSet=proto.setItem, origRemove=proto.removeItem;
@@ -13665,12 +14038,1368 @@ input,select,textarea{font-size:16px}
   auth.onAuthStateChanged(function(user){ if(user)start(user.uid); else stop(); });
 })();
 </script>
-<style id="ios-top-edge-fix">
-/* iPhone: een effen strook bovenin, zodat iOS de kopbalk niet meer half wazig maakt tijdens scrollen. */
-html.platform-ios body::before{content:"";position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 16px);background:#eef8f1;z-index:60;pointer-events:none}
-html.platform-ios body.dark-theme::before{background:#121612}
-#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}
+<style id="history-icon-off">#overviewActionOverlay .overviewActionTitleIcon[hidden]{display:none!important}</style>
+<style id="product-icon-tile">
+/* Eén vast vakje voor productfoto's én iconen, zodat de lijst rustig oogt. */
+.itemProductContent .productIcon{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:10px!important;visibility:visible!important;margin-right:0!important;transform:none!important;-webkit-transform:none!important}
+.itemProductContent .productIcon.hasPhoto{background:transparent!important;box-shadow:none!important;border:0!important}
+.itemProductContent .productIcon.hasPhoto img{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;max-height:30px!important;flex:0 0 30px!important;border-radius:6px!important}
+.itemProductContent .productIcon img,.itemProductContent .productRealImage,.itemProductContent .productBarcodeImage{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;flex:0 0 26px!important;border-radius:5px!important;object-fit:contain!important}
+.itemProductContent .productIcon .productInlineIcon,.itemProductContent .productIcon svg{width:28px!important;height:28px!important}
+/* Icoon links in zijn vak: meer lucht naar de − toe */
+.itemProductContent .productIcon{justify-content:flex-start!important}
+.itemProductContent .productIcon.hasPhoto{justify-content:center!important}
+/* Lange namen: schuiven blijft, maar met lucht en een zachte vervaging aan de rechterkant */
+.itemProductContent .productInfo{padding-right:8px!important;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 14px),transparent)}
+.itemProductContent .productInfo.atEnd,.itemProductContent .productInfo.fits{-webkit-mask-image:none;mask-image:none}
+.itemProductContent .productIcon{font-size:19px!important;line-height:1!important}
+body.dark-theme .itemProductContent .productIcon{background:transparent!important}
+body.dark-theme .itemProductContent .productIcon.hasPhoto{background:transparent!important}
+.aboutMenuHint a{color:inherit;text-decoration:underline}
 </style>
+<style id="about-pro-badge">
+.aboutProBadge{display:inline-block;vertical-align:2px;margin-left:4px;padding:2px 7px;border-radius:999px;background:#fff2d0;color:#916719;font-size:10px!important;font-weight:800;letter-spacing:.06em;line-height:1.3;white-space:nowrap}
+body.dark-theme .aboutProBadge{background:#4a3d1c;color:#f3d48a}
+.aboutSources{display:flex;flex-direction:column;gap:3px}
+.aboutSources .nowrap{white-space:nowrap}
+</style>
+<style id="photo-crop-and-sort">
+.photoCropOverlay{position:fixed;inset:0;z-index:2147483000;background:rgba(18,26,21,.72);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.photoCropBox{width:min(360px,100%);background:#fff;border-radius:24px;padding:20px 16px 16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.photoCropTitle{font-size:18px;font-weight:800;color:#2f4a38}
+.photoCropHint{font-size:14px;line-height:1.4;color:#66766c;text-align:center;margin-top:-6px}
+.photoCropStage{position:relative;overflow:hidden;border-radius:18px;background:#1b221e;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.photoCropStage img{position:absolute;left:0;top:0;max-width:none!important;pointer-events:none;transform-origin:0 0}
+.photoCropMask{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 999px rgba(0,0,0,.55);outline:2px solid rgba(255,255,255,.9);outline-offset:-2px;pointer-events:none}
+.photoCropZoom{display:flex;align-items:center;gap:10px;width:100%;max-width:280px;color:#5f7166}
+.photoCropZoom input{flex:1;accent-color:#3F5B45}
+.photoCropActions{display:flex;gap:10px;width:100%;margin-top:4px}
+.photoCropActions button{flex:1;min-height:48px;border:0;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
+.photoCropCancel{background:#eef1ef;color:#2f4a38}
+.photoCropSave{background:#3F5B45;color:#fff}
+body.dark-theme .photoCropBox{background:#222a24}
+body.dark-theme .photoCropTitle{color:#edf5ef}
+body.dark-theme .photoCropHint,body.dark-theme .photoCropZoom{color:#b8c6bc}
+body.dark-theme .photoCropCancel{background:#323d35;color:#edf5ef}
+.listOptionTitle{padding:10px 12px 6px;font-size:13px;font-weight:700;letter-spacing:.03em;color:#7b8a80}
+body.dark-theme .listOptionTitle{color:#aab8ae}
+</style>
+<style id="close-buttons-unified">
+/* Eén rustige stijl voor alle sluitknoppen: zichtbaar rondje van 36px, tikgebied van 44px, dun kruisje. */
+.overviewActionClose,#overviewActionOverlay .overviewActionClose,.barcodeClose,.recipeSheetClose{
+  width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;flex:0 0 44px!important;
+  padding:4px!important;box-sizing:border-box!important;border:0!important;border-radius:50%!important;
+  background-clip:content-box!important;-webkit-background-clip:content-box!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease,opacity .12s ease}
+.overviewActionClose,#overviewActionOverlay .overviewActionClose,.barcodeClose{background-color:#eef3ef!important;color:#5b7262!important;margin:-4px -6px -4px 0!important}
+.overviewActionClose::before,.overviewActionClose::after{width:14px!important;height:2px!important;background:#5b7262!important}
+.barcodeClose i,.recipeSheetClose i{font-size:16px!important}
+.recipeSheetClose{background-color:rgba(255,255,255,.9)!important;color:#2f4a38!important;box-shadow:none!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))}
+.overviewActionClose:active,.barcodeClose:active,.recipeSheetClose:active{transform:scale(.92);opacity:.8}
+body.dark-theme .overviewActionClose,body.dark-theme #overviewActionOverlay .overviewActionClose,body.dark-theme .barcodeClose{background-color:#2f3a33!important;color:#c3d1c7!important}
+body.dark-theme .overviewActionClose::before,body.dark-theme .overviewActionClose::after{background:#c3d1c7!important}
+/* Wisknopje in het zoekveld: klein grijs rondje met wit kruisje, zoals gebruikelijk op iPhone en Android. */
+.search-clear-btn{font-size:0!important;opacity:1!important;width:44px;height:44px;min-width:44px;border:0;background:transparent;align-items:center;justify-content:center;padding:0;position:relative;cursor:pointer}
+.search-clear-btn::before{content:"";width:20px;height:20px;border-radius:50%;background:#b3bdb6}
+.search-clear-btn::after{content:"✕";position:absolute;font-size:11px;font-weight:700;color:#fff;line-height:1}
+body.dark-theme .search-clear-btn::before{background:#5d6a61}
+/* Lege meldingen in Overzicht: zelfde opbouw, minder lege ruimte. */
+#overviewActionOverlay .overviewHistoryEmptyContent{padding:2px 2px 4px}
+#overviewActionOverlay .overviewHistoryEmptyContent p{margin:6px 0 0!important;font-size:15px;line-height:1.5;color:#5f6f65}
+#overviewActionOverlay .overviewHistoryEmptyTitle strong{font-size:16px}
+body.dark-theme #overviewActionOverlay .overviewHistoryEmptyContent p{color:#b8c6bc}
+</style>
+<script id="round-complete-prompt">
+/* Alles afgevinkt? Bied aan om de ronde in de geschiedenis te bewaren en met een lege lijst te beginnen. */
+(function(){
+  if(typeof showList!=="function") return;
+  var KEY="boodschappenRoundPromptDismissed";
+  function signature(items){ return items.map(function(i){return String(i&&(i.text||i.name)||"").toLowerCase()+":"+(i&&i.quantity||1);}).sort().join("|"); }
+  function onListView(){ var app=document.querySelector(".app"); return !!app && !app.classList.contains("overview-active") && !app.classList.contains("more-active") && document.body.classList.contains("logged-in"); }
+  function removeBar(){ var b=document.getElementById("roundCompleteBar"); if(b) b.remove(); }
+  function check(){
+    try{
+      var items=Array.isArray(boodschappen)?boodschappen:[];
+      if(!items.length || !items.every(function(i){return i && i.completed;}) || !onListView()){ removeBar(); return; }
+      var sig=signature(items);
+      var dismissed=""; try{dismissed=sessionStorage.getItem(KEY)||"";}catch(_){}
+      if(dismissed===sig || document.getElementById("roundCompleteBar")) return;
+      var bar=document.createElement("div");
+      bar.id="roundCompleteBar"; bar.className="roundCompleteBar"; bar.setAttribute("role","status");
+      bar.innerHTML='<div class="roundCompleteText"><strong>Alles afgevinkt 🎉</strong><span>Bewaar deze ronde in je geschiedenis en begin met een lege lijst.</span></div>'+
+        '<div class="roundCompleteActions"><button type="button" class="roundLater">Nog niet</button><button type="button" class="roundSave">Bewaren en nieuwe lijst</button></div>';
+      ["click","pointerdown","touchstart"].forEach(function(t){bar.addEventListener(t,function(e){e.stopPropagation();});});
+      bar.querySelector(".roundLater").addEventListener("click",function(){ try{sessionStorage.setItem(KEY,sig);}catch(_){} removeBar(); });
+      bar.querySelector(".roundSave").addEventListener("click",async function(){
+        this.disabled=true; removeBar();
+        try{ if(typeof clearList==="function") await clearList(); if(typeof updateOverviewDashboard==="function") updateOverviewDashboard(); }catch(e){ console.error("Ronde bewaren mislukt",e); }
+      });
+      document.body.appendChild(bar);
+    }catch(e){}
+  }
+  var orig=showList;
+  showList=function(){ var r=orig.apply(this,arguments); setTimeout(check,350); return r; };
+  document.addEventListener("click",function(){ setTimeout(function(){ if(!onListView()) removeBar(); },60); },true);
+})();
+</script>
+<style id="round-complete-style">
+.roundCompleteBar{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:9000;max-width:560px;margin:0 auto;background:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(35,55,43,.18);border:1px solid #dfebe2;display:flex;flex-direction:column;gap:10px;animation:roundBarIn .25s ease}
+@keyframes roundBarIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.roundCompleteText{display:flex;flex-direction:column;gap:3px}
+.roundCompleteText strong{font-size:15px;color:#2f4a38}
+.roundCompleteText span{font-size:14px;line-height:1.4;color:#66766c}
+.roundCompleteActions{display:flex;gap:8px}
+.roundCompleteActions button{min-height:44px;border:0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;padding:0 12px}
+.roundLater{flex:0 0 auto;background:#eef3ef;color:#2f4a38}
+.roundSave{flex:1;background:#3F5B45;color:#fff}
+body.dark-theme .roundCompleteBar{background:#222a24;border-color:#38453b}
+body.dark-theme .roundCompleteText strong{color:#edf5ef}
+body.dark-theme .roundCompleteText span{color:#b8c6bc}
+body.dark-theme .roundLater{background:#323d35;color:#edf5ef}
+.overviewInsightCard .overviewInsightIcon{width:30px!important;height:30px!important;min-width:30px!important;flex:0 0 30px!important;border-radius:9px!important;font-size:16px!important}
+.overviewInsightCard .overviewInsightIcon i{font-size:16px!important}
+.overviewInsightCard .overviewInsightHeading{gap:12px!important;align-items:center!important}
+.overviewInsightCard .overviewInsightHeading h3{font-size:16px!important;line-height:1.3!important}
+</style>
+<style id="icon-tiles-36">
+/* Eén maat voor alle icoonvakjes naast een titel of menu-item: 36px vakje, 17px icoon. */
+.overview-new-title i:not(.overview-new-arrow),
+.overviewInsightCard .overviewInsightIcon,
+.familyMenuPrimary > i:first-child,
+.familyMenuItem:not(.familyMenuDanger) > i:first-child:not(.familyMenuArrow),
+.familyMenuPage .familyMenuItem:not(.familyMenuDanger) > i:first-child:not(.familyMenuArrow),
+.proFeatureCard > i{
+  width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important;flex:0 0 36px!important;
+  font-size:17px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+.overviewInsightCard .overviewInsightIcon i{font-size:17px!important}
+.overview-new-title i:not(.overview-new-arrow),.overviewInsightCard .overviewInsightIcon,.proFeatureCard > i{border-radius:11px!important}
+.overview-new-title{gap:11px!important}
+.overviewInsightCard .overviewInsightHeading{gap:11px!important}
+</style>
+<style id="menu-text-16">
+/* Tekst naast een icoon van 36px: 16px, halfvet (zoals Android en iPhone voor menuregels). */
+html body .familyMenuItem > span,html body .familyMenuPrimary > span,
+html body .familyMenuSub .familyMenuItem > span,html body .familyMenuPage .familyMenuItem > span,
+html body .app.more-active .familyMenuPage .familyMenuItem > span{font-size:16px!important;font-weight:600!important;line-height:1.3!important}
+html body .familyMenuPrimary > span small,html body .familyMenuItem > span small{font-size:14px!important;font-weight:500!important}
+.familyMenuPrimary span strong,.proFeatureCard strong{font-size:16px!important}
+.familyMenuPrimary small{font-size:14px!important;font-weight:500!important}
+.overview-new-muted{font-size:14px!important;line-height:1.45!important}
+</style>
+<style id="content-pages-type">
+/* Paginatitel bovenaan een submenu */
+html body .settingsMenuBack span{font-size:17px!important;font-weight:700!important}
+/* Help & uitleg: vraag als kopje, antwoord als lopende tekst */
+html body #helpMenuSub .helpQuestion span{font-size:16px!important;font-weight:700!important;line-height:1.3!important}
+html body #helpMenuSub p{font-size:15px!important;line-height:1.5!important}
+/* Over de app */
+html body #appInfoMenuSub .aboutInfoTitle{font-size:18px!important}
+html body #appInfoMenuSub .aboutInfoSection p,html body #appInfoMenuSub .aboutInfoCard p,html body #appInfoMenuSub p{font-size:15px!important;line-height:1.5!important}
+html body #appInfoMenuSub .aboutInfoLine span{font-size:15px!important;line-height:1.45!important}
+/* Privacybeleid en voorwaarden */
+html body #privacyMenuSub h3,html body #termsMenuSub h3{font-size:20px!important;line-height:1.3!important}
+html body #privacyMenuSub h4,html body #termsMenuSub h4{font-size:16px!important;line-height:1.35!important;margin-top:18px!important}
+html body #privacyMenuSub p,html body #privacyMenuSub li,html body #termsMenuSub p,html body #termsMenuSub li{font-size:15px!important;line-height:1.5!important}
+html body #privacyMenuSub .legalSmall,html body #termsMenuSub .legalSmall{font-size:13px!important}
+html body #appInfoMenuSub .aboutInfoVersion{font-size:13px!important}
+</style>
+<style id="pro-page-type">
+/* Pro-pagina: zelfde lijn als de rest van de app */
+html body #proMenuSub .familyMenuBack span{font-size:17px!important;font-weight:700!important}
+html body #proMenuSub .smartPlannerPanel>h3:first-child,html body #proMenuSub .budgetPanelHeading h3{font-size:20px!important;line-height:1.25!important}
+html body #proMenuSub .plannerRecipeBox>h3,html body #proMenuSub .smartPlannerPanel>h3,html body #proMenuSub .budgetSectionTitle,html body #proMenuSub .budgetDealsCard h4{font-size:17px!important;line-height:1.3!important}
+html body #proMenuSub .budgetPanelHeading p{font-size:14px!important}
+html body #proMenuSub .budgetPanelHeading>i{flex:0 0 36px!important;width:36px!important;height:36px!important;border-radius:11px!important;font-size:17px!important}
+/* invoervelden 16 px: voorkomt inzoomen op de iPhone */
+html body #proMenuSub input,html body #proMenuSub select,html body #proMenuSub textarea{font-size:16px!important}
+/* uitgaven en categorieen */
+html body #proMenuSub .budgetCategoryTop span,html body #proMenuSub .budgetCategoryTop strong{font-size:15px!important}
+html body #proMenuSub .budgetExpenseDetails strong,html body #proMenuSub .budgetExpenseAmount{font-size:15px!important}
+html body #proMenuSub .budgetExpenseDetails small{font-size:13px!important}
+html body #proMenuSub .budgetExpenseDelete{font-size:13px!important;font-weight:600!important;min-height:36px;padding:8px 0!important}
+html body #proMenuSub .budgetTextButton{font-size:14px!important;font-weight:600!important}
+html body #proMenuSub .proFootnote{font-size:13px!important}
+html body #proMenuSub .budgetPanelHeading>i{display:none!important}
+html body #proMenuSub .budgetTextButton{white-space:nowrap!important}
+</style>
+<style id="legal-contact">
+html body .legalContact{margin:6px 0 12px;display:grid;gap:2px}
+html body .legalContact dt{font-size:13px;font-weight:600;color:var(--muted-text,#718177);margin-top:8px}
+html body .legalContact dt:first-child{margin-top:0}
+html body .legalContact dd{margin:0;font-size:15px;line-height:1.45;color:var(--text-color,#2f3b33)}
+html body .legalContact a{color:#3f6b4b;font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+body.dark-theme .legalContact a{color:#9fd3a9}
+</style>
+<script id="pantryLogic">
+/* Voorraadbeheer (Pro): wat je thuis hebt, gekoppeld aan de boodschappenlijst.
+   Opslag: localStorage "boodschappen_pantry_v1", gesynchroniseerd via accountCloudSync (users/{uid}/pantry). */
+(function(){
+  var KEY="boodschappen_pantry_v1";
+  var LOCS=[["fridge","Koelkast"],["freezer","Vriezer"],["pantry","Voorraadkast"]];
+  var LOC_LABEL={fridge:"Koelkast",freezer:"Vriezer",pantry:"Voorraadkast"};
+  var LOC_IN={fridge:"in de koelkast",freezer:"in de vriezer",pantry:"in de voorraadkast"};
+  var activeLoc="all", locTouched=false;
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function read(){
+    try{var d=JSON.parse(localStorage.getItem(KEY)||"{}");return {items:Array.isArray(d.items)?d.items.filter(function(i){return i&&i.name;}):[],log:Array.isArray(d.log)?d.log:[],share:(d.share===undefined?null:!!d.share)};}
+    catch(e){return {items:[],log:[],share:false};}
+  }
+  function write(d){
+    if(d.log&&d.log.length>300)d.log=d.log.slice(-300);
+    // Elke wijziging maakt de vorige bevestiging ("… staat nu …") ongeldig
+    try{var st=document.getElementById("pantryStatus");if(st){st.textContent="";clearTimeout(st.__t);}}catch(e){}
+    try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}
+    try{if(window.__pantryAfterWrite)window.__pantryAfterWrite(d);}catch(e){console.warn(e);}
+  }
+  // Logboek voor inzichten: in = erbij, use = gebruikt, out = op, toss = weggegooid
+  function logEv(d,item,type,qty){d.log=d.log||[];d.log.push({k:norm(item.name),n:item.name,t:type,q:qty||1,at:Date.now()});}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+  // Bewust streng: "Kaas" is niet hetzelfde als "Pindakaas", "Melk" niet als "Hagelslag melk".
+  function same(a,b){
+    a=norm(a);b=norm(b);if(!a||!b)return false;
+    if(a===b)return true;
+    var suf=["s","n","en","eren","jes","tjes"," s"];
+    for(var k=0;k<suf.length;k++){if(a+suf[k]===b||b+suf[k]===a)return true;}
+    return false;
+  }
+  function niceName(s){s=String(s||"").trim().replace(/\s+/g," ");return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+  function int(v,def){var n=parseInt(v,10);return Number.isFinite(n)&&n>=0?n:def;}
+
+  /* Slimme plek-keuze op basis van de productnaam */
+  function guessLoc(name){
+    var n=norm(name);
+    if(/pindakaas|hagelslag|choco|chocola|koek|biscuit|houdbare|poedermelk|kokosmelk|chips|snoep|thee\b|koffie|suiker|\bmeel\b|bloem\b|rijst|pasta\b|spaghetti|macaroni|noedel|mie\b|blik|soep|ketchup|mayonaise|mosterd|olie\b|azijn|kruiden|zout|peper\b|cornflakes|muesli|havermout|cruesli|cracker|beschuit|knackebrod|wijn|bier|frisdrank|cola|limonade|\bwater\b|wasmiddel|toiletpapier|keukenrol|shampoo|tandpasta/.test(n))return "pantry";
+    if(/diepvries|bevroren|vriezer|\bijs\b|ijsje|ijsjes|roomijs|ijsblok|frites|patat|kroket|bitterbal|loempia|diepvriespizza/.test(n))return "freezer";
+    if(/melk|karnemelk|yoghurt|kwark|vla|kaas|boter|room|creme fraiche|eieren|\bei\b|kip|gehakt|vlees|biefstuk|worst|ham\b|spek|vis|zalm|tonijnsalade|garnalen|salade|sla\b|spinazie|komkommer|courgette|broccoli|bloemkool|paprika|champignon|aardbei|blauwe bes|frambo|druiven|hummus|tofu|tempeh|pesto vers|sap\b|smoothie|margarine|zuivel|mozzarella|feta|roomkaas|pudding/.test(n))return "fridge";
+    try{
+      if(typeof productAisle==="function"){
+        var a=productAisle(name);
+        if(a===2||a===3)return "fridge";
+        if(a===8)return "freezer";
+      }
+    }catch(e){}
+    return "pantry";
+  }
+  function daysUntil(exp){
+    if(!exp)return null;
+    var t=new Date(exp+"T00:00:00");if(isNaN(t))return null;
+    var now=new Date();now.setHours(0,0,0,0);
+    return Math.round((t-now)/86400000);
+  }
+  function fmtDate(exp){var t=new Date(exp+"T00:00:00");return isNaN(t)?"":t.toLocaleDateString("nl-NL",{day:"numeric",month:"short"});}
+  function needsRefill(i){var q=int(i.qty,0),m=int(i.min,0);return q===0||(m>0&&q<m);}
+  function iconHtml(i){
+    var photos=true;try{photos=typeof productPhotosEnabled!=="function"||productPhotosEnabled();}catch(e){}
+    var loose=false;try{loose=typeof isLooseProduce==="function"&&isLooseProduce(i.name);}catch(e){}
+    if(i.imageUrl&&photos&&!loose)return '<span class="pantryIcon hasPhoto"><img src="'+esc(i.imageUrl)+'" alt="" loading="lazy" referrerpolicy="no-referrer"></span>';
+    var mk="🛍️";try{mk=productIconMarkup(getProductIcon(i.name));}catch(e){}
+    return '<span class="pantryIcon">'+mk+'</span>';
+  }
+
+  /* ---------- Lijst-koppeling ---------- */
+  function onShoppingList(name){
+    try{return (Array.isArray(boodschappen)?boodschappen:[]).some(function(x){return x&&!x.completed&&same(x.text,name);});}catch(e){return false;}
+  }
+  async function addNamesToShoppingList(entries){
+    var added=0;
+    try{
+      if(typeof activeListType!=="undefined"&&activeListType!=="shared"&&!currentHouseholdId&&!isPrivateMode()){
+        var hid=await getOrCreateHousehold();
+        if(!hid&&auth.currentUser)localStorage.setItem("boodschappenUseMode_"+auth.currentUser.uid,"private");
+      }
+    }catch(e){}
+    entries.forEach(function(e){
+      if(onShoppingList(e.name))return;
+      boodschappen.push({text:e.name,completed:false,completedBy:"",completedAt:null,quantity:1,createdAt:Date.now(),
+        barcode:e.barcode||"",imageUrl:e.imageUrl||"",brand:e.brand||""});
+      added++;
+    });
+    if(added){try{showList();}catch(e){} try{await saveList();}catch(e){console.warn(e);} }
+    return added;
+  }
+
+  /* ---------- Melding onderin ---------- */
+  var toastTimer=null;
+  function toast(message,actionLabel,action){
+    var old=document.getElementById("pantryToast");if(old)old.remove();
+    clearTimeout(toastTimer);
+    var t=document.createElement("div");t.id="pantryToast";t.className="pantryToast";t.setAttribute("role","status");
+    t.innerHTML='<span>'+message+'</span>'+(actionLabel?'<button type="button">'+esc(actionLabel)+'</button>':'');
+    ["click","pointerdown","touchstart"].forEach(function(ev){t.addEventListener(ev,function(e){e.stopPropagation();});});
+    if(actionLabel)t.querySelector("button").addEventListener("click",async function(){this.disabled=true;t.remove();try{await action();}catch(e){console.warn(e);}});
+    document.body.appendChild(t);
+    toastTimer=setTimeout(function(){t.classList.add("leaving");setTimeout(function(){t.remove();},250);},6000);
+  }
+
+  /* ---------- Weergave ---------- */
+  function render(){
+    var tabs=document.getElementById("pantryTabs"),listEl=document.getElementById("pantryList"),refill=document.getElementById("pantryRefill");
+    if(!tabs||!listEl)return;
+    var d=read(),items=d.items;
+    tabs.hidden=!items.length;if(!items.length)activeLoc="all";
+    // Formulier en knoppen netjes houden
+    var st0=document.getElementById("pantryStatus");
+    if(st0&&st0.textContent){var still=items.some(function(i){return st0.textContent.indexOf(i.name+" staat nu")===0;});if(!still)st0.textContent="";}
+    var q0=document.getElementById("pantryQty");
+    if(q0&&document.activeElement!==q0&&!(parseInt(q0.value,10)>0))q0.value="1";
+    var ca=document.querySelector("#pantryPanel .pantryClearAll");
+    if(ca)ca.hidden=!items.length;
+    var counts={all:items.length,fridge:0,freezer:0,pantry:0};
+    items.forEach(function(i){if(counts[i.loc]!=null)counts[i.loc]++;});
+    tabs.innerHTML=[["all","Alles"]].concat(LOCS).map(function(l){
+      return '<button type="button" role="tab" class="recipeChip'+(activeLoc===l[0]?' active':'')+'" aria-selected="'+(activeLoc===l[0])+'" data-loc="'+l[0]+'">'+l[1]+(counts[l[0]]?' <span>'+counts[l[0]]+'</span>':'')+'</button>';
+    }).join("");
+    tabs.querySelectorAll("button").forEach(function(b){b.onclick=function(e){e.stopPropagation();activeLoc=b.getAttribute("data-loc");render();};});
+
+    // Aanvullen
+    var low=items.filter(needsRefill);
+    if(refill){
+      if(low.length){
+        var notOnList=low.filter(function(i){return !onShoppingList(i.name);});
+        refill.innerHTML='<div class="pantryRefill"><div class="pantryRefillHead"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><div><strong>Aanvullen</strong><small>'+
+          (notOnList.length?(low.length===1?'Dit product is (bijna) op.':'Deze producten zijn (bijna) op.'):'Staat al op je boodschappenlijst ✓')+'</small></div></div>'+
+          '<div class="pantryRefillNames">'+low.map(function(i){return '<span class="'+(onShoppingList(i.name)?'onList':'')+'">'+esc(i.name)+'</span>';}).join("")+'</div>'+
+          (notOnList.length?'<button type="button" class="budgetActionButton pantryRefillBtn">'+(notOnList.length===1?'Zet op boodschappenlijst':'Zet alle '+notOnList.length+' op boodschappenlijst')+'</button>':'')+'</div>';
+        var rb=refill.querySelector(".pantryRefillBtn");
+        if(rb)rb.onclick=async function(e){e.stopPropagation();this.disabled=true;var n=await addNamesToShoppingList(notOnList);render();toast(n===1?'1 product op je lijst gezet.':n+' producten op je lijst gezet.');};
+      }else refill.innerHTML="";
+    }
+
+    // Lijst
+    var shown=items.filter(function(i){return activeLoc==="all"||i.loc===activeLoc;});
+    if(!items.length){
+      listEl.innerHTML='<div class="pantryEmpty"><i class="fa-solid fa-cube" aria-hidden="true"></i><strong>Je voorraad is nog leeg</strong><span>Voeg hieronder producten toe of scan een barcode. Na het boodschappen doen kun je je gekochte producten ook in één keer toevoegen.</span></div>';
+      try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){}
+      return;
+    }
+    if(!shown.length){listEl.innerHTML='<p class="budgetEmpty pantryNone">Nog niets in de '+esc(LOC_LABEL[activeLoc]||"").toLowerCase()+'.</p>';try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){}return;}
+    var sorter=function(a,b){
+      var ao=int(a.qty,0)===0,bo=int(b.qty,0)===0;if(ao!==bo)return ao?1:-1;
+      var da=daysUntil(a.exp),db=daysUntil(b.exp);
+      if(da!=null||db!=null){if(da==null)return 1;if(db==null)return -1;if(da!==db)return da-db;}
+      return norm(a.name).localeCompare(norm(b.name));
+    };
+    var groups=activeLoc==="all"?LOCS.map(function(l){return [l[1],shown.filter(function(i){return i.loc===l[0];})];}).filter(function(g){return g[1].length;}):[[null,shown]];
+    var tipSeen=false;try{tipSeen=localStorage.getItem("boodschappenPantryTipSeen")==="1";}catch(e){}
+    var tip=tipSeen?'':'<div class="pantryTip" role="note"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><span>Tik op een product om het aan te passen of te verwijderen.</span><button type="button" class="pantryTipClose" aria-label="Tip sluiten"><span class="stepIcon plus" aria-hidden="true"></span></button></div>';
+    listEl.innerHTML=tip+groups.map(function(g){
+      return (g[0]?'<div class="pantryGroupTitle">'+g[0]+'</div>':'')+g[1].sort(sorter).map(rowHtml).join("");
+    }).join("");
+    listEl.querySelectorAll("[data-act]").forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();var id=b.closest("[data-id]").getAttribute("data-id"),act=b.getAttribute("data-act");
+        if(act==="min")changeQty(id,-1);else if(act==="plus")changeQty(id,1);else if(act==="edit"){tipDone();editItem(id);}else if(act==="tolist")putOnList(id);};
+    });
+    var tc=listEl.querySelector(".pantryTipClose");
+    if(tc)tc.onclick=function(e){e.stopPropagation();tipDone();render();};
+    try{if(window.__pantryAfterRender)window.__pantryAfterRender(d);}catch(e){console.warn(e);}
+  }
+  function rowHtml(i){
+    var q=int(i.qty,0),m=int(i.min,0),days=daysUntil(i.exp),meta=[],cls="pantryRow";
+    if(q===0){cls+=" isOut";meta.push('<b class="pantryTag out">Op</b>');}
+    else if(m>0&&q<m){cls+=" isLow";meta.push('<b class="pantryTag low">Bijna op</b>');}
+    if(days!=null){
+      if(days<0)meta.push('<b class="pantryTag out">Over de datum</b>');
+      else if(days===0)meta.push('<b class="pantryTag low">Vandaag op</b>');
+      else if(days<=2)meta.push('<b class="pantryTag low">Nog '+days+(days===1?' dag':' dagen')+'</b>');
+      else meta.push('THT '+fmtDate(i.exp));
+    }
+    if(m>0&&q>=m)meta.push('min. '+m);
+    var onList=q===0&&onShoppingList(i.name);
+    var right=q===0
+      ?(onList?'<span class="pantryOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst</span>':'<button type="button" class="pantryToList" data-act="tolist">Op lijst</button>')+'<button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>'
+      :'<button type="button" class="pantryStep" data-act="min" aria-label="Eén '+esc(i.name)+' eraf"><span class="stepIcon" aria-hidden="true"></span></button><span class="pantryQty" aria-label="'+q+' stuks">'+q+'</span><button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>';
+    return '<div class="'+cls+'" data-id="'+esc(i.id)+'">'+iconHtml(i)+
+      '<button type="button" class="pantryInfo" data-act="edit" aria-label="'+esc(i.name)+' aanpassen"><strong>'+esc(i.name)+'<i class="fa-solid fa-pen pantryEditHint" aria-hidden="true"></i></strong>'+(meta.length?'<small>'+meta.join(' · ')+'</small>':'')+'</button>'+
+      '<div class="pantryControls">'+right+'</div></div>';
+  }
+
+  function tipDone(){try{localStorage.setItem("boodschappenPantryTipSeen","1");}catch(e){}var t=document.querySelector(".pantryTip");if(t)t.remove();}
+
+  /* ---------- Acties ---------- */
+  function upsert(entry){
+    var d=read(),loc=entry.loc||guessLoc(entry.name);
+    var ex=d.items.find(function(i){return i.loc===loc&&((entry.barcode&&i.barcode===entry.barcode)||same(i.name,entry.name));})
+         ||d.items.find(function(i){return (entry.barcode&&i.barcode===entry.barcode)||same(i.name,entry.name);});
+    if(ex){
+      ex.qty=int(ex.qty,0)+Math.max(1,int(entry.qty,1));
+      if(entry.exp)ex.exp=entry.exp;
+      if(entry.min!=null&&entry.min!=="")ex.min=int(entry.min,0);
+      if(entry.barcode&&!ex.barcode)ex.barcode=entry.barcode;
+      if(entry.imageUrl&&!ex.imageUrl)ex.imageUrl=entry.imageUrl;
+      ex.updatedAt=Date.now();
+      logEv(d,ex,"in",Math.max(1,int(entry.qty,1)));
+    }else{
+      ex={id:uid(),name:niceName(entry.name),qty:Math.max(1,int(entry.qty,1)),loc:loc,exp:entry.exp||"",min:int(entry.min,0),
+          barcode:entry.barcode||"",imageUrl:entry.imageUrl||"",brand:entry.brand||"",updatedAt:Date.now()};
+      d.items.push(ex);
+      logEv(d,ex,"in",ex.qty);
+    }
+    write(d);return ex;
+  }
+  function changeQty(id,delta){
+    var d=read(),it=d.items.find(function(i){return i.id===id;});if(!it)return;
+    var before=int(it.qty,0);it.qty=Math.max(0,before+delta);it.updatedAt=Date.now();
+    if(it.qty!==before){logEv(d,it,delta>0?"in":"use",1);if(it.qty===0)logEv(d,it,"out",0);}
+    write(d);render();
+    var expired=delta<0&&before>0&&daysUntil(it.exp)!=null&&daysUntil(it.exp)<0;
+    if(expired){
+      var opToast=function(){if(it.qty===0&&!onShoppingList(it.name))toast('<strong>'+esc(it.name)+'</strong> is op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});};
+      toast('<strong>'+esc(it.name)+'</strong> was over de datum. Weggegooid?','Ja, weggegooid',function(){
+        var d2=read();for(var k=d2.log.length-1;k>=0;k--){if(d2.log[k].k===norm(it.name)&&d2.log[k].t==="use"){d2.log[k].t="toss";break;}}
+        write(d2);render();setTimeout(opToast,150);
+      });
+      return;
+    }
+    if(before>0&&it.qty===0&&!onShoppingList(it.name)){
+      toast('<strong>'+esc(it.name)+'</strong> is op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});
+    }else if(delta<0&&int(it.min,0)>0&&it.qty<int(it.min,0)&&before>=int(it.min,0)&&!onShoppingList(it.name)){
+      toast('<strong>'+esc(it.name)+'</strong> is bijna op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});
+    }
+  }
+  async function putOnList(id){
+    var it=read().items.find(function(i){return i.id===id;});if(!it)return;
+    await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');
+  }
+  function editItem(id){
+    var d=read(),it=d.items.find(function(i){return i.id===id;});if(!it||typeof familyDialogBase!=="function")return;
+    var opts=LOCS.map(function(l){return '<option value="'+l[0]+'"'+(it.loc===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join("");
+    var ov=familyDialogBase("fa-cube",esc(it.name),
+      '<div class="pantryEdit"><label>Naam<input class="familyDialogInput" id="pantryEditName" maxlength="60" value="'+esc(it.name)+'"></label>'+
+      '<div class="pantryEditRow"><label>Plek<select class="familyDialogInput" id="pantryEditLoc">'+opts+'</select></label><label>Aantal<input class="familyDialogInput" id="pantryEditQty" type="number" min="0" step="1" inputmode="numeric" value="'+int(it.qty,0)+'"></label></div>'+
+      '<label>Houdbaar tot<input class="familyDialogInput" id="pantryEditExp" type="date" value="'+esc(it.exp||"")+'"></label>'+
+      '<label>Altijd minimaal in huis<input class="familyDialogInput" id="pantryEditMin" type="number" min="0" step="1" inputmode="numeric" placeholder="Geen minimum" value="'+(int(it.min,0)||"")+'"></label><button type="button" class="pantryDelete" data-b="del"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Verwijderen uit voorraad</button></div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="cancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="save">Opslaan</button>');
+    ov.classList.add("pantryDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var close=function(){closeFamilyDialog(ov);};
+    ov.querySelector('[data-b="cancel"]').onclick=close;
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    ov.querySelector('[data-b="del"]').onclick=function(){
+      var dd=read();dd.items=dd.items.filter(function(i){return i.id!==id;});
+      if(int(it.qty,0)>0&&daysUntil(it.exp)!=null&&daysUntil(it.exp)<0)logEv(dd,it,"toss",int(it.qty,0));
+      write(dd);close();render();
+      toast(esc(it.name)+' is uit je voorraad verwijderd.','Ongedaan maken',function(){var d3=read();d3.items.push(it);write(d3);render();});
+    };
+    ov.querySelector('[data-b="save"]').onclick=function(){
+      var name=ov.querySelector("#pantryEditName").value.trim();if(!name){ov.querySelector("#pantryEditName").focus();return;}
+      var dd=read(),x=dd.items.find(function(i){return i.id===id;});if(!x){close();return;}
+      x.name=niceName(name);x.loc=ov.querySelector("#pantryEditLoc").value;x.qty=int(ov.querySelector("#pantryEditQty").value,0);
+      x.exp=ov.querySelector("#pantryEditExp").value||"";x.min=int(ov.querySelector("#pantryEditMin").value,0);x.updatedAt=Date.now();
+      write(dd);close();render();
+    };
+  }
+
+  window.addPantryItem=function(){
+    var nameEl=document.getElementById("pantryName"),st=document.getElementById("pantryStatus");
+    var name=nameEl.value.trim();
+    if(!name){nameEl.focus();if(st)st.textContent="Vul eerst een product in.";return;}
+    var it=upsert({name:name,loc:document.getElementById("pantryLoc").value,qty:document.getElementById("pantryQty").value,
+      exp:document.getElementById("pantryExp").value,min:document.getElementById("pantryMin").value});
+    nameEl.value="";document.getElementById("pantryQty").value="1";document.getElementById("pantryExp").value="";document.getElementById("pantryMin").value="";
+    var more=document.querySelector("#pantryPanel .pantryMore");if(more)more.open=false;
+    locTouched=false;activeLoc="all";render();
+    if(st){st.textContent=it.name+" staat nu "+LOC_IN[it.loc]+" ("+it.qty+").";clearTimeout(st.__t);st.__t=setTimeout(function(){st.textContent="";},5000);}
+  };
+  window.togglePantry=function(event){
+    if(event)event.stopPropagation();
+    var panel=document.getElementById("pantryPanel");if(!panel)return;
+    panel.hidden=!panel.hidden;
+    var btn=document.querySelector(".pantryLaunchButton");
+    if(btn)btn.innerHTML=panel.hidden?'Open voorraad <i class="fa-solid fa-chevron-down"></i>':'Voorraad sluiten <i class="fa-solid fa-chevron-up"></i>';
+    if(!panel.hidden){
+      var scan=panel.querySelector(".pantryScanBtn");
+      if(scan)scan.hidden=localStorage.getItem("boodschappenScannerEnabled")==="false";
+      render();setTimeout(function(){panel.scrollIntoView({behavior:"smooth",block:"nearest"});},60);
+    }
+  };
+  window.__refreshPantryUI=function(){var p=document.getElementById("pantryPanel");if(p&&!p.hidden)render();};
+  window.__pantryRead=read;
+  window.__pantryApi={read:read,write:write,render:function(){render();},toast:toast,same:same,norm:norm,esc:esc,int:int,daysUntil:daysUntil,fmtDate:fmtDate,
+    LOC_IN:LOC_IN,LOC_LABEL:LOC_LABEL,addNamesToShoppingList:addNamesToShoppingList,onShoppingList:onShoppingList,niceName:niceName};
+
+  // Plek automatisch kiezen tijdens het typen (tenzij je die zelf hebt gekozen)
+  function bindForm(){
+    var n=document.getElementById("pantryName"),l=document.getElementById("pantryLoc");
+    if(!n||!l||n.__bound)return;n.__bound=true;
+    n.addEventListener("input",function(){if(!locTouched&&n.value.trim().length>=3)l.value=guessLoc(n.value);});
+    n.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();window.addPantryItem();}});
+    l.addEventListener("change",function(){locTouched=true;});
+    var q=document.getElementById("pantryQty");
+    if(q)q.addEventListener("blur",function(){if(!(parseInt(q.value,10)>0))q.value="1";});
+    // Bevestiging van het vorige product weghalen zodra je met een nieuw product bezig bent
+    ["pantryName","pantryLoc","pantryQty","pantryExp","pantryMin"].forEach(function(id){
+      var el=document.getElementById(id);if(!el)return;
+      ["input","change"].forEach(function(t){el.addEventListener(t,function(){var st=document.getElementById("pantryStatus");if(st)st.textContent="";});});
+    });
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bindForm);else bindForm();
+
+  /* ---------- Scannen naar voorraad ---------- */
+  window.__pantryScan=false;
+  window.scanIntoPantry=function(){
+    if(typeof openBarcodeScanner!=="function")return;
+    window.__pantryScan=true;
+    var t=document.getElementById("barcodeTitle");if(t)t.innerHTML='<i class="fa-solid fa-barcode"></i> Scannen voor je voorraad';
+    openBarcodeScanner();
+  };
+  if(typeof finishBarcodeProduct==="function"){
+    var origFinish=finishBarcodeProduct;
+    finishBarcodeProduct=async function(p){
+      if(!window.__pantryScan)return origFinish.apply(this,arguments);
+      var it=upsert({name:p.text,barcode:p.barcode,imageUrl:p.imageUrl,brand:p.brand,qty:1});
+      var r=document.getElementById("barcodeResult");
+      if(r){r.textContent=(p.brand?p.brand+" · ":"")+it.name+" staat nu "+LOC_IN[it.loc]+" ("+it.qty+").";r.classList.add("open");}
+      try{setBarcodeStatus("Toegevoegd aan je voorraad ✓");}catch(e){}
+      activeLoc="all";render();
+      setTimeout(closeBarcodeScanner,1100);
+    };
+  }
+  if(typeof closeBarcodeScanner==="function"){
+    var origClose=closeBarcodeScanner;
+    closeBarcodeScanner=function(){
+      window.__pantryScan=false;
+      var t=document.getElementById("barcodeTitle");if(t)t.innerHTML='<i class="fa-solid fa-barcode"></i> Barcode scannen';
+      return origClose.apply(this,arguments);
+    };
+  }
+
+  /* ---------- Fase 2: na het boodschappen doen ---------- */
+  function offerRestock(bought){
+    if(!bought.length||typeof familyDialogBase!=="function")return;
+    var rows=bought.map(function(b,ix){
+      var opts=LOCS.map(function(l){return '<option value="'+l[0]+'"'+(b.loc===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join("");
+      return '<div class="restockRow"><label class="restockCheck"><input type="checkbox" checked data-ix="'+ix+'"><span>'+esc(b.name)+(b.qty>1?' <em>×'+b.qty+'</em>':'')+'</span></label><select class="restockLoc" data-ix="'+ix+'" aria-label="Plek voor '+esc(b.name)+'">'+opts+'</select></div>';
+    }).join("");
+    var ov=familyDialogBase("fa-cube","Aan je voorraad toevoegen?",
+      '<div class="familyDialogText">Je hebt net boodschappen gedaan. Voeg wat je hebt gekocht in één keer toe aan je voorraad.</div><div class="restockList">'+rows+'</div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="skip">Overslaan</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="add">Toevoegen</button>');
+    ov.classList.add("pantryDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var add=ov.querySelector('[data-b="add"]');
+    function sync(){var n=ov.querySelectorAll('.restockCheck input:checked').length;add.textContent=n?(n===1?'1 product toevoegen':n+' producten toevoegen'):'Toevoegen';add.disabled=!n;}
+    ov.querySelectorAll('.restockCheck input').forEach(function(c){c.addEventListener("change",sync);});sync();
+    ov.querySelector('[data-b="skip"]').onclick=function(){closeFamilyDialog(ov);};
+    add.onclick=function(){
+      var n=0;
+      ov.querySelectorAll('.restockCheck input').forEach(function(c){
+        if(!c.checked)return;var ix=+c.getAttribute("data-ix"),b=bought[ix];
+        upsert({name:b.name,qty:b.qty,loc:ov.querySelector('.restockLoc[data-ix="'+ix+'"]').value,barcode:b.barcode,imageUrl:b.imageUrl,brand:b.brand});n++;
+      });
+      closeFamilyDialog(ov);render();
+      toast(n===1?'1 product toegevoegd aan je voorraad.':n+' producten toegevoegd aan je voorraad.');
+    };
+  }
+  if(typeof clearList==="function"){
+    var origClear=clearList;
+    clearList=async function(){
+      var bought=[];
+      try{
+        var seen={};
+        (Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){
+          if(!x||!x.completed||!x.text)return;var k=norm(x.text);
+          if(seen[k]){seen[k].qty+=Math.max(1,int(x.quantity,1));return;}
+          seen[k]={name:niceName(x.text),qty:Math.max(1,int(x.quantity,1)),loc:guessLoc(x.text),barcode:x.barcode||"",imageUrl:x.imageUrl||"",brand:x.brand||""};
+          bought.push(seen[k]);
+        });
+        // Bestaande plek in de voorraad heeft voorrang op de gok
+        var items=read().items;
+        bought.forEach(function(b){var ex=items.find(function(i){return same(i.name,b.name);});if(ex)b.loc=ex.loc;});
+      }catch(e){}
+      var r=await origClear.apply(this,arguments);
+      // Alleen vragen als je de voorraad al gebruikt
+      if(bought.length&&read().items.length&&(window.hasPantryAccess?window.hasPantryAccess():(!window.isProActive||window.isProActive())))setTimeout(function(){offerRestock(bought);},350);
+      return r;
+    };
+  }
+
+  /* ---------- Fase 2: waarschuwen bij toevoegen aan de lijst ---------- */
+  if(typeof addProduct==="function"){
+    var origAdd=addProduct;
+    addProduct=async function(){
+      var input=document.getElementById("product"),text=input?input.value.trim():"";
+      // Weekplanner: ingrediënten die je al in huis hebt niet toevoegen
+      if(text&&Array.isArray(window.__pantryPlannerSkip)&&window.__pantryInHouse){
+        var hit=window.__pantryInHouse(text);
+        if(hit){window.__pantryPlannerSkip.push({text:text,have:hit});if(input)input.value="";return;}
+      }
+      var r=await origAdd.apply(this,arguments);
+      if(!text||Array.isArray(window.__pantryPlannerSkip))return r;
+      var have=read().items.find(function(i){return int(i.qty,0)>0&&same(i.name,text);});
+      if(have&&(window.hasPantryAccess?window.hasPantryAccess():(!window.isProActive||window.isProActive()))){
+        toast('Je hebt nog <strong>'+int(have.qty,0)+'× '+esc(have.name)+'</strong> '+LOC_IN[have.loc]+'.','Toch niet nodig',async function(){
+          for(var k=boodschappen.length-1;k>=0;k--){if(boodschappen[k]&&!boodschappen[k].completed&&boodschappen[k].text===text){boodschappen.splice(k,1);break;}}
+          try{showList();}catch(e){} try{await saveList();}catch(e){}
+        });
+      }
+      return r;
+    };
+  }
+})();
+</script>
+<style id="pantry-style">
+.pantryLaunch{cursor:pointer}
+.pantryTabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:4px 0 12px;scrollbar-width:none}
+.pantryTabs::-webkit-scrollbar{display:none}
+.pantryTabs .recipeChip{flex:0 0 auto;white-space:nowrap;border:none!important;border-radius:999px;padding:8px 14px;min-height:36px;font-size:14px;font-weight:700;background:#e4ece6!important;color:#2f4a38!important;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pantryTabs .recipeChip.active{background:#2f5a3d!important;color:#fff!important}
+.pantryTabs[hidden]{display:none!important}
+body.dark-theme .pantryTabs .recipeChip{background:#34443a!important;color:#e4eee7!important}
+body.dark-theme .pantryTabs .recipeChip.active{background:#4f8a62!important;color:#fff!important}
+.pantryTabs .recipeChip span{opacity:.7;font-weight:600;margin-left:2px}
+.pantryList{display:flex;flex-direction:column;gap:8px}
+.pantryGroupTitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-text,#718177);margin:10px 2px 0}
+.pantryGroupTitle:first-child{margin-top:0}
+.pantryRow{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryRow.isOut{opacity:.92}
+.pantryRow.isOut .pantryInfo strong{color:#7b8a80}
+.pantryIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:transparent;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;overflow:hidden}
+.pantryIcon .productInlineIcon,.pantryIcon svg{width:28px;height:28px}
+.pantryIcon{font-size:24px!important}
+.pantryIcon.hasPhoto{background:transparent}
+.pantryIcon img{width:30px;height:30px;object-fit:contain;border-radius:6px}
+.pantryInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:none;border:0;padding:4px 0;color:inherit;font:inherit;cursor:pointer;min-height:44px;justify-content:center}
+.pantryInfo strong{font-size:16px;font-weight:600;line-height:1.25;color:var(--text-color,#2f4a38);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.pantryInfo small{font-size:14px;line-height:1.3;color:var(--muted-text,#718177)}
+.pantryTag{font-weight:600}
+.pantryEditHint{font-size:11px;margin-left:7px;color:#9aa89f;vertical-align:1px}
+.pantryTip{display:flex;align-items:center;gap:10px;padding:10px 8px 10px 12px;border-radius:14px;background:#e8f0ff;color:#2f4a6b;font-size:14px;line-height:1.4}
+.pantryTip > i{font-size:16px;color:#4e73ad;flex:0 0 auto}
+.pantryTip > span{flex:1}
+.pantryTipClose{flex:0 0 36px;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:#4e73ad;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pantryTipClose .stepIcon{transform:rotate(45deg)}
+body.dark-theme .pantryTip{background:#2d3a4f;color:#cfdcf2}
+body.dark-theme .pantryTip > i,body.dark-theme .pantryTipClose{color:#a9c2ec}
+body.dark-theme .pantryEditHint{color:#7f8f85}
+.pantryTag.low{color:#a86b12}
+.pantryTag.out{color:#b04545}
+.pantryControls{flex:0 0 auto;display:flex;align-items:center;gap:4px}
+.pantryStep{position:relative;width:36px;height:36px;padding:0;border-radius:11px;border:0;background:#fff;color:#2f4a38;font-size:20px;font-weight:600;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(40,60,45,.08)}
+.pantryStep:active{transform:scale(.95)}
+.pantryQty{min-width:24px;text-align:center;font-size:16px;font-weight:700;color:var(--text-color,#2f4a38)}
+.pantryToList{height:40px;padding:0 12px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.pantryOnList{font-size:13px;font-weight:600;color:#3f7a50;padding:0 6px;white-space:nowrap}
+.pantryEmpty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:20px 14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryEmpty i{width:36px;height:36px;border-radius:11px;background:#e3f4e7;color:#42634b;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:4px}
+.pantryEmpty strong{font-size:16px;color:var(--text-color,#2f4a38)}
+.pantryEmpty span{font-size:14px;line-height:1.45;color:var(--muted-text,#718177)}
+.pantryRefill{margin:0 0 12px;padding:14px;border-radius:16px;background:#fff6e0;border:1px solid #f1e0b3}
+.pantryRefillHead{display:flex;align-items:center;gap:12px}
+.pantryRefillHead i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#ffe9b0;color:#8a6212;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryRefillHead div{display:flex;flex-direction:column;gap:2px}
+.pantryRefillHead strong{font-size:16px;color:#5d4510}
+.pantryRefillHead small{font-size:14px;color:#86703b}
+.pantryRefillNames{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.pantryRefillNames span{font-size:14px;font-weight:600;padding:6px 10px;border-radius:999px;background:#fff;color:#5d4510}
+.pantryRefillNames span.onList{opacity:.55;text-decoration:line-through}
+.pantryRefillBtn{width:100%;margin-top:12px;background:#3F5B45!important;color:#fff!important}
+.pantryNameRow{display:flex;gap:8px;align-items:stretch}
+.pantryNameRow .budgetInput{flex:1}
+.pantryScanBtn{flex:0 0 52px;width:52px;padding:0!important;font-size:18px!important;display:flex;align-items:center;justify-content:center}
+.pantryScanBtn[hidden]{display:none!important}
+.pantryFormRow{display:grid;grid-template-columns:1.4fr 1fr;gap:9px}
+.pantryMore{margin-top:12px;border-radius:12px}
+.pantryMore summary{cursor:pointer;font-size:14px;font-weight:600;color:#3f6b4b;padding:8px 0;list-style:none;min-height:28px}
+.pantryMore summary::-webkit-details-marker{display:none}
+.pantryMore summary::before{content:"+ ";font-weight:700}
+.pantryMore[open] summary::before{content:"− "}
+.pantryMore summary span{font-weight:500;color:var(--muted-text,#718177)}
+.pantryMore .budgetStatus{margin:6px 0 0}
+.pantryNone{margin:4px 2px}
+.pantryToast{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:15500;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-radius:16px;background:#2f4a38;color:#fff;box-shadow:0 10px 30px rgba(20,35,25,.25);animation:roundBarIn .25s ease;transition:opacity .25s ease,transform .25s ease}
+.pantryToast.leaving{opacity:0;transform:translateY(8px)}
+.pantryToast span{flex:1;font-size:15px;line-height:1.4}
+.pantryToast button{flex:0 0 auto;min-height:40px;padding:0 14px;border:0;border-radius:11px;background:#e1f1e5;color:#2f4a38;font-size:14px;font-weight:700;cursor:pointer}
+.pantryDialog .pantryEdit{display:flex;flex-direction:column;gap:10px}
+.pantryDialog .pantryEdit label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted-text,#66766c)}
+.pantryDialog .pantryEditRow{display:grid;grid-template-columns:1.4fr 1fr;gap:9px}
+.pantryDialog .familyDialogInput{font-size:16px!important;margin:0;width:100%;box-sizing:border-box}
+.pantryDialog .familyDialogInput{letter-spacing:normal!important;font-weight:500!important;text-align:left!important}
+.pantryDelete{align-self:flex-start;margin-top:2px;min-height:44px;padding:0 4px;border:0;background:none;color:#b04545;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+body.dark-theme .pantryDelete{color:#f08f8f}
+.restockList{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:46vh;overflow-y:auto}
+.restockRow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:var(--subtle-card-bg,#f4f8f5)}
+.restockCheck{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:40px;cursor:pointer}
+.restockCheck input{width:20px;height:20px;accent-color:#3F5B45;flex:0 0 20px}
+.restockCheck span{font-size:15px;color:var(--text-color,#2f4a38);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.restockCheck em{font-style:normal;color:var(--muted-text,#718177)}
+.restockLoc{flex:0 0 auto;font-size:14px!important;padding:8px;border-radius:10px;border:1px solid #dce6df;background:#fff;color:#2f4a38;max-width:132px}
+body.dark-theme .pantryRow,body.dark-theme .pantryEmpty,body.dark-theme .restockRow{background:#29352d}
+body.dark-theme .pantryStep{background:#1d241f;color:#edf5ef}
+body.dark-theme .pantryInfo strong,body.dark-theme .pantryQty,body.dark-theme .pantryEmpty strong,body.dark-theme .restockCheck span{color:#edf5ef}
+body.dark-theme .pantryInfo small,body.dark-theme .pantryEmpty span,body.dark-theme .pantryGroupTitle,body.dark-theme .restockCheck em{color:#b8c6bc}
+body.dark-theme .pantryEmpty i{background:#34443a;color:#cfe6d5}
+body.dark-theme .pantryTag.low{color:#f0c065}
+body.dark-theme .pantryTag.out{color:#f08f8f}
+body.dark-theme .pantryRefill{background:#3a3424;border-color:#5a4c2a}
+body.dark-theme .pantryRefillHead strong{color:#f5e6c0}
+body.dark-theme .pantryRefillHead small{color:#d8c79c}
+body.dark-theme .pantryRefillHead i{background:#5a4c2a;color:#f5e6c0}
+body.dark-theme .pantryRefillNames span{background:#2a2619;color:#f5e6c0}
+body.dark-theme .pantryMore summary{color:#9fd3ac}
+body.dark-theme .pantryOnList{color:#9fd3ac}
+body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
+</style>
+<script id="name-fade">
+(function(){
+  function upd(el){var fits=el.scrollWidth<=el.clientWidth+1;el.classList.toggle("fits",fits);el.classList.toggle("atEnd",!fits&&el.scrollLeft+el.clientWidth>=el.scrollWidth-2);}
+  function scan(){document.querySelectorAll(".itemProductContent .productInfo").forEach(function(el){upd(el);if(!el.__fade){el.__fade=true;el.addEventListener("scroll",function(){upd(el);},{passive:true});}});}
+  if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);setTimeout(scan,30);return r;};}
+  window.addEventListener("resize",function(){setTimeout(scan,50);});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(scan,300);});else setTimeout(scan,300);
+})();
+</script>
+<style id="step-icons">
+/* Plus en min getekend in plaats van als letter: altijd precies in het midden */
+.quantityButton,.pantryStep{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;line-height:0!important;font-size:0!important}
+.stepIcon{position:relative;display:block;width:12px;height:12px;flex:0 0 12px}
+.stepIcon::before,.stepIcon.plus::after{content:"";position:absolute;left:0;top:5px;width:12px;height:2px;border-radius:2px;background:currentColor}
+.stepIcon.plus::after{transform:rotate(90deg)}
+.pantryStep .stepIcon{width:14px;height:14px;flex-basis:14px}
+.pantryStep .stepIcon::before,.pantryStep .stepIcon.plus::after{top:6px;width:14px}
+.pantryStep::after{content:"";position:absolute;inset:-4px}
+.pantryToList{height:36px!important}
+</style>
+<script id="pantryPhase34">
+/* Voorraad fase 3 en 4: houdbaarheid op het Overzicht, koppeling met de weekplanner,
+   voorraad delen met je familie (households/{id}/voorraad) en inzichten. */
+(function(){
+  var A=window.__pantryApi;if(!A)return;
+  var DAY=86400000;
+  function hid(){try{return (typeof currentHouseholdId!=="undefined"&&currentHouseholdId)?String(currentHouseholdId):"";}catch(e){return "";}}
+  function me(){try{return auth&&auth.currentUser?auth.currentUser.uid:"";}catch(e){return "";}}
+
+  /* ======================= Fase 3a: Overzicht ======================= */
+  function expiring(items){
+    return items.filter(function(i){var d=A.daysUntil(i.exp);return A.int(i.qty,0)>0&&d!=null&&d<=2;})
+      .sort(function(a,b){return A.daysUntil(a.exp)-A.daysUntil(b.exp);});
+  }
+  function whenText(d){return d<0?"over de datum":d===0?"vandaag":d===1?"morgen":"over "+d+" dagen";}
+  function renderExpiryCard(){
+    var card=document.getElementById("overviewExpiryCard");if(!card)return;
+    if(!(window.hasPantryAccess?window.hasPantryAccess():(!window.isProActive||window.isProActive()))){card.hidden=true;return;}
+    var list=expiring(A.read().items);
+    if(!list.length){card.hidden=true;return;}
+    card.hidden=false;
+    var names=list.slice(0,3).map(function(i){return i.name;});
+    var label=names.length===1?names[0]:names.slice(0,-1).join(", ")+" en "+names[names.length-1];
+    if(list.length>3)label=names.join(", ")+" en nog "+(list.length-3);
+    document.getElementById("overviewExpiryNames").textContent=label;
+    var first=list[0],dd=A.daysUntil(first.exp);
+    var expired=list.filter(function(i){return A.daysUntil(i.exp)<0;}).length;
+    document.getElementById("overviewExpiryText").textContent=list.length===1
+      ?(dd<0?first.name+" is over de datum. Kijk of je het nog kunt gebruiken.":first.name+" is "+whenText(dd)+" over de datum. Gebruik het op tijd.")
+      :(expired?expired+" over de datum, "+(list.length-expired)+" binnenkort. Gebruik ze op tijd.":"Deze producten gaan binnen 2 dagen over de datum.");
+  }
+  window.openPantryFromOverview=function(){
+    try{showMoreView();}catch(e){}
+    try{openProSubmenu();}catch(e){}
+    setTimeout(function(){
+      var panel=document.getElementById("pantryPanel");
+      if(panel&&panel.hidden)togglePantry();else A.render();
+      setTimeout(function(){var p=document.getElementById("pantryPanel");if(p)p.scrollIntoView({behavior:"smooth",block:"start"});},120);
+    },80);
+  };
+  if(typeof updateOverviewView==="function"){
+    var origOv=updateOverviewView;
+    updateOverviewView=function(){var r=origOv.apply(this,arguments);try{renderExpiryCard();}catch(e){}return r;};
+  }
+
+  /* ======================= Fase 3b: Weekplanner ======================= */
+  var UNIT=/^\s*(?:\d+(?:[.,]\d+)?|½|¼|¾|een|één|twee|drie|vier)\s*(?:g|gr|gram|kg|ml|l|dl|cl|el|tl|eetlepels?|theelepels?|blik(?:ken|je|jes)?|pak(?:ken|je|jes)?|zak(?:ken|je|jes)?|bos(?:je|jes)?|pot(?:je|jes)?|stuks?|tenen|teentjes?|teen|plak(?:ken|jes)?|snufje|scheutje|handje|handjes)?\.?\s+/i;
+  function ingName(line){
+    var t=String(line||"").split("(")[0].split(",")[0].trim();
+    t=t.replace(UNIT,"").replace(/^(?:verse|vers|gesneden|geraspte|gehakte|bevroren)\s+/i,"").trim();
+    return t;
+  }
+  function inHouse(line){
+    var name=ingName(line);if(!name)return null;
+    var words=A.norm(name).split(" ");var last=words[words.length-1];
+    return A.read().items.find(function(i){
+      if(A.int(i.qty,0)<=0)return false;
+      if(A.same(i.name,name))return true;
+      var pn=A.norm(i.name);
+      return pn.indexOf(" ")<0&&words.length>1&&A.same(pn,last);
+    })||null;
+  }
+  window.__pantryInHouse=inHouse;
+  window.__renderExpiryCard=function(){try{renderExpiryCard();}catch(e){}};
+
+  function annotateMeals(){
+    var box=document.getElementById("smartPlannerMeals");if(!box)return;
+    var hasPantry=A.read().items.length>0;
+    box.querySelectorAll(".plannerMealRow").forEach(function(row){
+      var p=row.querySelector("p");if(!p)return;
+      var lines=p.getAttribute("data-lines");
+      if(lines==null){lines=p.textContent;p.setAttribute("data-lines",lines);}
+      var arr=lines.split("\n").map(function(l){return l.trim();}).filter(Boolean);
+      var have=0;
+      p.classList.add("ingAnnotated");
+      p.innerHTML=arr.map(function(l){
+        var h=hasPantry&&inHouse(l);if(h)have++;
+        return '<span class="ingLine'+(h?' inHouse':'')+'">'+A.esc(l)+(h?'<em><i class="fa-solid fa-check" aria-hidden="true"></i> in huis</em>':'')+'</span>';
+      }).join("");
+      var sum=row.querySelector(".ingSummary");
+      if(hasPantry&&arr.length){
+        if(!sum){sum=document.createElement("small");sum.className="ingSummary";p.parentNode.insertBefore(sum,p);}
+        sum.textContent=have===arr.length?"Alles in huis ✓":have?have+" van "+arr.length+" ingrediënten in huis":"Nog niets van in huis";
+        sum.classList.toggle("allHave",have===arr.length);
+      }else if(sum)sum.remove();
+    });
+  }
+  (function watchMeals(){
+    var box=document.getElementById("smartPlannerMeals");if(!box)return;
+    var busy=false;
+    new MutationObserver(function(){if(busy)return;busy=true;try{annotateMeals();}finally{setTimeout(function(){busy=false;},0);}})
+      .observe(box,{childList:true});
+    annotateMeals();
+  })();
+
+  if(typeof window.addPlannerIngredientsToShoppingList==="function"){
+    var origPlan=window.addPlannerIngredientsToShoppingList;
+    window.addPlannerIngredientsToShoppingList=async function(){
+      var usePantry=A.read().items.some(function(i){return A.int(i.qty,0)>0;});
+      if(!usePantry)return origPlan.apply(this,arguments);
+      var before=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen))?boodschappen.length:0;
+      window.__pantryPlannerSkip=[];
+      var r;
+      try{r=await origPlan.apply(this,arguments);}finally{
+        var skipped=window.__pantryPlannerSkip||[];window.__pantryPlannerSkip=null;
+        var after=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen))?boodschappen.length:0;
+        var st=document.getElementById("smartPlannerStatus");
+        if(skipped.length&&st){
+          var real=Math.max(0,after-before);
+          var txt=st.textContent.replace(/^\d+ (?:product|producten) toegevoegd aan je lijst/,real+(real===1?" product":" producten")+" toegevoegd aan je lijst");
+          txt=txt.replace(/\.$/,"")+", "+skipped.length+" al in huis: "+skipped.map(function(x){return x.have.name;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+".";
+          st.textContent=txt;
+          A.toast(skipped.length===1?'<strong>'+A.esc(skipped[0].have.name)+'</strong> heb je al in huis en is niet toegevoegd.':'<strong>'+skipped.length+' ingrediënten</strong> heb je al in huis en zijn niet toegevoegd.','Toch toevoegen',async function(){
+            var n=await A.addNamesToShoppingList(skipped.map(function(x){return {name:x.text};}));
+            A.toast(n===1?'1 ingrediënt toegevoegd aan je lijst.':n+' ingrediënten toegevoegd aan je lijst.');
+          });
+        }
+      }
+      return r;
+    };
+  }
+
+  /* ======================= Fase 4a: delen met je familie ======================= */
+  var ref=null,refHid="",sharedTs=0,applying=false,pushTimer=null,shareError="",firstSnap=true;
+  function stop(){if(ref){try{ref.off("value");}catch(e){}}ref=null;refHid="";firstSnap=true;}
+  function viaFamily(){return !!(window.isProActive&&!window.isProActive()&&window.familyHasPro&&window.familyHasPro());}
+  function shareOn(d){return viaFamily()||d.share!==false;}
+  function desired(){var d=A.read();return shareOn(d)&&me()?hid():"";}
+  function ensure(){
+    var h=desired();if(h===refHid)return;
+    stop();if(!h||typeof database==="undefined")return;
+    refHid=h;shareError="";
+    ref=database.ref("households/"+h+"/voorraad");
+    ref.on("value",function(snap){
+      var v=snap.val();
+      if(firstSnap){
+        firstSnap=false;
+        if(v&&typeof v.json==="string"){mergeRemote(v);}
+        push(true);
+        return;
+      }
+      if(v&&Number(v.updatedAt)>sharedTs&&typeof v.json==="string")applyRemote(v);
+    },function(err){
+      shareError="Delen lukt nog niet. In Firebase ontbreekt de regel voor de gedeelde voorraad.";
+      console.warn("Voorraad delen:",err);stop();renderShare();
+    });
+  }
+  function parse(v){try{var o=JSON.parse(v.json);return {items:Array.isArray(o.items)?o.items:[],log:Array.isArray(o.log)?o.log:[]};}catch(e){return null;}}
+  function applyRemote(v){
+    var o=parse(v);if(!o)return;
+    var d=A.read();d.items=o.items;d.log=o.log;
+    applying=true;try{A.write(d);}finally{applying=false;}
+    sharedTs=Number(v.updatedAt)||Date.now();
+    A.render();refreshAll();
+  }
+  function mergeRemote(v){
+    var o=parse(v);if(!o)return;
+    var d=A.read();
+    var items=o.items.slice();
+    d.items.forEach(function(l){if(!items.some(function(r){return r.loc===l.loc&&A.same(r.name,l.name);}))items.push(l);});
+    var seen={},log=o.log.concat(d.log).filter(function(e){var k=e.at+"|"+e.k+"|"+e.t;if(seen[k])return false;seen[k]=1;return true;}).sort(function(a,b){return a.at-b.at;});
+    d.items=items;d.log=log;
+    applying=true;try{A.write(d);}finally{applying=false;}
+    A.render();refreshAll();
+  }
+  function push(now){
+    if(!ref||applying||firstSnap)return;   // eerst de familievoorraad ophalen, nooit blind overschrijven
+    clearTimeout(pushTimer);
+    pushTimer=setTimeout(function(){
+      if(!ref)return;var d=A.read();sharedTs=Date.now();
+      ref.set({json:JSON.stringify({items:d.items,log:d.log}),updatedAt:sharedTs,by:me()}).catch(function(err){
+        shareError="Delen lukt nog niet. In Firebase ontbreekt de regel voor de gedeelde voorraad.";console.warn(err);stop();renderShare();
+      });
+    },now?0:400);
+  }
+  function renderShare(){
+    var box=document.getElementById("pantryShare");if(!box)return;
+    var h=hid(),d=A.read();
+    if(!h){box.innerHTML="";return;}
+    var on=shareOn(d)&&!shareError;
+    if(viaFamily()){
+      box.innerHTML='<div class="pantryShareRow viaFamily"><span class="pantryShareIcon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span><span class="pantryShareText"><strong>Gedeelde voorraad van je familie</strong><small>Je hebt toegang via de Pro van '+A.esc(window.familyProName||"je familie")+'. Iedereen ziet en wijzigt dezelfde voorraad.</small></span></div>'+
+        (shareError?'<p class="pantryShareError">'+A.esc(shareError)+'</p>':'');
+      return;
+    }
+    box.innerHTML='<label class="pantryShareRow"><span class="pantryShareIcon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span><span class="pantryShareText"><strong>Delen met je familie</strong><small>'+
+      (on?'Iedereen in je familie ziet en wijzigt dezelfde voorraad.':'Zet aan om samen één voorraad bij te houden.')+'</small></span>'+
+      '<input type="checkbox" class="pantrySwitch" role="switch"'+(on?' checked':'')+' aria-label="Voorraad delen met je familie"></label>'+
+      (shareError?'<p class="pantryShareError">'+A.esc(shareError)+'</p>':'');
+    var cb=box.querySelector("input");
+    ["click","pointerdown","touchstart"].forEach(function(ev){box.addEventListener(ev,function(e){e.stopPropagation();});});
+    cb.onchange=function(){
+      shareError="";var dd=A.read();dd.share=cb.checked;A.write(dd);
+      A.toast(cb.checked?'Je voorraad wordt nu gedeeld met je familie.':'Je voorraad wordt niet meer gedeeld. Je houdt je eigen kopie.');
+      renderShare();
+    };
+  }
+  setInterval(function(){try{ensure();}catch(e){}},3000);
+
+  /* ======================= Fase 4b: inzichten ======================= */
+  function insights(d){
+    var log=d.log||[];
+    var ms=new Date();ms.setDate(1);ms.setHours(0,0,0,0);var m0=ms.getTime();
+    var month=log.filter(function(e){return e.at>=m0;});
+    var used=0,tossed=0,tossNames=[];
+    month.forEach(function(e){if(e.t==="use")used+=e.q||1;if(e.t==="toss"){tossed+=e.q||1;if(tossNames.indexOf(e.n)<0)tossNames.push(e.n);}});
+    // Hoe snel gaat iets op: van eerste keer aanvullen tot "op"
+    var by={};log.forEach(function(e){(by[e.k]=by[e.k]||[]).push(e);});
+    var speed=[];
+    Object.keys(by).forEach(function(k){
+      var ev=by[k].sort(function(a,b){return a.at-b.at;}),start=null,durs=[],name=ev[ev.length-1].n;
+      ev.forEach(function(e){if(e.t==="in"&&start==null)start=e.at;if(e.t==="out"&&start!=null){durs.push((e.at-start)/DAY);start=null;}});
+      if(durs.length>=2){var avg=durs.reduce(function(a,b){return a+b;},0)/durs.length;speed.push({name:name,days:Math.max(1,Math.round(avg)),n:durs.length});}
+    });
+    speed.sort(function(a,b){return a.days-b.days;});
+    return {used:used,tossed:tossed,tossNames:tossNames,speed:speed.slice(0,3),any:log.some(function(e){return e.t!=="in";})};
+  }
+  function renderInsights(d){
+    var box=document.getElementById("pantryInsights");if(!box)return;
+    var x=insights(d);
+    if(!x.any&&!(d.items&&d.items.length)){box.innerHTML="";return;}
+    var maand=new Date().toLocaleDateString("nl-NL",{month:"long"});
+    var lines=[];
+    if(!x.any){
+      box.innerHTML='<div class="pantryInsights"><div class="pantryInsightsHead"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><strong>Inzichten</strong><small>'+maand.charAt(0).toUpperCase()+maand.slice(1)+'</small></div>'+
+        '<div class="pantryStats"><div><b>0</b><span>gebruikt</span></div><div><b>0</b><span>weggegooid</span></div></div>'+
+        '<div class="pantryInsightLine muted"><i class="fa-solid fa-seedling" aria-hidden="true"></i><span>Je inzichten verschijnen zodra je producten gebruikt. Tik daarvoor op − bij een product.</span></div></div>';
+      return;
+    }
+    lines.push('<div class="pantryInsightLine"><i class="fa-solid '+(x.tossed?'fa-trash-can':'fa-leaf')+'" aria-hidden="true"></i><span>'+
+      (x.tossed?'Weggegooid in '+maand+': '+A.esc(x.tossNames.slice(0,4).join(", "))+(x.tossNames.length>4?' en meer':'')+'.':'In '+maand+' nog niets weggegooid. Goed bezig!')+'</span></div>');
+    if(x.speed.length){
+      x.speed.forEach(function(s){lines.push('<div class="pantryInsightLine"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span><strong>'+A.esc(s.name)+'</strong> is meestal na '+s.days+(s.days===1?' dag':' dagen')+' op.</span></div>');});
+    }else{
+      lines.push('<div class="pantryInsightLine muted"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span>Na een paar keer aanvullen zie je hier hoe snel je producten opgaan.</span></div>');
+    }
+    box.innerHTML='<div class="pantryInsights"><div class="pantryInsightsHead"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><strong>Inzichten</strong><small>'+maand.charAt(0).toUpperCase()+maand.slice(1)+'</small><button type="button" class="pantryInsightsReset" onclick="event.stopPropagation();resetPantryInsights()">Wissen</button></div>'+
+      '<div class="pantryStats"><div><b>'+x.used+'</b><span>gebruikt</span></div><div class="'+(x.tossed?'warn':'')+'"><b>'+x.tossed+'</b><span>weggegooid</span></div></div>'+
+      lines.join("")+'</div>';
+  }
+
+  /* ======================= Wissen ======================= */
+  function ask(title,msg,okLabel){
+    return new Promise(function(resolve){
+      var ov=familyDialogBase("fa-trash-can",title,'<div class="familyDialogText">'+msg+'</div>',
+        '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="no">Annuleren</button><button type="button" class="familyDialogBtn familyDialogRemove" data-b="yes">'+okLabel+'</button>');
+      ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+      var done=function(v){closeFamilyDialog(ov,function(){resolve(v);});};
+      ov.querySelector('[data-b="no"]').onclick=function(){done(false);};
+      ov.querySelector('[data-b="yes"]').onclick=function(){done(true);};
+      ov.addEventListener("click",function(e){if(e.target===ov)done(false);});
+    });
+  }
+  function sharedNote(){var d=A.read();return d.share&&hid()?' Je voorraad is gedeeld, dus dit geldt ook voor je familie.':'';}
+  window.resetPantryInsights=async function(){
+    var ok=await ask("Inzichten wissen?","De tellingen voor gebruikt en weggegooid en hoe snel producten opgaan beginnen opnieuw. Je producten blijven staan."+sharedNote(),"Wissen");
+    if(!ok)return;
+    var d=A.read(),old=d.log.slice();d.log=[];A.write(d);A.render();
+    A.toast("Inzichten gewist.","Ongedaan maken",function(){var d2=A.read();d2.log=old.concat(d2.log);A.write(d2);A.render();});
+  };
+  window.clearWholePantry=async function(){
+    var d=A.read();if(!d.items.length&&!d.log.length){A.toast("Je voorraad is al leeg.");return;}
+    var ok=await ask("Hele voorraad wissen?","Alle "+d.items.length+(d.items.length===1?" product":" producten")+" en je inzichten worden verwijderd."+sharedNote(),"Alles wissen");
+    if(!ok)return;
+    var oldI=d.items.slice(),oldL=d.log.slice();d.items=[];d.log=[];A.write(d);A.render();
+    A.toast("Je voorraad is gewist.","Ongedaan maken",function(){var d2=A.read();d2.items=oldI.concat(d2.items);d2.log=oldL.concat(d2.log);A.write(d2);A.render();});
+  };
+
+  /* ======================= Koppelen ======================= */
+  function refreshAll(){
+    try{renderExpiryCard();}catch(e){}
+    try{annotateMeals();}catch(e){}
+  }
+  window.__pantryAfterWrite=function(){
+    if(!applying){try{ensure();}catch(e){} push(false);}
+    refreshAll();
+  };
+  window.__pantryAfterRender=function(d){renderShare();renderInsights(d||A.read());};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",refreshAll);else refreshAll();
+  setTimeout(refreshAll,1500);
+})();
+</script>
+<style id="pantry-phase34-style">
+#overviewExpiryCard[hidden]{display:none!important}
+html body #pantryPanel .pantryShareRow{display:flex!important;align-items:center;margin:0 0 12px!important;font-size:inherit!important;font-weight:inherit!important}
+html body #pantryPanel .pantryShareText strong{font-size:16px!important;font-weight:600!important}
+html body #pantryPanel .pantryShareText small{font-size:14px!important;font-weight:400!important}
+.overview-new-expiry{background:#ffe7d6!important;color:#c0601a!important}
+body.dark-theme .overview-new-expiry{background:#4a3424!important;color:#f3b27f!important}
+.pantryShareRow{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5);cursor:pointer}
+.pantryShareIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e8f0ff;color:#4e73ad;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryShareText{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pantryShareText strong{font-size:16px;font-weight:600;color:var(--text-color,#2f4a38)}
+.pantryShareText small{font-size:14px;line-height:1.35;color:var(--muted-text,#718177)}
+.pantrySwitch{appearance:none;-webkit-appearance:none;flex:0 0 50px;width:50px;height:30px;border-radius:999px;background:#cfd9d2;position:relative;cursor:pointer;transition:background .2s ease;margin:0}
+.pantrySwitch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s ease}
+.pantrySwitch:checked{background:#3F5B45}
+.pantrySwitch:checked::after{transform:translateX(20px)}
+.pantryShareError{margin:-4px 2px 12px;font-size:14px;line-height:1.4;color:#b04545}
+.pantryInsights{margin:14px 0 4px;padding:14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryInsightsHead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pantryInsightsHead i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e8f0ff;color:#4e73ad;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryInsightsHead strong{font-size:16px;color:var(--text-color,#2f4a38);flex:1}
+.pantryInsightsHead small{font-size:14px;color:var(--muted-text,#718177)}
+.pantryInsightsReset{margin-left:4px;min-height:36px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:#3f6b4b;font-size:14px;font-weight:600;cursor:pointer}
+.pantryClearAll[hidden]{display:none!important}
+.pantryClearAll{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:6px;border:0;border-radius:12px;background:transparent;color:#b04545;font-size:15px;font-weight:600;cursor:pointer}
+body.dark-theme .pantryInsightsReset{color:#9fd3ac}
+body.dark-theme .pantryClearAll{color:#f08f8f}
+.pantryStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pantryStats div{background:#fff;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.pantryStats b{font-size:21px;line-height:1.1;color:var(--text-color,#2f4a38)}
+.pantryStats span{font-size:13px;color:var(--muted-text,#718177)}
+.pantryStats .warn b{color:#b04545}
+.pantryInsightLine{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;font-size:15px;line-height:1.4;color:var(--text-color,#2f4a38)}
+.pantryInsightLine i{width:18px;text-align:center;margin-top:3px;color:#5b7a63;font-size:14px}
+.pantryInsightLine.muted{color:var(--muted-text,#718177)}
+.ingAnnotated{white-space:normal!important}
+.ingLine{display:block;line-height:1.5}
+.ingLine.inHouse{color:#3f7a50}
+.ingLine em{font-style:normal;font-size:13px;font-weight:600;margin-left:6px;padding:1px 7px;border-radius:999px;background:#e3f4e7;color:#2f6b45;white-space:nowrap}
+.ingLine em i{font-size:11px}
+.ingSummary{display:block;margin:4px 0 2px;font-size:14px;font-weight:600;color:#86703b}
+.ingSummary.allHave{color:#3f7a50}
+body.dark-theme .pantryShareRow,body.dark-theme .pantryInsights{background:#29352d}
+body.dark-theme .pantryStats div{background:#1d241f}
+body.dark-theme .pantryShareText strong,body.dark-theme .pantryInsightsHead strong,body.dark-theme .pantryStats b,body.dark-theme .pantryInsightLine{color:#edf5ef}
+body.dark-theme .pantryShareText small,body.dark-theme .pantryStats span,body.dark-theme .pantryInsightLine.muted{color:#b8c6bc}
+body.dark-theme .pantryShareIcon,body.dark-theme .pantryInsightsHead i{background:#2d3a4f;color:#a9c2ec}
+body.dark-theme .pantrySwitch{background:#45524a}
+body.dark-theme .pantrySwitch:checked{background:#4f8a62}
+body.dark-theme .ingLine.inHouse{color:#9fd3ac}
+body.dark-theme .ingLine em{background:#34443a;color:#cfe6d5}
+body.dark-theme .ingSummary{color:#d8c79c}
+body.dark-theme .ingSummary.allHave{color:#9fd3ac}
+body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f08f8f}
+</style>
+<script id="proGate">
+/* Pro-status en slotjes.
+   Er is nog geen betaling gekoppeld: iedereen heeft Pro, tenzij je het in de Testinstellingen uitzet.
+   Testinstellingen tevoorschijn halen: Meer → Over de app → tik 5× op het versienummer. */
+(function(){
+  var MODE_KEY="boodschappenProTestMode", DEV_KEY="boodschappenDevSettings";
+  function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+
+  // Later vervangen door de echte Pro-status uit Firebase (door de server gezet na een aankoop).
+  window.isProActive=function(){return get(MODE_KEY)!=="free";};
+
+  /* ---------- Pro in de familie ----------
+     Wie Pro heeft, zet zichzelf in households/{id}/proMembers/{uid}.
+     Familieleden zonder Pro krijgen daardoor toegang tot de gedeelde voorraad (niet tot weekplanner en budget).
+     Let op: bij echte betalingen hoort alleen de server dit te mogen schrijven. */
+  var FAM_TEST_KEY="boodschappenFamilyProTest";
+  var proMembers={},pmRef=null,pmHid="",pmUid="",lastPublished="";
+  function uidNow(){try{return auth&&auth.currentUser?auth.currentUser.uid:"";}catch(e){return "";}}
+  function hidNow(){try{return (typeof currentHouseholdId!=="undefined"&&currentHouseholdId)?String(currentHouseholdId):"";}catch(e){return "";}}
+  window.familyHasPro=function(){
+    if(get(FAM_TEST_KEY)==="1")return true;
+    var me=uidNow();return Object.keys(proMembers).some(function(u){return u!==me&&proMembers[u]===true;});
+  };
+  window.hasPantryAccess=function(){return window.isProActive()||window.familyHasPro();};
+  window.isFamilyMemberPro=function(uid){return uid===uidNow()?window.isProActive():proMembers[uid]===true;};
+  function proNameLookup(){
+    window.familyProName="";
+    if(get(FAM_TEST_KEY)==="1"){window.familyProName="je familie";return;}
+    var me=uidNow(),u=Object.keys(proMembers).find(function(x){return x!==me&&proMembers[x]===true;});
+    if(!u||typeof database==="undefined")return;
+    database.ref("users/"+u+"/name").once("value").then(function(sn){window.familyProName=String(sn.val()||"").trim()||"je familie";try{if(window.__refreshPantryUI)window.__refreshPantryUI();}catch(e){}}).catch(function(){});
+  }
+  function syncFamilyPro(){
+    var h=hidNow(),u=uidNow();
+    if(h!==pmHid||u!==pmUid){
+      if(pmRef){try{pmRef.off("value");}catch(e){}}pmRef=null;proMembers={};pmHid=h;pmUid=u;lastPublished="";
+      if(h&&u&&typeof database!=="undefined"){
+        pmRef=database.ref("households/"+h+"/proMembers");
+        pmRef.on("value",function(sn){proMembers=sn.val()||{};proNameLookup();apply();try{if(window.__refreshPantryUI)window.__refreshPantryUI();}catch(e){}},function(){proMembers={};});
+      }
+    }
+    // Eigen Pro-status doorgeven aan de familie
+    if(h&&u&&typeof database!=="undefined"){
+      var want=window.isProActive()?"1":"0";
+      if(want!==lastPublished){
+        lastPublished=want;
+        var r=database.ref("households/"+h+"/proMembers/"+u);
+        (want==="1"?r.set(true):r.remove()).catch(function(e){console.warn("Pro-status voor familie niet opgeslagen:",e);});
+      }
+    }
+  }
+  setInterval(function(){try{syncFamilyPro();}catch(e){}},3000);
+  setTimeout(function(){try{syncFamilyPro();}catch(e){}},1200);
+
+  var CARDS=[
+    {card:".proPlannerLaunch",btn:".proPlannerLaunch .proPlannerButton",panel:"smartPlannerPanel",fn:"toggleSmartPlanner",label:'Open weekplanner <i class="fa-solid fa-chevron-down"></i>'},
+    {card:".budgetPlannerLaunch",btn:".budgetLaunchButton",panel:"budgetPlannerPanel",fn:"toggleBudgetPlanner",label:'Open budgetplanner <i class="fa-solid fa-chevron-down"></i>'},
+    {card:".pantryLaunch",btn:".pantryLaunchButton",panel:"pantryPanel",fn:"togglePantry",label:'Open voorraad <i class="fa-solid fa-chevron-down"></i>',family:true}
+  ];
+
+  // Openen van een Pro-onderdeel zonder Pro → ontgrendelscherm
+  CARDS.forEach(function(c){
+    var orig=window[c.fn];if(typeof orig!=="function")return;
+    window[c.fn]=function(event){
+      if(!(c.family?window.hasPantryAccess():window.isProActive())){if(event&&event.stopPropagation)event.stopPropagation();window.showProUpsell();return;}
+      return orig.apply(this,arguments);
+    };
+  });
+
+  function hasData(){
+    try{
+      var p=JSON.parse(get("boodschappen_pantry_v1")||"{}"),w=JSON.parse(get("boodschappen_pro_smart_weekplanner_v1")||"[]"),b=JSON.parse(get("boodschappen_budgetplanner_v1")||"{}");
+      return (p.items&&p.items.length)||(Array.isArray(w)&&w.length)||(b.expenses&&b.expenses.length)||b.budget;
+    }catch(e){return false;}
+  }
+
+  window.showProUpsell=function(){
+    if(typeof familyDialogBase!=="function")return;
+    var ov=familyDialogBase("fa-crown","Ontgrendel Pro",
+      '<div class="proUpsell"><p class="familyDialogText">Haal meer uit je boodschappen met Pro.</p><ul>'+
+      '<li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span><strong>Slimme weekplanner</strong>Recepten kiezen en alle ingrediënten in één keer op je lijst.</span></li>'+
+      '<li><i class="fa-solid fa-wallet" aria-hidden="true"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de aanbiedingen bij jouw supermarkt.</span></li>'+
+      '<li><i class="fa-solid fa-cube" aria-hidden="true"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en delen met je familie.</span></li>'+
+      '</ul>'+(hasData()?'<p class="proUpsellNote"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Je gegevens blijven bewaard. Met Pro kun je ze meteen weer gebruiken.</p>':'')+
+      '<p class="proUpsellTest">Testmodus: er is nog geen betaling gekoppeld.</p></div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="later">Niet nu</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="on">Pro aanzetten</button>');
+    ov.classList.add("proUpsellDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var close=function(){closeFamilyDialog(ov);};
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    ov.querySelector('[data-b="later"]').onclick=close;
+    ov.querySelector('[data-b="on"]').onclick=function(){set(MODE_KEY,null);close();apply();note("Pro staat aan (testmodus).");};
+  };
+
+  function note(msg){
+    if(window.__pantryApi&&window.__pantryApi.toast){window.__pantryApi.toast(msg);return;}
+  }
+
+  function apply(){
+    var free=!window.isProActive();
+    document.body.classList.toggle("proFree",free);
+    CARDS.forEach(function(c){
+      var card=document.querySelector(c.card),btn=document.querySelector(c.btn),panel=document.getElementById(c.panel);
+      var locked=c.family?!window.hasPantryAccess():free;
+      var wasLocked=card&&card.classList.contains("proLockedCard");
+      if(card){card.classList.toggle("proLockedCard",locked);card.classList.toggle("viaFamilyPro",!!c.family&&free&&!locked);}
+      if(locked&&panel)panel.hidden=true;
+      if(btn)btn.innerHTML=locked?'<i class="fa-solid fa-lock" aria-hidden="true"></i> Ontgrendel met Pro':((panel&&!panel.hidden&&!wasLocked)?btn.innerHTML:c.label);
+    });
+    var ft=document.getElementById("devFamProToggle"),frow=document.querySelector(".devFamProToggleRow");
+    if(ft)ft.classList.toggle("on",get(FAM_TEST_KEY)==="1");
+    if(frow)frow.setAttribute("aria-checked",String(get(FAM_TEST_KEY)==="1"));
+    var t=document.getElementById("devProToggle"),row=document.querySelector(".devProToggleRow");
+    if(t)t.classList.toggle("on",!free);
+    if(row)row.setAttribute("aria-checked",String(!free));
+    try{if(window.__renderExpiryCard)window.__renderExpiryCard();}catch(e){}
+  }
+  window.__applyProState=apply;
+
+  window.toggleProTestMode=function(event){
+    if(event)event.stopPropagation();
+    var free=window.isProActive();
+    set(MODE_KEY,free?"free":null);
+    apply();
+    note(free?"Je ziet de app nu zonder Pro.":"Pro staat weer aan.");
+  };
+
+  // Testinstellingen verschijnen na 5× tikken op het versienummer
+  function showDev(){var b=document.getElementById("devSettingsBlock");if(b)b.hidden=get(DEV_KEY)!=="1";}
+  window.toggleFamilyProTest=function(event){
+    if(event)event.stopPropagation();
+    var on=get(FAM_TEST_KEY)!=="1";set(FAM_TEST_KEY,on?"1":null);proNameLookup();apply();
+    try{if(window.__refreshPantryUI)window.__refreshPantryUI();}catch(e){}
+    note(on?"Test: iemand in je familie heeft nu Pro.":"Test: niemand in je familie heeft Pro.");
+  };
+  window.hideDevSettings=function(event){
+    if(event)event.stopPropagation();
+    set(DEV_KEY,null);set(MODE_KEY,null);set(FAM_TEST_KEY,null);showDev();apply();
+    note("Testinstellingen verborgen. Pro staat weer aan.");
+  };
+  // Testinstellingen: 5× tikken óf 2 seconden ingedrukt houden op het versienummer.
+  // Eén luisteraar op het hele document (capture), zodat het altijd werkt, ook als
+  // andere onderdelen tikken tegenhouden. Snelle dubbeltikken worden door de app
+  // geblokkeerd tegen inzoomen; daarom tellen we touchend/pointerup zelf.
+  var taps=0,tapTimer=null,lastAt=0,holdTimer=null;
+  function onVersion(e){return e&&e.target&&e.target.closest&&e.target.closest(".aboutInfoVersion");}
+  function enableDev(){
+    taps=0;clearTimeout(holdTimer);
+    if(get(DEV_KEY)==="1"){note("De testinstellingen staan al aan. Je vindt ze onderaan Instellingen.");return;}
+    set(DEV_KEY,"1");showDev();
+    note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");
+    try{if(navigator.vibrate)navigator.vibrate(30);}catch(_){}
+  }
+  function countTap(e){
+    if(!onVersion(e))return;
+    var now=Date.now();if(now-lastAt<80)return;lastAt=now;
+    clearTimeout(holdTimer);
+    taps++;clearTimeout(tapTimer);tapTimer=setTimeout(function(){taps=0;},3000);
+    if(taps>=5){enableDev();return;}
+    if(taps>=2&&get(DEV_KEY)!=="1")note("Nog "+(5-taps)+" keer tikken voor de testinstellingen.");
+  }
+  function startHold(e){
+    if(!onVersion(e))return;
+    clearTimeout(holdTimer);holdTimer=setTimeout(enableDev,2000);
+  }
+  function cancelHold(){clearTimeout(holdTimer);}
+  document.addEventListener("touchend",countTap,{capture:true,passive:true});
+  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")countTap(e);},true);
+  document.addEventListener("touchstart",startHold,{capture:true,passive:true});
+  document.addEventListener("pointerdown",function(e){if(e.pointerType!=="touch")startHold(e);},true);
+  ["touchmove","touchcancel","pointercancel"].forEach(function(t){document.addEventListener(t,cancelHold,{capture:true,passive:true});});
+  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")cancelHold();},true);
+  document.addEventListener("touchend",cancelHold,{capture:true,passive:true});
+  function bindVersion(){}
+  // Tik op een vergrendelde kaart → ontgrendelscherm
+  document.addEventListener("click",function(e){
+    var c=e.target.closest&&e.target.closest(".proLockedCard");
+    if(c&&c.classList.contains("proLockedCard")){e.stopPropagation();e.preventDefault();window.showProUpsell();}
+  },true);
+  function init(){bindVersion();showDev();apply();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<style id="pro-gate-style">
+.familyProBadge{margin-left:8px;vertical-align:2px}
+.viaFamilyPro > div > p::after{content:"Gedeeld via de Pro van je familie";display:block;margin-top:6px;font-size:13px;font-weight:600;color:#3f7a50}
+body.dark-theme .viaFamilyPro > div > p::after{color:#9fd3ac}
+.pantryShareRow.viaFamily{cursor:default}
+.pantryShareRow.viaFamily .pantryShareIcon{background:#fff2d0;color:#9a6f12}
+body.dark-theme .pantryShareRow.viaFamily .pantryShareIcon{background:#3a3424;color:#f0c065}
+html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;border-radius:10px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(63,91,69,.12)}
+.proUnlockHero{display:none;margin:12px auto 0;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+body.proFree .proUnlockHero{display:inline-flex}
+.proLockedCard > i:first-child{position:relative;overflow:visible}
+.proLockedCard > i:first-child::after{content:"\f023";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#3F5B45;color:#fff;font-size:9px;line-height:18px;text-align:center;border:2px solid var(--card-bg,#fff)}
+.proLockedCard strong,.proLockedCard p{opacity:.75}
+html body #proMenuSub .proLockedCard .proPlannerButton,html body #proMenuSub .proLockedCard .budgetLaunchButton{background:#fff2d0!important;color:#7a5a12!important}
+.proUpsell ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.proUpsell li{display:flex;gap:12px;align-items:flex-start}
+.proUpsell li i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#e3f4e7;color:#42634b;display:flex;align-items:center;justify-content:center;font-size:17px}
+.proUpsell li span{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.4;color:var(--muted-text,#66766c)}
+.proUpsell li strong{font-size:16px;color:var(--text-color,#2f4a38)}
+.proUpsellNote{margin:14px 0 0;padding:10px 12px;border-radius:12px;background:#f1f6f2;font-size:14px;line-height:1.4;color:#3f6b4b}
+.proUpsellTest{margin:10px 0 0;font-size:13px;color:#a07a2a}
+.devSettingsTitle{margin-top:18px!important}
+.devProToggleRow span small{display:block;font-size:13px!important;font-weight:400!important;color:var(--muted-text,#718177);margin-top:2px;white-space:normal}
+.devProToggleRow > span:not(.settingsToggle){flex:1;display:flex;flex-direction:column;text-align:left}
+body.dark-theme .proLockedCard > i:first-child::after{background:#4f8a62;border-color:#222a24}
+body.dark-theme html body #proMenuSub .proLockedCard .proPlannerButton{background:#3a3424!important;color:#f5e6c0!important}
+body.dark-theme .proUpsell li i{background:#34443a;color:#cfe6d5}
+body.dark-theme .proUpsell li strong{color:#edf5ef}
+body.dark-theme .proUpsell li span{color:#b8c6bc}
+body.dark-theme .proUpsellNote{background:#29352d;color:#9fd3ac}
+body.dark-theme .proLockedCard .proPlannerButton,body.dark-theme .proLockedCard .budgetLaunchButton{background:#3a3424!important;color:#f5e6c0!important}
+</style>
+<style id="list-calm-layout">
+/* Lijst: groeit mee met de inhoud en scrollt pas als hij vol is */
+html body .app:not(.more-active):not(.overview-active) #list{
+  height:auto!important;
+  min-height:0!important;
+  max-height:min(560px,max(200px,calc(100dvh - 392px)))!important;
+}
+@media (max-height:700px){html body .app:not(.more-active):not(.overview-active) #list{max-height:min(420px,max(170px,calc(100dvh - 360px)))!important}}
+/* Knop 'Lijst opslaan' staat nu in het ⋮-menu */
+html body .saveListMainWrap{display:none!important}
+.listOptionDivider{height:1px;background:rgba(63,91,69,.12);margin:8px 12px}
+body.dark-theme .listOptionDivider{background:rgba(255,255,255,.1)}
+/* Statusregel: klein en rustig */
+html body #status{background:transparent!important;box-shadow:none!important;border:0!important;min-height:0!important;padding:8px 14px 4px!important;margin:4px auto 0!important;font-size:13px!important;font-weight:600!important;color:#6f8a76!important;text-align:center!important;display:block!important;line-height:1.4!important}
+html body #status i{font-size:12px!important;margin-right:5px!important}
+html body #status span{display:inline!important;font-size:13px!important;font-weight:500!important;margin:0!important}
+html body #status span::before{content:" · "}
+html body #status.statusWarn{color:#b5651d!important}
+/* Alleen op het scherm Lijst tonen */
+html body .app.overview-active #status,html body .app.more-active #status,html body .app.overview-active .frequentStrip,html body .app.more-active .frequentStrip{display:none!important}
+body.dark-theme #status{color:#9fb8a6!important;background:transparent!important}
+/* Vaak gekocht */
+.frequentStrip{margin:12px 2px 0}
+.frequentStrip[hidden]{display:none!important}
+.frequentTitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-text,#718177);margin:0 4px 8px}
+.frequentChips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none}
+.frequentChips::-webkit-scrollbar{display:none}
+.frequentChip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px 0 10px;border:1px solid #dfe9e2;border-radius:999px;background:#fff;color:#2f4a38;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+.frequentChip .plus{font-weight:700;color:#3f7a50}
+.frequentChip .fIcon{font-size:17px;line-height:1;display:inline-flex}
+.frequentChip .fIcon svg{width:20px;height:20px}
+.frequentChip:active{transform:scale(.97)}
+body.dark-theme .frequentChip{background:#222a24;border-color:#38453b;color:#edf5ef}
+body.dark-theme .frequentChip .plus{color:#9fd3ac}
+</style>
+<script id="list-calm-logic">
+(function(){
+  /* Waarschuwingen in de statusregel oranje kleuren */
+  var st=document.getElementById("status");
+  if(st){var mark=function(){var t=st.textContent||"";st.classList.toggle("statusWarn",/⚠|niet|Geen|kon/i.test(t)&&!/Bijgewerkt/.test(t));};
+    new MutationObserver(mark).observe(st,{childList:true,characterData:true,subtree:true});mark();}
+
+  /* Vaak gekocht: producten uit je geschiedenis en opgeslagen lijsten */
+  var cache=null,cacheAt=0,busy=false;
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+  async function load(){
+    if(cache&&Date.now()-cacheAt<60000)return cache;
+    if(busy)return cache||[];busy=true;
+    var sources=[];
+    try{if(typeof readOverviewHistory==="function"){var h=await readOverviewHistory();sources=sources.concat((h||[]).map(function(x){return x.items||[];}));}}catch(e){}
+    try{if(typeof readSavedLists==="function"){var sv=await readSavedLists();sources=sources.concat((sv||[]).map(function(x){return x.items||[];}));}}catch(e){}
+    var counts={};
+    sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;(counts[k]=counts[k]||{text:t,n:0}).n++;});});
+    cache=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n||a.text.localeCompare(b.text,"nl");});
+    cacheAt=cache.length?Date.now():0;busy=false;return cache;   // lege uitkomst niet vasthouden
+  }
+  function onList(){var m={};try{(Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)m[norm(x.text)]=1;});}catch(e){}return m;}
+  function icon(t){try{return productIconMarkup(getProductIcon(t));}catch(e){return "";}}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function onListView(){var a=document.querySelector(".app");return a&&!a.classList.contains("overview-active")&&!a.classList.contains("more-active");}
+  async function render(){
+    var box=document.getElementById("frequentStrip");if(!box)return;
+    var items=[];try{items=Array.isArray(boodschappen)?boodschappen:[];}catch(e){}
+    if(!onListView()||items.length>5){box.hidden=true;return;}
+    var all=await load(),have=onList();
+    var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,8);
+    if(!pick.length){box.hidden=true;return;}
+    box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+pick.map(function(p){
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
+    box.hidden=false;
+    box.querySelectorAll(".frequentChip").forEach(function(b){b.onclick=async function(e){
+      e.stopPropagation();var inp=document.getElementById("product");if(!inp||typeof addProduct!=="function")return;
+      inp.value=b.getAttribute("data-t");b.disabled=true;await addProduct();};});
+    // Alleen tonen als het past boven de navigatie
+    requestAnimationFrame(function(){var nav=document.querySelector(".bottomNav"),stEl=document.getElementById("status");
+      if(!nav)return;var limit=nav.getBoundingClientRect().top-(stEl?stEl.offsetHeight:0)-4;
+      if(box.getBoundingClientRect().bottom>limit)box.hidden=true;});
+  }
+  var t=null;function later(){clearTimeout(t);t=setTimeout(render,120);}
+  if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);later();return r;};}
+  ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){if(typeof window[fn]==="function"){var of=window[fn];window[fn]=function(){var r=of.apply(this,arguments);later();return r;};}});
+  window.addEventListener("resize",later);
+  setTimeout(render,1500);
+})();
+</script>
 </body>
 
 <style id="overview-dashboard-final">
@@ -13740,10 +15469,11 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
 
   window.toggleListOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
-    var p=panel('listOptionsPanel');
+    // Het menu bevat alleen nog sorteren: open de sorteeropties meteen.
+    var p=panel('sortOptionsPanel');
     var open=p ? !p.classList.contains('open') : false;
-    setPanel('sortOptionsPanel', false);
-    setPanel('listOptionsPanel', open);
+    setPanel('listOptionsPanel', false);
+    setPanel('sortOptionsPanel', open);
     if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
       window.AndroidApp.setMenuDimmed(open);
     }
@@ -13786,6 +15516,7 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
   window.closeSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('sortOptionsPanel', false);
+    var lb=panel('listOptionsButton'); if(lb) lb.setAttribute('aria-expanded','false');
     if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
       window.AndroidApp.setMenuDimmed(false);
     }
@@ -13803,15 +15534,16 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
             .localeCompare(String(b && (b.name ?? b.text) || ''),'nl',{sensitivity:'base'});
         });
       } else if(mode==='newest'){
+        // Oudere producten hebben geen tijdstip; die staan in volgorde van toevoegen, dus achteraan = nieuwst.
+        var pos=new Map(items.map(function(it,i){return [it,i];}));
         items.sort(function(a,b){
-          return Number((b && (b.createdAt ?? b.addedAt)) || 0) -
-                 Number((a && (a.createdAt ?? a.addedAt)) || 0);
+          var ta=Number((a && (a.createdAt ?? a.addedAt)) || 0), tb=Number((b && (b.createdAt ?? b.addedAt)) || 0);
+          return (tb-ta) || (pos.get(b)-pos.get(a));
         });
       } else if(mode==='category'){
+        var cat=function(it){ return (typeof productAisle==='function') ? productAisle(String(it && (it.name ?? it.text) || '')) : 99; };
         items.sort(function(a,b){
-          var ca=String(a && a.category || 'Overig');
-          var cb=String(b && b.category || 'Overig');
-          return ca.localeCompare(cb,'nl',{sensitivity:'base'}) ||
+          return (cat(a)-cat(b)) ||
             String(a && (a.name ?? a.text) || '').localeCompare(
               String(b && (b.name ?? b.text) || ''),'nl',{sensitivity:'base'});
         });
