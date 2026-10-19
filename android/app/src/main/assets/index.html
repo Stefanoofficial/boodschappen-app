@@ -5352,7 +5352,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <button type="button" class="pantryClearAll" onclick="event.stopPropagation();clearWholePantry()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Hele voorraad wissen</button>
     </section>
     <div class="proFeatureCard assistantLaunch" onclick="toggleAssistant(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAssistant(event)}">
-      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Tips op basis van wat je vaak koopt: wat bijna op is, wat je vergeet en wat in de aanbieding is.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Tips op basis van wat je vaak koopt en wat je in huis hebt: wat bijna op is, wat je vergeet, wat in de aanbieding is en wat je vandaag kunt koken.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="assistantPanel" class="budgetPlannerPanel assistantPanel" hidden aria-label="Persoonlijke assistent" onclick="event.stopPropagation()">
       <div class="budgetPanelHeading"><div><h3>Je assistent</h3><p>Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten.</p></div></div>
@@ -5361,6 +5361,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="assistSettings">
         <label class="assistSettingRow"><span><strong>Bijna op</strong><small>Op basis van hoe vaak je iets koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="soon" onchange="setAssistantSetting('soon',this.checked)"></label>
         <label class="assistSettingRow"><span><strong>Niet vergeten</strong><small>Producten die je meestal samen koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="forgot" onchange="setAssistantSetting('forgot',this.checked)"></label>
+        <label class="assistSettingRow"><span><strong>Wat eten we vandaag?</strong><small>Recepten met wat je in huis hebt, vooral wat bijna over de datum gaat.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="cook" onchange="setAssistantSetting('cook',this.checked)"></label>
         <label class="assistSettingRow"><span><strong>Aanbiedingen</strong><small id="assistantDealNote">Op producten die je vaak koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="deals" onchange="setAssistantSetting('deals',this.checked)"></label>
       </div>
       <p class="budgetPrivacyNote">De tips worden op je eigen telefoon berekend uit je boodschappengeschiedenis. Alleen voor aanbiedingen wordt de productnaam opgezocht via PrijsProfeet.</p>
@@ -5651,8 +5652,11 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-bolt"></i><span>Producten die je vaak koopt snel opnieuw toevoegen.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en recepten. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget bijhouden en aanbiedingen bekijken. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
     </div>
     <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
@@ -5685,15 +5689,15 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 18 oktober 2026</p>
+      <p><strong>Versie:</strong> 19 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
-        <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
-        <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
-        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard.</li>
+        <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen.</li>
+        <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
+        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
+        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard. Ook een kopie van je laatste boodschappenlijst wordt op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt die kopie gewist.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
@@ -5712,7 +5716,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 19 oktober 2026.</p>
     </div>
   </div>
 
@@ -5724,17 +5728,19 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 18 oktober 2026</p>
+      <p><strong>Versie:</strong> 19 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
       <h4>4. Barcodescanner</h4><p>De scanner is een hulpmiddel om producten sneller te herkennen. Controleer altijd of het juiste product en aantal op je lijst staan.</p>
       <h4>5. Recepten, prijzen en aanbiedingen</h4><p>Aanbiedingen worden geleverd door PrijsProfeet en zijn bedoeld als hulpmiddel. Prijzen en acties kunnen afwijken van die in de winkel. Bekijk bij twijfel altijd de prijs in de winkel. Recepten en hoeveelheden zijn suggesties.</p>
-      <h4>6. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
-      <h4>7. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
-      <h4>8. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
-      <h4>9. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 18 oktober 2026.</p>
+      <h4>6. Pro-functies</h4><p>Sommige functies zijn onderdeel van Mijn Boodschappen Pro, zoals de weekplanner, de budgetplanner, voorraadbeheer en de persoonlijke assistent. Op dit moment is er geen betaald abonnement nodig. Als Pro later betaald wordt, maken we de prijs en voorwaarden vooraf bekend. Gegevens die je al hebt ingevoerd, blijven bewaard. Heeft iemand in je familie Pro, dan kunnen familieleden de gedeelde voorraad gebruiken.</p>
+      <h4>7. Tips van de assistent</h4><p>De tips van de persoonlijke assistent zijn suggesties op basis van je eerdere boodschappen. Ze zijn niet altijd juist; jij bepaalt zelf wat je op je lijst zet.</p>
+      <h4>8. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
+      <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
+      <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
+      <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
+      <p class="legalSmall">Laatst bijgewerkt: 19 oktober 2026.</p>
     </div>
   </div>
 
@@ -5771,8 +5777,25 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
+      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
       <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Tik op een product om het aan te passen of te verwijderen. Is iets op, dan zet je het met één tik op je lijst.</p>
+      <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
+      <p>De assistent geeft tips over wat waarschijnlijk bijna op is, wat je meestal samen koopt, welke producten die je vaak koopt in de aanbieding zijn en wat je vandaag kunt koken met wat je in huis hebt. Bij <strong>Wat eten we vandaag?</strong> zet <strong>Plan voor vandaag</strong> het recept in je weekplanner en de ontbrekende ingrediënten op je lijst. Hij leert van je boodschappenrondes, dus na een paar keer "Bewaren en nieuwe lijst" verschijnen de eerste tips. Je ziet de belangrijkste tip op het Overzicht.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-crown"></i><span>Pro en je familie</span></div>
+      <p>Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
@@ -13503,6 +13526,10 @@ window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
 };
 window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));const st=document.getElementById("smartPlannerStatus");if(st)st.textContent="";render()};
 window.__refreshPlannerUI=function(){try{render();}catch(e){console.warn(e);}};
+// Voor de persoonlijke assistent: recepten lezen en een maaltijd inplannen
+window.__plannerRecipes=recipes;
+window.__plannerMeals=function(){return read();};
+window.__plannerAddMeal=function(day,meal,ingredients){const items=read();items.push({id:Date.now(),day:day,meal:meal,ingredients:ingredients.slice()});items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);try{render();}catch(e){}};
 function render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
  const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
@@ -15491,7 +15518,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
   }
   function nice(s){s=String(s||"").trim();return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
   function isPro(){return !window.isProActive||window.isProActive();}
-  function settings(){var s=get(SET_KEY,{});return {soon:s.soon!==false,forgot:s.forgot!==false,deals:s.deals!==false};}
+  function settings(){var s=get(SET_KEY,{});return {soon:s.soon!==false,forgot:s.forgot!==false,deals:s.deals!==false,cook:s.cook!==false};}
   function dismissed(id){var m=get(DISMISS_KEY,{});return m[id]&&m[id]>Date.now();}
   function dismiss(id,days){var m=get(DISMISS_KEY,{});var now=Date.now();Object.keys(m).forEach(function(k){if(m[k]<now)delete m[k];});m[id]=now+(days||3)*DAY;put(DISMISS_KEY,m);}
   function listItems(){try{return Array.isArray(boodschappen)?boodschappen:[];}catch(e){return [];}}
@@ -15610,6 +15637,44 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     return changed;
   }
 
+  /* ---------- 4. Wat eten we vandaag? ---------- */
+  var BASICS=/^(zout|peper|zout en peper|peper en zout|water|olie|olijfolie|zonnebloemolie|boter of olie om te bakken|kruiden)$/;
+  var DAYNAMES=["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"];
+  var cookSkip={};   // recepten die je met "Ander recept" hebt overgeslagen (deze sessie)
+  function ingName(line){try{return String(line).split("(")[0].split(",")[0].replace(/^\s*[\d.,½¼¾]+\s*(?:g|gr|gram|kg|ml|l|dl|cl|el|tl|blik(?:ken)?|pak(?:ken)?|zak(?:ken)?|bos(?:je)?|pot(?:je)?|stuks?|teentjes?|tenen|teen|plakjes?|snufje|scheutje|handje)?\.?\s+/i,"").trim();}catch(e){return String(line);}}
+  function cookTips(){
+    var recipes=window.__plannerRecipes,inHouse=window.__pantryInHouse,A=window.__pantryApi;
+    if(!Array.isArray(recipes)||!inHouse||!A||!window.__pantryRead)return [];
+    var pantry=window.__pantryRead().items.filter(function(i){return Number(i.qty)>0;});
+    if(!pantry.length)return [];
+    var planned={};try{(window.__plannerMeals()||[]).forEach(function(m){planned[norm(m.meal)]=1;});}catch(e){}
+    var out=[];
+    recipes.forEach(function(r){
+      if(planned[norm(r.name)]||cookSkip[r.id])return;
+      var lines=(r.ingredients||[]).filter(function(l){return !BASICS.test(norm(ingName(l)));});
+      if(!lines.length)return;
+      var have=0,soon=[],missing=[];
+      lines.forEach(function(l){
+        var hit=inHouse(l);
+        if(hit){have++;var d=A.daysUntil(hit.exp);if(d!=null&&d>=0&&d<=2&&soon.indexOf(hit)<0)soon.push(hit);}
+        else missing.push(l);
+      });
+      if(!have)return;
+      var share=have/lines.length;
+      if(!soon.length&&share<0.5)return;
+      var score=soon.length*5+share*3-missing.length*0.2;
+      var first=soon.sort(function(a,b){return A.daysUntil(a.exp)-A.daysUntil(b.exp);})[0];
+      var when=first?(A.daysUntil(first.exp)===0?"vandaag":A.daysUntil(first.exp)===1?"morgen":"over 2 dagen"):"";
+      out.push({id:"cook:"+r.id,type:"cook",prio:score,product:r.name,recipe:r,missing:missing,
+        title:"Wat eten we vandaag?",
+        text:(first?"Je "+first.name.toLowerCase()+" gaat "+when+" over de datum. Wat dacht je van "+r.name.toLowerCase()+"?":
+              "Je hebt "+have+" van de "+lines.length+" ingrediënten voor "+r.name.toLowerCase()+" al in huis.")+
+             (missing.length?" Nog nodig: "+missing.map(function(m){return ingName(m).toLowerCase();}).slice(0,4).join(", ")+(missing.length>4?" en meer":"")+".":" Je hebt alles al in huis!"),
+        action:"cook",urgent:!!first});
+    });
+    return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,1);
+  }
+
   /* ---------- Alle tips ---------- */
   var lastTips=[];
   async function computeTips(){
@@ -15618,22 +15683,25 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     if(s.forgot)tips=tips.concat(forgotTips(R));
     if(s.soon)tips=tips.concat(soonTips(R).slice(0,4));
     if(s.deals)tips=tips.concat(dealTipsFromCache(R));
+    if(s.cook)tips=tips.concat(cookTips());
     tips=tips.filter(function(t){return !dismissed(t.id);});
     // Eén tip per product
-    var seenP={};tips=tips.filter(function(t){var k=norm(t.product);if(seenP[k])return false;seenP[k]=1;return true;});
+    var seenP={};tips=tips.filter(function(t){var k=(t.type==="cook"?"recipe:":"")+norm(t.product);if(seenP[k])return false;seenP[k]=1;return true;});
     // Volgorde: eerst wat nu op je lijst ontbreekt, dan wat bijna op is, dan aanbiedingen
-    var order={forgot:0,soon:1,deal:2};
-    tips.sort(function(a,b){return order[a.type]-order[b.type]||b.prio-a.prio;});
+    var order={forgot:0,soon:1.5,deal:2,cook:1};
+    var rank=function(t){return t.type==="cook"&&t.urgent?-1:order[t.type];};
+    tips.sort(function(a,b){return rank(a)-rank(b)||b.prio-a.prio;});
     lastTips=tips;return tips;
   }
-  var ICON={soon:"fa-hourglass-half",forgot:"fa-lightbulb",deal:"fa-tag"};
+  var ICON={soon:"fa-hourglass-half",forgot:"fa-lightbulb",deal:"fa-tag",cook:"fa-utensils"};
   function tipHtml(t,compact){
     return '<div class="assistTip type-'+t.type+'" data-id="'+esc(t.id)+'">'+
       '<span class="assistTipIcon"><i class="fa-solid '+ICON[t.type]+'" aria-hidden="true"></i></span>'+
       '<div class="assistTipBody"><strong>'+esc(t.title)+'</strong><span>'+esc(t.text)+'</span>'+
       '<div class="assistTipActions">'+
-        (t.action?'<button type="button" class="assistAdd" data-p="'+esc(t.product)+'"><span class="plus">+</span> '+esc(t.type==="forgot"?t.action:"Op lijst")+'</button>':(t.onListAlready?'<span class="assistOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Staat op je lijst</span>':''))+
-        (compact?'<button type="button" class="assistMore">Meer tips</button>':'')+
+        (t.type==="cook"?'<button type="button" class="assistAdd assistCook"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i> Plan voor vandaag</button><button type="button" class="assistMore assistRecipe">Recept bekijken</button><button type="button" class="assistMore assistOther">Ander recept</button>':
+        t.action?'<button type="button" class="assistAdd" data-p="'+esc(t.product)+'"><span class="plus">+</span> '+esc(t.type==="forgot"?t.action:"Op lijst")+'</button>':(t.onListAlready?'<span class="assistOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Staat op je lijst</span>':''))+
+        (compact&&t.type!=="cook"?'<button type="button" class="assistMore assistMoreTips">Meer tips</button>':'')+
       '</div></div>'+
       '<button type="button" class="assistDismiss" aria-label="Tip verbergen"><span class="stepIcon plus" aria-hidden="true"></span></button>'+
     '</div>';
@@ -15642,7 +15710,21 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     ["click","pointerdown","touchstart"].forEach(function(ev){box.addEventListener(ev,function(e){if(e.target.closest("button"))e.stopPropagation();});});
     box.querySelectorAll(".assistTip").forEach(function(el){
       var id=el.getAttribute("data-id");
-      var add=el.querySelector(".assistAdd"),dis=el.querySelector(".assistDismiss"),more=el.querySelector(".assistMore");
+      var add=el.querySelector(".assistAdd:not(.assistCook)"),dis=el.querySelector(".assistDismiss"),more=el.querySelector(".assistMoreTips");
+      var tip=lastTips.find(function(x){return x.id===id;});
+      var cook=el.querySelector(".assistCook"),rec=el.querySelector(".assistRecipe"),oth=el.querySelector(".assistOther");
+      if(cook&&tip)cook.onclick=async function(e){
+        e.stopPropagation();cook.disabled=true;
+        var r=tip.recipe,day=DAYNAMES[new Date().getDay()];
+        try{if(window.__plannerAddMeal)window.__plannerAddMeal(day,r.name,r.ingredients);}catch(err){console.warn(err);}
+        var n=0;
+        try{if(tip.missing.length&&window.__pantryApi)n=await window.__pantryApi.addNamesToShoppingList(tip.missing.map(function(m){return {name:m};}));}catch(err){}
+        dismiss(id,30);
+        toast(esc(r.name)+" staat in je weekplanner voor "+day.toLowerCase()+"."+(n?" "+n+(n===1?" ingrediënt":" ingrediënten")+" op je lijst gezet.":""));
+        after();
+      };
+      if(rec&&tip)rec.onclick=function(e){e.stopPropagation();try{if(window.openRecipeSheet)window.openRecipeSheet(tip.recipe.id);}catch(err){}};
+      if(oth&&tip)oth.onclick=function(e){e.stopPropagation();cookSkip[tip.recipe.id]=1;el.classList.add("leaving");setTimeout(after,180);};
       if(add)add.onclick=async function(e){
         e.stopPropagation();add.disabled=true;var name=add.getAttribute("data-p");
         try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:name}]);}catch(err){}
@@ -15732,6 +15814,9 @@ body.dark-theme .overview-new-assist{background:#3a3150!important;color:#cbb8f5!
 .type-soon .assistTipIcon{background:#fff2d0;color:#9a6f12}
 .type-forgot .assistTipIcon{background:#efe7ff;color:#6a4fb3}
 .type-deal .assistTipIcon{background:#ffe3e3;color:#b04545}
+.type-cook .assistTipIcon{background:#e3f4e7;color:#2f6b45}
+body.dark-theme .type-cook .assistTipIcon{background:#34443a;color:#9fd3ac}
+.assistCook i{margin-right:4px}
 .assistTipBody{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .assistTipBody strong{font-size:16px;font-weight:600;line-height:1.3;color:var(--text-color,#2f4a38)}
 .assistTipBody > span{font-size:14px;line-height:1.4;color:var(--muted-text,#66766c)}
