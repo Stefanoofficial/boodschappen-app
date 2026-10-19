@@ -7061,7 +7061,7 @@ async function logoutFromMenu() {
     const status = document.getElementById("status");
     if (status) status.innerText = "";
 
-    await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
   } catch(error) {
     explicitLogoutInProgress = false;
     await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation");
@@ -10825,7 +10825,7 @@ async function register() {
 
     // Een nieuw Firebase-account wordt automatisch ingelogd.
     // Direct uitloggen voorkomt dat de gebruiker onverwacht meteen binnenkomt.
-    await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
     registrationInProgress = false;
 
     document.getElementById("registerName").value = "";
@@ -10844,7 +10844,7 @@ async function register() {
     // newly created account unexpectedly signed in.
     try {
       if (auth.currentUser) {
-        await auth.signOut();
+        try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
       }
     } catch (signOutError) {
       console.error("Uitloggen na registratiefout mislukt:", signOutError);
@@ -11646,22 +11646,31 @@ async function refreshOverviewGreeting(){
 
   var name = "";
   var user = (typeof auth !== "undefined" && auth) ? auth.currentUser : null;
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem("boodschappenGreetingName") || "null"); } catch (_) {}
 
   if (user) {
     if (__overviewNameCacheUid === user.uid && __overviewNameCache) {
       name = __overviewNameCache;
     } else {
+      // Toon direct de bekende naam, zodat de begroeting niet verspringt
+      var quick = (stored && stored.uid === user.uid && stored.name) ? stored.name : String(user.displayName || "").trim();
+      if (quick) el.textContent = greeting + ", " + quick + " 👋";
       try {
         var snap = await database.ref("users/" + user.uid + "/name").once("value");
         name = String(snap.val() || "").trim();
       } catch (_) {}
       if (!name) name = String(user.displayName || "").trim();
+      if (!name && stored && stored.uid === user.uid) name = stored.name || "";
       __overviewNameCacheUid = user.uid;
       __overviewNameCache = name;
+      try { if (name) localStorage.setItem("boodschappenGreetingName", JSON.stringify({ uid: user.uid, name: name })); } catch (_) {}
     }
   } else {
     __overviewNameCacheUid = "";
     __overviewNameCache = "";
+    // Tijdens het opstarten is het account nog niet geladen: gebruik de laatst bekende naam
+    if (stored && stored.name) name = stored.name;
   }
 
   el.textContent = name ? greeting + ", " + name + " 👋" : greeting + " 👋";
@@ -11682,7 +11691,7 @@ async function updateOverviewView(){
   } catch (_) {}
   var history=await readOverviewHistory();
   var hs=document.getElementById("overviewHistorySummary");
-  if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk je vorige boodschappen.";
+  if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk wat je eerder hebt gekocht.";
   if(typeof updateOverviewSavedLists==="function") await updateOverviewSavedLists();
   await updateOverviewDashboard();
 }
