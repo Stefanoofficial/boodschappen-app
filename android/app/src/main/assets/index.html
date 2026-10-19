@@ -5619,7 +5619,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.7</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.9</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -5740,7 +5740,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te laden. Je gewone boodschappenlijst blijft daarbij behouden.</p>
+      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
@@ -5750,7 +5750,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
-      <p>Gebruik de lijstopties om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+      <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
@@ -5785,6 +5785,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
   <div class="list" id="list">
     <div id="listProgress" class="listProgress" aria-live="polite"></div>
   </div>
+
+  <div id="frequentStrip" class="frequentStrip" hidden></div>
 
   <div class="saveListMainWrap">
     <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
@@ -5862,10 +5864,13 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 
   <div id="sortOptionsPanel" class="listOptionsPanel sortOptionsPanel" aria-hidden="true">
     <div class="listOptionsPanelInner">
-      <div class="listOptionTitle">Lijst sorteren</div>
+      <div class="listOptionTitle">Sorteren</div>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('alpha')"><i class="fa-solid fa-arrow-down-a-z"></i><span>Alfabetisch</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('category')"><i class="fa-solid fa-layer-group"></i><span>Per categorie</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('newest')"><i class="fa-solid fa-clock"></i><span>Nieuwste eerst</span></button>
+      <div class="listOptionDivider" aria-hidden="true"></div>
+      <div class="listOptionTitle">Bewaren</div>
+      <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
     </div>
   </div>
 
@@ -7279,7 +7284,15 @@ function showSaveToast(name) {
   const saveWrap = document.querySelector('.saveListMainWrap');
   const saveBtn = document.querySelector('.saveListMainBtn');
   document.body.appendChild(toast);
-  if (saveBtn) {
+  const navEl = document.querySelector('.bottomNav');
+  if (saveBtn && !saveBtn.offsetParent) {
+    const navTop = navEl ? navEl.getBoundingClientRect().top : window.innerHeight - 90;
+    toast.style.left = '16px';
+    toast.style.width = 'calc(100% - 32px)';
+    toast.style.top = (navTop - 72) + 'px';
+    toast.style.height = '58px';
+    toast.style.borderRadius = '16px';
+  } else if (saveBtn) {
     const rect = saveBtn.getBoundingClientRect();
     toast.style.left = rect.left + 'px';
     toast.style.top = rect.top + 'px';
@@ -9114,8 +9127,7 @@ function updateStatus() {
     String(now.getMinutes()).padStart(2, "0");
 
 document.getElementById("status").innerHTML =
-  "<i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen<span>Laatste update: vandaag "
-  + hour + ":" + minute + "</span>";
+  "<i class=\"fa-solid fa-check\"></i> Bijgewerkt om " + hour + ":" + minute;
 }
 
 
@@ -10814,10 +10826,10 @@ function updatePrivateStatus() {
     const date = new Date(savedAt);
     const hour = String(date.getHours()).padStart(2, "0");
     const minute = String(date.getMinutes()).padStart(2, "0");
-    timeText = `<span>Laatste update: vandaag ${hour}:${minute}</span>`;
+    timeText = ` om ${hour}:${minute}`;
   }
 
-  status.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Privé opgeslagen op dit apparaat.' + timeText;
+  status.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> Bijgewerkt' + timeText + '<span>op dit apparaat</span>';
 }
 
 function openRegister() {
@@ -15212,6 +15224,89 @@ body.dark-theme .proUpsell li span{color:#b8c6bc}
 body.dark-theme .proUpsellNote{background:#29352d;color:#9fd3ac}
 body.dark-theme .proLockedCard .proPlannerButton,body.dark-theme .proLockedCard .budgetLaunchButton{background:#3a3424!important;color:#f5e6c0!important}
 </style>
+<style id="list-calm-layout">
+/* Lijst: groeit mee met de inhoud en scrollt pas als hij vol is */
+html body .app:not(.more-active):not(.overview-active) #list{
+  height:auto!important;
+  min-height:0!important;
+  max-height:min(560px,max(200px,calc(100dvh - 392px)))!important;
+}
+@media (max-height:700px){html body .app:not(.more-active):not(.overview-active) #list{max-height:min(420px,max(170px,calc(100dvh - 360px)))!important}}
+/* Knop 'Lijst opslaan' staat nu in het ⋮-menu */
+html body .saveListMainWrap{display:none!important}
+.listOptionDivider{height:1px;background:rgba(63,91,69,.12);margin:8px 12px}
+body.dark-theme .listOptionDivider{background:rgba(255,255,255,.1)}
+/* Statusregel: klein en rustig */
+html body #status{background:transparent!important;box-shadow:none!important;border:0!important;min-height:0!important;padding:8px 14px 4px!important;margin:4px auto 0!important;font-size:13px!important;font-weight:600!important;color:#6f8a76!important;text-align:center!important;display:block!important;line-height:1.4!important}
+html body #status i{font-size:12px!important;margin-right:5px!important}
+html body #status span{display:inline!important;font-size:13px!important;font-weight:500!important;margin:0!important}
+html body #status span::before{content:" · "}
+html body #status.statusWarn{color:#b5651d!important}
+body.dark-theme #status{color:#9fb8a6!important;background:transparent!important}
+/* Vaak gekocht */
+.frequentStrip{margin:12px 2px 0}
+.frequentStrip[hidden]{display:none!important}
+.frequentTitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-text,#718177);margin:0 4px 8px}
+.frequentChips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none}
+.frequentChips::-webkit-scrollbar{display:none}
+.frequentChip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px 0 10px;border:1px solid #dfe9e2;border-radius:999px;background:#fff;color:#2f4a38;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+.frequentChip .plus{font-weight:700;color:#3f7a50}
+.frequentChip .fIcon{font-size:17px;line-height:1;display:inline-flex}
+.frequentChip .fIcon svg{width:20px;height:20px}
+.frequentChip:active{transform:scale(.97)}
+body.dark-theme .frequentChip{background:#222a24;border-color:#38453b;color:#edf5ef}
+body.dark-theme .frequentChip .plus{color:#9fd3ac}
+</style>
+<script id="list-calm-logic">
+(function(){
+  /* Waarschuwingen in de statusregel oranje kleuren */
+  var st=document.getElementById("status");
+  if(st){var mark=function(){var t=st.textContent||"";st.classList.toggle("statusWarn",/⚠|niet|Geen|kon/i.test(t)&&!/Bijgewerkt/.test(t));};
+    new MutationObserver(mark).observe(st,{childList:true,characterData:true,subtree:true});mark();}
+
+  /* Vaak gekocht: producten uit je geschiedenis en opgeslagen lijsten */
+  var cache=null,cacheAt=0,busy=false;
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+  async function load(){
+    if(cache&&Date.now()-cacheAt<60000)return cache;
+    if(busy)return cache||[];busy=true;
+    var sources=[];
+    try{if(typeof readOverviewHistory==="function"){var h=await readOverviewHistory();sources=sources.concat((h||[]).map(function(x){return x.items||[];}));}}catch(e){}
+    try{if(typeof readSavedLists==="function"){var sv=await readSavedLists();sources=sources.concat((sv||[]).map(function(x){return x.items||[];}));}}catch(e){}
+    var counts={};
+    sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;(counts[k]=counts[k]||{text:t,n:0}).n++;});});
+    cache=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n||a.text.localeCompare(b.text,"nl");});
+    cacheAt=cache.length?Date.now():0;busy=false;return cache;   // lege uitkomst niet vasthouden
+  }
+  function onList(){var m={};try{(Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)m[norm(x.text)]=1;});}catch(e){}return m;}
+  function icon(t){try{return productIconMarkup(getProductIcon(t));}catch(e){return "";}}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function onListView(){var a=document.querySelector(".app");return a&&!a.classList.contains("overview-active")&&!a.classList.contains("more-active");}
+  async function render(){
+    var box=document.getElementById("frequentStrip");if(!box)return;
+    var items=[];try{items=Array.isArray(boodschappen)?boodschappen:[];}catch(e){}
+    if(!onListView()||items.length>5){box.hidden=true;return;}
+    var all=await load(),have=onList();
+    var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,8);
+    if(!pick.length){box.hidden=true;return;}
+    box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+pick.map(function(p){
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
+    box.hidden=false;
+    box.querySelectorAll(".frequentChip").forEach(function(b){b.onclick=async function(e){
+      e.stopPropagation();var inp=document.getElementById("product");if(!inp||typeof addProduct!=="function")return;
+      inp.value=b.getAttribute("data-t");b.disabled=true;await addProduct();};});
+    // Alleen tonen als het past boven de navigatie
+    requestAnimationFrame(function(){var nav=document.querySelector(".bottomNav"),stEl=document.getElementById("status");
+      if(!nav)return;var limit=nav.getBoundingClientRect().top-(stEl?stEl.offsetHeight:0)-4;
+      if(box.getBoundingClientRect().bottom>limit)box.hidden=true;});
+  }
+  var t=null;function later(){clearTimeout(t);t=setTimeout(render,120);}
+  if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);later();return r;};}
+  ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){if(typeof window[fn]==="function"){var of=window[fn];window[fn]=function(){var r=of.apply(this,arguments);later();return r;};}});
+  window.addEventListener("resize",later);
+  setTimeout(render,1500);
+})();
+</script>
 </body>
 
 <style id="overview-dashboard-final">
