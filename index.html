@@ -5624,7 +5624,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.1</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.2</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -11511,23 +11511,33 @@ async function openQuickAddFromOverview(){
     var history=await readOverviewHistory();
     sources=sources.concat(history.map(function(x){return x.items||[];}));
   }catch(_){}
-  sources.push(Array.isArray(boodschappen)?boodschappen:[]);
+  // Huidige lijst telt niet mee; wat er al op staat, laten we weg (net als onder de lijst).
+  var __qaNorm=function(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();};
+  var onList={};
+  (Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)onList[__qaNorm(x.text)]=1;});
 
   var counts={};
-  sources.flat().forEach(function(item){
-    var text=typeof item==="string"?item:(item&&item.text);
-    if(!text) return;
-    text=String(text).trim();
-    var key=text.toLowerCase();
-    if(!counts[key]) counts[key]={text:text,count:0};
-    counts[key].count++;
+  sources.forEach(function(list){
+    var seen={};
+    (list||[]).forEach(function(item){
+      var text=typeof item==="string"?item:(item&&item.text);
+      if(!text) return;
+      text=String(text).trim();
+      var key=__qaNorm(text);
+      if(!key||seen[key]) return; seen[key]=1;
+      if(!counts[key]) counts[key]={text:text,count:0};
+      counts[key].count++;
+    });
   });
-  var products=Object.keys(counts).map(function(k){return counts[k];})
+  var allKnown=Object.keys(counts).length;
+  var products=Object.keys(counts).filter(function(k){return !onList[k];}).map(function(k){return counts[k];})
     .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
 
   body.innerHTML="";
   if(!products.length){
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je vaak koopt, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
+    body.innerHTML=allKnown
+      ?'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Alles staat al op je lijst</strong></div><p>De producten die je vaak koopt, staan al op je boodschappenlijst.</p></div>'
+      :'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je eerder hebt gekocht of in een vaste lijst hebt bewaard, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11539,10 +11549,11 @@ async function openQuickAddFromOverview(){
     btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
     btn.querySelector("span").textContent=p.text;
     btn.addEventListener("click",function(){
+      if(btn.classList.contains("added")) return;
       __overviewAddProduct(p.text);
       btn.classList.add("added");
+      btn.disabled=true;
       btn.querySelector("i").className="fa-solid fa-check";
-      setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
     });
     grid.appendChild(btn);
   });
