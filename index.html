@@ -8849,7 +8849,7 @@ function showList(animationType = "") {
     const minusButton = document.createElement("button");
     minusButton.type = "button";
     minusButton.className = "quantityButton";
-    minusButton.textContent = "−";
+    minusButton.innerHTML = '<span class="stepIcon" aria-hidden="true"></span>';
     minusButton.setAttribute("aria-label", "Aantal verlagen");
     minusButton.title = "Aantal verlagen";
     minusButton.addEventListener("click", async (event) => {
@@ -8865,7 +8865,7 @@ function showList(animationType = "") {
     const plusButton = document.createElement("button");
     plusButton.type = "button";
     plusButton.className = "quantityButton";
-    plusButton.textContent = "+";
+    plusButton.innerHTML = '<span class="stepIcon plus" aria-hidden="true"></span>';
     plusButton.setAttribute("aria-label", "Aantal verhogen");
     plusButton.title = "Aantal verhogen";
     plusButton.addEventListener("click", async (event) => {
@@ -14324,8 +14324,8 @@ body.dark-theme .legalContact a{color:#9fd3a9}
     if(m>0&&q>=m)meta.push('min. '+m);
     var onList=q===0&&onShoppingList(i.name);
     var right=q===0
-      ?(onList?'<span class="pantryOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst</span>':'<button type="button" class="pantryToList" data-act="tolist">Op lijst</button>')+'<button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij">+</button>'
-      :'<button type="button" class="pantryStep" data-act="min" aria-label="Eén '+esc(i.name)+' eraf">−</button><span class="pantryQty" aria-label="'+q+' stuks">'+q+'</span><button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij">+</button>';
+      ?(onList?'<span class="pantryOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst</span>':'<button type="button" class="pantryToList" data-act="tolist">Op lijst</button>')+'<button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>'
+      :'<button type="button" class="pantryStep" data-act="min" aria-label="Eén '+esc(i.name)+' eraf"><span class="stepIcon" aria-hidden="true"></span></button><span class="pantryQty" aria-label="'+q+' stuks">'+q+'</span><button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij"><span class="stepIcon plus" aria-hidden="true"></span></button>';
     return '<div class="'+cls+'" data-id="'+esc(i.id)+'">'+iconHtml(i)+
       '<button type="button" class="pantryInfo" data-act="edit" aria-label="'+esc(i.name)+' aanpassen"><strong>'+esc(i.name)+'</strong>'+(meta.length?'<small>'+meta.join(' · ')+'</small>':'')+'</button>'+
       '<div class="pantryControls">'+right+'</div></div>';
@@ -14550,7 +14550,7 @@ body.dark-theme .pantryTabs .recipeChip.active{background:#4f8a62!important;colo
 .pantryTag.low{color:#a86b12}
 .pantryTag.out{color:#b04545}
 .pantryControls{flex:0 0 auto;display:flex;align-items:center;gap:4px}
-.pantryStep{width:40px;height:40px;border-radius:12px;border:0;background:#fff;color:#2f4a38;font-size:20px;font-weight:600;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(40,60,45,.08)}
+.pantryStep{position:relative;width:36px;height:36px;padding:0;border-radius:11px;border:0;background:#fff;color:#2f4a38;font-size:20px;font-weight:600;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(40,60,45,.08)}
 .pantryStep:active{transform:scale(.95)}
 .pantryQty{min-width:24px;text-align:center;font-size:16px;font-weight:700;color:var(--text-color,#2f4a38)}
 .pantryToList{height:40px;padding:0 12px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
@@ -14615,6 +14615,17 @@ body.dark-theme .pantryRefillNames span{background:#2a2619;color:#f5e6c0}
 body.dark-theme .pantryMore summary{color:#9fd3ac}
 body.dark-theme .pantryOnList{color:#9fd3ac}
 body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
+</style>
+<style id="step-icons">
+/* Plus en min getekend in plaats van als letter: altijd precies in het midden */
+.quantityButton,.pantryStep{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;line-height:0!important;font-size:0!important}
+.stepIcon{position:relative;display:block;width:12px;height:12px;flex:0 0 12px}
+.stepIcon::before,.stepIcon.plus::after{content:"";position:absolute;left:0;top:5px;width:12px;height:2px;border-radius:2px;background:currentColor}
+.stepIcon.plus::after{transform:rotate(90deg)}
+.pantryStep .stepIcon{width:14px;height:14px;flex-basis:14px}
+.pantryStep .stepIcon::before,.pantryStep .stepIcon.plus::after{top:6px;width:14px}
+.pantryStep::after{content:"";position:absolute;inset:-4px}
+.pantryToList{height:36px!important}
 </style>
 </body>
 
