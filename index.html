@@ -5641,7 +5641,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.5.1</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.0.0</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -6095,8 +6095,13 @@ function closeOpenMenusOnOutsideClick(event) {
   if (themeButton && themeButton.contains(target)) return;
   if (familyMenu && familyMenu.contains(target)) return;
   if (familyButton && familyButton.contains(target)) return;
+  // Tikken in een venster (zoals Familieleden) is geen tik 'buiten het menu'
+  if (target && target.closest && target.closest(".familyDialogOverlay, .overviewActionOverlay, .pantryToast, #pantryToast")) return;
 
   closeThemePicker();
+  // In het scherm Meer is het menu de pagina zelf: niet sluiten of terugspringen
+  const __app = document.querySelector(".app");
+  if (__app && __app.classList.contains("more-active")) return;
   closeFamilyMenu();
 }
 
@@ -15757,6 +15762,13 @@ body.dark-theme .type-forgot .assistTipIcon,body.dark-theme .assistEmpty i{backg
 body.dark-theme .type-deal .assistTipIcon{background:#4a2b2b;color:#f2a3a3}
 body.dark-theme .assistAdd{background:#4f8a62}
 body.dark-theme .assistMore,body.dark-theme .assistOnList{color:#9fd3ac}
+</style>
+<style id="list-header-fixed">
+/* 1. Voortgang (mandje, "0 van 7 klaar") blijft bovenin staan tijdens het scrollen */
+html body #list #listProgress{position:sticky!important;top:-10px!important;z-index:6!important;background:rgb(248,251,249)!important;margin:-10px -10px 4px!important;padding:10px 10px 6px!important;border-radius:16px 16px 0 0}
+body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
+/* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
+html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
 </style>
 </body>
 
