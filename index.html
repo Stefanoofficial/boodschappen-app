@@ -15058,15 +15058,23 @@ body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f0
     note("Testinstellingen verborgen. Pro staat weer aan.");
   };
   function bindVersion(){
-    var v=document.querySelector(".aboutInfoVersion");if(!v||v.__dev)return;v.__dev=true;
-    var taps=0,timer=null;
-    v.addEventListener("click",function(e){
-      e.stopPropagation();taps++;clearTimeout(timer);timer=setTimeout(function(){taps=0;},1500);
-      if(taps>=5){taps=0;
-        if(get(DEV_KEY)==="1"){note("De testinstellingen staan al aan. Je vindt ze onder Instellingen.");return;}
-        set(DEV_KEY,"1");showDev();
-        note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");
+    // Let op: de app blokkeert snelle dubbeltikken (tegen inzoomen), waardoor "click" bij snel tikken
+    // niet komt. Daarom tellen we pointerup/touchend zelf.
+    document.querySelectorAll(".aboutInfoVersion").forEach(function(v){
+      if(v.__dev)return;v.__dev=true;
+      v.style.cursor="pointer";v.style.webkitUserSelect="none";v.style.userSelect="none";
+      var taps=0,timer=null,lastAt=0;
+      function tap(e){
+        var now=Date.now();if(now-lastAt<60)return;lastAt=now;   // touchend + pointerup van dezelfde tik maar één keer tellen
+        // Geen stopPropagation: de bescherming tegen inzoomen (op document) moet de tik blijven zien.
+        taps++;clearTimeout(timer);timer=setTimeout(function(){taps=0;},2500);
+        if(get(DEV_KEY)==="1"){if(taps>=5){taps=0;note("De testinstellingen staan al aan. Je vindt ze onderaan Instellingen.");}return;}
+        if(taps>=2&&taps<5)note("Nog "+(5-taps)+" keer tikken voor de testinstellingen.");
+        if(taps>=5){taps=0;set(DEV_KEY,"1");showDev();note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");}
       }
+      v.addEventListener("pointerup",tap);
+      v.addEventListener("touchend",tap,{passive:true});
+      v.addEventListener("click",function(e){e.stopPropagation();});
     });
   }
   // Tik op een vergrendelde kaart → ontgrendelscherm
