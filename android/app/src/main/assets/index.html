@@ -5219,7 +5219,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="proHero">
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
       <h2>Mijn Boodschappen Pro</h2>
-      <p>Plan je maaltijden, houd je budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
     </div>
     <div class="proFeatureCard proPlannerLaunch">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5308,9 +5308,39 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
       <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
     </section>
-    <div class="proFeatureCard">
-      <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis nog op voorraad hebt.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    <div class="proFeatureCard pantryLaunch" onclick="togglePantry(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePantry(event)}">
+      <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis hebt en zet wat op is met één tik op je lijst.</p><button type="button" class="budgetLaunchButton pantryLaunchButton" onclick="event.stopPropagation();togglePantry(event)">Open voorraad <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
+    <section id="pantryPanel" class="budgetPlannerPanel pantryPanel" hidden aria-label="Voorraadbeheer" onclick="event.stopPropagation()">
+      <div class="budgetPanelHeading">
+        <div><h3>Mijn voorraad</h3><p>Houd bij wat je thuis hebt. Is iets op, dan zet je het met één tik op je boodschappenlijst.</p></div>
+      </div>
+      <div id="pantryTabs" class="pantryTabs" role="tablist" aria-label="Plek"></div>
+      <div id="pantryRefill"></div>
+      <div id="pantryList" class="pantryList" aria-live="polite"></div>
+
+      <h3 class="budgetSectionTitle">Product toevoegen</h3>
+      <label for="pantryName">Product</label>
+      <div class="pantryNameRow">
+        <input id="pantryName" class="budgetInput" type="text" placeholder="Bijv. pasta" maxlength="60" autocomplete="off">
+        <button type="button" class="budgetActionButton pantryScanBtn" onclick="scanIntoPantry()" aria-label="Barcode scannen" title="Barcode scannen"><i class="fa-solid fa-barcode"></i></button>
+      </div>
+      <div class="pantryFormRow">
+        <div><label for="pantryLoc">Plek</label><select id="pantryLoc" class="budgetInput"><option value="fridge">Koelkast</option><option value="freezer">Vriezer</option><option value="pantry">Voorraadkast</option></select></div>
+        <div><label for="pantryQty">Aantal</label><input id="pantryQty" class="budgetInput" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+      </div>
+      <details class="pantryMore">
+        <summary>Houdbaarheid en minimum <span>(optioneel)</span></summary>
+        <label for="pantryExp">Houdbaar tot</label>
+        <input id="pantryExp" class="budgetInput" type="date">
+        <label for="pantryMin">Altijd minimaal in huis</label>
+        <input id="pantryMin" class="budgetInput" type="number" min="0" step="1" placeholder="Bijv. 2" inputmode="numeric">
+        <p class="budgetStatus">Heb je minder dan dit aantal, dan zie je het product bij “Aanvullen”.</p>
+      </details>
+      <button type="button" class="budgetActionButton budgetAddButton" onclick="addPantryItem()">Toevoegen aan voorraad</button>
+      <p id="pantryStatus" class="budgetStatus" aria-live="polite"></p>
+      <p class="budgetPrivacyNote">Je voorraad wordt aan je account gekoppeld. Je ziet hem dus ook op een andere telefoon als je daar inlogt.</p>
+    </section>
     <div class="proFeatureCard">
       <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
     </div>
@@ -5625,7 +5655,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt.</li>
-        <li><strong>Planning en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
+        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad, je budget en uitgaven en je gekozen supermarkt. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken.</li>
         <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
@@ -5634,7 +5664,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
-      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning en budget, en voor het delen van lijsten.</p>
+      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
       <h4>Delen met anderen</h4>
@@ -13873,7 +13903,9 @@ input,select,textarea{font-size:16px}
     {path:"weekPlanner", key:function(){return "boodschappen_pro_smart_weekplanner_v1";}, scoped:false,
      refresh:function(){if(window.__refreshPlannerUI)window.__refreshPlannerUI();}},
     {path:"budget", key:function(){return "boodschappen_budgetplanner_v1";}, scoped:false,
-     refresh:function(){if(window.__refreshBudgetUI)window.__refreshBudgetUI();}}
+     refresh:function(){if(window.__refreshBudgetUI)window.__refreshBudgetUI();}},
+    {path:"pantry", key:function(){return "boodschappen_pantry_v1";}, scoped:false,
+     refresh:function(){if(window.__refreshPantryUI)window.__refreshPantryUI();}}
   ];
   var uid=null, applying=false, timers={}, listeners=[];
   var proto=Storage.prototype, origSet=proto.setItem, origRemove=proto.removeItem;
@@ -14134,6 +14166,455 @@ html body .legalContact dt:first-child{margin-top:0}
 html body .legalContact dd{margin:0;font-size:15px;line-height:1.45;color:var(--text-color,#2f3b33)}
 html body .legalContact a{color:#3f6b4b;font-weight:600;text-decoration:none;overflow-wrap:anywhere}
 body.dark-theme .legalContact a{color:#9fd3a9}
+</style>
+<script id="pantryLogic">
+/* Voorraadbeheer (Pro): wat je thuis hebt, gekoppeld aan de boodschappenlijst.
+   Opslag: localStorage "boodschappen_pantry_v1", gesynchroniseerd via accountCloudSync (users/{uid}/pantry). */
+(function(){
+  var KEY="boodschappen_pantry_v1";
+  var LOCS=[["fridge","Koelkast"],["freezer","Vriezer"],["pantry","Voorraadkast"]];
+  var LOC_LABEL={fridge:"Koelkast",freezer:"Vriezer",pantry:"Voorraadkast"};
+  var LOC_IN={fridge:"in de koelkast",freezer:"in de vriezer",pantry:"in de voorraadkast"};
+  var activeLoc="all", locTouched=false;
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function read(){
+    try{var d=JSON.parse(localStorage.getItem(KEY)||"{}");return {items:Array.isArray(d.items)?d.items.filter(function(i){return i&&i.name;}):[]};}
+    catch(e){return {items:[]};}
+  }
+  function write(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+  // Bewust streng: "Kaas" is niet hetzelfde als "Pindakaas", "Melk" niet als "Hagelslag melk".
+  function same(a,b){
+    a=norm(a);b=norm(b);if(!a||!b)return false;
+    if(a===b)return true;
+    var suf=["s","n","en","jes","tjes"];
+    for(var k=0;k<suf.length;k++){if(a+suf[k]===b||b+suf[k]===a)return true;}
+    return false;
+  }
+  function niceName(s){s=String(s||"").trim().replace(/\s+/g," ");return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+  function int(v,def){var n=parseInt(v,10);return Number.isFinite(n)&&n>=0?n:def;}
+
+  /* Slimme plek-keuze op basis van de productnaam */
+  function guessLoc(name){
+    var n=norm(name);
+    if(/pindakaas|hagelslag|choco|chocola|koek|biscuit|houdbare|poedermelk|kokosmelk|chips|snoep|thee\b|koffie|suiker|\bmeel\b|bloem\b|rijst|pasta\b|spaghetti|macaroni|noedel|mie\b|blik|soep|ketchup|mayonaise|mosterd|olie\b|azijn|kruiden|zout|peper\b|cornflakes|muesli|havermout|cruesli|cracker|beschuit|knackebrod|wijn|bier|frisdrank|cola|limonade|\bwater\b|wasmiddel|toiletpapier|keukenrol|shampoo|tandpasta/.test(n))return "pantry";
+    if(/diepvries|bevroren|vriezer|\bijs\b|ijsje|ijsjes|roomijs|ijsblok|frites|patat|kroket|bitterbal|loempia|diepvriespizza/.test(n))return "freezer";
+    if(/melk|karnemelk|yoghurt|kwark|vla|kaas|boter|room|creme fraiche|eieren|\bei\b|kip|gehakt|vlees|biefstuk|worst|ham\b|spek|vis|zalm|tonijnsalade|garnalen|salade|sla\b|spinazie|komkommer|courgette|broccoli|bloemkool|paprika|champignon|aardbei|blauwe bes|frambo|druiven|hummus|tofu|tempeh|pesto vers|sap\b|smoothie|margarine|zuivel|mozzarella|feta|roomkaas|pudding/.test(n))return "fridge";
+    try{
+      if(typeof productAisle==="function"){
+        var a=productAisle(name);
+        if(a===2||a===3)return "fridge";
+        if(a===8)return "freezer";
+      }
+    }catch(e){}
+    return "pantry";
+  }
+  function daysUntil(exp){
+    if(!exp)return null;
+    var t=new Date(exp+"T00:00:00");if(isNaN(t))return null;
+    var now=new Date();now.setHours(0,0,0,0);
+    return Math.round((t-now)/86400000);
+  }
+  function fmtDate(exp){var t=new Date(exp+"T00:00:00");return isNaN(t)?"":t.toLocaleDateString("nl-NL",{day:"numeric",month:"short"});}
+  function needsRefill(i){var q=int(i.qty,0),m=int(i.min,0);return q===0||(m>0&&q<m);}
+  function iconHtml(i){
+    var photos=true;try{photos=typeof productPhotosEnabled!=="function"||productPhotosEnabled();}catch(e){}
+    var loose=false;try{loose=typeof isLooseProduce==="function"&&isLooseProduce(i.name);}catch(e){}
+    if(i.imageUrl&&photos&&!loose)return '<span class="pantryIcon hasPhoto"><img src="'+esc(i.imageUrl)+'" alt="" loading="lazy" referrerpolicy="no-referrer"></span>';
+    var mk="🛍️";try{mk=productIconMarkup(getProductIcon(i.name));}catch(e){}
+    return '<span class="pantryIcon">'+mk+'</span>';
+  }
+
+  /* ---------- Lijst-koppeling ---------- */
+  function onShoppingList(name){
+    try{return (Array.isArray(boodschappen)?boodschappen:[]).some(function(x){return x&&!x.completed&&same(x.text,name);});}catch(e){return false;}
+  }
+  async function addNamesToShoppingList(entries){
+    var added=0;
+    try{
+      if(typeof activeListType!=="undefined"&&activeListType!=="shared"&&!currentHouseholdId&&!isPrivateMode()){
+        var hid=await getOrCreateHousehold();
+        if(!hid&&auth.currentUser)localStorage.setItem("boodschappenUseMode_"+auth.currentUser.uid,"private");
+      }
+    }catch(e){}
+    entries.forEach(function(e){
+      if(onShoppingList(e.name))return;
+      boodschappen.push({text:e.name,completed:false,completedBy:"",completedAt:null,quantity:1,createdAt:Date.now(),
+        barcode:e.barcode||"",imageUrl:e.imageUrl||"",brand:e.brand||""});
+      added++;
+    });
+    if(added){try{showList();}catch(e){} try{await saveList();}catch(e){console.warn(e);} }
+    return added;
+  }
+
+  /* ---------- Melding onderin ---------- */
+  var toastTimer=null;
+  function toast(message,actionLabel,action){
+    var old=document.getElementById("pantryToast");if(old)old.remove();
+    clearTimeout(toastTimer);
+    var t=document.createElement("div");t.id="pantryToast";t.className="pantryToast";t.setAttribute("role","status");
+    t.innerHTML='<span>'+message+'</span>'+(actionLabel?'<button type="button">'+esc(actionLabel)+'</button>':'');
+    ["click","pointerdown","touchstart"].forEach(function(ev){t.addEventListener(ev,function(e){e.stopPropagation();});});
+    if(actionLabel)t.querySelector("button").addEventListener("click",async function(){this.disabled=true;t.remove();try{await action();}catch(e){console.warn(e);}});
+    document.body.appendChild(t);
+    toastTimer=setTimeout(function(){t.classList.add("leaving");setTimeout(function(){t.remove();},250);},6000);
+  }
+
+  /* ---------- Weergave ---------- */
+  function render(){
+    var tabs=document.getElementById("pantryTabs"),listEl=document.getElementById("pantryList"),refill=document.getElementById("pantryRefill");
+    if(!tabs||!listEl)return;
+    var d=read(),items=d.items;
+    tabs.hidden=!items.length;if(!items.length)activeLoc="all";
+    var counts={all:items.length,fridge:0,freezer:0,pantry:0};
+    items.forEach(function(i){if(counts[i.loc]!=null)counts[i.loc]++;});
+    tabs.innerHTML=[["all","Alles"]].concat(LOCS).map(function(l){
+      return '<button type="button" role="tab" class="recipeChip'+(activeLoc===l[0]?' active':'')+'" aria-selected="'+(activeLoc===l[0])+'" data-loc="'+l[0]+'">'+l[1]+(counts[l[0]]?' <span>'+counts[l[0]]+'</span>':'')+'</button>';
+    }).join("");
+    tabs.querySelectorAll("button").forEach(function(b){b.onclick=function(e){e.stopPropagation();activeLoc=b.getAttribute("data-loc");render();};});
+
+    // Aanvullen
+    var low=items.filter(needsRefill);
+    if(refill){
+      if(low.length){
+        var notOnList=low.filter(function(i){return !onShoppingList(i.name);});
+        refill.innerHTML='<div class="pantryRefill"><div class="pantryRefillHead"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><div><strong>Aanvullen</strong><small>'+
+          (notOnList.length?(low.length===1?'Dit product is (bijna) op.':'Deze producten zijn (bijna) op.'):'Staat al op je boodschappenlijst ✓')+'</small></div></div>'+
+          '<div class="pantryRefillNames">'+low.map(function(i){return '<span class="'+(onShoppingList(i.name)?'onList':'')+'">'+esc(i.name)+'</span>';}).join("")+'</div>'+
+          (notOnList.length?'<button type="button" class="budgetActionButton pantryRefillBtn">'+(notOnList.length===1?'Zet op boodschappenlijst':'Zet alle '+notOnList.length+' op boodschappenlijst')+'</button>':'')+'</div>';
+        var rb=refill.querySelector(".pantryRefillBtn");
+        if(rb)rb.onclick=async function(e){e.stopPropagation();this.disabled=true;var n=await addNamesToShoppingList(notOnList);render();toast(n===1?'1 product op je lijst gezet.':n+' producten op je lijst gezet.');};
+      }else refill.innerHTML="";
+    }
+
+    // Lijst
+    var shown=items.filter(function(i){return activeLoc==="all"||i.loc===activeLoc;});
+    if(!items.length){
+      listEl.innerHTML='<div class="pantryEmpty"><i class="fa-solid fa-cube" aria-hidden="true"></i><strong>Je voorraad is nog leeg</strong><span>Voeg hieronder producten toe of scan een barcode. Na het boodschappen doen kun je je gekochte producten ook in één keer toevoegen.</span></div>';
+      return;
+    }
+    if(!shown.length){listEl.innerHTML='<p class="budgetEmpty pantryNone">Nog niets in de '+esc(LOC_LABEL[activeLoc]||"").toLowerCase()+'.</p>';return;}
+    var sorter=function(a,b){
+      var ao=int(a.qty,0)===0,bo=int(b.qty,0)===0;if(ao!==bo)return ao?1:-1;
+      var da=daysUntil(a.exp),db=daysUntil(b.exp);
+      if(da!=null||db!=null){if(da==null)return 1;if(db==null)return -1;if(da!==db)return da-db;}
+      return norm(a.name).localeCompare(norm(b.name));
+    };
+    var groups=activeLoc==="all"?LOCS.map(function(l){return [l[1],shown.filter(function(i){return i.loc===l[0];})];}).filter(function(g){return g[1].length;}):[[null,shown]];
+    listEl.innerHTML=groups.map(function(g){
+      return (g[0]?'<div class="pantryGroupTitle">'+g[0]+'</div>':'')+g[1].sort(sorter).map(rowHtml).join("");
+    }).join("");
+    listEl.querySelectorAll("[data-act]").forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();var id=b.closest("[data-id]").getAttribute("data-id"),act=b.getAttribute("data-act");
+        if(act==="min")changeQty(id,-1);else if(act==="plus")changeQty(id,1);else if(act==="edit")editItem(id);else if(act==="tolist")putOnList(id);};
+    });
+  }
+  function rowHtml(i){
+    var q=int(i.qty,0),m=int(i.min,0),days=daysUntil(i.exp),meta=[],cls="pantryRow";
+    if(q===0){cls+=" isOut";meta.push('<b class="pantryTag out">Op</b>');}
+    else if(m>0&&q<m){cls+=" isLow";meta.push('<b class="pantryTag low">Bijna op</b>');}
+    if(days!=null){
+      if(days<0)meta.push('<b class="pantryTag out">Over de datum</b>');
+      else if(days===0)meta.push('<b class="pantryTag low">Vandaag op</b>');
+      else if(days<=2)meta.push('<b class="pantryTag low">Nog '+days+(days===1?' dag':' dagen')+'</b>');
+      else meta.push('THT '+fmtDate(i.exp));
+    }
+    if(m>0&&q>=m)meta.push('min. '+m);
+    var onList=q===0&&onShoppingList(i.name);
+    var right=q===0
+      ?(onList?'<span class="pantryOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst</span>':'<button type="button" class="pantryToList" data-act="tolist">Op lijst</button>')+'<button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij">+</button>'
+      :'<button type="button" class="pantryStep" data-act="min" aria-label="Eén '+esc(i.name)+' eraf">−</button><span class="pantryQty" aria-label="'+q+' stuks">'+q+'</span><button type="button" class="pantryStep" data-act="plus" aria-label="Eén '+esc(i.name)+' erbij">+</button>';
+    return '<div class="'+cls+'" data-id="'+esc(i.id)+'">'+iconHtml(i)+
+      '<button type="button" class="pantryInfo" data-act="edit" aria-label="'+esc(i.name)+' aanpassen"><strong>'+esc(i.name)+'</strong>'+(meta.length?'<small>'+meta.join(' · ')+'</small>':'')+'</button>'+
+      '<div class="pantryControls">'+right+'</div></div>';
+  }
+
+  /* ---------- Acties ---------- */
+  function upsert(entry){
+    var d=read(),loc=entry.loc||guessLoc(entry.name);
+    var ex=d.items.find(function(i){return i.loc===loc&&((entry.barcode&&i.barcode===entry.barcode)||same(i.name,entry.name));})
+         ||d.items.find(function(i){return (entry.barcode&&i.barcode===entry.barcode)||same(i.name,entry.name);});
+    if(ex){
+      ex.qty=int(ex.qty,0)+Math.max(1,int(entry.qty,1));
+      if(entry.exp)ex.exp=entry.exp;
+      if(entry.min!=null&&entry.min!=="")ex.min=int(entry.min,0);
+      if(entry.barcode&&!ex.barcode)ex.barcode=entry.barcode;
+      if(entry.imageUrl&&!ex.imageUrl)ex.imageUrl=entry.imageUrl;
+      ex.updatedAt=Date.now();
+    }else{
+      ex={id:uid(),name:niceName(entry.name),qty:Math.max(1,int(entry.qty,1)),loc:loc,exp:entry.exp||"",min:int(entry.min,0),
+          barcode:entry.barcode||"",imageUrl:entry.imageUrl||"",brand:entry.brand||"",updatedAt:Date.now()};
+      d.items.push(ex);
+    }
+    write(d);return ex;
+  }
+  function changeQty(id,delta){
+    var d=read(),it=d.items.find(function(i){return i.id===id;});if(!it)return;
+    var before=int(it.qty,0);it.qty=Math.max(0,before+delta);it.updatedAt=Date.now();write(d);render();
+    if(before>0&&it.qty===0&&!onShoppingList(it.name)){
+      toast('<strong>'+esc(it.name)+'</strong> is op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});
+    }else if(delta<0&&int(it.min,0)>0&&it.qty<int(it.min,0)&&before>=int(it.min,0)&&!onShoppingList(it.name)){
+      toast('<strong>'+esc(it.name)+'</strong> is bijna op.','Op lijst zetten',async function(){await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');});
+    }
+  }
+  async function putOnList(id){
+    var it=read().items.find(function(i){return i.id===id;});if(!it)return;
+    await addNamesToShoppingList([it]);render();toast(esc(it.name)+' staat op je boodschappenlijst.');
+  }
+  function editItem(id){
+    var d=read(),it=d.items.find(function(i){return i.id===id;});if(!it||typeof familyDialogBase!=="function")return;
+    var opts=LOCS.map(function(l){return '<option value="'+l[0]+'"'+(it.loc===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join("");
+    var ov=familyDialogBase("fa-cube",esc(it.name),
+      '<div class="pantryEdit"><label>Naam<input class="familyDialogInput" id="pantryEditName" maxlength="60" value="'+esc(it.name)+'"></label>'+
+      '<div class="pantryEditRow"><label>Plek<select class="familyDialogInput" id="pantryEditLoc">'+opts+'</select></label><label>Aantal<input class="familyDialogInput" id="pantryEditQty" type="number" min="0" step="1" inputmode="numeric" value="'+int(it.qty,0)+'"></label></div>'+
+      '<label>Houdbaar tot<input class="familyDialogInput" id="pantryEditExp" type="date" value="'+esc(it.exp||"")+'"></label>'+
+      '<label>Altijd minimaal in huis<input class="familyDialogInput" id="pantryEditMin" type="number" min="0" step="1" inputmode="numeric" placeholder="Geen minimum" value="'+(int(it.min,0)||"")+'"></label><button type="button" class="pantryDelete" data-b="del"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Verwijderen uit voorraad</button></div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="cancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="save">Opslaan</button>');
+    ov.classList.add("pantryDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var close=function(){closeFamilyDialog(ov);};
+    ov.querySelector('[data-b="cancel"]').onclick=close;
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    ov.querySelector('[data-b="del"]').onclick=function(){
+      var dd=read();dd.items=dd.items.filter(function(i){return i.id!==id;});write(dd);close();render();
+      toast(esc(it.name)+' is uit je voorraad verwijderd.','Ongedaan maken',function(){var d3=read();d3.items.push(it);write(d3);render();});
+    };
+    ov.querySelector('[data-b="save"]').onclick=function(){
+      var name=ov.querySelector("#pantryEditName").value.trim();if(!name){ov.querySelector("#pantryEditName").focus();return;}
+      var dd=read(),x=dd.items.find(function(i){return i.id===id;});if(!x){close();return;}
+      x.name=niceName(name);x.loc=ov.querySelector("#pantryEditLoc").value;x.qty=int(ov.querySelector("#pantryEditQty").value,0);
+      x.exp=ov.querySelector("#pantryEditExp").value||"";x.min=int(ov.querySelector("#pantryEditMin").value,0);x.updatedAt=Date.now();
+      write(dd);close();render();
+    };
+  }
+
+  window.addPantryItem=function(){
+    var nameEl=document.getElementById("pantryName"),st=document.getElementById("pantryStatus");
+    var name=nameEl.value.trim();
+    if(!name){nameEl.focus();if(st)st.textContent="Vul eerst een product in.";return;}
+    var it=upsert({name:name,loc:document.getElementById("pantryLoc").value,qty:document.getElementById("pantryQty").value,
+      exp:document.getElementById("pantryExp").value,min:document.getElementById("pantryMin").value});
+    nameEl.value="";document.getElementById("pantryQty").value="1";document.getElementById("pantryExp").value="";document.getElementById("pantryMin").value="";
+    var more=document.querySelector("#pantryPanel .pantryMore");if(more)more.open=false;
+    locTouched=false;activeLoc="all";render();
+    if(st)st.textContent=it.name+" staat nu "+LOC_IN[it.loc]+" ("+it.qty+").";
+  };
+  window.togglePantry=function(event){
+    if(event)event.stopPropagation();
+    var panel=document.getElementById("pantryPanel");if(!panel)return;
+    panel.hidden=!panel.hidden;
+    var btn=document.querySelector(".pantryLaunchButton");
+    if(btn)btn.innerHTML=panel.hidden?'Open voorraad <i class="fa-solid fa-chevron-down"></i>':'Voorraad sluiten <i class="fa-solid fa-chevron-up"></i>';
+    if(!panel.hidden){
+      var scan=panel.querySelector(".pantryScanBtn");
+      if(scan)scan.hidden=localStorage.getItem("boodschappenScannerEnabled")==="false";
+      render();setTimeout(function(){panel.scrollIntoView({behavior:"smooth",block:"nearest"});},60);
+    }
+  };
+  window.__refreshPantryUI=function(){var p=document.getElementById("pantryPanel");if(p&&!p.hidden)render();};
+  window.__pantryRead=read;
+
+  // Plek automatisch kiezen tijdens het typen (tenzij je die zelf hebt gekozen)
+  function bindForm(){
+    var n=document.getElementById("pantryName"),l=document.getElementById("pantryLoc");
+    if(!n||!l||n.__bound)return;n.__bound=true;
+    n.addEventListener("input",function(){if(!locTouched&&n.value.trim().length>=3)l.value=guessLoc(n.value);});
+    n.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();window.addPantryItem();}});
+    l.addEventListener("change",function(){locTouched=true;});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bindForm);else bindForm();
+
+  /* ---------- Scannen naar voorraad ---------- */
+  window.__pantryScan=false;
+  window.scanIntoPantry=function(){
+    if(typeof openBarcodeScanner!=="function")return;
+    window.__pantryScan=true;
+    var t=document.getElementById("barcodeTitle");if(t)t.innerHTML='<i class="fa-solid fa-barcode"></i> Scannen voor je voorraad';
+    openBarcodeScanner();
+  };
+  if(typeof finishBarcodeProduct==="function"){
+    var origFinish=finishBarcodeProduct;
+    finishBarcodeProduct=async function(p){
+      if(!window.__pantryScan)return origFinish.apply(this,arguments);
+      var it=upsert({name:p.text,barcode:p.barcode,imageUrl:p.imageUrl,brand:p.brand,qty:1});
+      var r=document.getElementById("barcodeResult");
+      if(r){r.textContent=(p.brand?p.brand+" · ":"")+it.name+" staat nu "+LOC_IN[it.loc]+" ("+it.qty+").";r.classList.add("open");}
+      try{setBarcodeStatus("Toegevoegd aan je voorraad ✓");}catch(e){}
+      activeLoc="all";render();
+      setTimeout(closeBarcodeScanner,1100);
+    };
+  }
+  if(typeof closeBarcodeScanner==="function"){
+    var origClose=closeBarcodeScanner;
+    closeBarcodeScanner=function(){
+      window.__pantryScan=false;
+      var t=document.getElementById("barcodeTitle");if(t)t.innerHTML='<i class="fa-solid fa-barcode"></i> Barcode scannen';
+      return origClose.apply(this,arguments);
+    };
+  }
+
+  /* ---------- Fase 2: na het boodschappen doen ---------- */
+  function offerRestock(bought){
+    if(!bought.length||typeof familyDialogBase!=="function")return;
+    var rows=bought.map(function(b,ix){
+      var opts=LOCS.map(function(l){return '<option value="'+l[0]+'"'+(b.loc===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join("");
+      return '<div class="restockRow"><label class="restockCheck"><input type="checkbox" checked data-ix="'+ix+'"><span>'+esc(b.name)+(b.qty>1?' <em>×'+b.qty+'</em>':'')+'</span></label><select class="restockLoc" data-ix="'+ix+'" aria-label="Plek voor '+esc(b.name)+'">'+opts+'</select></div>';
+    }).join("");
+    var ov=familyDialogBase("fa-cube","Aan je voorraad toevoegen?",
+      '<div class="familyDialogText">Je hebt net boodschappen gedaan. Voeg wat je hebt gekocht in één keer toe aan je voorraad.</div><div class="restockList">'+rows+'</div>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="skip">Overslaan</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="add">Toevoegen</button>');
+    ov.classList.add("pantryDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+    var add=ov.querySelector('[data-b="add"]');
+    function sync(){var n=ov.querySelectorAll('.restockCheck input:checked').length;add.textContent=n?(n===1?'1 product toevoegen':n+' producten toevoegen'):'Toevoegen';add.disabled=!n;}
+    ov.querySelectorAll('.restockCheck input').forEach(function(c){c.addEventListener("change",sync);});sync();
+    ov.querySelector('[data-b="skip"]').onclick=function(){closeFamilyDialog(ov);};
+    add.onclick=function(){
+      var n=0;
+      ov.querySelectorAll('.restockCheck input').forEach(function(c){
+        if(!c.checked)return;var ix=+c.getAttribute("data-ix"),b=bought[ix];
+        upsert({name:b.name,qty:b.qty,loc:ov.querySelector('.restockLoc[data-ix="'+ix+'"]').value,barcode:b.barcode,imageUrl:b.imageUrl,brand:b.brand});n++;
+      });
+      closeFamilyDialog(ov);render();
+      toast(n===1?'1 product toegevoegd aan je voorraad.':n+' producten toegevoegd aan je voorraad.');
+    };
+  }
+  if(typeof clearList==="function"){
+    var origClear=clearList;
+    clearList=async function(){
+      var bought=[];
+      try{
+        var seen={};
+        (Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){
+          if(!x||!x.completed||!x.text)return;var k=norm(x.text);
+          if(seen[k]){seen[k].qty+=Math.max(1,int(x.quantity,1));return;}
+          seen[k]={name:niceName(x.text),qty:Math.max(1,int(x.quantity,1)),loc:guessLoc(x.text),barcode:x.barcode||"",imageUrl:x.imageUrl||"",brand:x.brand||""};
+          bought.push(seen[k]);
+        });
+        // Bestaande plek in de voorraad heeft voorrang op de gok
+        var items=read().items;
+        bought.forEach(function(b){var ex=items.find(function(i){return same(i.name,b.name);});if(ex)b.loc=ex.loc;});
+      }catch(e){}
+      var r=await origClear.apply(this,arguments);
+      // Alleen vragen als je de voorraad al gebruikt
+      if(bought.length&&read().items.length)setTimeout(function(){offerRestock(bought);},350);
+      return r;
+    };
+  }
+
+  /* ---------- Fase 2: waarschuwen bij toevoegen aan de lijst ---------- */
+  if(typeof addProduct==="function"){
+    var origAdd=addProduct;
+    addProduct=async function(){
+      var input=document.getElementById("product"),text=input?input.value.trim():"";
+      var r=await origAdd.apply(this,arguments);
+      if(!text)return r;
+      var have=read().items.find(function(i){return int(i.qty,0)>0&&same(i.name,text);});
+      if(have){
+        toast('Je hebt nog <strong>'+int(have.qty,0)+'× '+esc(have.name)+'</strong> '+LOC_IN[have.loc]+'.','Toch niet nodig',async function(){
+          for(var k=boodschappen.length-1;k>=0;k--){if(boodschappen[k]&&!boodschappen[k].completed&&boodschappen[k].text===text){boodschappen.splice(k,1);break;}}
+          try{showList();}catch(e){} try{await saveList();}catch(e){}
+        });
+      }
+      return r;
+    };
+  }
+})();
+</script>
+<style id="pantry-style">
+.pantryLaunch{cursor:pointer}
+.pantryTabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:4px 0 12px;scrollbar-width:none}
+.pantryTabs::-webkit-scrollbar{display:none}
+.pantryTabs .recipeChip{flex:0 0 auto;white-space:nowrap;border:none!important;border-radius:999px;padding:8px 14px;min-height:36px;font-size:14px;font-weight:700;background:#e4ece6!important;color:#2f4a38!important;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pantryTabs .recipeChip.active{background:#2f5a3d!important;color:#fff!important}
+.pantryTabs[hidden]{display:none!important}
+body.dark-theme .pantryTabs .recipeChip{background:#34443a!important;color:#e4eee7!important}
+body.dark-theme .pantryTabs .recipeChip.active{background:#4f8a62!important;color:#fff!important}
+.pantryTabs .recipeChip span{opacity:.7;font-weight:600;margin-left:2px}
+.pantryList{display:flex;flex-direction:column;gap:8px}
+.pantryGroupTitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-text,#718177);margin:10px 2px 0}
+.pantryGroupTitle:first-child{margin-top:0}
+.pantryRow{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryRow.isOut{opacity:.92}
+.pantryRow.isOut .pantryInfo strong{color:#7b8a80}
+.pantryIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;overflow:hidden}
+.pantryIcon .productInlineIcon,.pantryIcon svg{width:24px;height:24px}
+.pantryIcon.hasPhoto{background:transparent}
+.pantryIcon img{width:30px;height:30px;object-fit:contain;border-radius:6px}
+.pantryInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:none;border:0;padding:4px 0;color:inherit;font:inherit;cursor:pointer;min-height:44px;justify-content:center}
+.pantryInfo strong{font-size:16px;font-weight:600;line-height:1.25;color:var(--text-color,#2f4a38);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.pantryInfo small{font-size:14px;line-height:1.3;color:var(--muted-text,#718177)}
+.pantryTag{font-weight:600}
+.pantryTag.low{color:#a86b12}
+.pantryTag.out{color:#b04545}
+.pantryControls{flex:0 0 auto;display:flex;align-items:center;gap:4px}
+.pantryStep{width:40px;height:40px;border-radius:12px;border:0;background:#fff;color:#2f4a38;font-size:20px;font-weight:600;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(40,60,45,.08)}
+.pantryStep:active{transform:scale(.95)}
+.pantryQty{min-width:24px;text-align:center;font-size:16px;font-weight:700;color:var(--text-color,#2f4a38)}
+.pantryToList{height:40px;padding:0 12px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.pantryOnList{font-size:13px;font-weight:600;color:#3f7a50;padding:0 6px;white-space:nowrap}
+.pantryEmpty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:20px 14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}
+.pantryEmpty i{width:36px;height:36px;border-radius:11px;background:#e3f4e7;color:#42634b;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:4px}
+.pantryEmpty strong{font-size:16px;color:var(--text-color,#2f4a38)}
+.pantryEmpty span{font-size:14px;line-height:1.45;color:var(--muted-text,#718177)}
+.pantryRefill{margin:0 0 12px;padding:14px;border-radius:16px;background:#fff6e0;border:1px solid #f1e0b3}
+.pantryRefillHead{display:flex;align-items:center;gap:12px}
+.pantryRefillHead i{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#ffe9b0;color:#8a6212;display:flex;align-items:center;justify-content:center;font-size:17px}
+.pantryRefillHead div{display:flex;flex-direction:column;gap:2px}
+.pantryRefillHead strong{font-size:16px;color:#5d4510}
+.pantryRefillHead small{font-size:14px;color:#86703b}
+.pantryRefillNames{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.pantryRefillNames span{font-size:14px;font-weight:600;padding:6px 10px;border-radius:999px;background:#fff;color:#5d4510}
+.pantryRefillNames span.onList{opacity:.55;text-decoration:line-through}
+.pantryRefillBtn{width:100%;margin-top:12px;background:#3F5B45!important;color:#fff!important}
+.pantryNameRow{display:flex;gap:8px;align-items:stretch}
+.pantryNameRow .budgetInput{flex:1}
+.pantryScanBtn{flex:0 0 52px;width:52px;padding:0!important;font-size:18px!important;display:flex;align-items:center;justify-content:center}
+.pantryScanBtn[hidden]{display:none!important}
+.pantryFormRow{display:grid;grid-template-columns:1.4fr 1fr;gap:9px}
+.pantryMore{margin-top:12px;border-radius:12px}
+.pantryMore summary{cursor:pointer;font-size:14px;font-weight:600;color:#3f6b4b;padding:8px 0;list-style:none;min-height:28px}
+.pantryMore summary::-webkit-details-marker{display:none}
+.pantryMore summary::before{content:"+ ";font-weight:700}
+.pantryMore[open] summary::before{content:"− "}
+.pantryMore summary span{font-weight:500;color:var(--muted-text,#718177)}
+.pantryMore .budgetStatus{margin:6px 0 0}
+.pantryNone{margin:4px 2px}
+.pantryToast{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:15500;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-radius:16px;background:#2f4a38;color:#fff;box-shadow:0 10px 30px rgba(20,35,25,.25);animation:roundBarIn .25s ease;transition:opacity .25s ease,transform .25s ease}
+.pantryToast.leaving{opacity:0;transform:translateY(8px)}
+.pantryToast span{flex:1;font-size:15px;line-height:1.4}
+.pantryToast button{flex:0 0 auto;min-height:40px;padding:0 14px;border:0;border-radius:11px;background:#e1f1e5;color:#2f4a38;font-size:14px;font-weight:700;cursor:pointer}
+.pantryDialog .pantryEdit{display:flex;flex-direction:column;gap:10px}
+.pantryDialog .pantryEdit label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted-text,#66766c)}
+.pantryDialog .pantryEditRow{display:grid;grid-template-columns:1.4fr 1fr;gap:9px}
+.pantryDialog .familyDialogInput{font-size:16px!important;margin:0;width:100%;box-sizing:border-box}
+.pantryDialog .familyDialogInput{letter-spacing:normal!important;font-weight:500!important;text-align:left!important}
+.pantryDelete{align-self:flex-start;margin-top:2px;min-height:44px;padding:0 4px;border:0;background:none;color:#b04545;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+body.dark-theme .pantryDelete{color:#f08f8f}
+.restockList{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:46vh;overflow-y:auto}
+.restockRow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:var(--subtle-card-bg,#f4f8f5)}
+.restockCheck{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:40px;cursor:pointer}
+.restockCheck input{width:20px;height:20px;accent-color:#3F5B45;flex:0 0 20px}
+.restockCheck span{font-size:15px;color:var(--text-color,#2f4a38);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.restockCheck em{font-style:normal;color:var(--muted-text,#718177)}
+.restockLoc{flex:0 0 auto;font-size:14px!important;padding:8px;border-radius:10px;border:1px solid #dce6df;background:#fff;color:#2f4a38;max-width:132px}
+body.dark-theme .pantryRow,body.dark-theme .pantryEmpty,body.dark-theme .restockRow{background:#29352d}
+body.dark-theme .pantryIcon:not(.hasPhoto),body.dark-theme .pantryStep{background:#1d241f;color:#edf5ef}
+body.dark-theme .pantryInfo strong,body.dark-theme .pantryQty,body.dark-theme .pantryEmpty strong,body.dark-theme .restockCheck span{color:#edf5ef}
+body.dark-theme .pantryInfo small,body.dark-theme .pantryEmpty span,body.dark-theme .pantryGroupTitle,body.dark-theme .restockCheck em{color:#b8c6bc}
+body.dark-theme .pantryEmpty i{background:#34443a;color:#cfe6d5}
+body.dark-theme .pantryTag.low{color:#f0c065}
+body.dark-theme .pantryTag.out{color:#f08f8f}
+body.dark-theme .pantryRefill{background:#3a3424;border-color:#5a4c2a}
+body.dark-theme .pantryRefillHead strong{color:#f5e6c0}
+body.dark-theme .pantryRefillHead small{color:#d8c79c}
+body.dark-theme .pantryRefillHead i{background:#5a4c2a;color:#f5e6c0}
+body.dark-theme .pantryRefillNames span{background:#2a2619;color:#f5e6c0}
+body.dark-theme .pantryMore summary{color:#9fd3ac}
+body.dark-theme .pantryOnList{color:#9fd3ac}
+body.dark-theme .restockLoc{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
 </style>
 </body>
 
