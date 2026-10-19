@@ -5618,7 +5618,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion">Versie 1.3</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.3.2</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -15057,26 +15057,40 @@ body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f0
     set(DEV_KEY,null);set(MODE_KEY,null);showDev();apply();
     note("Testinstellingen verborgen. Pro staat weer aan.");
   };
-  function bindVersion(){
-    // Let op: de app blokkeert snelle dubbeltikken (tegen inzoomen), waardoor "click" bij snel tikken
-    // niet komt. Daarom tellen we pointerup/touchend zelf.
-    document.querySelectorAll(".aboutInfoVersion").forEach(function(v){
-      if(v.__dev)return;v.__dev=true;
-      v.style.cursor="pointer";v.style.webkitUserSelect="none";v.style.userSelect="none";
-      var taps=0,timer=null,lastAt=0;
-      function tap(e){
-        var now=Date.now();if(now-lastAt<60)return;lastAt=now;   // touchend + pointerup van dezelfde tik maar één keer tellen
-        // Geen stopPropagation: de bescherming tegen inzoomen (op document) moet de tik blijven zien.
-        taps++;clearTimeout(timer);timer=setTimeout(function(){taps=0;},2500);
-        if(get(DEV_KEY)==="1"){if(taps>=5){taps=0;note("De testinstellingen staan al aan. Je vindt ze onderaan Instellingen.");}return;}
-        if(taps>=2&&taps<5)note("Nog "+(5-taps)+" keer tikken voor de testinstellingen.");
-        if(taps>=5){taps=0;set(DEV_KEY,"1");showDev();note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");}
-      }
-      v.addEventListener("pointerup",tap);
-      v.addEventListener("touchend",tap,{passive:true});
-      v.addEventListener("click",function(e){e.stopPropagation();});
-    });
+  // Testinstellingen: 5× tikken óf 2 seconden ingedrukt houden op het versienummer.
+  // Eén luisteraar op het hele document (capture), zodat het altijd werkt, ook als
+  // andere onderdelen tikken tegenhouden. Snelle dubbeltikken worden door de app
+  // geblokkeerd tegen inzoomen; daarom tellen we touchend/pointerup zelf.
+  var taps=0,tapTimer=null,lastAt=0,holdTimer=null;
+  function onVersion(e){return e&&e.target&&e.target.closest&&e.target.closest(".aboutInfoVersion");}
+  function enableDev(){
+    taps=0;clearTimeout(holdTimer);
+    if(get(DEV_KEY)==="1"){note("De testinstellingen staan al aan. Je vindt ze onderaan Instellingen.");return;}
+    set(DEV_KEY,"1");showDev();
+    note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");
+    try{if(navigator.vibrate)navigator.vibrate(30);}catch(_){}
   }
+  function countTap(e){
+    if(!onVersion(e))return;
+    var now=Date.now();if(now-lastAt<80)return;lastAt=now;
+    clearTimeout(holdTimer);
+    taps++;clearTimeout(tapTimer);tapTimer=setTimeout(function(){taps=0;},3000);
+    if(taps>=5){enableDev();return;}
+    if(taps>=2&&get(DEV_KEY)!=="1")note("Nog "+(5-taps)+" keer tikken voor de testinstellingen.");
+  }
+  function startHold(e){
+    if(!onVersion(e))return;
+    clearTimeout(holdTimer);holdTimer=setTimeout(enableDev,2000);
+  }
+  function cancelHold(){clearTimeout(holdTimer);}
+  document.addEventListener("touchend",countTap,{capture:true,passive:true});
+  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")countTap(e);},true);
+  document.addEventListener("touchstart",startHold,{capture:true,passive:true});
+  document.addEventListener("pointerdown",function(e){if(e.pointerType!=="touch")startHold(e);},true);
+  ["touchmove","touchcancel","pointercancel"].forEach(function(t){document.addEventListener(t,cancelHold,{capture:true,passive:true});});
+  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")cancelHold();},true);
+  document.addEventListener("touchend",cancelHold,{capture:true,passive:true});
+  function bindVersion(){}
   // Tik op een vergrendelde kaart → ontgrendelscherm
   document.addEventListener("click",function(e){
     var c=e.target.closest&&e.target.closest(".proLockedCard");
@@ -15087,6 +15101,7 @@ body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f0
 })();
 </script>
 <style id="pro-gate-style">
+html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;border-radius:10px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(63,91,69,.12)}
 .proUnlockHero{display:none;margin:12px auto 0;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 body.proFree .proUnlockHero{display:inline-flex}
 .proLockedCard > i:first-child{position:relative;overflow:visible}
