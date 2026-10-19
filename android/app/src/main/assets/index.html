@@ -5034,6 +5034,12 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 </head>
 
 <body>
+<script>
+/* Was je de vorige keer ingelogd? Toon dan meteen de app in plaats van het inlogscherm.
+   Firebase bevestigt de sessie op de achtergrond; mocht die toch verlopen zijn, dan verschijnt het inlogscherm alsnog. */
+(function(){try{if(localStorage.getItem("boodschappenWasLoggedIn")==="1"){document.documentElement.classList.add("boot-logged-in");document.body.classList.add("logged-in");}}catch(e){}})();
+</script>
+<style id="boot-logged-in-style">html.boot-logged-in #loginScreen{display:none!important}</style>
 <div id="loginScreen">
   <div class="loginBox">
     <div class="welcome">
@@ -5345,9 +5351,20 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p class="budgetPrivacyNote">Je voorraad wordt aan je account gekoppeld. Je ziet hem dus ook op een andere telefoon als je daar inlogt.</p>
       <button type="button" class="pantryClearAll" onclick="event.stopPropagation();clearWholePantry()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Hele voorraad wissen</button>
     </section>
-    <div class="proFeatureCard">
-      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Suggesties op basis van je vaste producten en eerdere boodschappen.</p><span class="proComingSoon">Binnenkort beschikbaar</span></div>
+    <div class="proFeatureCard assistantLaunch" onclick="toggleAssistant(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAssistant(event)}">
+      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Tips op basis van wat je vaak koopt: wat bijna op is, wat je vergeet en wat in de aanbieding is.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
+    <section id="assistantPanel" class="budgetPlannerPanel assistantPanel" hidden aria-label="Persoonlijke assistent" onclick="event.stopPropagation()">
+      <div class="budgetPanelHeading"><div><h3>Je assistent</h3><p>Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten.</p></div></div>
+      <div id="assistantTips"></div>
+      <h3 class="budgetSectionTitle">Welke tips wil je zien?</h3>
+      <div class="assistSettings">
+        <label class="assistSettingRow"><span><strong>Bijna op</strong><small>Op basis van hoe vaak je iets koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="soon" onchange="setAssistantSetting('soon',this.checked)"></label>
+        <label class="assistSettingRow"><span><strong>Niet vergeten</strong><small>Producten die je meestal samen koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="forgot" onchange="setAssistantSetting('forgot',this.checked)"></label>
+        <label class="assistSettingRow"><span><strong>Aanbiedingen</strong><small id="assistantDealNote">Op producten die je vaak koopt.</small></span><input type="checkbox" class="pantrySwitch assistSwitch" data-k="deals" onchange="setAssistantSetting('deals',this.checked)"></label>
+      </div>
+      <p class="budgetPrivacyNote">De tips worden op je eigen telefoon berekend uit je boodschappengeschiedenis. Alleen voor aanbiedingen wordt de productnaam opgezocht via PrijsProfeet.</p>
+    </section>
     <p class="proFootnote">De Pro-functies worden stap voor stap ontwikkeld. Er is op dit moment geen betaald abonnement nodig.</p>
   </div>
 
@@ -5624,7 +5641,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.4.1</div>
+      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.5.1</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -5685,7 +5702,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
-      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft.</p>
+      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook of jij Pro hebt.</p>
@@ -5797,16 +5814,18 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <button type="button" class="saveListMainBtn" onclick="saveCurrentListAs()"><i class="fa-solid fa-floppy-disk"></i> Lijst opslaan</button>
   </div>
 
-  <div class="status" id="status">
-   <i class=\"fa-solid fa-cloud\"></i> Lijst automatisch opgeslagen
-    <span>Laatste update: vandaag</span>
-</div>
+  <div class="status" id="status"></div>
 
   
 <section id="overviewView" class="overviewView" aria-label="Overzicht">
   <div class="overview-new">
     <h2 id="overviewGreetingNew" class="overview-new-greeting">Goedendag 👋</h2>
   <div id="overviewScrollArea">
+
+    <div id="overviewAssistCard" class="overview-new-card" hidden>
+      <div class="overview-new-title"><i class="fa-solid fa-wand-magic-sparkles overview-new-assist"></i><span>Tip voor jou</span></div>
+      <div class="assistCardBody"></div>
+    </div>
 
     <button type="button" id="overviewExpiryCard" class="overview-new-card overview-click-card" onclick="openPantryFromOverview()" hidden>
       <div class="overview-new-title"><i class="fa-solid fa-hourglass-half overview-new-expiry"></i><span>Bijna over de datum</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
@@ -7123,7 +7142,7 @@ async function logoutFromMenu() {
     const status = document.getElementById("status");
     if (status) status.innerText = "";
 
-    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); localStorage.removeItem("boodschappenWasLoggedIn"); localStorage.removeItem("boodschappenBootCache"); } catch (_) {} document.documentElement.classList.remove("boot-logged-in"); await auth.signOut();
   } catch(error) {
     explicitLogoutInProgress = false;
     await familyAlert("Uitloggen", "Uitloggen is niet gelukt.", "fa-triangle-exclamation");
@@ -10197,6 +10216,9 @@ async function showFamilyCode() {
 }
 
 function closeFamilyMenuForDialog() {
+  // In het scherm Meer is het menu de pagina zelf: laat die staan, alleen het venster komt erover.
+  const __app = document.querySelector(".app");
+  if (__app && __app.classList.contains("more-active")) return;
   closeFamilyMenu();
   const menu = document.getElementById("familyMenu");
   if (menu) {
@@ -10902,7 +10924,7 @@ async function register() {
 
     // Een nieuw Firebase-account wordt automatisch ingelogd.
     // Direct uitloggen voorkomt dat de gebruiker onverwacht meteen binnenkomt.
-    try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
+    try { localStorage.removeItem("boodschappenGreetingName"); localStorage.removeItem("boodschappenWasLoggedIn"); localStorage.removeItem("boodschappenBootCache"); } catch (_) {} document.documentElement.classList.remove("boot-logged-in"); await auth.signOut();
     registrationInProgress = false;
 
     document.getElementById("registerName").value = "";
@@ -10921,7 +10943,7 @@ async function register() {
     // newly created account unexpectedly signed in.
     try {
       if (auth.currentUser) {
-        try { localStorage.removeItem("boodschappenGreetingName"); } catch (_) {} await auth.signOut();
+        try { localStorage.removeItem("boodschappenGreetingName"); localStorage.removeItem("boodschappenWasLoggedIn"); localStorage.removeItem("boodschappenBootCache"); } catch (_) {} document.documentElement.classList.remove("boot-logged-in"); await auth.signOut();
       }
     } catch (signOutError) {
       console.error("Uitloggen na registratiefout mislukt:", signOutError);
@@ -11045,6 +11067,8 @@ function toggleRegisterPassword(fieldId, button) {
 
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
+      try { localStorage.removeItem("boodschappenWasLoggedIn"); localStorage.removeItem("boodschappenBootCache"); } catch (_) {}
+      document.documentElement.classList.remove("boot-logged-in");
       if (firstAuthState || explicitLogoutInProgress) {
         document.body.classList.remove("logged-in");
         const loginScreen = document.getElementById("loginScreen");
@@ -11067,6 +11091,7 @@ function toggleRegisterPassword(fieldId, button) {
     }
 
     firstAuthState = false;
+    try { localStorage.setItem("boodschappenWasLoggedIn", "1"); } catch (_) {}
 
     // Tijdens registratie wordt een nieuwe Firebase-gebruiker automatisch ingelogd.
     // Negeer die tijdelijke auth-state: pas na een echte login mag de normale flow starten.
@@ -11511,23 +11536,33 @@ async function openQuickAddFromOverview(){
     var history=await readOverviewHistory();
     sources=sources.concat(history.map(function(x){return x.items||[];}));
   }catch(_){}
-  sources.push(Array.isArray(boodschappen)?boodschappen:[]);
+  // Huidige lijst telt niet mee; wat er al op staat, laten we weg (net als onder de lijst).
+  var __qaNorm=function(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();};
+  var onList={};
+  (Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)onList[__qaNorm(x.text)]=1;});
 
   var counts={};
-  sources.flat().forEach(function(item){
-    var text=typeof item==="string"?item:(item&&item.text);
-    if(!text) return;
-    text=String(text).trim();
-    var key=text.toLowerCase();
-    if(!counts[key]) counts[key]={text:text,count:0};
-    counts[key].count++;
+  sources.forEach(function(list){
+    var seen={};
+    (list||[]).forEach(function(item){
+      var text=typeof item==="string"?item:(item&&item.text);
+      if(!text) return;
+      text=String(text).trim();
+      var key=__qaNorm(text);
+      if(!key||seen[key]) return; seen[key]=1;
+      if(!counts[key]) counts[key]={text:text,count:0};
+      counts[key].count++;
+    });
   });
-  var products=Object.keys(counts).map(function(k){return counts[k];})
+  var allKnown=Object.keys(counts).length;
+  var products=Object.keys(counts).filter(function(k){return !onList[k];}).map(function(k){return counts[k];})
     .sort(function(a,b){return b.count-a.count || a.text.localeCompare(b.text,"nl");}).slice(0,10);
 
   body.innerHTML="";
   if(!products.length){
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je vaak koopt, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
+    body.innerHTML=allKnown
+      ?'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Alles staat al op je lijst</strong></div><p>De producten die je vaak koopt, staan al op je boodschappenlijst.</p></div>'
+      :'<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen producten</strong></div><p>Producten die je eerder hebt gekocht of in een vaste lijst hebt bewaard, verschijnen hier. Dan voeg je ze met één tik opnieuw toe aan je lijst.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -11539,10 +11574,11 @@ async function openQuickAddFromOverview(){
     btn.innerHTML='<span></span><i class="fa-solid fa-plus"></i>';
     btn.querySelector("span").textContent=p.text;
     btn.addEventListener("click",function(){
+      if(btn.classList.contains("added")) return;
       __overviewAddProduct(p.text);
       btn.classList.add("added");
+      btn.disabled=true;
       btn.querySelector("i").className="fa-solid fa-check";
-      setTimeout(function(){btn.classList.remove("added");btn.querySelector("i").className="fa-solid fa-plus";},900);
     });
     grid.appendChild(btn);
   });
@@ -13785,6 +13821,17 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   function bestDeal(rows,term){
     return rankDeals(rows,term)[0]||null;
   }
+  // Voor de persoonlijke assistent: beste aanbieding voor een product bij je gekozen supermarkt.
+  window.__assistantBestDeal=async function(term){
+    const sel=read().supermarket||"ah";
+    const rows=await fetchBudgetDeals(term,sel);
+    return rows?bestDeal(rows,term):null;
+  };
+  window.__assistantSupermarket=function(){
+    const sel=read().supermarket||"ah";
+    const names={ah:"Albert Heijn",jumbo:"Jumbo",lidl:"Lidl",aldi:"Aldi",plus:"PLUS",dirk:"Dirk",vomar:"Vomar",other:""};
+    return {key:sel,name:names[sel]||"",supported:!!budgetRetailerSlugs[sel]};
+  };
   const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
   const niceDate=iso=>{const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return"";const d=new Date(+m[1],+m[2]-1,+m[3]);return LONG_DAYS[d.getDay()]+" "+(+m[3])+" "+MONTHS[+m[2]-1];};
   function dealCard(p,label){
@@ -15146,7 +15193,8 @@ body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f0
   var CARDS=[
     {card:".proPlannerLaunch",btn:".proPlannerLaunch .proPlannerButton",panel:"smartPlannerPanel",fn:"toggleSmartPlanner",label:'Open weekplanner <i class="fa-solid fa-chevron-down"></i>'},
     {card:".budgetPlannerLaunch",btn:".budgetLaunchButton",panel:"budgetPlannerPanel",fn:"toggleBudgetPlanner",label:'Open budgetplanner <i class="fa-solid fa-chevron-down"></i>'},
-    {card:".pantryLaunch",btn:".pantryLaunchButton",panel:"pantryPanel",fn:"togglePantry",label:'Open voorraad <i class="fa-solid fa-chevron-down"></i>',family:true}
+    {card:".pantryLaunch",btn:".pantryLaunchButton",panel:"pantryPanel",fn:"togglePantry",label:'Open voorraad <i class="fa-solid fa-chevron-down"></i>',family:true},
+    {card:".assistantLaunch",btn:".assistantLaunchButton",panel:"assistantPanel",fn:"toggleAssistant",label:'Open assistent <i class="fa-solid fa-chevron-down"></i>'}
   ];
 
   // Openen van een Pro-onderdeel zonder Pro → ontgrendelscherm
@@ -15172,6 +15220,7 @@ body.dark-theme .pantryStats .warn b,body.dark-theme .pantryShareError{color:#f0
       '<li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span><strong>Slimme weekplanner</strong>Recepten kiezen en alle ingrediënten in één keer op je lijst.</span></li>'+
       '<li><i class="fa-solid fa-wallet" aria-hidden="true"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de aanbiedingen bij jouw supermarkt.</span></li>'+
       '<li><i class="fa-solid fa-cube" aria-hidden="true"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en delen met je familie.</span></li>'+
+      '<li><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span><strong>Persoonlijke assistent</strong>Tips over wat bijna op is, wat je vergeet en wat in de aanbieding is.</span></li>'+
       '</ul>'+(hasData()?'<p class="proUpsellNote"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Je gegevens blijven bewaard. Met Pro kun je ze meteen weer gebruiken.</p>':'')+
       '<p class="proUpsellTest">Testmodus: er is nog geen betaling gekoppeld.</p></div>',
       '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="later">Niet nu</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="on">Pro aanzetten</button>');
@@ -15282,8 +15331,8 @@ body.dark-theme .pantryShareRow.viaFamily .pantryShareIcon{background:#3a3424;co
 html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;border-radius:10px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(63,91,69,.12)}
 .proUnlockHero{display:none;margin:12px auto 0;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 body.proFree .proUnlockHero{display:inline-flex}
-.proLockedCard > i:first-child{position:relative;overflow:visible}
-.proLockedCard > i:first-child::after{content:"\f023";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#3F5B45;color:#fff;font-size:9px;line-height:18px;text-align:center;border:2px solid var(--card-bg,#fff)}
+/* Geen klein slotje op het icoon: de knop "Ontgrendel met Pro" laat het slot al zien */
+.proLockedCard > i:first-child::after{content:none!important;display:none!important}
 .proLockedCard strong,.proLockedCard p{opacity:.75}
 html body #proMenuSub .proLockedCard .proPlannerButton,html body #proMenuSub .proLockedCard .budgetLaunchButton{background:#fff2d0!important;color:#7a5a12!important}
 .proUpsell ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -15296,7 +15345,7 @@ html body #proMenuSub .proLockedCard .proPlannerButton,html body #proMenuSub .pr
 .devSettingsTitle{margin-top:18px!important}
 .devProToggleRow span small{display:block;font-size:13px!important;font-weight:400!important;color:var(--muted-text,#718177);margin-top:2px;white-space:normal}
 .devProToggleRow > span:not(.settingsToggle){flex:1;display:flex;flex-direction:column;text-align:left}
-body.dark-theme .proLockedCard > i:first-child::after{background:#4f8a62;border-color:#222a24}
+
 body.dark-theme html body #proMenuSub .proLockedCard .proPlannerButton{background:#3a3424!important;color:#f5e6c0!important}
 body.dark-theme .proUpsell li i{background:#34443a;color:#cfe6d5}
 body.dark-theme .proUpsell li strong{color:#edf5ef}
@@ -15389,6 +15438,326 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
   setTimeout(render,1500);
 })();
 </script>
+<script id="boot-cache">
+/* Laatste lijst en statusregel onthouden, zodat ze bij het openen direct zichtbaar zijn
+   (in plaats van een lege kaart) tot Firebase de actuele versie heeft geladen. */
+(function(){
+  var KEY="boodschappenBootCache";
+  function save(){
+    try{
+      if(!document.documentElement.classList.contains("boot-logged-in")&&!document.body.classList.contains("logged-in"))return;
+      var st=document.getElementById("status");
+      var items=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen))?boodschappen.slice(0,200):[];
+      localStorage.setItem(KEY,JSON.stringify({items:items,status:st?st.innerHTML:"",at:Date.now()}));
+    }catch(e){}
+  }
+  var restored=false;
+  try{
+    if(localStorage.getItem("boodschappenWasLoggedIn")==="1"){
+      var c=JSON.parse(localStorage.getItem(KEY)||"null");
+      if(c){
+        var st=document.getElementById("status");if(st&&!st.innerHTML&&c.status)st.innerHTML=c.status;
+        if(Array.isArray(c.items)&&typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&!boodschappen.length&&c.items.length){
+          c.items.forEach(function(x){boodschappen.push(x);});restored=true;
+          try{showList();}catch(e){}
+        }
+      }
+    }
+  }catch(e){}
+  if(typeof saveList==="function"){var os=saveList;saveList=async function(){var r=await os.apply(this,arguments);save();return r;};}
+  if(typeof showList==="function"){var ol=showList;var t=null;showList=function(){var r=ol.apply(this,arguments);clearTimeout(t);t=setTimeout(save,400);return r;};}
+  var stEl=document.getElementById("status");if(stEl)new MutationObserver(function(){clearTimeout(window.__bootSt);window.__bootSt=setTimeout(save,300);}).observe(stEl,{childList:true,subtree:true,characterData:true});
+})();
+</script>
+<script id="assistantLogic">
+/* Persoonlijke assistent (Pro) – fase 1.
+   Alles wordt op de telefoon berekend uit je geschiedenis, je lijst en je voorraad.
+   Alleen voor aanbiedingen wordt (net als in de budgetplanner) PrijsProfeet geraadpleegd. */
+(function(){
+  var DAY=86400000;
+  var SET_KEY="assistantSettings",DISMISS_KEY="assistantDismissed",DEAL_KEY="assistantDealCache";
+  function get(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+  function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+  function same(a,b){
+    try{if(window.__pantryApi&&window.__pantryApi.same)return window.__pantryApi.same(a,b);}catch(e){}
+    return norm(a)===norm(b);
+  }
+  function nice(s){s=String(s||"").trim();return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+  function isPro(){return !window.isProActive||window.isProActive();}
+  function settings(){var s=get(SET_KEY,{});return {soon:s.soon!==false,forgot:s.forgot!==false,deals:s.deals!==false};}
+  function dismissed(id){var m=get(DISMISS_KEY,{});return m[id]&&m[id]>Date.now();}
+  function dismiss(id,days){var m=get(DISMISS_KEY,{});var now=Date.now();Object.keys(m).forEach(function(k){if(m[k]<now)delete m[k];});m[id]=now+(days||3)*DAY;put(DISMISS_KEY,m);}
+  function listItems(){try{return Array.isArray(boodschappen)?boodschappen:[];}catch(e){return [];}}
+  function onList(name){return listItems().some(function(x){return x&&!x.completed&&same(x.text,name);});}
+  function inPantry(name){
+    try{if(!window.__pantryRead)return false;return window.__pantryRead().items.some(function(i){return Number(i.qty)>0&&same(i.name,name);});}catch(e){return false;}
+  }
+  function daysTxt(n){n=Math.round(n);return n===1?"1 dag":n+" dagen";}
+
+  /* ---------- Geschiedenis (60 s in het geheugen) ---------- */
+  var histCache=null,histAt=0;
+  async function rounds(){
+    if(histCache&&Date.now()-histAt<(histCache.length?60000:4000))return histCache;
+    var h=[];try{if(typeof readOverviewHistory==="function")h=await readOverviewHistory();}catch(e){}
+    histCache=(h||[]).map(function(r){
+      var at=Number(r.savedAt||r.date||r.createdAt||0);if(!at&&r.savedAt)at=Date.parse(r.savedAt)||0;
+      var seen={},names=[];
+      (r.items||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);var k=norm(t);if(!k||seen[k])return;seen[k]=1;names.push({k:k,t:String(t).trim()});});
+      return {at:at,items:names};
+    }).filter(function(r){return r.at&&r.items.length;}).sort(function(a,b){return a.at-b.at;});
+    histAt=Date.now();return histCache;
+  }
+
+  /* ---------- 1. Bijna op ---------- */
+  function soonTips(R){
+    var per={};
+    R.forEach(function(r){r.items.forEach(function(it){(per[it.k]=per[it.k]||{t:it.t,dates:[]}).dates.push(r.at);});});
+    var now=Date.now(),out=[];
+    Object.keys(per).forEach(function(k){
+      var p=per[k],d=p.dates;if(d.length<3)return;
+      var gaps=[];for(var i=1;i<d.length;i++)gaps.push((d[i]-d[i-1])/DAY);
+      var avg=gaps.reduce(function(a,b){return a+b;},0)/gaps.length;if(avg<1||avg>45)return;
+      var since=(now-d[d.length-1])/DAY,ratio=since/avg;
+      if(ratio<0.85||ratio>3)return;
+      if(onList(p.t)||inPantry(p.t))return;
+      out.push({id:"soon:"+k,type:"soon",prio:ratio,product:nice(p.t),
+        title:nice(p.t)+" is waarschijnlijk bijna op",
+        text:"Je koopt "+p.t.toLowerCase()+" meestal elke "+daysTxt(avg)+". De laatste keer was "+daysTxt(since)+" geleden.",
+        action:"Op lijst"});
+    });
+    return out.sort(function(a,b){return b.prio-a.prio;});
+  }
+
+  /* ---------- 2. Niet vergeten ---------- */
+  function forgotTips(R){
+    if(R.length<4)return [];
+    var count={},pair={},names={};
+    R.forEach(function(r){
+      var ks=r.items.map(function(i){names[i.k]=names[i.k]||i.t;return i.k;});
+      ks.forEach(function(a){count[a]=(count[a]||0)+1;ks.forEach(function(b){if(a!==b){var key=a+"|"+b;pair[key]=(pair[key]||0)+1;}});});
+    });
+    var cur=listItems().filter(function(x){return x&&x.text;});
+    var curKeys={};cur.forEach(function(x){curKeys[norm(x.text)]=1;});
+    var out=[],used={};
+    cur.forEach(function(x){
+      if(x.completed)return;
+      var a=norm(x.text);if(!count[a]||count[a]<3)return;
+      var best=null;
+      Object.keys(count).forEach(function(b){
+        if(b===a||curKeys[b]||used[b])return;
+        var both=pair[a+"|"+b]||0;if(both<3)return;
+        var p=both/count[a];if(p<0.6)return;
+        // Basisproducten die je bijna altijd koopt (melk, brood) vallen onder "bijna op", niet onder "niet vergeten".
+        var pB=count[b]/R.length;if(pB>=0.8)return;
+        if(p/pB<1.2)return;   // alleen echte combinaties
+        if(!best||p>best.p)best={b:b,p:p};
+      });
+      if(best&&!inPantry(names[best.b])&&!onList(names[best.b])){
+        used[best.b]=1;
+        out.push({id:"forgot:"+a+">"+best.b,type:"forgot",prio:best.p+1,product:nice(names[best.b]),
+          title:"Niet vergeten?",
+          text:"Bij "+String(x.text).toLowerCase()+" koop je meestal ook "+names[best.b].toLowerCase()+".",
+          action:nice(names[best.b])});
+      }
+    });
+    return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,3);
+  }
+
+  /* ---------- 3. Aanbiedingen op wat jij vaak koopt ---------- */
+  var dealsBusy=false;
+  function frequent(R,n){
+    var c={},t={};R.forEach(function(r){r.items.forEach(function(i){c[i.k]=(c[i.k]||0)+1;t[i.k]=t[i.k]||i.t;});});
+    return Object.keys(c).filter(function(k){return c[k]>=2;}).sort(function(a,b){return c[b]-c[a];}).slice(0,n).map(function(k){return t[k];});
+  }
+  function money(n){return "€\u00a0"+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function untilTxt(iso){var m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return "";var d=new Date(+m[1],+m[2]-1,+m[3]);return " t/m "+d.toLocaleDateString("nl-NL",{weekday:"short",day:"numeric",month:"short"});}
+  function dealTipsFromCache(R){
+    var sm=window.__assistantSupermarket?window.__assistantSupermarket():{supported:false};
+    if(!sm.supported)return [];
+    var cache=get(DEAL_KEY,{}),out=[];
+    frequent(R,6).forEach(function(name){
+      var c=cache[sm.key+":"+norm(name)];
+      if(!c||!c.deal||Date.now()-c.at>6*3600000)return;
+      var p=c.deal,price=Number(p.price),orig=Number(p.original_price);
+      var promo=(p.promotional_keywords&&p.promotional_keywords[0])?String(p.promotional_keywords[0]):"";
+      out.push({id:"deal:"+norm(name)+":"+(p.valid_until||""),type:"deal",prio:orig>price?(orig-price)/orig:0.1,product:nice(name),
+        title:nice(name)+" is in de aanbieding",
+        text:String(p.name||name)+" · "+money(price)+(orig>price?" (was "+money(orig)+")":"")+(promo?" · "+promo:"")+" bij "+sm.name+untilTxt(p.valid_until)+".",
+        action:onList(name)?"":"Op lijst",onListAlready:onList(name)});
+    });
+    return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,3);
+  }
+  async function refreshDeals(R){
+    if(dealsBusy||!window.__assistantBestDeal)return false;
+    var sm=window.__assistantSupermarket?window.__assistantSupermarket():{supported:false};if(!sm.supported)return false;
+    var cache=get(DEAL_KEY,{}),changed=false;dealsBusy=true;
+    try{
+      var names=frequent(R,6);
+      for(var i=0;i<names.length;i++){
+        var key=sm.key+":"+norm(names[i]);
+        if(cache[key]&&Date.now()-cache[key].at<6*3600000)continue;
+        try{var d=await window.__assistantBestDeal(names[i]);cache[key]={at:Date.now(),deal:d||null};changed=true;}catch(e){break;}
+      }
+    }finally{dealsBusy=false;}
+    if(changed)put(DEAL_KEY,cache);
+    return changed;
+  }
+
+  /* ---------- Alle tips ---------- */
+  var lastTips=[];
+  async function computeTips(){
+    if(!isPro())return [];
+    var R=await rounds(),s=settings(),tips=[];
+    if(s.forgot)tips=tips.concat(forgotTips(R));
+    if(s.soon)tips=tips.concat(soonTips(R).slice(0,4));
+    if(s.deals)tips=tips.concat(dealTipsFromCache(R));
+    tips=tips.filter(function(t){return !dismissed(t.id);});
+    // Eén tip per product
+    var seenP={};tips=tips.filter(function(t){var k=norm(t.product);if(seenP[k])return false;seenP[k]=1;return true;});
+    // Volgorde: eerst wat nu op je lijst ontbreekt, dan wat bijna op is, dan aanbiedingen
+    var order={forgot:0,soon:1,deal:2};
+    tips.sort(function(a,b){return order[a.type]-order[b.type]||b.prio-a.prio;});
+    lastTips=tips;return tips;
+  }
+  var ICON={soon:"fa-hourglass-half",forgot:"fa-lightbulb",deal:"fa-tag"};
+  function tipHtml(t,compact){
+    return '<div class="assistTip type-'+t.type+'" data-id="'+esc(t.id)+'">'+
+      '<span class="assistTipIcon"><i class="fa-solid '+ICON[t.type]+'" aria-hidden="true"></i></span>'+
+      '<div class="assistTipBody"><strong>'+esc(t.title)+'</strong><span>'+esc(t.text)+'</span>'+
+      '<div class="assistTipActions">'+
+        (t.action?'<button type="button" class="assistAdd" data-p="'+esc(t.product)+'"><span class="plus">+</span> '+esc(t.type==="forgot"?t.action:"Op lijst")+'</button>':(t.onListAlready?'<span class="assistOnList"><i class="fa-solid fa-check" aria-hidden="true"></i> Staat op je lijst</span>':''))+
+        (compact?'<button type="button" class="assistMore">Meer tips</button>':'')+
+      '</div></div>'+
+      '<button type="button" class="assistDismiss" aria-label="Tip verbergen"><span class="stepIcon plus" aria-hidden="true"></span></button>'+
+    '</div>';
+  }
+  function bind(box,after){
+    ["click","pointerdown","touchstart"].forEach(function(ev){box.addEventListener(ev,function(e){if(e.target.closest("button"))e.stopPropagation();});});
+    box.querySelectorAll(".assistTip").forEach(function(el){
+      var id=el.getAttribute("data-id");
+      var add=el.querySelector(".assistAdd"),dis=el.querySelector(".assistDismiss"),more=el.querySelector(".assistMore");
+      if(add)add.onclick=async function(e){
+        e.stopPropagation();add.disabled=true;var name=add.getAttribute("data-p");
+        try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:name}]);}catch(err){}
+        dismiss(id,7);toast(esc(name)+" staat op je boodschappenlijst.");after();
+      };
+      if(dis)dis.onclick=function(e){e.stopPropagation();dismiss(id,3);el.classList.add("leaving");setTimeout(after,180);};
+      if(more)more.onclick=function(e){e.stopPropagation();openAssistant();};
+    });
+  }
+  function toast(m){try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(m);}catch(e){}}
+
+  /* ---------- Overzicht: "Tip voor jou" ---------- */
+  async function renderOverviewTip(){
+    var card=document.getElementById("overviewAssistCard");if(!card)return;
+    var tips=await computeTips();
+    if(!tips.length){card.hidden=true;return;}
+    card.hidden=false;
+    var body=card.querySelector(".assistCardBody");
+    body.innerHTML=tipHtml(tips[0],true)+(tips.length>1?'<div class="assistCount">'+(tips.length-1)+(tips.length===2?' andere tip':' andere tips')+'</div>':'');
+    bind(body,renderAll);
+  }
+
+  /* ---------- Pro: assistent-paneel ---------- */
+  async function renderPanel(){
+    var box=document.getElementById("assistantTips");if(!box)return;
+    var tips=await computeTips();
+    box.innerHTML=tips.length?tips.map(function(t){return tipHtml(t,false);}).join(""):
+      '<div class="assistEmpty"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><strong>Nog geen tips</strong><span>De assistent leert van je boodschappenrondes. Na een paar keer "Bewaren en nieuwe lijst" verschijnen hier tips die bij jou passen.</span></div>';
+    bind(box,renderAll);
+    var s=settings();
+    document.querySelectorAll("#assistantPanel .assistSwitch").forEach(function(cb){cb.checked=!!s[cb.getAttribute("data-k")];});
+    var sm=window.__assistantSupermarket?window.__assistantSupermarket():{};
+    var note=document.getElementById("assistantDealNote");
+    if(note)note.textContent=sm.supported?"Aanbiedingen bij "+sm.name+" (kies je supermarkt in de budgetplanner).":"Kies in de budgetplanner je supermarkt om aanbiedingen te zien.";
+  }
+  function renderAll(){renderOverviewTip();renderPanel();}
+
+  function openAssistant(){
+    try{showMoreView();}catch(e){}
+    try{openProSubmenu();}catch(e){}
+    setTimeout(function(){var p=document.getElementById("assistantPanel");if(p&&p.hidden)window.toggleAssistant();else renderPanel();
+      setTimeout(function(){var q=document.getElementById("assistantPanel");if(q)q.scrollIntoView({behavior:"smooth",block:"start"});},120);},80);
+  }
+  window.openAssistant=openAssistant;
+  window.toggleAssistant=function(event){
+    if(event&&event.stopPropagation)event.stopPropagation();
+    if(!isPro()){if(window.showProUpsell)window.showProUpsell();return;}
+    var panel=document.getElementById("assistantPanel");if(!panel)return;
+    panel.hidden=!panel.hidden;
+    var btn=document.querySelector(".assistantLaunchButton");
+    if(btn)btn.innerHTML=panel.hidden?'Open assistent <i class="fa-solid fa-chevron-down"></i>':'Assistent sluiten <i class="fa-solid fa-chevron-up"></i>';
+    if(!panel.hidden){renderPanel();setTimeout(function(){panel.scrollIntoView({behavior:"smooth",block:"nearest"});},60);
+      rounds().then(refreshDeals).then(function(ch){if(ch)renderAll();});}
+  };
+  window.setAssistantSetting=function(k,on){var s=get(SET_KEY,{});s[k]=!!on;put(SET_KEY,s);renderAll();};
+  window.__assistantRefresh=renderAll;
+
+  /* ---------- Koppelen ---------- */
+  if(typeof updateOverviewView==="function"){
+    var o=updateOverviewView;
+    updateOverviewView=function(){var r=o.apply(this,arguments);setTimeout(renderOverviewTip,50);return r;};
+  }
+  if(typeof showList==="function"){
+    var ol=showList,t=null;
+    showList=function(){var r=ol.apply(this,arguments);clearTimeout(t);t=setTimeout(renderAll,800);return r;};
+  }
+  // Na een nieuwe boodschappenronde is de geschiedenis veranderd
+  if(typeof clearList==="function"){
+    var oc=clearList;
+    clearList=async function(){var r=await oc.apply(this,arguments);histCache=null;setTimeout(renderAll,1200);return r;};
+  }
+  // Aanbiedingen op de achtergrond verversen (hooguit eens per 6 uur per product)
+  setTimeout(function(){if(isPro()&&settings().deals)rounds().then(refreshDeals).then(function(ch){if(ch)renderAll();});},4000);
+  setTimeout(renderAll,1800);
+})();
+</script>
+<style id="assistant-style">
+#overviewAssistCard[hidden]{display:none!important}
+.overview-new-assist{background:#efe7ff!important;color:#6a4fb3!important}
+body.dark-theme .overview-new-assist{background:#3a3150!important;color:#cbb8f5!important}
+#overviewAssistCard{cursor:default}
+.assistCardBody{margin-top:10px}
+.assistTip{position:relative;display:flex;gap:12px;align-items:flex-start;padding:12px 44px 12px 12px;border-radius:14px;background:var(--subtle-card-bg,#f4f8f5);transition:opacity .18s ease,transform .18s ease}
+.assistTip+.assistTip{margin-top:8px}
+.assistTip.leaving{opacity:0;transform:translateX(12px)}
+.assistTipIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.type-soon .assistTipIcon{background:#fff2d0;color:#9a6f12}
+.type-forgot .assistTipIcon{background:#efe7ff;color:#6a4fb3}
+.type-deal .assistTipIcon{background:#ffe3e3;color:#b04545}
+.assistTipBody{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.assistTipBody strong{font-size:16px;font-weight:600;line-height:1.3;color:var(--text-color,#2f4a38)}
+.assistTipBody > span{font-size:14px;line-height:1.4;color:var(--muted-text,#66766c)}
+.assistTipActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.assistAdd{min-height:40px;padding:0 14px;border:0;border-radius:11px;background:#3F5B45;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.assistAdd .plus{font-weight:800}
+.assistMore{min-height:40px;padding:0 12px;border:0;border-radius:11px;background:transparent;color:#3f6b4b;font-size:14px;font-weight:600;cursor:pointer}
+.assistOnList{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#3f7a50;min-height:40px}
+.assistDismiss{position:absolute;top:6px;right:6px;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:#8a988f;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.assistDismiss .stepIcon{transform:rotate(45deg)}
+.assistCount{margin:8px 2px 0;font-size:13px;color:var(--muted-text,#718177)}
+.assistEmpty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:20px 14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}
+.assistEmpty i{width:36px;height:36px;border-radius:11px;background:#efe7ff;color:#6a4fb3;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:4px}
+.assistEmpty strong{font-size:16px;color:var(--text-color,#2f4a38)}
+.assistEmpty span{font-size:14px;line-height:1.45;color:var(--muted-text,#718177)}
+.assistSettings{margin-top:16px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5);padding:4px 12px}
+.assistSettingRow{display:flex!important;align-items:center;gap:12px;padding:10px 0!important;margin:0!important;cursor:pointer;border-bottom:1px solid rgba(63,91,69,.08)}
+.assistSettingRow:last-child{border-bottom:0}
+.assistSettingRow > span{flex:1;display:flex;flex-direction:column;gap:2px}
+html body #proMenuSub .assistSettingRow strong{font-size:16px!important;font-weight:600!important;color:var(--text-color,#2f4a38)}
+html body #proMenuSub .assistSettingRow small{font-size:14px!important;font-weight:400!important;color:var(--muted-text,#718177)}
+.assistantLaunch{cursor:pointer}
+body.dark-theme .assistTip,body.dark-theme .assistEmpty,body.dark-theme .assistSettings{background:#29352d}
+body.dark-theme .assistTipBody strong,body.dark-theme .assistEmpty strong,body.dark-theme #proMenuSub .assistSettingRow strong{color:#edf5ef}
+body.dark-theme .assistTipBody > span,body.dark-theme .assistEmpty span,body.dark-theme .assistCount{color:#b8c6bc}
+body.dark-theme .type-soon .assistTipIcon{background:#3a3424;color:#f0c065}
+body.dark-theme .type-forgot .assistTipIcon,body.dark-theme .assistEmpty i{background:#3a3150;color:#cbb8f5}
+body.dark-theme .type-deal .assistTipIcon{background:#4a2b2b;color:#f2a3a3}
+body.dark-theme .assistAdd{background:#4f8a62}
+body.dark-theme .assistMore,body.dark-theme .assistOnList{color:#9fd3ac}
+</style>
 </body>
 
 <style id="overview-dashboard-final">
