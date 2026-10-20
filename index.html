@@ -5316,10 +5316,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       </div>
       <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
       <label for="budgetExpenseName">Product of omschrijving</label>
-      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. boodschappen bij supermarkt">
+      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. weekboodschappen">
       <div class="budgetFormRow">
         <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
-        <div><label for="budgetExpenseCategory">Categorie</label><select id="budgetExpenseCategory" class="budgetInput"><option value="Groente en fruit">Groente en fruit</option><option value="Zuivel en eieren">Zuivel en eieren</option><option value="Brood en voorraad">Brood en voorraad</option><option value="Vlees, vis en vega">Vlees, vis en vega</option><option value="Huishouden">Huishouden</option><option value="Overig">Overig</option></select></div>
+        <div><label for="budgetExpenseStore">Winkel</label><select id="budgetExpenseStore" class="budgetInput"></select></div>
       </div>
       <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
       <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
@@ -5787,7 +5787,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
       <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
-      <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het komt niet in je geschiedenis.</p>
+      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>. Een verwijderd product komt niet in je geschiedenis.</p>
+      <p>Zie je een aanbieding in de budgetplanner, tik dan op <strong>+ Op lijst</strong>. Onder het product zie je dan de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
@@ -7732,7 +7733,13 @@ function normalizeBoodschappen(data) {
         barcode: item.barcode ? String(item.barcode) : "",
         imageUrl: item.imageUrl ? String(item.imageUrl) : "",
         brand: item.brand ? String(item.brand) : "",
-        quantity: Math.max(1, Number(item.quantity) || 1)
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        ...(item.deal && typeof item.deal === "object" && Number.isFinite(Number(item.deal.price)) ? { deal: {
+          price: Number(item.deal.price),
+          promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
+          until: item.deal.until ? String(item.deal.until).slice(0, 10) : "",
+          store: item.deal.store ? String(item.deal.store).slice(0, 30) : ""
+        } } : {})
       };
     }
 
@@ -8776,6 +8783,26 @@ function updateListProgress() {
   progress.style.setProperty("--progress", percentage + "%");
 }
 
+async function removeProductWithUndo(index) {
+  const item = boodschappen[index];
+  if (!item) return;
+  const removed = JSON.parse(JSON.stringify(item));
+  boodschappen.splice(index, 1);
+  selectedIndex = -1;
+  showList();
+  await saveList();
+  const safe = String(removed.text).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  try {
+    if (window.__pantryApi && window.__pantryApi.toast) {
+      window.__pantryApi.toast(safe + " is van je lijst gehaald.", "Ongedaan maken", async () => {
+        boodschappen.splice(Math.min(index, boodschappen.length), 0, removed);
+        showList();
+        await saveList();
+      });
+    }
+  } catch (e) {}
+}
+
 async function changeProductQuantity(index, delta) {
   const item = boodschappen[index];
   if (!item) return;
@@ -8947,15 +8974,20 @@ function showList(animationType = "") {
     quantityWrap.className = "productQuantity";
     quantityWrap.setAttribute("aria-label", "Aantal");
 
+    const atOne = Math.max(1, Number(item.quantity) || 1) <= 1;
     const minusButton = document.createElement("button");
     minusButton.type = "button";
-    minusButton.className = "quantityButton";
-    minusButton.innerHTML = '<span class="stepIcon" aria-hidden="true"></span>';
-    minusButton.setAttribute("aria-label", "Aantal verlagen");
-    minusButton.title = "Aantal verlagen";
+    minusButton.className = "quantityButton" + (atOne ? " qtyTrash" : "");
+    minusButton.innerHTML = atOne ? '<i class="fa-solid fa-trash-can" aria-hidden="true"></i>' : '<span class="stepIcon" aria-hidden="true"></span>';
+    minusButton.setAttribute("aria-label", atOne ? "Product verwijderen" : "Aantal verlagen");
+    minusButton.title = atOne ? "Product verwijderen" : "Aantal verlagen";
     minusButton.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
+      if (Math.max(1, Number(item.quantity) || 1) <= 1) {
+        await removeProductWithUndo(index);
+        return;
+      }
       await changeProductQuantity(index, -1);
     });
 
@@ -8980,23 +9012,12 @@ function showList(animationType = "") {
     quantityWrap.appendChild(plusButton);
     productWrap.appendChild(quantityWrap);
 
-    const trashButton = document.createElement("button");
-    trashButton.type = "button";
-    trashButton.className = "product-row-trash-can";
-    trashButton.setAttribute("aria-label", "Product verwijderen");
-    trashButton.title = "Product verwijderen";
-    trashButton.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i>';
-    trashButton.addEventListener("click", async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      boodschappen.splice(index, 1);
-      selectedIndex = -1;
-      showList();
-      await saveList();
-    });
-    productWrap.appendChild(trashButton);
 
     div.appendChild(productWrap);
+    if (typeof window.__dealLineFor === "function") {
+      const dl = window.__dealLineFor(item);
+      if (dl) { div.appendChild(dl); div.classList.add("hasDeal"); }
+    }
 
     // In zowel de familielijst als een Deellijst is zichtbaar wie een product heeft voltooid.
     if (item.completed && item.completedBy) {
@@ -13766,6 +13787,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const note=document.getElementById("budgetSupermarketNote");
     if(note)note.textContent="Keuze opgeslagen: "+select.options[select.selectedIndex].text.replace(/ \(zonder aanbiedingen\)/,"")+".";
     window.__updateDealsAvail();
+    if(window.__fillExpenseStores)window.__fillExpenseStores();
   };
   window.__updateDealsAvail=function(){
     const sel=document.getElementById("budgetSupermarket");if(!sel)return;
@@ -13788,13 +13810,26 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const d=read();d.budget=Math.round(value*100)/100;write(d);renderBudget();document.getElementById("budgetStatus").textContent="Je weekbudget is opgeslagen.";
   };
   window.addBudgetExpense=function(){
-    const name=document.getElementById("budgetExpenseName"),price=document.getElementById("budgetExpensePrice"),category=document.getElementById("budgetExpenseCategory");
+    const name=document.getElementById("budgetExpenseName"),price=document.getElementById("budgetExpensePrice"),storeSel=document.getElementById("budgetExpenseStore");
     const label=name.value.trim(),amount=Number(price.value);
     if(!label){name.focus();document.getElementById("budgetStatus").textContent="Vul een omschrijving in voor deze uitgave.";return;}
     if(!price.value.trim()||!Number.isFinite(amount)||amount<=0){price.focus();document.getElementById("budgetStatus").textContent="Vul een bedrag groter dan € 0 in.";return;}
-    const d=read();d.expenses.unshift({id:Date.now()+Math.random(),name:label,amount:Math.round(amount*100)/100,category:category.value,date:new Date().toISOString()});write(d);
-    name.value="";price.value="";renderBudget();document.getElementById("budgetStatus").textContent="Uitgave toegevoegd.";
+    const d=read();d.expenses.unshift({id:Date.now()+Math.random(),name:label,amount:Math.round(amount*100)/100,store:storeSel&&storeSel.value?storeSel.value:"Andere winkel",date:new Date().toISOString()});write(d);
+    name.value="";price.value="";if(storeSel){storeSel.__touched=false;fillStores();}renderBudget();document.getElementById("budgetStatus").textContent="Uitgave toegevoegd.";
   };
+  // Winkel-keuze bij een uitgave: dezelfde supermarkten als "Mijn vaste supermarkt"; standaard je vaste supermarkt.
+  function fillStores(){
+    const sel=document.getElementById("budgetExpenseStore"),fav=document.getElementById("budgetSupermarket");if(!sel||!fav)return;
+    const keep=sel.__touched?sel.value:"";
+    if(!sel.options.length){
+      [...fav.options].forEach(o=>{if(o.value==="other")return;const x=document.createElement("option");x.value=o.text;x.textContent=o.text;sel.appendChild(x);});
+      const other=document.createElement("option");other.value="Andere winkel";other.textContent="Andere winkel";sel.appendChild(other);
+      sel.addEventListener("change",()=>{sel.__touched=true;});
+    }
+    const favName=fav.value==="other"?"Andere winkel":(fav.selectedOptions[0]?fav.selectedOptions[0].text:"Andere winkel");
+    sel.value=keep||favName;
+  }
+  window.__fillExpenseStores=fillStores;
   window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
   window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
 
@@ -13901,7 +13936,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
   const niceDate=iso=>{const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return"";const d=new Date(+m[1],+m[2]-1,+m[3]);return LONG_DAYS[d.getDay()]+" "+(+m[3])+" "+MONTHS[+m[2]-1];};
-  function dealCard(p,label){
+  function dealCard(p,label,searchTerm){
     const card=document.createElement("div");card.className="dealItem";
     if(label){const l=document.createElement("span");l.className="dealLabel";l.textContent=label;card.appendChild(l);}
     const name=document.createElement("div");name.className="dealName";name.textContent=p.name||p.product_name||p.title||"Product";card.appendChild(name);
@@ -13918,8 +13953,9 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(!badge){const f=document.createElement("span");f.className="dealFolder";f.textContent="Folderactie";priceRow.appendChild(f);}
     card.appendChild(priceRow);
     const meta=document.createElement("div");meta.className="dealMeta";
-    meta.textContent=[promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
+    meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:retailerName()}));
     return card;
   }
   window.searchBudgetLivePrices=async function(){
@@ -13938,12 +13974,12 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
       results.replaceChildren();
       const list=document.createElement("div");list.className="dealList";results.appendChild(list);
       const FIRST=4;
-      rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p)));
+      rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p,null,term)));
       if(rows.length>FIRST){
         const more=document.createElement("button");more.type="button";more.className="dealMore";
         const rest=Math.min(rows.length,12)-FIRST;
         more.textContent="Toon "+rest+" meer";
-        more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p)));more.remove();});
+        more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p,null,term)));more.remove();});
         results.appendChild(more);
       }
     }catch(err){results.textContent=dealError(err);}
@@ -14003,9 +14039,11 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const progress=document.getElementById("budgetProgress");if(progress)progress.style.width=pct+"%";
     const ring=document.getElementById("budgetRing");if(ring){const over=d.budget>0&&spent>d.budget;ring.style.background=d.budget>0?`conic-gradient(${over?"#c95b52":"#57956c"} 0 ${pct}%, #83b8e8 ${pct}% 100%)`:"conic-gradient(#dfe9e2 0 100%)";ring.setAttribute("aria-label",`Uitgegeven ${euro(spent)} van ${euro(d.budget)}`);}
     const status=document.getElementById("budgetStatus");if(status){if(!d.budget)status.textContent="Stel je weekbudget in en voeg je uitgaven toe.";else if(spent>d.budget)status.textContent="Je zit "+euro(spent-d.budget)+" boven je weekbudget.";else if(pct>=80)status.textContent="Let op: je hebt al "+Math.round(pct)+"% van je weekbudget gebruikt.";else status.textContent="Je hebt nog "+euro(remaining)+" van je weekbudget over.";}
-    const totals={};d.expenses.forEach(x=>{const cat=x.category||"Overig";totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
-    const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Je categorieën verschijnen zodra je uitgaven toevoegt.</p>';}
-    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(x.category||"Overig")} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
+    fillStores();
+    const storeOf=x=>x.store||"Zonder winkel";
+    const totals={};d.expenses.forEach(x=>{const cat=storeOf(x);totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
+    const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Zodra je uitgaven toevoegt, zie je hier per winkel wat je uitgeeft.</p>';}
+    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
   window.__refreshBudgetUI=function(){try{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();}catch(e){console.warn(e);}};
   document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();});
@@ -15475,18 +15513,32 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     new MutationObserver(mark).observe(st,{childList:true,characterData:true,subtree:true});mark();}
 
   /* Vaak gekocht: producten uit je geschiedenis en opgeslagen lijsten */
-  var cache=null,cacheAt=0,busy=false;
+  var cache=null,cacheAt=0,busy=false,BOOT=Date.now(),STORE="boodschappenStripCache";
+  // Laatste voorstellen op de telefoon bewaren, zodat ze bij het openen meteen klaarstaan.
+  var saved=null;try{saved=JSON.parse(localStorage.getItem(STORE)||"null");}catch(e){}
+  function persist(patch){try{var o=saved||{};Object.keys(patch).forEach(function(k){o[k]=patch[k];});saved=o;localStorage.setItem(STORE,JSON.stringify(o));}catch(e){}}
   function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
   async function load(){
     if(cache&&Date.now()-cacheAt<60000)return cache;
-    if(busy)return cache||[];busy=true;
+    if(!(cache&&cache.length)&&saved&&Array.isArray(saved.freq)&&saved.freq.length&&!busy){
+      // Eerst de bewaarde voorstellen tonen; op de achtergrond de echte geschiedenis ophalen.
+      fresh().then(function(r){if(r.length)later();});
+      return saved.freq;
+    }
+    return fresh();
+  }
+  async function fresh(){
+    if(busy)return (cache&&cache.length)?cache:((saved&&saved.freq)||[]);busy=true;
     var sources=[];
     try{if(typeof readOverviewHistory==="function"){var h=await readOverviewHistory();sources=sources.concat((h||[]).map(function(x){return x.items||[];}));}}catch(e){}
     try{if(typeof readSavedLists==="function"){var sv=await readSavedLists();sources=sources.concat((sv||[]).map(function(x){return x.items||[];}));}}catch(e){}
     var counts={};
     sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;(counts[k]=counts[k]||{text:t,n:0}).n++;});});
     cache=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n||a.text.localeCompare(b.text,"nl");});
-    cacheAt=cache.length?Date.now():0;busy=false;return cache;   // lege uitkomst niet vasthouden
+    cacheAt=cache.length?Date.now():0;busy=false;
+    if(cache.length)persist({freq:cache.slice(0,40)});
+    else if(Date.now()-BOOT<15000&&saved&&Array.isArray(saved.freq))return saved.freq;   // geschiedenis nog niet binnen
+    return cache;   // lege uitkomst niet vasthouden
   }
   function onList(){var m={};try{(Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)m[norm(x.text)]=1;});}catch(e){}return m;}
   function icon(t){try{return productIconMarkup(getProductIcon(t));}catch(e){return "";}}
@@ -15499,6 +15551,10 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     var all=await load(),have=onList();
     var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,4);
     var routine=[];try{if(window.__routineCandidates)routine=await window.__routineCandidates();}catch(e){}
+    var proOn=!window.isProActive||window.isProActive();
+    if(routine.length)persist({routine:routine});
+    else if(proOn&&Date.now()-BOOT<15000&&saved&&Array.isArray(saved.routine))routine=saved.routine.filter(function(x){return !have[norm(x)];});
+    else if(Date.now()-BOOT>=15000)persist({routine:[]});
     var showR=routine.length>=2;
     if(!pick.length&&!showR){box.hidden=true;return;}
     box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+
@@ -15520,6 +15576,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
   if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);later();return r;};}
   ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){if(typeof window[fn]==="function"){var of=window[fn];window[fn]=function(){var r=of.apply(this,arguments);later();return r;};}});
   window.addEventListener("resize",later);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(render,0);});else setTimeout(render,0);
   setTimeout(render,1500);
 })();
 </script>
@@ -15544,6 +15601,9 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
         var st=document.getElementById("status");if(st&&!st.innerHTML&&c.status)st.innerHTML=c.status;
         if(Array.isArray(c.items)&&typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&!boodschappen.length&&c.items.length){
           c.items.forEach(function(x){boodschappen.push(x);});restored=true;
+          try{showList();}catch(e){}
+        }else if(Array.isArray(c.items)&&!c.items.length){
+          // Lege lijst: meteen "0 boodschappen" tonen in plaats van een lege kaart
           try{showList();}catch(e){}
         }
       }
@@ -15719,7 +15779,8 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       out.push({id:"deal:"+norm(name)+":"+(p.valid_until||""),type:"deal",prio:orig>price?(orig-price)/orig:0.1,product:nice(name),
         title:nice(name)+" is in de aanbieding",
         text:String(p.name||name)+" · "+money(price)+(orig>price?" (was "+money(orig)+")":"")+(promo?" · "+promo:"")+" bij "+sm.name+untilTxt(p.valid_until)+".",
-        action:onList(name)?"":"Op lijst",onListAlready:onList(name)});
+        action:onList(name)?"":"Op lijst",onListAlready:onList(name),
+        deal:{name:String(p.name||name),term:name,price:price,promo:String(p.promotional_keywords&&p.promotional_keywords[0]||""),until:p.valid_until||"",store:sm.name}});
     });
     return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,3);
   }
@@ -15834,6 +15895,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       if(oth&&tip)oth.onclick=function(e){e.stopPropagation();cookSkip[tip.recipe.id]=1;el.classList.add("leaving");setTimeout(after,180);};
       if(add)add.onclick=async function(e){
         e.stopPropagation();add.disabled=true;var name=add.getAttribute("data-p");
+        if(tip&&tip.type==="deal"&&tip.deal&&window.__addDealToList){try{await window.__addDealToList(tip.deal);}catch(err){}dismiss(id,7);after();return;}
         try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:name}]);}catch(err){}
         dismiss(id,7);toast(esc(name)+" staat op je boodschappenlijst.");after();
       };
@@ -15973,6 +16035,87 @@ html body #list #listProgress{position:sticky!important;top:-10px!important;z-in
 body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
 /* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
 html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
+</style>
+<script id="dealToList">
+/* Aanbiedingen op je boodschappenlijst: knop "+ Op lijst" en een klein regeltje onder het product. */
+(function(){
+  var MON=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function todayIso(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+  function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  var PCT=/^(tot\s*)?-?\s*\d+([.,]\d+)?\s*%(\s*korting)?$/i;
+  function tidyPromo(p){
+    p=String(p||"").trim();if(!p||PCT.test(p))return "";
+    if(/=/.test(p))return p.toUpperCase();
+    if(p===p.toUpperCase()&&/[A-Z]/.test(p)){p=p.toLowerCase();}
+    return p.replace(/\s*\+\s*/g," + ");
+  }
+  window.__tidyPromo=tidyPromo;
+  // Hoeveel moet je kopen om de korting te krijgen?
+  function qtyForPromo(p){
+    p=String(p||"").toLowerCase();
+    var m=p.match(/(\d+)\s*\+\s*(\d+)\s*gratis/);if(m)return Math.min(12,+m[1]+ +m[2]);
+    if(/(2e|2de|tweede)\s*(halve\s*prijs|gratis|voor\s*de\s*halve|\d+\s*%)/.test(p))return 2;
+    m=p.match(/^(\d+)\s*(stuks\s*)?voor\b/);if(m)return Math.min(12,+m[1]);
+    return 1;
+  }
+  window.__qtyForPromo=qtyForPromo;
+  function untilTxt(iso){var m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);return m?"t/m "+(+m[3])+" "+MON[+m[2]-1]:"";}
+  function active(d){return d&&Number.isFinite(Number(d.price))&&(!d.until||d.until>=todayIso());}
+  window.__dealLineFor=function(item){
+    if(!item||item.completed||!active(item.deal))return null;
+    var d=item.deal,el=document.createElement("span");el.className="productDeal";
+    var parts=[money(d.price)];var pr=tidyPromo(d.promo);if(pr)parts.push(pr);
+    var fav="";try{var fs=document.getElementById("budgetSupermarket");fav=fs&&fs.selectedOptions[0]?fs.selectedOptions[0].text:"";}catch(e){}
+    if(d.store&&d.store!==fav)parts.push("bij "+d.store);var u=untilTxt(d.until);if(u)parts.push(u);
+    el.innerHTML='<i class="fa-solid fa-tag" aria-hidden="true"></i>'+esc(parts.join(" · "));
+    return el;
+  };
+  function same(a,b){try{if(window.__pantryApi&&window.__pantryApi.same)return window.__pantryApi.same(a,b);}catch(e){}return String(a).trim().toLowerCase()===String(b).trim().toLowerCase();}
+  function findOnList(names){
+    try{var L=Array.isArray(boodschappen)?boodschappen:[];
+      for(var i=0;i<names.length;i++){if(!names[i])continue;for(var j=0;j<L.length;j++){if(L[j]&&!L[j].completed&&same(L[j].text,names[i]))return L[j];}}}catch(e){}
+    return null;
+  }
+  window.__dealOnList=function(d){var it=findOnList([d.name,d.term]);return !!(it&&it.deal&&Number(it.deal.price)===Number(d.price));};
+  // d = {name, term, price, promo, until, store}
+  window.__addDealToList=async function(d){
+    var deal={price:Number(d.price),promo:String(d.promo||""),until:String(d.until||"").slice(0,10),store:String(d.store||"")};
+    var it=findOnList([d.name,d.term]),added=false;
+    if(!it){
+      try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:d.name}]);}catch(e){}
+      it=findOnList([d.name]);added=true;
+    }
+    if(!it)return false;
+    it.deal=deal;
+    var need=qtyForPromo(deal.promo);if(need>(Number(it.quantity)||1))it.quantity=need;
+    try{showList();}catch(e){}
+    try{await saveList();}catch(e){console.warn(e);}
+    var msg=added?esc(it.text)+" staat op je boodschappenlijst":"De aanbieding staat nu bij "+esc(it.text);
+    if(need>1)msg+=" ("+need+" stuks voor de actie)";
+    try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(msg+".");}catch(e){}
+    return true;
+  };
+  window.__dealButton=function(d){
+    var b=document.createElement("button");b.type="button";b.className="dealAddBtn";
+    function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst';}
+    if(window.__dealOnList(d))done();else b.innerHTML='<span class="plus">+</span> Op lijst';
+    b.addEventListener("click",async function(e){e.preventDefault();e.stopPropagation();if(b.disabled)return;b.disabled=true;var ok=await window.__addDealToList(d);if(ok)done();else b.disabled=false;});
+    return b;
+  };
+})();
+</script>
+<style id="deal-to-list-style">
+#list .item .productDeal{display:flex;align-items:center;gap:5px;margin:-2px 0 2px 30px;font-size:13px!important;font-weight:600;line-height:1.3;color:#b04545;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.productDeal i{font-size:11px}
+body.dark-theme .productDeal{color:#f2a3a3}
+.dealAddBtn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:38px;padding:0 14px;border:0;border-radius:11px;background:#3F5B45;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.dealAddBtn .plus{font-weight:800}
+.dealAddBtn.done{background:#e3f4e7;color:#2f6b45;cursor:default}
+body.dark-theme .dealAddBtn.done{background:#2c3d31;color:#9fd3ac}
+html body #list .itemProductContent{grid-template-columns:19px minmax(0,1fr) 32px 92px !important}
+.quantityButton.qtyTrash{background:#f9e9e7!important;color:#b85a52!important;font-size:13px!important}
+body.dark-theme .quantityButton.qtyTrash{background:#3d2a28!important;color:#f0a49c!important}
 </style>
 <script id="expPicker">
 /* "Houdbaar tot": snelknoppen in plaats van meteen de kalender van de telefoon.
