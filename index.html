@@ -16159,9 +16159,12 @@ body.dark-theme .servVal,body.dark-theme .plannerServDefault{color:#edf5ef}
     SUB.classList.toggle("proScreen",!!c);
     P.forEach(function(x){var el=panel(x.id);if(el)el.classList.toggle("proScreenActive",x===c);});
     bar.hidden=!c;
-    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;bar.querySelector(".proScreenSub").textContent=c.sub||"";if(c!==was)setTimeout(scrollTop,0),setTimeout(scrollTop,90);}
+    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;bar.querySelector(".proScreenSub").textContent=c.sub||"";if(c!==was)scrollTop();}
     else if(was)setTimeout(scrollTop,0);
   }
+  // De onderdelen scrollen bij het openen zelf naar beneden (van vroeger, toen ze uitklapten).
+  // Als eigen scherm staat alles al bovenaan: dat scrollen uitzetten, anders verspringt het scherm.
+  P.forEach(function(c){var el=panel(c.id);if(el)el.scrollIntoView=function(){if(!SUB.classList.contains("proScreen"))return Element.prototype.scrollIntoView.apply(el,arguments);};});
   var mo=new MutationObserver(sync);
   P.forEach(function(c){var el=panel(c.id);if(el)mo.observe(el,{attributes:true,attributeFilter:["hidden"]});});
   bar.querySelector(".proScreenBack").addEventListener("click",function(e){e.stopPropagation();if(current)closePanel(current);sync();});
@@ -16293,6 +16296,8 @@ body.dark-theme .recipeShowAll{background:#222a24;border-color:#38453b;color:#9f
     try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(msg+".");}catch(e){}
     return true;
   };
+  // De bewaarde lijst wordt bij het opstarten al getoond voordat dit script er is: nog één keer tekenen met de aanbiedingsregeltjes.
+  try{if(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&boodschappen.some(function(x){return x&&x.deal;}))showList();}catch(e){}
   window.__dealButton=function(d){
     var b=document.createElement("button");b.type="button";b.className="dealAddBtn";
     function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst';}
