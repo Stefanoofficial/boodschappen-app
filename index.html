@@ -5272,15 +5272,24 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <label for="budgetSupermarket">Mijn vaste supermarkt</label>
       <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
         <option value="ah">Albert Heijn</option>
+        <option value="aldi">Aldi</option>
+        <option value="boni">Boni</option>
+        <option value="boons">Boon's Markt</option>
+        <option value="coop">Coop</option>
+        <option value="dagwinkel">Dagwinkel</option>
+        <option value="dekamarkt">DekaMarkt</option>
+        <option value="dirk">Dirk</option>
+        <option value="ekoplaza">Ekoplaza</option>
+        <option value="gewooncoop">Gewoon Coop</option>
+        <option value="hoogvliet">Hoogvliet</option>
         <option value="jumbo">Jumbo</option>
         <option value="lidl">Lidl</option>
-        <option value="aldi">Aldi</option>
+        <option value="mcd">MCD</option>
+        <option value="nettorama">Nettorama</option>
         <option value="plus">PLUS</option>
-        <option value="dirk">Dirk</option>
+        <option value="poiesz">Poiesz</option>
+        <option value="spar">SPAR</option>
         <option value="vomar">Vomar</option>
-        <option value="dekamarkt">DekaMarkt</option>
-        <option value="hoogvliet">Hoogvliet</option>
-        <option value="ekoplaza">Ekoplaza</option>
         <option value="other">Andere supermarkt (zonder aanbiedingen)</option>
       </select>
       <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard en gebruikt om aanbiedingen te zoeken.</p>
@@ -13791,13 +13800,21 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
 
   // Adres van je eigen tussenstap (Cloudflare Worker). Vervang JOUW-NAAM door jouw workers.dev-adres.
   const PRIJZEN_PROXY="https://boodschappen-prijzen.stefanoofficialgraanoogst.workers.dev";
-  const budgetRetailerSlugs={ah:"albert_heijn",jumbo:"jumbo",lidl:"lidl",aldi:"aldi",plus:"plus",dirk:"dirk",vomar:"vomar",dekamarkt:"dekamarkt",hoogvliet:"hoogvliet",ekoplaza:"ekoplaza"};
+  const budgetRetailerSlugs={ah:"albert_heijn",aldi:"aldi",boni:"boni",boons:"boons_markt",coop:"coop",dagwinkel:"dagwinkel",dekamarkt:"dekamarkt",dirk:"dirk",ekoplaza:"ekoplaza",gewooncoop:"gewoon_coop",hoogvliet:"hoogvliet",jumbo:"jumbo",lidl:"lidl",mcd:"mcd",nettorama:"nettorama",plus:"plus",poiesz:"poiesz",spar:"spar",vomar:"vomar"};
   const retailerName=()=>{const s=document.getElementById("budgetSupermarket");return s&&s.selectedOptions[0]?s.selectedOptions[0].text:"je supermarkt"};
   const money=n=>"€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
   const shortDate=iso=>{if(!iso)return"";const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"-"+m[2]:""};
   async function fetchBudgetDeals(term,selected){
-    const retailer=budgetRetailerSlugs[selected];
-    if(!retailer)return null;
+    const slug=budgetRetailerSlugs[selected];
+    if(!slug)return null;
+    try{return await fetchBudgetDealsFor(term,slug);}
+    catch(err){
+      // Sommige ketens hebben een naam met streepje (boons-markt); probeer die als de eerste vorm niet bekend is.
+      if(slug.indexOf("_")>=0&&err&&err.status>=400&&err.status<500)return await fetchBudgetDealsFor(term,slug.replace(/_/g,"-"));
+      throw err;
+    }
+  }
+  async function fetchBudgetDealsFor(term,retailer){
     const query="q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=30";
     const bases=[];
     if(PRIJZEN_PROXY&&!/JOUW-NAAM/.test(PRIJZEN_PROXY))bases.push(PRIJZEN_PROXY.replace(/\/+$/,"")+"/search?");
@@ -13819,9 +13836,9 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const rows=Array.isArray(payload)?payload:(payload.results||payload.products||payload.items||payload.data||[]);
     const today=new Date().toISOString().slice(0,10);
     return rows.filter(p=>{
-      const store=String(p.retailer||"").toLowerCase().replace(/-/g,"_");
+      const store=String(p.retailer||"").toLowerCase().replace(/[^a-z0-9]/g,"");
       const start=p.valid_from||"",end=p.valid_until||"";
-      return store===retailer&&Number.isFinite(Number(p.price))&&(!start||start<=today)&&(!end||end>=today);
+      return store===retailer.replace(/[^a-z0-9]/g,"")&&Number.isFinite(Number(p.price))&&(!start||start<=today)&&(!end||end>=today);
     });
   }
   function dealError(err){
@@ -13879,7 +13896,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   window.__assistantSupermarket=function(){
     const sel=read().supermarket||"ah";
-    const names={ah:"Albert Heijn",jumbo:"Jumbo",lidl:"Lidl",aldi:"Aldi",plus:"PLUS",dirk:"Dirk",vomar:"Vomar",dekamarkt:"DekaMarkt",hoogvliet:"Hoogvliet",ekoplaza:"Ekoplaza",other:""};
+    const names={ah:"Albert Heijn",aldi:"Aldi",boni:"Boni",boons:"Boon's Markt",coop:"Coop",dagwinkel:"Dagwinkel",dekamarkt:"DekaMarkt",dirk:"Dirk",ekoplaza:"Ekoplaza",gewooncoop:"Gewoon Coop",hoogvliet:"Hoogvliet",jumbo:"Jumbo",lidl:"Lidl",mcd:"MCD",nettorama:"Nettorama",plus:"PLUS",poiesz:"Poiesz",spar:"SPAR",vomar:"Vomar",other:""};
     return {key:sel,name:names[sel]||"",supported:!!budgetRetailerSlugs[sel]};
   };
   const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
@@ -15444,6 +15461,9 @@ body.dark-theme #status{color:#9fb8a6!important;background:transparent!important
 .frequentChip .fIcon{font-size:17px;line-height:1;display:inline-flex}
 .frequentChip .fIcon svg{width:20px;height:20px}
 .frequentChip:active{transform:scale(.97)}
+.frequentChip.frequentMore{padding:0 14px;color:#3f6b4b;background:#f4f8f5}
+.frequentChip.frequentMore i{font-size:11px}
+body.dark-theme .frequentChip.frequentMore{background:#1d241f;color:#9fd3ac}
 body.dark-theme .frequentChip{background:#222a24;border-color:#38453b;color:#edf5ef}
 body.dark-theme .frequentChip .plus{color:#9fd3ac}
 </style>
@@ -15477,16 +15497,17 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     var items=[];try{items=Array.isArray(boodschappen)?boodschappen:[];}catch(e){}
     if(!onListView()||items.length>5){box.hidden=true;return;}
     var all=await load(),have=onList();
-    var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,8);
+    var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,4);
     var routine=[];try{if(window.__routineCandidates)routine=await window.__routineCandidates();}catch(e){}
     var showR=routine.length>=2;
     if(!pick.length&&!showR){box.hidden=true;return;}
     box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+
       (showR?'<button type="button" class="frequentChip routineChip"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>Vaste boodschappen ('+routine.length+')</button>':'')+pick.map(function(p){
-      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+(pick.length?'<button type="button" class="frequentChip frequentMore">Meer <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>':'')+'</div>';
     box.hidden=false;
     var rc=box.querySelector(".routineChip");if(rc)rc.onclick=function(e){e.stopPropagation();if(window.openRoutinePicker)window.openRoutinePicker();};
-    box.querySelectorAll(".frequentChip:not(.routineChip)").forEach(function(b){b.onclick=async function(e){
+    var mo=box.querySelector(".frequentMore");if(mo)mo.onclick=function(e){e.stopPropagation();try{if(typeof openQuickAddFromOverview==="function"){openQuickAddFromOverview();return;}}catch(err){}try{showOverviewView();}catch(err){}};
+    box.querySelectorAll(".frequentChip:not(.routineChip):not(.frequentMore)").forEach(function(b){b.onclick=async function(e){
       e.stopPropagation();var inp=document.getElementById("product");if(!inp||typeof addProduct!=="function")return;
       inp.value=b.getAttribute("data-t");b.disabled=true;await addProduct();};});
     // Alleen tonen als het past boven de navigatie
