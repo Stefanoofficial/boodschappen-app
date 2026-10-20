@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Mijn Boodschappen</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="fontawesome/css/fa.min.css">
 <style>
 * {
   box-sizing: border-box;
@@ -4734,7 +4734,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       </div>
     </section>
     <div class="proFeatureCard budgetPlannerLaunch" onclick="toggleBudgetPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBudgetPlanner(event)}">
-      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je uitgaven bij en vind aanbiedingen bij jouw supermarkt.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="budgetPlannerPanel" class="budgetPlannerPanel" hidden aria-label="Prijs- en budgetplanner">
       <div class="budgetPanelHeading">
@@ -4842,7 +4842,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <button type="button" class="pantryClearAll" onclick="event.stopPropagation();clearWholePantry()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Hele voorraad wissen</button>
     </section>
     <div class="proFeatureCard assistantLaunch" onclick="toggleAssistant(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAssistant(event)}">
-      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Tips op basis van wat je vaak koopt en wat je in huis hebt: je vaste boodschappen, wat bijna op is, wat je vergeet, wat in de aanbieding is en wat je vandaag kunt koken.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Slimme tips: je vaste boodschappen, wat bijna op is en wat je vandaag kunt koken.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="assistantPanel" class="budgetPlannerPanel assistantPanel" hidden aria-label="Persoonlijke assistent" onclick="event.stopPropagation()">
       <div class="budgetPanelHeading"><div><h3>Je assistent</h3><p>Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten.</p></div></div>
@@ -5149,7 +5149,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
     </div>
-    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
+    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span><span>Iconen: <a href="https://fontawesome.com" target="_blank" rel="noopener">Font&nbsp;Awesome</a> <span class="nowrap">(CC&nbsp;BY&nbsp;4.0)</span></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -5199,6 +5199,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
+      <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook of jij Pro hebt.</p>
       <h4>Bewaren en verwijderen</h4>
@@ -5250,6 +5251,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Tik op het rondje naast een product om het af te vinken. Zo zie je direct wat al in je winkelwagen zit.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-plus-minus"></i><span>Aantal aanpassen of verwijderen</span></div>
+      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
       <p>Via Mijn familie kun je een nieuwe familie maken of met een familiecode meedoen met een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
@@ -5259,18 +5264,15 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>.</p>
+      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>. Anders dan bij de geschiedenis kies je zelf welke lijsten je bewaart.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
-      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>. Een verwijderd product komt niet in je geschiedenis.</p>
-      <p>Zie je een aanbieding in de budgetplanner (tabblad <strong>Aanbiedingen</strong>), tik dan op <strong>+ Op lijst</strong>. Onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
-      <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
+      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
-      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld.</p>
+      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld. Onder je lijst tik je op <strong>Meer</strong> om alle producten te zien.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
@@ -5284,6 +5286,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en budget <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. Tik op een label zoals <strong>Italiaans</strong> om alle recepten met dat label te zien. In een recept pas je met <strong>−</strong> en <strong>+</strong> het aantal porties aan; de hoeveelheden rekenen vanzelf mee, ook op je boodschappenlijst. De app onthoudt dat aantal voor de volgende recepten. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Aanbiedingen op je lijst <b class="aboutProBadge">PRO</b></span></div>
+      <p>Tik bij een aanbieding op <strong>+ Op lijst</strong>. Onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -5306,7 +5312,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="moreViewTitle">Meer</div>
   </section>
 
-  <h2>Voeg iets toe aan je lijst</h2>
+  <h2 class="srOnly">Voeg iets toe aan je lijst</h2>
 
   <div class="input-row-wrap">
     <div class="input-row">
@@ -13031,7 +13037,8 @@ window.__plannerMeals=function(){return read();};
 window.__plannerAddMeal=function(day,meal,ingredients,servings){const items=read();const entry={id:Date.now(),day:day,meal:meal,ingredients:ingredients.slice()};if(servings)entry.servings=servings;items.push(entry);items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);try{render();}catch(e){}};
 function render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
- const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
+ const items=read();const __ab=document.querySelector(".plannerAddListButton");if(__ab)__ab.hidden=!items.length;
+ if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
  box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+(x.servings?' <span class="plannerServ">· '+Number(x.servings)+(Number(x.servings)===1?' portie':' porties')+'</span>':'')+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -14935,7 +14942,7 @@ body.dark-theme .proLockedCard .proPlannerButton,body.dark-theme .proLockedCard 
 html body .app:not(.more-active):not(.overview-active) #list{
   height:auto!important;
   min-height:0!important;
-  max-height:min(560px,max(200px,calc(100dvh - 392px)))!important;
+  max-height:min(560px,max(200px,calc(100dvh - var(--listTopOffset,392px))))!important;
 }
 @media (max-height:700px){html body .app:not(.more-active):not(.overview-active) #list{max-height:min(420px,max(170px,calc(100dvh - 360px)))!important}}
 /* Knop 'Lijst opslaan' staat nu in het ⋮-menu */
@@ -15628,6 +15635,48 @@ body.dark-theme .proTab.active{background:#2c372f;color:#edf5ef}
 .recipeShowAll i{font-size:12px}
 body.dark-theme .recipeShowAll{background:#222a24;border-color:#38453b;color:#9fd3ac}
 </style>
+<style id="pro-polish-style">
+/* Kop boven het invoerveld alleen voor schermlezers: meer ruimte voor je lijst */
+html body h2.srOnly{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+html body h2.srOnly + .input-row-wrap{margin-top:16px!important}
+body.dark-theme .budgetRingInner strong{color:#edf5ef!important}
+/* Weekplanner: knop "Ingrediënten aan boodschappenlijst" alleen als er maaltijden gepland zijn */
+.plannerAddListButton[hidden]{display:none!important}
+/* Over de app: iconen in één nette kolom */
+html body .aboutInfoLine{align-items:flex-start!important}
+html body .aboutInfoLine > i{flex:0 0 24px!important;width:24px!important;min-width:24px!important;margin:2px 0 0!important;text-align:center!important;display:inline-flex!important;justify-content:center!important}
+/* Help & uitleg: inklapbaar */
+#helpMenuSub .helpSection{cursor:pointer;transition:none}
+#helpMenuSub .helpQuestion{margin-bottom:0!important;min-height:36px;padding-right:28px;position:relative;-webkit-tap-highlight-color:transparent}
+#helpMenuSub .helpQuestion::after{content:"\f078";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:12px;color:#8aa293}
+#helpMenuSub .helpSection.open .helpQuestion::after{transform:translateY(-50%) rotate(180deg)}
+#helpMenuSub .helpSection:not(.open) > p{display:none!important}
+#helpMenuSub .helpSection.open .helpQuestion{margin-bottom:8px!important}
+#helpMenuSub .helpSection > p + p{margin-top:8px}
+</style>
+<script id="pro-polish">
+(function(){
+  // Help & uitleg: alleen de vragen tonen; tik om het antwoord te openen
+  document.querySelectorAll("#helpMenuSub .helpSection").forEach(function(sec){
+    var q=sec.querySelector(".helpQuestion");if(!q)return;
+    q.setAttribute("role","button");q.setAttribute("tabindex","0");q.setAttribute("aria-expanded","false");
+    function toggle(e){if(e){e.stopPropagation();if(e.target.closest("a"))return;}var o=sec.classList.toggle("open");q.setAttribute("aria-expanded",String(o));}
+    sec.addEventListener("click",toggle);
+    q.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle(e);}});
+  });
+  // De lijst mag de ruimte van de weggehaalde kop gebruiken: hoogte opnieuw berekenen
+  function fit(){
+    var l=document.getElementById("list");if(!l)return;
+    var app=document.querySelector(".app");if(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")))return;
+    var top=l.getBoundingClientRect().top+(window.scrollY||0);
+    if(top>0)document.documentElement.style.setProperty("--listTopOffset",Math.round(top+392-256)+"px");
+  }
+  window.addEventListener("resize",fit);
+  if(typeof showList==="function"){var __o=showList;showList=function(){var r=__o.apply(this,arguments);fit();return r;};}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fit);else fit();
+  setTimeout(fit,300);
+})();
+</script>
 <script id="dealToList">
 /* Aanbiedingen op je boodschappenlijst: knop "+ Op lijst" en een klein regeltje onder het product. */
 (function(){
