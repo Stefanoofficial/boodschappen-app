@@ -5251,7 +5251,6 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="proTabPane" data-pane="recipes" hidden>
       <div class="plannerRecipeBox">
         <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het in je week te zetten.</p>
-        <div class="plannerServDefault"><span>Wij eten meestal met</span><div class="servStepper"><button type="button" class="servBtn" onclick="changeDefaultServings(-1,event)" aria-label="Minder personen"><span class="stepIcon" aria-hidden="true"></span></button><span class="servVal"><b id="plannerDefServ">2</b> <span id="plannerDefServWord">personen</span></span><button type="button" class="servBtn" onclick="changeDefaultServings(1,event)" aria-label="Meer personen"><span class="stepIcon plus" aria-hidden="true"></span></button></div></div>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
         <div id="plannerRecipeChips" class="recipeChips">
           <button type="button" class="recipeChip active" data-f="all" onclick="setRecipeFilter('all',event)">Alle recepten</button>
@@ -5815,7 +5814,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en budget <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. Tik op een label zoals <strong>Italiaans</strong> om alle recepten met dat label te zien. Stel bij <strong>Wij eten meestal met</strong> in voor hoeveel personen je kookt; in een recept kun je het aantal porties ook per keer aanpassen. De hoeveelheden rekenen dan vanzelf mee, ook op je boodschappenlijst. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. Tik op een label zoals <strong>Italiaans</strong> om alle recepten met dat label te zien. In een recept pas je met <strong>−</strong> en <strong>+</strong> het aantal porties aan; de hoeveelheden rekenen vanzelf mee, ook op je boodschappenlijst. De app onthoudt dat aantal voor de volgende recepten. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -13557,14 +13556,17 @@ window.openRecipeSheet=function(id){
  window.__rsServ=defServ(r);
  ov.querySelectorAll(".servBtn").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();
   window.__rsServ=Math.max(1,Math.min(12,window.__rsServ+Number(b.getAttribute("data-d"))));
+  try{localStorage.setItem(SERV_KEY,String(window.__rsServ));}catch(err){}
   ov.querySelector(".rsServVal").textContent=window.__rsServ;ov.querySelector(".rsServMeta").textContent=window.__rsServ;
   ov.querySelector(".rsIngredients").innerHTML=scaleIngredients(r.ingredients,window.__rsServ/r.servings).map(i=>'<li>'+esc(i)+'</li>').join('');});});
  ov.querySelectorAll(".recipeTagBtn").forEach(function(t){t.addEventListener("click",function(e){e.stopPropagation();closeRecipeSheet();
   try{if(window.__proSetTab)window.__proSetTab("smartPlannerPanel","recipes");}catch(err){}window.filterRecipeTag(t.getAttribute("data-tag"));});});
  document.body.style.overflow="hidden";
  requestAnimationFrame(function(){ov.classList.add("open");});
+
 };
 window.closeRecipeSheet=function(immediate){
+ try{renderRecipeCatalog();}catch(e){}
  const ov=document.getElementById("recipeSheetOverlay");
  document.body.style.overflow="";
  if(!ov)return;
@@ -15624,7 +15626,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
   async function render(){
     var box=document.getElementById("frequentStrip");if(!box)return;
     var items=[];try{items=Array.isArray(boodschappen)?boodschappen:[];}catch(e){}
-    if(!onListView()||items.length>5){box.hidden=true;return;}
+    if(items.length>5){box.hidden=true;return;}
     var all=await load(),have=onList();
     var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,4);
     var routine=[];try{if(window.__routineCandidates)routine=await window.__routineCandidates();}catch(e){}
@@ -15645,7 +15647,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       inp.value=b.getAttribute("data-t");b.disabled=true;await addProduct();};});
     // Alleen tonen als het past boven de navigatie
     requestAnimationFrame(function(){var nav=document.querySelector(".bottomNav"),stEl=document.getElementById("status");
-      if(!nav)return;var limit=nav.getBoundingClientRect().top-(stEl?stEl.offsetHeight:0)-4;
+      if(!nav||!onListView())return;var limit=nav.getBoundingClientRect().top-(stEl?stEl.offsetHeight:0)-4;
       if(box.getBoundingClientRect().bottom>limit)box.hidden=true;});
   }
   var t=null;function later(){clearTimeout(t);t=setTimeout(render,120);}
