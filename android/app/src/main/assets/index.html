@@ -8916,9 +8916,15 @@ function showList(animationType = "") {
   list.innerHTML = "";
   if (progress) list.appendChild(progress);
 
+  // Alleen nieuwe producten laten "binnenkomen"; bij opnieuw tekenen (bijv. als de lijst van internet binnenkomt) niets laten bewegen.
+  const __prevKeys = window.__renderedItemKeys || new Set();
+  const __nowKeys = new Set();
   ordered.forEach(({ item, index }) => {
     const div = document.createElement("div");
     div.className = "item" + (item.completed ? " completed" : "");
+    const __k = String(item.text || "").trim().toLowerCase();
+    __nowKeys.add(__k);
+    if (__prevKeys.has(__k)) div.classList.add("seenItem");
     div.dataset.index = String(index);
 
     const productText = item.text;
@@ -9055,6 +9061,7 @@ function showList(animationType = "") {
     list.appendChild(div);
   });
 
+  window.__renderedItemKeys = __nowKeys;
   updateListProgress();
   // Keep the overview in sync with the actual list, even when the list was
   // loaded before the user switched to Overzicht.
@@ -11868,6 +11875,8 @@ async function refreshOverviewGreeting(){
 // Keep the greeting current when the app remains open across a time change.
 setInterval(function(){ refreshOverviewGreeting(); }, 30000);
 
+function overviewHistoryText(n){return n ? n+" eerdere boodschappenlijst"+(n===1?"":"en")+" beschikbaar." : "Bekijk wat je eerder hebt gekocht.";}
+(function(){try{var c=localStorage.getItem("boodschappenHistCount");if(c!==null&&localStorage.getItem("boodschappenWasLoggedIn")==="1"){var set=function(){var hs=document.getElementById("overviewHistorySummary");if(hs)hs.textContent=overviewHistoryText(parseInt(c,10)||0);};if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",set);else set();}}catch(_){}})();
 async function updateOverviewView(){
   refreshOverviewGreeting();
   // Ensure the overview reads the same current list the user sees on Lijst.
@@ -11880,7 +11889,9 @@ async function updateOverviewView(){
   } catch (_) {}
   var history=await readOverviewHistory();
   var hs=document.getElementById("overviewHistorySummary");
-  if(hs) hs.textContent=history.length ? history.length+" eerdere boodschappenlijst"+(history.length===1?"":"en")+" beschikbaar." : "Bekijk wat je eerder hebt gekocht.";
+  // Pas de tekst alleen aan als de geschiedenis echt geladen is; anders blijft de bewaarde tekst staan (geen wisselende tekst bij opstarten).
+  var __hsLoaded=history.length>0||(auth&&auth.currentUser);
+  if(hs&&__hsLoaded){hs.textContent=overviewHistoryText(history.length);try{localStorage.setItem("boodschappenHistCount",String(history.length));}catch(_){}}
   if(typeof updateOverviewSavedLists==="function") await updateOverviewSavedLists();
   await updateOverviewDashboard();
 }
@@ -16310,6 +16321,7 @@ body.dark-theme .recipeShowAll{background:#222a24;border-color:#38453b;color:#9f
 })();
 </script>
 <style id="deal-to-list-style">
+#list .item.seenItem:not(.completedMoving):not(.uncompleting){animation:none!important}
 #list .item .productDeal .productDealBadge{flex:0 0 auto;font-size:11px;font-weight:800;color:#fff;background:#d9534f;border-radius:999px;padding:1px 7px;line-height:1.35}
 #list .item .productDeal{display:flex;align-items:center;gap:5px;margin:-2px 0 2px 30px;font-size:13px!important;font-weight:600;line-height:1.3;color:#b04545;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .productDeal i{font-size:11px}
