@@ -220,7 +220,6 @@ body.dark-theme .productSuggestion:active, body.dark-theme .productSuggestion:ho
   background: rgba(255,255,255,.06);
 }
 
-
 input {
   flex: 1;
   min-width: 0;
@@ -256,7 +255,6 @@ button {
   box-sizing: border-box;
   box-shadow: none;
 }
-
 
 .listProgressText {
   display: inline-flex;
@@ -409,11 +407,9 @@ body.dark-theme .quantityValue { color: #e7f0ea; }
   .quantityValue { font-size: 17px; }
 }
 
-
 /* Productregel: vaste bediening rechts, producttekst krijgt de resterende ruimte. */
 .itemProductContent{
   display:grid !important;
-  grid-template-columns:20px minmax(0,1fr) 34px 78px 34px !important;
   align-items:center !important;
   column-gap:7px !important;
   width:100% !important;
@@ -439,10 +435,7 @@ body.dark-theme .quantityValue { color: #e7f0ea; }
   min-width:78px !important;
   justify-self:end !important;
 }
-.itemProductContent .product-row-trash-can{
-  grid-column:5;
-  justify-self:end !important;
-}
+
 .itemProductContent .productBrand,
 .itemProductContent .productName{
   display:block !important;
@@ -455,20 +448,17 @@ body.dark-theme .quantityValue { color: #e7f0ea; }
 @media (max-width:430px){
   .item{padding:10px 9px !important;}
   .itemProductContent{
-    grid-template-columns:19px minmax(0,1fr) 30px 74px 32px !important;
     column-gap:5px !important;
   }
   .itemProductContent .itemCheck{width:19px !important;height:19px !important;}
-  .itemProductContent .productIcon,
-  .itemProductContent .productIconImage,
-  .itemProductContent .productRealImage{
+  .itemProductContent .productIcon,.itemProductContent .productRealImage {
     width:30px !important;min-width:30px !important;max-width:30px !important;
     height:30px !important;max-height:30px !important;
   }
   .itemProductContent .productQuantity{width:74px !important;min-width:74px !important;height:36px !important;}
   .itemProductContent .quantityButton{width:28px !important;height:28px !important;flex-basis:28px !important;}
   .itemProductContent .quantityValue{font-size:17px !important;min-width:14px !important;}
-  .itemProductContent .product-row-trash-can{width:32px !important;min-width:32px !important;height:34px !important;}
+  
 }
 .legalTextPage .legalCard{
   margin:12px 2px 24px;padding:18px;border-radius:18px;
@@ -559,7 +549,6 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-
 .buttons {
   display: flex;
   gap: 8px;
@@ -592,22 +581,7 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   font-size: 12px;
   font-weight: bold;
   }
-  .householdButton {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  background: #3F5B45;
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
 
-.householdButton i {
-  margin-right: 6px;
-}
 .status span {
     display: block;
     font-size: 10px;
@@ -731,16 +705,6 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   font-size: 12px;
   color: #7a847e;
 }
-.copyright {
-  color: #7a847e;
-  font-size: 12px;
-  margin-top: 4px;
-}
-.login-icon {
-  text-align: center;
-  font-size: 48px;
-  margin-bottom: 12px;
-}
 
 @media (max-height: 680px) {
   #loginScreen {
@@ -811,7 +775,6 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   font-size: 14px;
   color: white;
 }
-
 
 /* Stap 2: account aanmaken */
 .loginOr{
@@ -928,7 +891,6 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   border:1px solid #3F5B45;
 }
 
-
 /* Schermwissel registratie */
 .registerModal{
   overflow-y:auto;
@@ -942,7 +904,6 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
     padding-bottom:22px;
   }
 }
-
 
 .registerInputBox{
   position:relative;
@@ -971,13 +932,11 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   transform:translateY(-50%) scale(.96);
 }
 
-
 /* Account aanmaken: eigen achtergrond, geen scrollen */
 .registerBox{
   max-height:calc(100vh - 40px);
   overflow:hidden !important;
 }
-
 
 /* Stap 3: eerste keuze voor gebruikers zonder familie.
    De popup gebruikt dezelfde rechts-naar-links slide als de andere
@@ -1044,7 +1003,7 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   color:#666;
   font-size:16px;
 }
-.useModeButton,.useModeSkip{
+.useModeButton {
   width:100%;
   min-height:54px;
   margin-top:10px;
@@ -1064,15 +1023,9 @@ body.dark-theme .legalTextPage .legalCard h4{color:#9ed5ad;}
   background:#3F5B45;
   color:#fff;
 }
-.useModeButton i,.useModeSkip i{
+.useModeButton i {
   width:22px;
 }
-.useModeSkip{
-  border:1px solid #3F5B45;
-  background:transparent;
-  color:#3F5B45;
-}
-
 
 /* Thema's: licht (standaard) en donker */
 body { transition: background-color .2s ease, color .2s ease; }
@@ -1093,13 +1046,12 @@ body.dark-theme .status { background: #203d29; color: #bfe3c7; }
 body.dark-theme .useModeBox, body.dark-theme .loginBox, body.dark-theme .registerBox { background: #202620; color: #f3f5f3; }
 body.dark-theme .useModeBox h2, body.dark-theme .registerBox h2, body.dark-theme .welcome h2 { color: #9ed5ad; }
 body.dark-theme .useModeBox p, body.dark-theme .welcome p, body.dark-theme .loginOr { color: #b8c0ba; }
-body.dark-theme .useModeSkip { color: #9ed5ad; border-color: #668b70; }
+
 body.dark-theme .registerButton { color: #9ed5ad; border-color: #668b70; }
 body.dark-theme .registerBack { color: #9ed5ad; border-color: #668b70; }
-body.dark-theme .version, body.dark-theme .copyright { color: #b8c0ba; }
+body.dark-theme .version { color: #b8c0ba; }
 body.dark-theme .loginOr span { background: #667069; }
 body.dark-theme #refresh { color: #f3f5f3; }
-
 
 /* Thema-kiezer — altijd zichtbaar, ook op het inlogscherm */
 .themeButton{
@@ -1242,16 +1194,10 @@ body.modal-navigation-locked .bottomNav{opacity:.92}
 .overviewView{display:none;margin-top:18px;padding-bottom:115px}
 .app.overview-active .overviewView{display:block}
 .app.overview-active > h2,.app.overview-active .input-row-wrap,.app.overview-active .searchBox,.app.overview-active #refresh,.app.overview-active .list,.app.overview-active .saveListMainBtn,.app.overview-active .buttons,.app.overview-active .status{display:none!important}
-.overviewCard{background:#fff;border:1px solid rgba(63,91,69,.10);border-radius:24px;padding:22px;box-shadow:0 8px 24px rgba(63,91,69,.07);margin-bottom:14px}
-.overviewTitle{font-size:22px;font-weight:800;color:#3F5B45;margin-bottom:18px}
-.overviewStats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.overviewStat{background:#F3F8F4;border-radius:18px;padding:17px 14px;text-align:center}
-.overviewStat strong{display:block;font-size:28px;color:#3F5B45;line-height:1.1}.overviewStat span{display:block;margin-top:5px;color:#6d7c73;font-size:13px;font-weight:700}
-.overviewProgress{height:11px;background:#E8F0EA;border-radius:99px;overflow:hidden;margin-top:18px}.overviewProgressFill{height:100%;width:0;background:#5C7F65;border-radius:99px;transition:width .35s ease}
+
 .overviewEmpty{color:#6d7c73;text-align:center;padding:16px 4px;font-size:15px}
 body.dark-theme .bottomNav{background:rgba(25,30,26,.97);border-top-color:rgba(255,255,255,.08)}
 body.dark-theme .bottomNavBtn{color:#aeb8b1}.bottomNavBtn.active{color:#3F5B45}body.dark-theme .bottomNavBtn.active{background:#304b39;color:#dce9df}
-
 
 /* === Meer is een volwaardig navigatiescherm; geen dropdown meer === */
 .moreView{display:none;padding-bottom:115px;}
@@ -1269,33 +1215,9 @@ body.dark-theme .moreViewTitle{color:#bfe3c7;}
 
 /* === Meer: acties uit het hoofdscherm naar het Meer-menu === */
 .app.more-active .buttons{display:none !important;}
-.moreMenuActions{
-  margin: 10px 12px 12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.moreAction{
-  width:100%;
-  min-height:46px;
-  border:0;
-  border-radius:14px;
-  padding:10px 14px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font:700 15px/1 inherit;
-  cursor:pointer;
-}
-.moreActionClear{background:#F5F7F5;color:#303530;}
-.moreActionDelete{background:#FBEAEA;color:#C43A34;}
-.moreAction i{font-size:17px;}
-body.dark-theme .moreActionClear{background:#2c332e;color:#e6ece8;}
-body.dark-theme .moreActionDelete{background:#442b2b;color:#f1b4b0;}
 
-body.dark-theme .overviewCard{background:#202620;border-color:rgba(255,255,255,.08)}body.dark-theme .overviewTitle{color:#bfe3c7}body.dark-theme .overviewStat{background:#28332b}body.dark-theme .overviewStat strong{color:#bfe3c7}body.dark-theme .overviewStat span,.overviewEmpty{color:#b8c0ba}body.dark-theme .overviewProgress{background:#303a32}
+.overviewEmpty {color:#b8c0ba}
 @media(max-width:600px){.bottomNav{height:76px;padding-left:8px;padding-right:8px}.bottomNavBtn{border-radius:20px;font-size:12px}.bottomNavBtn i{font-size:23px}.app{padding-bottom:92px!important}.themeButton{bottom:92px!important}.themePicker{bottom:144px!important}}
-
 
 /* UX vereenvoudiging: geavanceerde inzichten blijven beschikbaar, maar zijn niet meer dominant. */
 .overview-more-insights-btn{
@@ -1305,30 +1227,11 @@ body.dark-theme .overviewCard{background:#202620;border-color:rgba(255,255,255,.
 }
 .overview-more-insights-btn i{transition:none;}
 .overview-more-insights-btn[aria-expanded="true"] i{transform:none;}
-.overview-more-insights{padding-top:2px;}
+
 .useModeIntro{margin:0 0 14px; line-height:1.5; color:#667066;}
 body.dark-theme .useModeIntro{color:#b8c0ba;}
 
-
 /* Compact product quantity controls */
-.quantity-controls {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  flex: 0 0 auto !important;
-}
-.quantity-controls .quantity-btn {
-  width: 42px !important;
-  min-width: 42px !important;
-  height: 42px !important;
-  padding: 0 !important;
-}
-.quantity-controls .quantity {
-  width: 28px !important;
-  min-width: 28px !important;
-  text-align: center !important;
-}
-
 
 /* Real product photos in autocomplete suggestions */
 .productSuggestionContent {
@@ -1375,59 +1278,7 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   font-size: 14px;
 }
 
-
 /* Meer-menu: consistente zachte groen/witte pop-ups */
-.meer-modal,
-.more-modal,
-.modal.meer-modal,
-.modal.more-modal,
-.help-modal,
-.info-modal,
-.privacy-modal,
-.terms-modal,
-.about-modal {
-  background: #eef8f1 !important;
-}
-
-.meer-modal .modal-content,
-.more-modal .modal-content,
-.modal.meer-modal .modal-content,
-.modal.more-modal .modal-content,
-.help-modal .modal-content,
-.info-modal .modal-content,
-.privacy-modal .modal-content,
-.terms-modal .modal-content,
-.about-modal .modal-content {
-  background: #eef8f1 !important;
-  border: 1px solid rgba(79, 118, 88, 0.14) !important;
-  box-shadow: 0 12px 32px rgba(50, 85, 62, 0.14) !important;
-}
-
-.meer-modal .modal-header,
-.more-modal .modal-header,
-.modal.meer-modal .modal-header,
-.modal.more-modal .modal-header,
-.help-modal .modal-header,
-.info-modal .modal-header,
-.privacy-modal .modal-header,
-.terms-modal .modal-header,
-.about-modal .modal-header {
-  background: #eef8f1 !important;
-}
-
-.meer-modal .modal-body,
-.more-modal .modal-body,
-.modal.meer-modal .modal-body,
-.modal.more-modal .modal-body,
-.help-modal .modal-body,
-.info-modal .modal-body,
-.privacy-modal .modal-body,
-.terms-modal .modal-body,
-.about-modal .modal-body {
-  background: #eef8f1 !important;
-}
-
-
 
 /* ===== Productteller: genoeg ruimte voor 1, 2 en 3 cijfers ===== */
 .itemProductContent .productQuantity{
@@ -1454,7 +1305,6 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
 /* Mobiel: de teller blijft breed genoeg voor bijvoorbeeld 15 en 100. */
 @media (max-width:430px){
   .itemProductContent{
-    grid-template-columns:19px minmax(0,1fr) 30px 90px 32px !important;
     column-gap:5px !important;
   }
   .itemProductContent .productQuantity{
@@ -1504,12 +1354,7 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
 }
 
 /* ===== Scanner: geen zwarte opstartflits ===== */
-.barcodeVideoWrap{
-  position:relative !important;
-  overflow:hidden !important;
-  background:#eef8f1 !important;
-  aspect-ratio:4/3 !important;
-}
+
 #barcodeVideo{
   width:100% !important;
   height:100% !important;
@@ -1524,16 +1369,6 @@ body.dark-theme .productSuggestionBrand { color: #aab5ad; }
   -webkit-backface-visibility:hidden !important;
   backface-visibility:hidden !important;
 }
-.barcodeVideoWrap.scanner-preparing #barcodeVideo{
-  visibility:hidden !important;
-  opacity:0 !important;
-}
-.barcodeVideoWrap.scanner-live #barcodeVideo{
-  visibility:visible !important;
-  opacity:1 !important;
-}
-
-
 
 /* ===== Meldingen / boodschappenherinnering ===== */
 .notificationSettingsPage .notificationCard{
@@ -1751,7 +1586,6 @@ body.dark-theme .androidDayOptions button,body.dark-theme .androidTimeGrid butto
 body.dark-theme .androidDayOptions button.selected,body.dark-theme .androidTimeGrid button.selected,body.dark-theme .androidMinuteGrid button.selected{background:#2f4c37;color:#b9e1c3;}
 body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#29352d;color:#b9e1c3;}
 
-
 /* Reminder messaging adapts to the detected device; never hide it on iOS. */
 </style>
 <style>
@@ -1767,45 +1601,10 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
 }
 
 /* ===== Stap 1: moderne productregels ===== */
-.productRow,
-.shoppingItem,
-.listItem {
-  border-radius: 12px;
-  padding: 8px 10px;
-  margin: 3px 0;
-  transition: background-color .15s ease, transform .15s ease;
-}
 
-.productRow:hover,
-.shoppingItem:hover,
-.listItem:hover {
-  background: #f1f8f3;
-}
-
-.productRow .productName,
-.shoppingItem .productName,
-.listItem .productName {
-  line-height: 1.2;
-  letter-spacing: -.1px;
-}
-
-.productIcon,
-.productIconImage {
+.productIcon {
   flex-shrink: 0;
 }
-
-.productIconImage {
-  object-fit: contain;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .productRow,
-  .shoppingItem,
-  .listItem {
-    transition: none;
-  }
-}
-
 
 /* ===== Stap 2: consistente producticonen ===== */
 .itemProductContent {
@@ -1838,7 +1637,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   text-overflow: ellipsis;
 }
 
-
 .productIcon {
   width: 34px;
   min-width: 34px;
@@ -1852,15 +1650,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   font-size: 25px;
 }
 
-.productIconImage {
-  width: 30px;
-  height: 30px;
-  max-width: 30px;
-  max-height: 30px;
-  object-fit: contain;
-  display: block;
-}
-
 .productSuggestionIcon {
   width: 30px;
   min-width: 30px;
@@ -1870,15 +1659,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   justify-content: center;
   line-height: 1;
   font-size: 23px;
-}
-
-.productSuggestionImage {
-  width: 26px;
-  height: 26px;
-  max-width: 26px;
-  max-height: 26px;
-  object-fit: contain;
-  display: block;
 }
 
 .productInlineIcon {
@@ -1902,7 +1682,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   max-width: 28px;
   max-height: 28px;
 }
-
 
 /* ===== Stap 3: verfijnd boodschappenpaneel ===== */
 .list {
@@ -1929,7 +1708,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
 .searchBox input:focus {
   outline: none !important;
 }
-
 
 /* ===== Stap 4: moderne knoppen ===== */
 .add,
@@ -1964,7 +1742,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   }
 }
 
-
 /* ===== Stap 5: onderste knoppen netjes op één regel ===== */
 .clear,
 .delete {
@@ -1973,7 +1750,6 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   overflow-wrap: normal;
   line-height: 1.15;
 }
-
 
 /* ===== Stap 6: moderne productsuggesties ===== */
 .productSuggestions {
@@ -2021,7 +1797,6 @@ body.dark-theme .productSuggestion {
   border-bottom-color: rgba(255,255,255,.07);
 }
 
-
 /* ===== Stap 7: kleine, subtiele animaties ===== */
 
 /* Product verschijnt zachtjes wanneer hij aan de lijst wordt toegevoegd. */
@@ -2066,40 +1841,10 @@ body.dark-theme .productSuggestion {
   }
 }
 
-
 /* ===== Stap 8: compacte, moderne opslagmelding ===== */
-.save-status,
-.storage-status,
-.auto-save-status {
-  min-height: 42px !important;
-  padding: 7px 14px !important;
-  border-radius: 14px !important;
-  font-size: 15px !important;
-  line-height: 1.2 !important;
-  box-shadow: 0 3px 10px rgba(0,0,0,.07) !important;
-}
-
-.save-status .subtext,
-.storage-status .subtext,
-.auto-save-status .subtext {
-  font-size: 12px !important;
-  margin-top: 2px !important;
-}
-
-@media (max-width: 480px) {
-  .save-status,
-  .storage-status,
-  .auto-save-status {
-    min-height: 40px !important;
-    padding: 6px 12px !important;
-    font-size: 14px !important;
-  }
-}
 
 #status { min-height: 42px !important; padding: 7px 14px !important; border-radius: 14px !important; box-shadow: 0 3px 10px rgba(0,0,0,.07) !important; }
 #status > i.fa-circle-exclamation { margin-right: 5px; }
-
-
 
 /* ===== Opslaan: bevestiging die exact over de knop 'Lijst opslaan' schuift ===== */
 .saveListMainWrap {
@@ -2191,7 +1936,6 @@ body.dark-theme .familyMenu {
     transition: none !important;
   }
 }
-
 
 /* Definitieve compacte familie-menu */
 .familyMenu {
@@ -2333,8 +2077,6 @@ body.dark-theme .familyListBackCircle {
 body.dark-theme .settingsMenuItem i:first-child { color:#dff1e2; }
 body.dark-theme .settingsMenuBack { color:#dff1e2; border-bottom-color:rgba(255,255,255,.10); }
 body.dark-theme .settingsMenuHint { color:#aab4ad; }
-
-
 
 /* Direct opslaan-knop: altijd zichtbaar bij de boodschappenlijst. */
 .saveListMainBtn {
@@ -2496,7 +2238,7 @@ body.dark-theme .settingsToggle { background:#59635c; }
 .accountMenuPage .familyMenuItem, .aboutMenuPage .familyMenuItem {
   min-height:38px;
 }
-.accountMenuHint, .aboutMenuHint {
+.aboutMenuHint {
   padding:8px 7px 5px; color:#8b928d; font-size:11px; line-height:1.35;
 }
 .accountMenuEmail {
@@ -2536,7 +2278,7 @@ body.dark-theme .settingsToggle { background:#59635c; }
 body.dark-theme .moreMenuSectionLabel { color:#9eaaa2; }
 body.dark-theme .moreMenuLogoutWrap { border-top-color: rgba(255,255,255,.10); }
 body.dark-theme .moreMenuLogout { background:#4a2527; color:#ffb4b4; border:1px solid #6b3336; box-shadow:none; }
-body.dark-theme .accountMenuHint, body.dark-theme .aboutMenuHint, body.dark-theme .accountMenuEmail { color:#aab4ad; }
+body.dark-theme .aboutMenuHint,body.dark-theme .accountMenuEmail { color:#aab4ad; }
 body.dark-theme .familyDialogDanger { background:#b92e2e; }
 
 /* Moderne, compacte familie-popups */
@@ -2716,7 +2458,6 @@ body.logged-in .app {
   pointer-events: none;
 }
 
-
 /* Alle hoofdopties van het Menu gebruiken exact dezelfde tekststijl. */
 .familyMenuPrimary > span {
   font-size:13.5px !important;
@@ -2788,10 +2529,7 @@ body.dark-theme .familyMenuPage .familyMenuItem:not(.familyMenuDanger) > i:first
 .familyMenuDanger { margin-top: 4px; padding-top: 8px !important; }
 
 /* De inhoud van Mijn familie schuift horizontaal als een echt tweede scherm. */
-.familyMenu {
-  overflow: hidden !important;
-  overflow-anchor: none !important;
-}
+
 .familyMenu.menu-open {
   display: grid !important;
   align-items: start;
@@ -2914,10 +2652,9 @@ body.dark-theme .familyMenuPage .familyMenuItem:not(.familyMenuDanger) > i:first
 
 .sharedListInviteBox{margin:8px 0;padding:10px 11px;border-radius:13px;background:rgba(255,255,255,.5);border:1px solid rgba(63,91,69,.10)}
 .sharedListInviteCode{font-size:21px;font-weight:800;letter-spacing:.14em;color:#3F5B45;margin:4px 0 8px}
-.sharedListCodeLink{border:0;background:transparent;padding:0;cursor:pointer;text-decoration:underline;font:inherit}
+
 .sharedListLinkLabel{margin-top:8px;font-size:11px;font-weight:700;opacity:.72}
-.sharedListInviteLink{display:block;word-break:break-all;font-size:11px;line-height:1.35;color:#3F5B45;text-decoration:underline}
-body.dark-theme .sharedListInviteLink{color:#dff1e2}
+
 .sharedListActionRow{display:flex;gap:6px;flex-wrap:wrap}.sharedListAction{border:0;border-radius:10px;padding:8px 10px;background:#e5f1e5;color:#3F5B45;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10)}body.dark-theme .sharedListInviteCode{color:#dff1e2}.sharedListEmpty{padding:10px 7px;color:#8b928d;font-size:11px;line-height:1.35}
 </style>
@@ -2962,57 +2699,22 @@ body.dark-theme .sharedListInviteBox{background:rgba(255,255,255,.06);border-col
 /* === FINAL 3 UI FIXES === */
 
 /* 1 + 2. Login and account-creation buttons match + Toevoegen */
-#loginScreen .login-btn,
-#loginScreen .register-btn,
-#loginScreen .btn-login,
-#loginScreen .btn-register,
-#loginScreen #loginBtn,
-#loginScreen #registerBtn,
-#loginScreen #loginButton,
-#loginScreen #registerButton {
+#loginScreen #loginBtn,#loginScreen #registerButton {
   background: #3F5B45 !important;
   background-color: #3F5B45 !important;
   color: #FFFFFF !important;
 }
 
 /* 3. Moon toggle: remove cream from the circle */
-#themeToggle,
-#themeButton,
-.theme-toggle,
-.moon-toggle,
-#moonButton,
-.moon-button {
+#themeButton {
   background: #F7F8F6 !important;
   background-color: #F7F8F6 !important;
 }
 
 /* 3. Moon/theme popup: same clean white style as the app */
-#themeModal,
-#themePopup,
-#themeMenu,
-#themePopover,
-.theme-modal,
-.theme-popup,
-.theme-menu,
-.theme-popover {
-  background: #FFFFFF !important;
-  background-color: #FFFFFF !important;
-  border-color: #E1E4E0 !important;
-  box-shadow: 0 10px 30px rgba(63,91,69,.12) !important;
-}
 
 /* Selected theme option */
-#themeModal .active,
-#themePopup .active,
-#themeMenu .active,
-#themePopover .active,
-.theme-modal .active,
-.theme-popup .active,
-.theme-menu .active,
-.theme-popover .active {
-  background: #E8F3EA !important;
-  background-color: #E8F3EA !important;
-}
+
 </style>
 
 <style id="smooth-tab-slide">
@@ -3177,10 +2879,7 @@ body:has(.app.more-active) #themePicker {
 }
 
 /* Never reserve room for an action on the right of the green header. */
-.headerBar > .familyMenu,
-.headerBar > .familyButton,
-.headerBar > .header-actions,
-.headerBar > .right-actions {
+.headerBar > .familyMenu,.headerBar > .familyButton {
   display:none !important;
 }
 .headerBar {
@@ -3208,50 +2907,11 @@ body:not(.logged-in) #themePicker {
 </style>
 
 
-<style id="article-trash-style">
-/* Alleen het verwijderen-icoon op een artikelregel. */
-.article-trash,
-.product-trash,
-.shopping-item-trash {
-  appearance:none;
-  -webkit-appearance:none;
-  border:0;
-  width:34px;
-  height:34px;
-  min-width:34px;
-  padding:0;
-  margin-left:8px;
-  border-radius:10px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:#FDE8E8;
-  color:#C62828;
-  font-size:15px;
-  line-height:1;
-  cursor:pointer;
-  flex:0 0 auto;
-}
-.article-trash:hover,
-.product-trash:hover,
-.shopping-item-trash:hover { background:#f9dede; }
-.article-trash:active,
-.product-trash:active,
-.shopping-item-trash:active { transform:scale(.96); }
-
-body.dark-theme .article-trash,
-body.dark-theme .product-trash,
-body.dark-theme .shopping-item-trash {
-  background:#5a3333;
-  color:#ffaaa3;
-}
-</style>
 
 
 <style id="final-product-trash-and-overview">
 .itemProductContent{display:flex;align-items:center;width:100%;min-width:0}
-.product-row-trash-can{width:34px;height:34px;min-width:34px;padding:0;margin-left:auto;border:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#f9e9e7;color:#b85a52;font-size:15px;line-height:1;cursor:pointer;flex:0 0 auto}
-.product-row-trash-can:active{transform:scale(.96)}
+
 .overview-new{padding:14px 12px 105px}
 .overview-new-greeting{margin:2px 4px 14px;font-size:22px;font-weight:750;color:#30453a}
 .overview-new-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:14px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
@@ -3260,7 +2920,7 @@ body.dark-theme .shopping-item-trash {
 .overview-new-bolt{background:#fff1c9;color:#c18a18}.overview-new-history{background:#e7f3ec;color:#3d8060}.overview-new-lists{background:#e8f0ff;color:#4e73ad}
 .overview-new-row{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#405047}
 .overview-new-muted{font-size:13px;color:#718078;margin-top:2px}
-.overview-new-plus{width:34px;height:34px;border:0;border-radius:10px;background:#e7f4ec;color:#3c8b5e;display:inline-flex;align-items:center;justify-content:center}
+
 .overview-new-arrow{color:#7aa086}
 body.dark-theme .overview-new-greeting,body.dark-theme .overview-new-title,body.dark-theme .overview-new-row{color:#e2ebe5}
 body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
@@ -3299,16 +2959,7 @@ body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
 }
 .app.overview-active #overviewScrollArea::-webkit-scrollbar{display:none}
 /* Compacte statistiekkaart voor Deze week */
-.overview-week-card{padding:12px;margin-bottom:11px}
-.overview-week-card .overview-dashboard-heading{margin-bottom:8px}
-.overview-week-card .overview-dashboard-stats{gap:6px}
-.overview-week-card .overview-dashboard-stat{padding:8px 4px;border-radius:11px}
-.overview-week-card .overview-dashboard-stat strong{font-size:20px}
-.overview-week-card .overview-dashboard-stat span{margin-top:3px;font-size:10px}
-.overview-week-card .overview-dashboard-heading i{
-  background:#e8f0ff;
-  color:#4e73ad;
-}
+
 </style>
 
 <style id="overview-header-and-week-final">
@@ -3317,38 +2968,10 @@ body.dark-theme .overview-new-card{background:#202923;border-color:#34443a}
 .app.overview-active .overviewView{margin-top:4px;}
 .app.overview-active .overview-new-greeting{margin-top:0;}
 /* Deze week terug naar de normale grotere kaartafmetingen. */
-.overview-week-card{padding:15px !important;margin-bottom:11px !important;}
-.overview-week-card .overview-dashboard-heading{margin-bottom:12px !important;}
-.overview-week-card .overview-dashboard-stats{gap:8px !important;}
-.overview-week-card .overview-dashboard-stat{padding:12px 6px !important;border-radius:13px !important;}
-.overview-week-card .overview-dashboard-stat strong{font-size:23px !important;}
-.overview-week-card .overview-dashboard-stat span{margin-top:5px !important;font-size:11px !important;}
+
 </style>
 
-<style id="overview-week-clickable-final">
-.overview-stat-clickable{
-  position:relative;
-  border:0;
-  background:transparent;
-  font:inherit;
-  color:inherit;
-  cursor:pointer;
-  text-align:center;
-  -webkit-tap-highlight-color:transparent;
-  padding:8px 18px;
-}
-.overview-stat-clickable > i{
-  position:absolute;
-  right:3px;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:11px;
-  opacity:.45;
-}
-.overview-stat-clickable:active{
-  transform:scale(.98);
-}
-</style>
+
 
 <style id="submenu-text-size-fix">
 /* Submenu-teksten: rustiger en in verhouding met de rest van Meer.
@@ -3420,9 +3043,6 @@ body.dark-theme .feedbackTextarea{background:#202821;color:#e4eee6;border-color:
   padding:12px 13px;
   margin:0 0 9px;
 }
-.aboutInfoFeatureCard{margin:0;background:#fff;border:1px solid rgba(63,91,69,.08);box-shadow:none;}
-.aboutInfoFeatureCard p{font-size:12px;line-height:1.5;}
-body.dark-theme .aboutInfoFeatureCard{background:#202821;border-color:rgba(255,255,255,.08);}
 
 .aboutInfoTitle{font-size:15px;font-weight:800;color:#3F5B45;display:flex;align-items:center;gap:9px;}
 .aboutInfoTitle i{width:30px;height:30px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;}
@@ -3496,31 +3116,6 @@ body.dark-theme .aboutInfoCard p,body.dark-theme .helpSection p{color:#AAB4AD;}
 .app.more-active .familyMenuArrow { margin-left:auto; }
 
 /* Clear visual separation before destructive actions */
-.app.more-active .moreMenuActions {
-  margin:14px 0 0;
-  padding-top:14px;
-  border-top:1px solid rgba(63,91,69,.09);
-  gap:9px;
-}
-.app.more-active .moreMenuActions::before {
-  content:'Acties';
-  display:block;
-  padding:0 4px 3px;
-  color:#7B887F;
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:.02em;
-}
-.app.more-active .moreAction {
-  min-height:52px;
-  border-radius:16px;
-  padding:11px 14px;
-  font-size:15px;
-  justify-content:flex-start;
-}
-.app.more-active .moreAction i { width:24px; text-align:center; font-size:17px; }
-.app.more-active .moreActionClear { background:#F4F7F4; color:#303530; }
-.app.more-active .moreActionDelete { background:#FBEAEA; color:#C43A34; }
 
 body.dark-theme .app.more-active #familyMenu {
   background:#202620;
@@ -3529,10 +3124,6 @@ body.dark-theme .app.more-active #familyMenu {
 }
 body.dark-theme .app.more-active .familyMenuItem:hover { background:rgba(255,255,255,.06); }
 body.dark-theme .app.more-active .familyMenuPrimary > i:first-child { background:#304B39; color:#DCE9DF; }
-body.dark-theme .app.more-active .moreMenuActions { border-top-color:rgba(255,255,255,.10); }
-body.dark-theme .app.more-active .moreMenuActions::before { color:#AAB4AD; }
-body.dark-theme .app.more-active .moreActionClear { background:#2C332E; color:#E6ECE8; }
-body.dark-theme .app.more-active .moreActionDelete { background:#442B2B; color:#F1B4B0; }
 
 @media(max-width:600px){
   .app.more-active .moreView { padding-top:14px; }
@@ -3639,9 +3230,6 @@ body.logged-in {
 }
 
 /* Give the scrolling content enough room to finish above the nav. */
-.app.more-active #moreView .moreMenuActions {
-  margin-bottom: 8px !important;
-}
 
 @media (max-width: 600px) {
   .app.more-active #moreView {
@@ -3740,12 +3328,6 @@ body.logged-in {
 }
 
 /* Tijdens een slide zijn beide pagina's bovenop elkaar gelegd. */
-.app.more-active #familyMenu .familyMenuPage.menuSlideOutLeft,
-.app.more-active #familyMenu .familyMenuPage.menuSlideInRight,
-.app.more-active #familyMenu .familyMenuPage.menuSlideOutRight,
-.app.more-active #familyMenu .familyMenuPage.menuSlideInLeft {
-  pointer-events: none !important;
-}
 
 @keyframes familyMenuSlideLeft {
   from { opacity: 1; transform: translate3d(0,0,0); }
@@ -3836,28 +3418,8 @@ html, body { -webkit-tap-highlight-color: transparent; }
 .app.overview-active .mainListTrashButton,.app.more-active .mainListTrashButton{display:none!important}
 </style>
 
-<style id="smart-insights-card-extra"> .smart-overview-card .overview-dashboard-heading .fa-lightbulb{font-size:20px} .smartInsightsIntro span{display:block;opacity:.76} </style> <style id="smart-insights-card">
-.smartInsightsIntro{margin:10px 0 16px;padding:14px 16px;border-radius:16px;background:rgba(63,91,69,.08);line-height:1.45}
-.smartInsightsIntro strong{display:block;margin-bottom:4px}
-.smartInsightsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.smartInsightsItem{padding:14px 10px;border-radius:15px;background:rgba(63,91,69,.06);text-align:center}
-.smartInsightsItem .siIcon{font-size:20px;margin-bottom:7px}
-.smartInsightsItem strong{display:block;font-size:15px}
-.smartInsightsItem span{display:block;font-size:12px;opacity:.72;margin-top:3px}
-body.dark-theme .smartInsightsIntro,body.dark-theme .smartInsightsItem{background:rgba(126,170,137,.12)}
-</style>
-<style id="smart-insights-readability-final">
-.smartInsightsIntro strong{color:#30453a!important}
-.smartInsightsIntro span{color:#6a756e!important;opacity:1!important}
-.smartInsightsItem strong{color:#3f5b45!important}
-.smartInsightsItem span{color:#718078!important;opacity:1!important}
-.smartInsightsItem .siIcon{color:#3d8060!important}
-body.dark-theme .smartInsightsIntro strong{color:#e2ebe5!important}
-body.dark-theme .smartInsightsIntro span{color:#aeb8b1!important}
-body.dark-theme .smartInsightsItem strong{color:#dce9df!important}
-body.dark-theme .smartInsightsItem span{color:#aeb8b1!important}
-body.dark-theme .smartInsightsItem .siIcon{color:#9bc8a8!important}
-</style>
+ 
+
 
 
 
@@ -4136,8 +3698,7 @@ body.logged-in {
   background:var(--popup-soft) !important;
   border-left:1px solid var(--popup-soft-border);
 }
-.listOptionItem:hover,
-.listOptionBack:hover{
+.listOptionItem:hover {
   background:#eef5f0 !important;
 }
 
@@ -4152,41 +3713,7 @@ body.logged-in {
 
 /* Algemene keuze-/informatiepop-ups die dezelfde zachte uitstraling
    gebruiken, zonder de inhoud of afmetingen te wijzigen. */
-.meer-modal .modal-content,
-.more-modal .modal-content,
-.modal.meer-modal .modal-content,
-.modal.more-modal .modal-content,
-.help-modal .modal-content,
-.info-modal .modal-content,
-.privacy-modal .modal-content,
-.terms-modal .modal-content,
-.about-modal .modal-content{
-  background:var(--popup-soft) !important;
-}
 
-.meer-modal .modal-header,
-.more-modal .modal-header,
-.modal.meer-modal .modal-header,
-.modal.more-modal .modal-header,
-.help-modal .modal-header,
-.info-modal .modal-header,
-.privacy-modal .modal-header,
-.terms-modal .modal-header,
-.about-modal .modal-header{
-  background:var(--popup-soft) !important;
-}
-
-.meer-modal .modal-body,
-.more-modal .modal-body,
-.modal.meer-modal .modal-body,
-.modal.more-modal .modal-body,
-.help-modal .modal-body,
-.info-modal .modal-body,
-.privacy-modal .modal-body,
-.terms-modal .modal-body,
-.about-modal .modal-body{
-  background:var(--popup-soft) !important;
-}
 </style>
 
 
@@ -4452,15 +3979,7 @@ body.dark-theme .androidTimeDialogCard .androidMinuteGrid button{
 #loginScreen .loginBox > .registerButton:active {
   background: #E8F2EA !important;
 }
-body.dark-theme #loginScreen .loginBox > .registerButton {
-  background: #202620 !important;
-  background-color: #202620 !important;
-  color: #9ED5AD !important;
-  border-color: #668B70 !important;
-}
-body.dark-theme #loginScreen .loginBox > .registerButton i {
-  color: #9ED5AD !important;
-}
+
 </style>
 
 <style id="minimal-quantity-and-trash-fix">
@@ -4494,24 +4013,7 @@ body.dark-theme .itemProductContent .quantityValue {
   visibility: visible !important;
 }
 /* Match the delete button to the 29px compact +/- buttons; retain its red styling. */
-.itemProductContent .product-row-trash-can {
-  box-sizing: border-box !important;
-  width: 29px !important;
-  min-width: 29px !important;
-  max-width: 29px !important;
-  height: 29px !important;
-  min-height: 29px !important;
-  max-height: 29px !important;
-  flex: 0 0 29px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  transform: none !important;
-  -webkit-transform: none !important;
-  align-self: center !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
+
 </style>
 
 
@@ -4525,34 +4027,13 @@ body.dark-theme .itemProductContent .quantityValue {
   font-weight: 700 !important;
 }
 /* Keep the delete button the same height as the quantity buttons. */
-.itemProductContent .product-row-trash-can {
-  box-sizing: border-box !important;
-  height: 29px !important;
-  min-height: 29px !important;
-  max-height: 29px !important;
-  align-self: center !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
+
 </style>
 
 
 <style id="trash-button-height-match">
 /* Alleen de hoogte van de prullenbak gelijkmaken aan de plus- en minknoppen. */
-.itemProductContent .product-row-trash-can {
-  box-sizing: border-box !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
-  align-self: center !important;
-}
-@media (max-width: 430px) {
-  .itemProductContent .product-row-trash-can {
-    height: 29px !important;
-    min-height: 29px !important;
-    max-height: 29px !important;
-  }
-}
+
 </style>
 
 
@@ -4573,11 +4054,7 @@ html.platform-android {
   --platform-dialog-primary: #3F5B45;
 }
 /* De bestaande familie- en bevestigingsdialogen krijgen platformpassende vormen. */
-.platform-ios .familyDialog,
-.platform-ios .androidReminderDialogCard,
-.platform-ios .useModeBox,
-.platform-ios .registerBox,
-.platform-ios .modal-content {
+.platform-ios .familyDialog,.platform-ios .androidReminderDialogCard,.platform-ios .useModeBox,.platform-ios .registerBox {
   border-radius: var(--platform-dialog-radius);
   transition-timing-function: var(--platform-dialog-motion);
 }
@@ -4597,11 +4074,7 @@ html.platform-android {
 .platform-ios .androidDialogPrimaryButton {
   border-radius: 12px;
 }
-.platform-android .familyDialog,
-.platform-android .androidReminderDialogCard,
-.platform-android .useModeBox,
-.platform-android .registerBox,
-.platform-android .modal-content {
+.platform-android .familyDialog,.platform-android .androidReminderDialogCard,.platform-android .useModeBox,.platform-android .registerBox {
   border-radius: var(--platform-dialog-radius);
   transition-timing-function: var(--platform-dialog-motion);
 }
@@ -4622,8 +4095,7 @@ html.platform-android {
   border-radius: 10px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .platform-ios .familyDialog, .platform-android .familyDialog,
-  .platform-ios .modal-content, .platform-android .modal-content {
+  .platform-ios .familyDialog,.platform-android .familyDialog {
     animation: none !important;
     transition: none !important;
   }
@@ -4812,8 +4284,7 @@ html.platform-ios #reminderDayDialog .androidDayOptions {
   -webkit-overflow-scrolling: touch;
   background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,.2) 22%, rgba(255,255,255,.2) 78%, #fff 100%);
 }
-html.platform-ios #reminderDayDialog .androidDayOptions::-webkit-scrollbar,
-html.platform-ios #reminderTimeDialog .iosWheelColumn::-webkit-scrollbar { display:none; }
+html.platform-ios #reminderDayDialog .androidDayOptions::-webkit-scrollbar { display:none; }
 html.platform-ios #reminderDayDialog .androidDayOptions button {
   display: block !important;
   width: 100% !important;
@@ -4946,8 +4417,7 @@ html.platform-ios #reminderDayDialog .androidDayOptions,html.platform-ios #remin
 html.platform-ios #reminderTimeDialog .androidTimeLabel{display:none!important}
 html.platform-ios #reminderDayDialog .androidReminderDialogCard,html.platform-ios #reminderTimeDialog .androidReminderDialogCard{width:min(390px,calc(100vw - 32px));max-height:85dvh;overflow:auto}
 html.platform-ios #reminderTimeDialog .androidTimePreview{font-size:32px!important;margin:0 0 10px!important}
-html.platform-ios .ios-wheel-actions-label{display:flex;justify-content:space-between;color:#5b8cc9;font-size:18px;margin-bottom:18px}
-html.platform-ios .ios-wheel-actions-label span{cursor:pointer}
+
 </style>
 <script>
 (function(){
@@ -4986,7 +4456,7 @@ body.dark-theme .itemProductContent .quantityValue {
 </style>
 
 <style id="free-recipe-catalog">
-.plannerRecipeBox{margin:14px 0;padding:14px;border-radius:18px;background:var(--card-bg,#fff);border:1px solid #dce9df}.plannerRecipeBox h3{margin:0 0 6px}.plannerRecipeCatalog{display:grid;gap:9px;margin-top:10px}.plannerRecipeCard{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:#f2f7f3}.plannerRecipeCard>div{min-width:0;flex:1}.plannerRecipeCard strong{display:block;font-size:14px;color:#2f4a38}.plannerRecipeBox .plannerRecipeCard strong{color:#2f4a38!important}.plannerRecipeCard p{margin:5px 0;color:#718178;font-size:12px;line-height:1.45}.plannerRecipeCard .proPlannerButton{flex-shrink:0;padding:9px 11px;font-size:12px}.plannerRecipeCard details{font-size:13px;line-height:1.5}.plannerRecipeCard summary{cursor:pointer;color:#477d55;font-weight:700}.plannerRecipeCard ul{padding-left:19px}.plannerRecipeCard details p{font-size:13px;color:var(--text-color,#405047)}body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}body.dark-theme .plannerRecipeBox .plannerRecipeCard strong{color:#e8f1ea!important}.plannerRecipeCard p{color:#5f7066}body.dark-theme .plannerRecipeCard p{color:#b8c6bc}.plannerRecipeCard .recipeSectionTitle{margin:12px 0 4px;font-size:13px;color:#2f4a38}body.dark-theme .plannerRecipeCard .recipeSectionTitle{color:#e8f1ea}.plannerRecipeCard .recipeIngredientList{margin:0 0 4px;padding-left:19px}.plannerRecipeCard .recipeStepList{margin:0;padding-left:20px}.plannerRecipeCard .recipeStepList li{margin-bottom:6px;padding-left:2px}.plannerRecipeCard .recipeTip{margin:10px 0 2px;padding:8px 10px;border-radius:10px;background:#e3f0e6;color:#2f4a38}body.dark-theme .plannerRecipeCard .recipeTip{background:#344c3a;color:#e8f1ea}body.dark-theme .plannerRecipeCard summary{color:#9fd3ac}.plannerRecipeBox .plannerRecipeCard{flex-direction:column;align-items:stretch;gap:10px}.plannerRecipeCard .recipeTop{display:flex;gap:12px;align-items:flex-start}.plannerRecipeCard .recipeThumb{position:relative;flex:0 0 84px;width:84px;height:84px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center}.plannerRecipeCard .recipeThumbEmoji{font-size:36px;line-height:1}.plannerRecipeCard .recipeThumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.plannerRecipeCard .recipeHead{flex:1;min-width:0}.plannerRecipeCard .recipeHead strong{font-size:15px;line-height:1.25}.plannerRecipeCard .recipeMeta{margin:4px 0 2px;font-size:12px}.plannerRecipeCard .recipeDesc{margin:2px 0 6px;font-size:12px;line-height:1.4}.plannerRecipeCard .recipeTags{display:flex;flex-wrap:wrap;gap:5px}.plannerRecipeCard .recipeTags span{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:650;background:#dcefe0;color:#2f6a40}.plannerRecipeCard .recipeTags span:nth-child(2){background:#fff0cc;color:#8a6410}.plannerRecipeCard .recipeTags span:nth-child(3){background:#e1ebfb;color:#3b5f99}body.dark-theme .plannerRecipeCard .recipeTags span{background:#344c3a;color:#d3ecd9}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(2){background:#4a4126;color:#f1dfa6}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(3){background:#2d3d57;color:#cfdcf5}body.dark-theme .plannerRecipeCard .recipeThumb{background:linear-gradient(135deg,#34503b,#2a4031)}.plannerRecipeBox .plannerRecipeCard>.proPlannerButton{width:100%}.plannerRecipeBox .plannerRecipeCard li,.plannerRecipeBox .plannerRecipeCard ul,.plannerRecipeBox .plannerRecipeCard ol{color:#33463a!important}.plannerRecipeBox .plannerRecipeCard li::marker{color:#477d55}body.dark-theme .plannerRecipeBox .plannerRecipeCard li,body.dark-theme .plannerRecipeBox .plannerRecipeCard ul,body.dark-theme .plannerRecipeBox .plannerRecipeCard ol{color:#e4eee7!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard li::marker{color:#9fd3ac}.plannerRecipeBox .plannerRecipeCard .recipeTip,.plannerRecipeBox .plannerRecipeCard .recipeTip strong{color:#2f4a38!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeTip,body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeTip strong{color:#e8f1ea!important}.plannerRecipeBox .plannerRecipeCard .recipeSectionTitle{color:#2f4a38!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard .recipeSectionTitle{color:#e8f1ea!important}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
+.plannerRecipeBox{margin:14px 0;padding:14px;border-radius:18px;background:var(--card-bg,#fff);border:1px solid #dce9df}.plannerRecipeBox h3{margin:0 0 6px}.plannerRecipeCatalog{display:grid;gap:9px;margin-top:10px}.plannerRecipeCard{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;background:#f2f7f3}.plannerRecipeCard>div{min-width:0;flex:1}.plannerRecipeCard strong{display:block;font-size:14px;color:#2f4a38}.plannerRecipeBox .plannerRecipeCard strong{color:#2f4a38!important}.plannerRecipeCard p{margin:5px 0;color:#718178;font-size:12px;line-height:1.45}.plannerRecipeCard .proPlannerButton{flex-shrink:0;padding:9px 11px;font-size:12px}.plannerRecipeCard details{font-size:13px;line-height:1.5}.plannerRecipeCard summary{cursor:pointer;color:#477d55;font-weight:700}.plannerRecipeCard ul{padding-left:19px}.plannerRecipeCard details p{font-size:13px;color:var(--text-color,#405047)}body.dark-theme .plannerRecipeBox{background:#202923;border-color:#34443a}body.dark-theme .plannerRecipeCard{background:#29352d}body.dark-theme .plannerRecipeCard details p{color:#dce7df}body.dark-theme .plannerRecipeBox .plannerRecipeCard strong{color:#e8f1ea!important}.plannerRecipeCard p{color:#5f7066}body.dark-theme .plannerRecipeCard p{color:#b8c6bc}body.dark-theme .plannerRecipeCard summary{color:#9fd3ac}.plannerRecipeBox .plannerRecipeCard{flex-direction:column;align-items:stretch;gap:10px}.plannerRecipeCard .recipeTop{display:flex;gap:12px;align-items:flex-start}.plannerRecipeCard .recipeThumb{position:relative;flex:0 0 84px;width:84px;height:84px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#dcedde,#c3dfc8);display:flex;align-items:center;justify-content:center}.plannerRecipeCard .recipeThumbEmoji{font-size:36px;line-height:1}.plannerRecipeCard .recipeThumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.plannerRecipeCard .recipeHead{flex:1;min-width:0}.plannerRecipeCard .recipeHead strong{font-size:15px;line-height:1.25}.plannerRecipeCard .recipeMeta{margin:4px 0 2px;font-size:12px}.plannerRecipeCard .recipeDesc{margin:2px 0 6px;font-size:12px;line-height:1.4}.plannerRecipeCard .recipeTags{display:flex;flex-wrap:wrap;gap:5px}.plannerRecipeCard .recipeTags span{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:650;background:#dcefe0;color:#2f6a40}.plannerRecipeCard .recipeTags span:nth-child(2){background:#fff0cc;color:#8a6410}.plannerRecipeCard .recipeTags span:nth-child(3){background:#e1ebfb;color:#3b5f99}body.dark-theme .plannerRecipeCard .recipeTags span{background:#344c3a;color:#d3ecd9}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(2){background:#4a4126;color:#f1dfa6}body.dark-theme .plannerRecipeCard .recipeTags span:nth-child(3){background:#2d3d57;color:#cfdcf5}body.dark-theme .plannerRecipeCard .recipeThumb{background:linear-gradient(135deg,#34503b,#2a4031)}.plannerRecipeBox .plannerRecipeCard>.proPlannerButton{width:100%}.plannerRecipeBox .plannerRecipeCard li,.plannerRecipeBox .plannerRecipeCard ul,.plannerRecipeBox .plannerRecipeCard ol{color:#33463a!important}.plannerRecipeBox .plannerRecipeCard li::marker{color:#477d55}body.dark-theme .plannerRecipeBox .plannerRecipeCard li,body.dark-theme .plannerRecipeBox .plannerRecipeCard ul,body.dark-theme .plannerRecipeBox .plannerRecipeCard ol{color:#e4eee7!important}body.dark-theme .plannerRecipeBox .plannerRecipeCard li::marker{color:#9fd3ac}@media(max-width:380px){.plannerRecipeCard{flex-direction:column}.plannerRecipeCard .proPlannerButton{width:100%}}
 </style>
 
 <style id="recipe-sheet-style">html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}@supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}#smartPlannerPanel.smartPlannerPanel{margin:18px 0 14px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}body.dark-theme #smartPlannerPanel.smartPlannerPanel{background:transparent;border:0}#smartPlannerPanel.smartPlannerPanel>h3:first-child{font-size:21px;margin:0 0 6px}#smartPlannerPanel.smartPlannerPanel .plannerHelp{margin:0 0 14px}.smartPlannerPanel .plannerRecipeBox{margin:16px 0 18px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}body.dark-theme .smartPlannerPanel .plannerRecipeBox{background:transparent;border:0}.smartPlannerPanel .plannerRecipeBox>h3{font-size:18px;margin:0 0 6px}.plannerRecipeBox .plannerRecipeCard{text-align:left;background:#fff;border:0;border-radius:20px;padding:14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(47,90,61,.12)}body.dark-theme .plannerRecipeBox .plannerRecipeCard{background:#29352d;box-shadow:none}.plannerRecipeBox .plannerRecipeCard .recipeHead,.plannerRecipeBox .plannerRecipeCard .recipeTags{text-align:left;justify-content:flex-start}.plannerRecipeBox .plannerRecipeCard .recipeThumb{flex:0 0 96px;width:96px;height:96px;border-radius:18px}.plannerRecipeBox .plannerRecipeCard .recipeHead strong{font-size:16px}.plannerRecipeBox .plannerRecipeCard>.proPlannerButton{margin-top:2px;padding:11px 14px;border-radius:14px}.plannerRecipeBox .plannerRecipeCard .recipeMore{display:block;margin-top:8px}.plannerRecipeBox #plannerRecipeSearch{border-radius:14px;padding:12px 14px}.proPlannerButton{transition:transform .12s ease,background-color .12s ease,box-shadow .12s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.proPlannerButton:active{transform:scale(.97);background-color:#cfe6d5!important;box-shadow:inset 0 2px 6px rgba(47,90,61,.18)}body.dark-theme .proPlannerButton:active{background-color:#3d5646!important;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}.recipeSheetChoose{transition:transform .12s ease,background-color .12s ease}.recipeSheetChoose:active{transform:scale(.98);background:#244a31}body.dark-theme .recipeSheetChoose:active{background:#3f7352}.plannerRecipeBox .recipeChip{transition:transform .12s ease,background-color .12s ease}.plannerRecipeBox .recipeChip:active{transform:scale(.95)}.plannerRecipeCard .recipeTop:active{opacity:.75}.recipeSheetPanel .rsTip{flex-direction:row;align-items:flex-start;gap:12px;padding:12px 14px}.recipeSheetPanel .rsTip i{flex:0 0 auto;margin-top:2px;font-size:24px;color:#e0a400!important}body.dark-theme .recipeSheetPanel .rsTip i{color:#f4cf5a!important}.recipeSheetPanel .rsTipText{display:flex;flex-direction:column;gap:2px;min-width:0}.plannerRecipeBox .recipeChips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 6px}.plannerRecipeBox .recipeChip{border:none!important;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;background:#e4ece6!important;color:#2f4a38!important;cursor:pointer;-webkit-tap-highlight-color:transparent}.plannerRecipeBox .recipeChip.active{background:#2f5a3d!important;color:#fff!important}.plannerRecipeBox .recipeCount{margin:4px 0 2px;font-size:12px;color:#66776d!important}body.dark-theme .plannerRecipeBox .recipeChip{background:#34443a!important;color:#e4eee7!important}body.dark-theme .plannerRecipeBox .recipeChip.active{background:#4f8a62!important;color:#fff!important}body.dark-theme .plannerRecipeBox .recipeCount{color:#b8c6bc!important}
@@ -5226,7 +4696,6 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
       <h2>Mijn Boodschappen Pro</h2>
       <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
-      <button type="button" class="proUnlockHero" onclick="event.stopPropagation();showProUpsell()"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ontdek Pro</button>
     </div>
     <div class="proFeatureCard proPlannerLaunch" onclick="toggleSmartPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSmartPlanner(event)}">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -11898,22 +11367,7 @@ async function updateOverviewView(){
 
 </script>
 
-<style>
-.shared-code-button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  background: rgba(255,255,255,.10);
-  color: #fff;
-  border: 0;
-  border-radius: 30px;
-  padding: 8px 10px;
-  font-size: 15px;
-  font-weight: 700;
-}
-@media (max-width:430px) {
-  .shared-code-button { width: 40px; height: 40px; padding: 0; display:inline-flex; align-items:center; justify-content:center; }
-}
-</style>
+
 
 <style id="more-final-layout">
 /* Meer is a real, scrollable screen. The bottom navigation stays fixed. */
@@ -11937,9 +11391,7 @@ async function updateOverviewView(){
 .app.more-active .familyMenuItem {
   min-height: 56px;
 }
-.app.more-active .moreMenuActions {
-  padding-bottom: 8px;
-}
+
 /* Submenu pages are allowed to grow naturally when opened. */
 .app.more-active .familyMenuPage {
   max-height: none;
@@ -11982,10 +11434,7 @@ async function updateOverviewView(){
 .overviewActionOverlay{position:fixed;inset:0;z-index:120000;background:rgba(24,37,29,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:18px;box-sizing:border-box}
 .overviewActionSheet{width:min(520px,100%);max-height:min(78vh,720px);overflow:auto;background:#fff;border-radius:26px;padding:18px 16px 22px;box-shadow:0 20px 55px rgba(0,0,0,.2);color:#314338}
 .overviewActionHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.overviewActionTitle{display:flex;align-items:center;gap:12px;min-width:0}
-.overviewActionTitle h3{margin:0}
-.overviewActionTitleIcon{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#e5f3e9;color:#397651;display:flex;align-items:center;justify-content:center;font-size:19px}
-.overviewActionTitleIcon[hidden]{display:none}
+
 .overviewActionTitle{display:flex;align-items:center;gap:12px;min-width:0}
 .overviewActionTitle h3{margin:0}
 .overviewActionTitleIcon{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#e5f3e9;color:#397651;display:flex;align-items:center;justify-content:center;font-size:19px}
@@ -11996,7 +11445,7 @@ async function updateOverviewView(){
 .overviewActionClose::before,.overviewActionClose::after{content:"";position:absolute;left:50%;top:50%;width:21px;height:3.5px;border-radius:999px;background:#405c48;transform-origin:center}
 .overviewActionClose::before{transform:translate(-50%,-50%) rotate(45deg)}
 .overviewActionClose::after{transform:translate(-50%,-50%) rotate(-45deg)}
-.overviewActionMuted{padding:22px 8px;text-align:center;color:#718078;font-size:15px}
+
 .overviewActionProductGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .overviewActionProduct{min-height:52px;border:0;border-radius:15px;background:#edf6ef;color:#3f5b45;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:inherit;font-weight:750;text-align:left;cursor:pointer}
 .overviewActionProduct span{min-width:0;overflow-wrap:anywhere}
@@ -12016,22 +11465,11 @@ async function updateOverviewView(){
 .overview-click-card:active{transform:scale(.99)}
 .overview-click-card .overview-new-title{margin-bottom:10px}
 .overview-quick-content{display:flex;flex-wrap:wrap;gap:8px}
-.overviewQuickProduct{border:0;border-radius:12px;background:#eef6f0;color:#3F5B45;padding:9px 11px;display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;max-width:100%;text-align:left;vertical-align:top}
-.overviewQuickProduct span{flex:1 1 auto;min-width:0;line-height:1.25;overflow-wrap:normal;word-break:normal}
-.overviewQuickProduct i{font-size:12px;flex:0 0 auto;margin-left:auto}
-@media (max-width:420px){.overviewQuickProduct{font-size:13px;padding:10px 12px}.overviewQuickProduct span{line-height:1.3}}
-.historyTrip{padding:10px 0;border-bottom:1px solid rgba(63,91,69,.12);color:#405047}
-.historyTrip:last-child{border-bottom:0}
-.historyTrip strong{display:block;margin-bottom:3px;color:#3F5B45}
-.historyTrip div{font-size:13px;line-height:1.4}
+
 </style>
 
 <style id="overview-my-lists">
-.overviewAllListsBtn{
-  width:100%;border:0;border-radius:14px;background:#E8F3EA;color:#3F5B45;
-  padding:11px 13px;display:flex;align-items:center;justify-content:space-between;
-  font:inherit;font-size:14px;font-weight:800;cursor:pointer;
-}
+
 .overviewSavedListLine{
   display:flex;align-items:center;gap:9px;text-align:left;
   padding:8px 0;border-bottom:1px solid rgba(63,91,69,.08);
@@ -12039,7 +11477,7 @@ async function updateOverviewView(){
 }
 .overviewSavedListLine:last-child{border-bottom:0}
 .overviewSavedListLine i{color:#3F5B45;width:20px;text-align:center}
-body.dark-theme .overviewAllListsBtn{background:#304b39;color:#dce9df}
+
 body.dark-theme .overviewSavedListLine{color:#c2ccc5;border-bottom-color:rgba(255,255,255,.08)}
 </style>
 
@@ -12131,62 +11569,6 @@ body.dark-theme .overviewSavedListLine{color:#c2ccc5;border-bottom-color:rgba(25
 </script>
 
 
-<script id="article-trash-function">
-(function(){
-  function getProductRow(el){
-    return el.closest(
-      '[data-product-id], .product-row, .product-item, .shopping-item, ' +
-      '.boodschap-item, .list-item, .grocery-item'
-    );
-  }
-
-  function addTrashButtons(){
-    var rows=document.querySelectorAll(
-      '[data-product-id], .product-row, .product-item, .shopping-item, ' +
-      '.boodschap-item, .list-item, .grocery-item'
-    );
-    rows.forEach(function(row){
-      if(row.querySelector('.article-trash,.product-trash,.shopping-item-trash,.product-row-trash-can')) return;
-      var button=document.createElement('button');
-      button.type='button';
-      button.className='article-trash';
-      button.setAttribute('aria-label','Product verwijderen');
-      button.title='Product verwijderen';
-      button.innerHTML='<i class="fa-solid fa-trash-can" aria-hidden="true"></i>';
-      var id=row.getAttribute('data-product-id');
-      if(id) button.dataset.productId=id;
-      row.appendChild(button);
-    });
-  }
-
-  document.addEventListener('click',function(e){
-    var b=e.target.closest('.article-trash,.product-trash,.shopping-item-trash');
-    if(!b) return;
-    e.preventDefault();
-    e.stopPropagation();
-    var row=getProductRow(b);
-    if(!row) return;
-
-    var id=b.dataset.productId || row.getAttribute('data-product-id');
-    /* Laat bestaande app-code het verwijderen afhandelen als die functie bestaat. */
-    if(id && typeof window.deleteProduct==='function'){
-      window.deleteProduct(id);
-      return;
-    }
-    if(id && typeof window.removeProduct==='function'){
-      window.removeProduct(id);
-      return;
-    }
-    row.remove();
-  });
-
-  document.addEventListener('DOMContentLoaded',function(){
-    addTrashButtons();
-    var observer=new MutationObserver(function(){ addTrashButtons(); });
-    observer.observe(document.body,{childList:true,subtree:true});
-  });
-})();
-</script>
 
 
 <script id="overview-greeting-refresh-final">
@@ -13103,7 +12485,6 @@ document.addEventListener('visibilitychange',function(){
 <style id="quantity-compact-final">
 /* Compacte aantallen: productnaam krijgt meer ruimte, bediening blijft goed aantikbaar. */
 .itemProductContent{
-  grid-template-columns:20px minmax(0,1fr) 32px 72px 32px !important;
   column-gap:6px !important;
 }
 .itemProductContent .productQuantity{
@@ -13126,7 +12507,6 @@ document.addEventListener('visibilitychange',function(){
 }
 @media (max-width:430px){
   .itemProductContent{
-    grid-template-columns:19px minmax(0,1fr) 29px 70px 31px !important;
     column-gap:5px !important;
   }
   .itemProductContent .productQuantity{
@@ -13257,10 +12637,7 @@ document.addEventListener('visibilitychange',function(){
   box-shadow: none !important;
   filter: none !important;
 }
-.app.more-active > #moreView {
-  opacity: 1 !important;
-  transform: none !important;
-}
+
 .app.more-active #familyMenu {
   box-shadow: none !important;
 }
@@ -13650,9 +13027,6 @@ function scaleIngredients(lines,f){return (lines||[]).map(function(l){return sca
 window.__scaleIngredients=scaleIngredients;
 window.__recipeScaled=function(r){var n=defServAll();return {servings:n,ingredients:scaleIngredients(r.ingredients,n/(r.servings||n))};};
 window.filterRecipeTag=function(tag){if(!tag)return;window.setRecipeFilter("tag:"+tag);try{var b=document.getElementById("plannerRecipeChips");if(b)b.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}};
-window.changeDefaultServings=function(d,event){if(event)event.stopPropagation();var v=Math.max(1,Math.min(12,defServAll()+d));try{localStorage.setItem(SERV_KEY,String(v));}catch(e){}
- var el=document.getElementById("plannerDefServ");if(el)el.textContent=v;var w=document.getElementById("plannerDefServWord");if(w)w.textContent=v===1?"persoon":"personen";renderRecipeCatalog();};
-document.addEventListener("DOMContentLoaded",function(){var el=document.getElementById("plannerDefServ");if(el)el.textContent=defServAll();var w=document.getElementById("plannerDefServWord");if(w)w.textContent=defServAll()===1?"persoon":"personen";});
 window.__plannerMeals=function(){return read();};
 window.__plannerAddMeal=function(day,meal,ingredients,servings){const items=read();const entry={id:Date.now(),day:day,meal:meal,ingredients:ingredients.slice()};if(servings)entry.servings=servings;items.push(entry);items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);try{render();}catch(e){}};
 function render(){
@@ -13821,7 +13195,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 .budgetExpenseDetails{min-width:0}.budgetExpenseDetails strong{display:block;font-size:13px;color:var(--text-color,#344d3b);overflow-wrap:anywhere}.budgetExpenseDetails small{display:block;margin-top:4px;color:var(--muted-text,#718177);font-size:11px}
 .budgetExpenseAmount{font-size:13px;font-weight:750;color:var(--text-color,#344d3b);white-space:nowrap}
 .budgetExpenseDelete{display:block;border:0;background:transparent;color:#a34848;font-size:11px;padding:5px 0 0;cursor:pointer}
-.dealRow{padding:10px 0;border-bottom:1px solid var(--border-color,#dce9e2)}.dealRow strong{display:block;font-size:13px;overflow-wrap:anywhere}.dealRow div{font-size:13px;margin-top:2px}.dealRow small{display:block;margin-top:2px;color:var(--muted-text,#718177);font-size:11px}
+
 .budgetDealsCard{margin:16px 0;padding:14px;border-radius:16px;background:var(--subtle-card-bg,#f4f8f5)}.budgetDealsCard h4{margin:0 0 4px;font-size:16px;color:var(--text-color,#344d3b)}.budgetDealsCard>.budgetStatus{margin:0 0 10px}.budgetDealsSearch{display:flex;gap:8px;align-items:stretch}.budgetDealsSearch .budgetInput{flex:1}#budgetLivePriceResults:not(:empty),#weekplanDealsResults:not(:empty){margin:10px 0;font-size:13px;line-height:1.45}.budgetWeekButton{width:100%;margin-top:8px}.budgetSource{margin-top:12px!important}.budgetSource a{color:#3e7650;font-weight:700;text-decoration:underline}body.dark-theme .budgetDealsCard{background:#1d241f}body.dark-theme .budgetDealsCard h4{color:#edf5ef}body.dark-theme .budgetSource a{color:#9fd3ac}body.dark-theme #budgetLivePriceResults,body.dark-theme #weekplanDealsResults{color:#edf5ef}
 .budgetDealsCard .dealList{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}
 .budgetDealsCard .dealItem{background:#fff;border-radius:14px;padding:11px 13px;box-shadow:0 1px 4px rgba(47,90,61,.08)}
@@ -13855,7 +13229,7 @@ body.dark-theme .budgetDealsCard .dealMore{color:#9fd3ac}
 .budgetPrivacyNote{margin:16px 0 0}
 body.dark-theme .budgetPlannerPanel{background:#222a24;border-color:#38453b;color:#edf5ef}
 body.dark-theme .budgetPlannerPanel label,body.dark-theme .budgetPanelHeading h3,body.dark-theme .budgetSectionTitle,body.dark-theme .budgetCategoryTop,body.dark-theme .budgetExpenseDetails strong,body.dark-theme .budgetExpenseAmount,body.dark-theme .budgetStats strong{color:#edf5ef}
-body.dark-theme .dealRow small,body.dark-theme .budgetPanelHeading p,body.dark-theme .budgetStats span,body.dark-theme .budgetRingInner span,body.dark-theme .budgetRingInner small,body.dark-theme .budgetStatus,body.dark-theme .budgetEmpty,body.dark-theme .budgetPrivacyNote,body.dark-theme .budgetExpenseDetails small{color:#c0cec4}
+body.dark-theme .budgetPanelHeading p,body.dark-theme .budgetStats span,body.dark-theme .budgetRingInner span,body.dark-theme .budgetRingInner small,body.dark-theme .budgetStatus,body.dark-theme .budgetEmpty,body.dark-theme .budgetPrivacyNote,body.dark-theme .budgetExpenseDetails small {color:#c0cec4}
 body.dark-theme .budgetInput{background:#1d241f;border-color:#3c4b40;color:#edf5ef}
 body.dark-theme .budgetSummaryCard{background:#1d241f;border-color:#38453b}
 body.dark-theme .budgetRing:before{background:#1d241f}
@@ -14150,7 +13524,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
 .aboutInfoSectionTitle{font-size:12px!important;font-weight:600!important}
 .aboutMenuHint{font-size:12px!important;line-height:1.33}
 .aboutInfoLine span{font-size:14px!important;line-height:1.43}
-.proComingSoon{font-size:11px!important;font-weight:600!important}
+
 #familyMenuMain small{font-size:14px!important;line-height:1.35}
 .proFootnote{font-size:12px!important;line-height:1.33}
 #helpMenuSub p{font-size:14px!important;line-height:1.43!important}
@@ -15533,8 +14907,7 @@ body.dark-theme .viaFamilyPro > div > p::after{color:#9fd3ac}
 .pantryShareRow.viaFamily .pantryShareIcon{background:#fff2d0;color:#9a6f12}
 body.dark-theme .pantryShareRow.viaFamily .pantryShareIcon{background:#3a3424;color:#f0c065}
 html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;border-radius:10px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(63,91,69,.12)}
-.proUnlockHero{display:none;margin:12px auto 0;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#3F5B45;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
-body.proFree .proUnlockHero{display:inline-flex}
+
 /* Geen klein slotje op het icoon: de knop "Ontgrendel met Pro" laat het slot al zien */
 .proLockedCard > i:first-child::after{content:none!important;display:none!important}
 .proLockedCard strong,.proLockedCard p{opacity:.75}
@@ -16124,14 +15497,14 @@ body.dark-theme .assistMore,body.dark-theme .assistOnList{color:#9fd3ac}
 html body #list #listProgress{position:sticky!important;top:-10px!important;z-index:6!important;background:rgb(248,251,249)!important;margin:-10px -10px 4px!important;padding:10px 10px 6px!important;border-radius:16px 16px 0 0}
 body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
 /* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
-html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
+
 </style>
 <style id="servings-style">
 .servStepper{display:inline-flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:#eef3ef}
 .servBtn{display:inline-flex;align-items:center;justify-content:center;padding:0;width:32px;height:32px;border:0;border-radius:50%;background:#fff;color:#3f6b4b;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .servVal{min-width:24px;text-align:center;font-size:14px;color:var(--text-color,#2f4a38);padding:0 4px;white-space:nowrap}
 .servVal b{font-size:16px}
-.plannerServDefault{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:0 0 12px;font-size:15px;font-weight:600;color:var(--text-color,#2f4a38)}
+
 .rsIngHead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .rsIngHead h4{margin:0!important}
 .plannerServ{font-weight:600;color:var(--muted-text,#66766c)}
@@ -16139,7 +15512,19 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
 .recipeTagChip span{margin-left:4px;font-weight:800}
 body.dark-theme .servStepper{background:#1b221d}
 body.dark-theme .servBtn{background:#2c372f;color:#cfe6d5}
-body.dark-theme .servVal,body.dark-theme .plannerServDefault{color:#edf5ef}
+body.dark-theme .servVal {color:#edf5ef}
+</style>
+<style id="dark-list-rows">
+/* Donkere modus: ook de productregels in de boodschappenlijst donker */
+html body.dark-theme #list{border-color:#38453b!important}
+html body.dark-theme #list .item{background:#2a332c!important;border-color:#3a473d!important;box-shadow:none!important}
+html body.dark-theme #list .item .productName{color:#edf5ef!important}
+html body.dark-theme #list .item .productBrand{color:#9fd3ac!important}
+html body.dark-theme #list .item .quantityValue{background:#1d241f!important;color:#edf5ef!important;-webkit-text-fill-color:#edf5ef!important;border-color:#3c4b40!important}
+html body.dark-theme #list .item.completed{background:#242b25!important}
+html body.dark-theme #list .item.completed .productName{color:#8fa096!important}
+html body.dark-theme #list .item .completedMeta{color:#a9b8ad!important}
+html body.dark-theme #list .item .productDeal{color:#f2a3a3!important}
 </style>
 <script id="proScreens">
 /* Pro-onderdelen openen als eigen scherm (met "‹ Pro" terug) in plaats van uit te klappen tussen de andere kaarten.
@@ -16405,21 +15790,7 @@ body.dark-theme .pantryDialog .pantryEditField{color:#b8c6bc}
 </body>
 
 <style id="overview-dashboard-final">
-.overview-dashboard-card{background:#fff;border:1px solid #e1ece4;border-radius:16px;padding:15px;margin:0 0 11px;box-shadow:0 2px 8px rgba(40,70,50,.05)}
-.overview-dashboard-heading{display:flex;align-items:center;gap:9px;margin:0 0 12px;font-size:16px;font-weight:800;color:#30453a}
-.overview-dashboard-heading i{width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:#e7f3ec;color:#3d8060}
-.overview-dashboard-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.overview-dashboard-stat{background:#f3f8f4;border-radius:13px;padding:12px 6px;text-align:center}
-.overview-dashboard-stat strong{display:block;font-size:23px;line-height:1.05;color:#3f5b45}
-.overview-dashboard-stat span{display:block;margin-top:5px;font-size:11px;font-weight:750;color:#718078}
-.overview-frequent-list,.overview-activity-list{display:flex;flex-direction:column}
-.overview-frequent-row{width:100%;border:0;border-bottom:1px solid rgba(63,91,69,.09);background:transparent;padding:9px 1px;display:flex;align-items:center;justify-content:space-between;color:#405047;font:inherit;cursor:pointer;text-align:left}
-.overview-frequent-row:last-child{border-bottom:0}
-.overview-frequent-row>span:first-child{display:flex;align-items:center;gap:9px}
-.overview-frequent-row i{color:#52765d;width:20px;text-align:center}
-.overview-frequent-row b{font-size:14px}
-.overview-frequent-add{width:30px;height:30px;border-radius:9px;background:#e7f3ec;display:inline-flex;align-items:center;justify-content:center}
-.overview-frequent-add i{font-size:12px;color:#3f5b45}
+
 .overview-activity-row{display:flex;align-items:center;gap:10px;padding:9px 1px;border-bottom:1px solid rgba(63,91,69,.09)}
 .overview-activity-row:last-child{border-bottom:0}
 .overview-activity-row>i{width:28px;height:28px;border-radius:9px;background:#e7f3ec;color:#3d8060;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
@@ -16427,10 +15798,10 @@ body.dark-theme .pantryDialog .pantryEditField{color:#b8c6bc}
 .overview-activity-row b{font-size:13px;color:#405047}
 .overview-activity-row small{font-size:11px;color:#718078}
 .overview-dashboard-muted{font-size:13px;line-height:1.4;color:#718078}
-body.dark-theme .overview-dashboard-card{background:#202923;border-color:#34443a}
-body.dark-theme .overview-dashboard-heading,body.dark-theme .overview-frequent-row b,body.dark-theme .overview-activity-row b{color:#e2ebe5}
-body.dark-theme .overview-dashboard-stat{background:#29352d}
-body.dark-theme .overview-dashboard-muted,body.dark-theme .overview-dashboard-stat span,body.dark-theme .overview-activity-row small{color:#aeb8b1}
+
+body.dark-theme .overview-activity-row b {color:#e2ebe5}
+
+body.dark-theme .overview-dashboard-muted,body.dark-theme .overview-activity-row small {color:#aeb8b1}
 </style>
 
 
@@ -16445,16 +15816,14 @@ body.dark-theme .overview-dashboard-muted,body.dark-theme .overview-dashboard-st
 .listOptionsPanelInner{position:relative;width:min(330px,88vw);height:100%;background:#fff;padding:calc(env(safe-area-inset-top) + 22px) 16px 24px;box-sizing:border-box;box-shadow:-10px 0 30px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .28s ease;overflow-y:auto}
 .listOptionsPanel.open .listOptionsPanelInner{transform:translateX(0)}
 .sortOptionsPanel .listOptionsPanelInner{transform:translateX(100%)}
-.listOptionItem,.listOptionBack{width:100%;min-height:54px;border:0;background:transparent;border-radius:15px;padding:10px 12px;display:flex;align-items:center;gap:12px;font:inherit;font-size:16px;font-weight:700;color:#3f5b45;text-align:left;cursor:pointer;box-sizing:border-box}
-.listOptionItem:hover,.listOptionBack:hover{background:#f3f7f3}
-.listOptionItem i:first-child,.listOptionBack i:first-child{width:28px;text-align:center}
+.listOptionItem {width:100%;min-height:54px;border:0;background:transparent;border-radius:15px;padding:10px 12px;display:flex;align-items:center;gap:12px;font:inherit;font-size:16px;font-weight:700;color:#3f5b45;text-align:left;cursor:pointer;box-sizing:border-box}
+.listOptionItem:hover {background:#f3f7f3}
+.listOptionItem i:first-child {width:28px;text-align:center}
 .listOptionArrow{margin-left:auto;opacity:.55;width:auto!important}
-.listOptionDanger{color:#b75a52}
-.listOptionDanger i:first-child{color:#b75a52}
-.listOptionBack{margin-bottom:8px}
+
 body.dark-theme .listOptionsPanelInner{background:#202923;color:#e5ece7}
-body.dark-theme .listOptionItem,body.dark-theme .listOptionBack{color:#dce9df}
-body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{background:#2b362f}
+body.dark-theme .listOptionItem {color:#dce9df}
+body.dark-theme .listOptionItem:hover {background:#2b362f}
 @media(max-width:600px){.listOptionsPanelInner{width:86vw}}
 </style>
 
@@ -16601,21 +15970,19 @@ body.dark-theme .listOptionItem:hover,body.dark-theme .listOptionBack:hover{back
 .listOptionsPanel.open .listOptionsPanelInner{transform:translateX(0) !important;}
 .sortOptionsPanel .listOptionsPanelInner{transform:translateX(18px) !important;}
 .sortOptionsPanel.open .listOptionsPanelInner{transform:translateX(0) !important;}
-.listOptionItem,.listOptionBack{
+.listOptionItem {
   min-height:36px !important; padding:5px 7px !important; border-radius:9px !important;
   font-size:13px !important; gap:7px !important;
 }
 .listOptionItem + .listOptionItem{margin-top:1px;}
-.listOptionItem i:first-child,.listOptionBack i:first-child{width:20px !important; font-size:14px !important;}
+.listOptionItem i:first-child {width:20px !important; font-size:14px !important;}
 .listOptionArrow{font-size:11px !important;}
-.listOptionDanger{color:#b75a52 !important;}
-.listOptionDanger i:first-child{color:#b75a52 !important;}
-.listOptionBack{margin-bottom:2px !important;}
+
 body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:0 12px 28px rgba(0,0,0,.35) !important;}
 @media(max-width:600px){.listOptionsPanelInner{top:calc(env(safe-area-inset-top) + 82px) !important; width:160px !important; right:12px !important;}}
 
 /* Meer bevat geen destructieve lijstactie. */
-.app.more-active .moreMenuActions{display:none !important;}
+
 </style>
 
 <style id="barcode-scanner-system">
@@ -16642,7 +16009,6 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
 /* ===== Definitieve productregel-layout ===== */
 .itemProductContent{
   display:grid !important;
-  grid-template-columns:19px minmax(0,1fr) 34px 90px 32px !important;
   align-items:center !important;
   column-gap:5px !important;
   width:100% !important;
@@ -16713,13 +16079,6 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   text-align:center !important;
   white-space:nowrap !important;
 }
-.itemProductContent .product-row-trash-can{
-  grid-column:5 !important;
-  width:32px !important;
-  min-width:32px !important;
-  max-width:32px !important;
-  justify-self:end !important;
-}
 
 /* Alleen de productnaam is horizontaal schuifbaar. */
 .itemProductContent .productName{
@@ -16747,7 +16106,6 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
 
 @media(max-width:430px){
   .itemProductContent{
-    grid-template-columns:19px minmax(0,1fr) 32px 90px 32px !important;
     column-gap:5px !important;
   }
   .itemProductContent .productIcon{
@@ -16795,7 +16153,6 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   -webkit-transform-origin:center center !important;
 }
 
-
 /* Definitieve cameraweergave: video vult het volledige scanvenster */
 .barcodeVideoWrap{
   position:relative !important;
@@ -16836,10 +16193,8 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   opacity:1 !important;
 }
 
-
 /* Ruimere productbediening: teller en prullenbak ademen meer */
 .itemProductContent{
-  grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
   column-gap:7px !important;
 }
 .itemProductContent .productQuantity{
@@ -16848,16 +16203,9 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   max-width:90px !important;
   margin-right:3px !important;
 }
-.itemProductContent .product-row-trash-can{
-  width:40px !important;
-  min-width:40px !important;
-  max-width:40px !important;
-  justify-self:end !important;
-  margin-left:4px !important;
-}
+
 @media(max-width:430px){
   .itemProductContent{
-    grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
     column-gap:6px !important;
   }
   .itemProductContent .productQuantity{
@@ -16866,14 +16214,8 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
     max-width:90px !important;
     margin-right:3px !important;
   }
-  .itemProductContent .product-row-trash-can{
-    width:40px !important;
-    min-width:40px !important;
-    max-width:40px !important;
-    margin-left:3px !important;
-  }
+  
 }
-
 
 /* ===== Productbediening iets naar links voor meer lucht bij de rechterrand ===== */
 .itemProductContent{
@@ -16903,41 +16245,24 @@ body.dark-theme .barcodeCard{background:#202923;color:#e5eee8}.dark-theme .barco
   left:0 !important;
 }
 
-
 /* Productteller en prullenbak iets meer naar rechts */
 .itemProductContent{
   padding-right:0 !important;
-  grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
   column-gap:5px !important;
 }
 .itemProductContent .productQuantity{
   margin-right:0 !important;
 }
-.itemProductContent .product-row-trash-can{
-  margin-left:0 !important;
-}
+
 @media(max-width:430px){
   .itemProductContent{
     padding-right:0 !important;
-    grid-template-columns:19px minmax(0,1fr) 32px 90px 40px !important;
     column-gap:5px !important;
   }
 }
 
-
 /* Alleen de rode prullenbak iets verder naar rechts,
    zodat er meer ruimte zit tussen teller en prullenbak. */
-.itemProductContent .product-row-trash-can{
-  transform:translateX(6px) !important;
-  -webkit-transform:translateX(6px) !important;
-}
-@media(max-width:430px){
-  .itemProductContent .product-row-trash-can{
-    transform:translateX(6px) !important;
-    -webkit-transform:translateX(6px) !important;
-  }
-}
-
 
 /* ===== Compacte plus/min-bediening ===== */
 .productQuantity{
@@ -17073,15 +16398,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
   display:block;
   line-height:1.25;
 }
-.overviewHistoryEmptyTitle .overviewHistoryEmptyIcon{
-  display:flex;
-  flex:0 0 38px;
-  width:38px;
-  height:38px;
-  align-items:center;
-  justify-content:center;
-  margin:0;
-}
+
 #overview-more-insights-btn[aria-expanded="true"] i{
   transform:rotate(180deg);
 }
@@ -17127,7 +16444,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 #overviewActionOverlay .overviewHistoryEmptyTitle{
   display:block!important; margin:0 0 12px!important;
 }
-#overviewActionOverlay .overviewHistoryEmptyTitle .overviewHistoryEmptyIcon{display:none!important;}
+
 #overviewActionOverlay .overviewHistoryEmptyTitle strong{line-height:1.3!important;}
 .overview-more-insights-btn i{
   display:inline-block!important; transition:transform .18s ease!important;
@@ -17140,7 +16457,6 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
   #overviewActionOverlay .overviewActionTitle h3{font-size:clamp(17px, 4.8vw, 22px)!important;}
   #overviewActionOverlay .overviewActionClose{width:40px!important;min-width:40px!important;flex-basis:40px!important;height:40px!important;min-height:40px!important;}
 }
-
 
 /* Boodschappenlijst Pro: subtiele goudkleurige kaart in het menu Meer */
 .proMenuCard {
@@ -17169,7 +16485,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton i {
 .proFeatureCard div { flex:1; min-width:0; }
 .proFeatureCard strong { display:block; font-size:14px; color:var(--text-color, #344d3b); }
 .proFeatureCard p { margin:5px 0 8px; font-size:12px; line-height:1.4; color:#718177; }
-.proComingSoon { display:inline-block; border-radius:999px; padding:4px 8px; background:#fff2d0; color:#916719; font-size:10px; font-weight:700; }
+
 .proFootnote { text-align:center; color:#78857c; font-size:11px; line-height:1.5; padding:8px 12px 16px; }
 body.dark-theme .proMenuCard { background:linear-gradient(135deg,#3c3627,#4a402b) !important; border-color:#6a5730 !important; color:#f2e6c5 !important; }
 body.dark-theme .proMenuCard span small { color:#d0c5a8; }
