@@ -5228,16 +5228,29 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
       <button type="button" class="proUnlockHero" onclick="event.stopPropagation();showProUpsell()"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ontdek Pro</button>
     </div>
-    <div class="proFeatureCard proPlannerLaunch">
+    <div class="proFeatureCard proPlannerLaunch" onclick="toggleSmartPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSmartPlanner(event)}">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="smartPlannerPanel" class="smartPlannerPanel" hidden onclick="event.stopPropagation()">
-      <h3>Mijn weekplanning</h3>
-      <p class="plannerHelp">Kies een recept of vul zelf een maaltijd in. Kies daarna de dag en tik op “Maaltijd opslaan”.</p>
-
+      <div class="proTabs" role="tablist" data-for="smartPlannerPanel"><button type="button" role="tab" class="proTab active" data-tab="week">Mijn week</button><button type="button" role="tab" class="proTab" data-tab="recipes">Recepten</button></div>
+      <div class="proTabPane" data-pane="week">
+      <h3>Deze week</h3>
+      <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
+      <button type="button" class="proPlannerButton plannerAddListButton" onclick="event.stopPropagation(); addPlannerIngredientsToShoppingList(event)">Ingrediënten aan boodschappenlijst toevoegen</button>
+      <h3 class="plannerFormTitle">Maaltijd toevoegen</h3>
+      <p class="plannerHelp">Vul zelf een maaltijd in, of kies er een bij <a href="#" class="plannerToRecipes">Recepten</a>. Kies daarna de dag en tik op “Maaltijd opslaan”.</p>
+      <label for="plannerDay">Dag</label>
+      <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
+      <label for="plannerMeal">Maaltijd</label>
+      <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
+      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
+      <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
+      <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
+      <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
+      </div>
+      <div class="proTabPane" data-pane="recipes" hidden>
       <div class="plannerRecipeBox">
-        <h3>Recepten kiezen</h3>
-        <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het meteen in te vullen.</p>
+        <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het in je week te zetten.</p>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
         <div id="plannerRecipeChips" class="recipeChips">
           <button type="button" class="recipeChip active" data-f="all" onclick="setRecipeFilter('all',event)">Alle recepten</button>
@@ -5249,17 +5262,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <p id="plannerRecipeCount" class="recipeCount"></p>
         <div id="plannerRecipeCatalog" class="plannerRecipeCatalog"></div>
       </div>
-      <label for="plannerDay">Dag</label>
-      <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
-      <label for="plannerMeal">Maaltijd</label>
-      <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
-      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
-      <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
-      <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
-      <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
-      <h3>Geplande maaltijden</h3>
-      <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
-      <button type="button" class="proPlannerButton plannerAddListButton" onclick="event.stopPropagation(); addPlannerIngredientsToShoppingList(event)">Ingrediënten aan boodschappenlijst toevoegen</button>
+      </div>
     </section>
     <div class="proFeatureCard budgetPlannerLaunch" onclick="toggleBudgetPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBudgetPlanner(event)}">
       <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5269,6 +5272,31 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <div><h3>Mijn boodschappenbudget</h3><p>Houd je uitgaven bij en zie wat je nog over hebt.</p></div>
         <i class="fa-solid fa-wallet" aria-hidden="true"></i>
       </div>
+      <div class="proTabs" role="tablist" data-for="budgetPlannerPanel"><button type="button" role="tab" class="proTab active" data-tab="budget">Mijn budget</button><button type="button" role="tab" class="proTab" data-tab="deals">Aanbiedingen</button></div>
+      <div class="proTabPane" data-pane="budget">
+      <label for="budgetAmount">Budget per week (€)</label>
+      <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
+      <div class="budgetSummaryCard">
+        <div class="budgetRing" id="budgetRing" role="img" aria-label="Uitgaven als deel van het budget"><div class="budgetRingInner"><span>Uitgegeven</span><strong id="budgetSpent">€ 0,00</strong><small id="budgetOf">van € 0,00</small></div></div>
+        <div class="budgetStats"><div><span>Uitgegeven</span><strong id="budgetSpentSmall">€ 0,00</strong></div><div><span>Nog beschikbaar</span><strong id="budgetRemaining">€ 0,00</strong></div></div>
+        <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
+        <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
+      </div>
+      <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
+      <label for="budgetExpenseName">Product of omschrijving</label>
+      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. weekboodschappen">
+      <div class="budgetFormRow">
+        <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
+        <div><label for="budgetExpenseStore">Winkel</label><select id="budgetExpenseStore" class="budgetInput"></select></div>
+      </div>
+      <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
+      <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
+      <div id="budgetCategories" class="budgetCategories"></div>
+      <h3 class="budgetSectionTitle">Recente uitgaven</h3>
+      <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
+      </div>
+      <div class="proTabPane" data-pane="deals" hidden>
       <label for="budgetSupermarket">Mijn vaste supermarkt</label>
       <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
         <option value="ah">Albert Heijn</option>
@@ -5306,27 +5334,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <div id="weekplanDealsResults" aria-live="polite"></div>
         <p class="budgetStatus budgetSource">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
       </div>
-      <label for="budgetAmount">Budget per week (€)</label>
-      <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
-      <div class="budgetSummaryCard">
-        <div class="budgetRing" id="budgetRing" role="img" aria-label="Uitgaven als deel van het budget"><div class="budgetRingInner"><span>Uitgegeven</span><strong id="budgetSpent">€ 0,00</strong><small id="budgetOf">van € 0,00</small></div></div>
-        <div class="budgetStats"><div><span>Uitgegeven</span><strong id="budgetSpentSmall">€ 0,00</strong></div><div><span>Nog beschikbaar</span><strong id="budgetRemaining">€ 0,00</strong></div></div>
-        <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
-        <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
       </div>
-      <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
-      <label for="budgetExpenseName">Product of omschrijving</label>
-      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. boodschappen bij supermarkt">
-      <div class="budgetFormRow">
-        <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
-        <div><label for="budgetExpenseCategory">Categorie</label><select id="budgetExpenseCategory" class="budgetInput"><option value="Groente en fruit">Groente en fruit</option><option value="Zuivel en eieren">Zuivel en eieren</option><option value="Brood en voorraad">Brood en voorraad</option><option value="Vlees, vis en vega">Vlees, vis en vega</option><option value="Huishouden">Huishouden</option><option value="Overig">Overig</option></select></div>
-      </div>
-      <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
-      <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
-      <div id="budgetCategories" class="budgetCategories"></div>
-      <h3 class="budgetSectionTitle">Recente uitgaven</h3>
-      <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
-      <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
     </section>
     <div class="proFeatureCard pantryLaunch" onclick="togglePantry(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePantry(event)}">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis hebt en zet wat op is met één tik op je lijst.</p><button type="button" class="budgetLaunchButton pantryLaunchButton" onclick="event.stopPropagation();togglePantry(event)">Open voorraad <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5787,7 +5795,8 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
       <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
-      <p>Verwijder je één product met de prullenbak naast dat product, dan verdwijnt alleen dat product uit je huidige lijst. Het komt niet in je geschiedenis.</p>
+      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>. Een verwijderd product komt niet in je geschiedenis.</p>
+      <p>Zie je een aanbieding in de budgetplanner (tabblad <strong>Aanbiedingen</strong>), tik dan op <strong>+ Op lijst</strong>. Onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
@@ -5802,6 +5811,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> kies je snel 3 dagen, 1 week, 2 weken of 1 maand, of een eigen datum. Is iets op, dan zet je het met één tik op je lijst.</p>
       <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en budget <b class="aboutProBadge">PRO</b></span></div>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -7732,7 +7745,14 @@ function normalizeBoodschappen(data) {
         barcode: item.barcode ? String(item.barcode) : "",
         imageUrl: item.imageUrl ? String(item.imageUrl) : "",
         brand: item.brand ? String(item.brand) : "",
-        quantity: Math.max(1, Number(item.quantity) || 1)
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        ...(item.deal && typeof item.deal === "object" && Number.isFinite(Number(item.deal.price)) ? { deal: {
+          price: Number(item.deal.price),
+          promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
+          until: item.deal.until ? String(item.deal.until).slice(0, 10) : "",
+          store: item.deal.store ? String(item.deal.store).slice(0, 30) : "",
+          ...(Number(item.deal.was) > Number(item.deal.price) ? { was: Number(item.deal.was) } : {})
+        } } : {})
       };
     }
 
@@ -8776,6 +8796,26 @@ function updateListProgress() {
   progress.style.setProperty("--progress", percentage + "%");
 }
 
+async function removeProductWithUndo(index) {
+  const item = boodschappen[index];
+  if (!item) return;
+  const removed = JSON.parse(JSON.stringify(item));
+  boodschappen.splice(index, 1);
+  selectedIndex = -1;
+  showList();
+  await saveList();
+  const safe = String(removed.text).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  try {
+    if (window.__pantryApi && window.__pantryApi.toast) {
+      window.__pantryApi.toast(safe + " is van je lijst gehaald.", "Ongedaan maken", async () => {
+        boodschappen.splice(Math.min(index, boodschappen.length), 0, removed);
+        showList();
+        await saveList();
+      });
+    }
+  } catch (e) {}
+}
+
 async function changeProductQuantity(index, delta) {
   const item = boodschappen[index];
   if (!item) return;
@@ -8947,15 +8987,20 @@ function showList(animationType = "") {
     quantityWrap.className = "productQuantity";
     quantityWrap.setAttribute("aria-label", "Aantal");
 
+    const atOne = Math.max(1, Number(item.quantity) || 1) <= 1;
     const minusButton = document.createElement("button");
     minusButton.type = "button";
-    minusButton.className = "quantityButton";
-    minusButton.innerHTML = '<span class="stepIcon" aria-hidden="true"></span>';
-    minusButton.setAttribute("aria-label", "Aantal verlagen");
-    minusButton.title = "Aantal verlagen";
+    minusButton.className = "quantityButton" + (atOne ? " qtyTrash" : "");
+    minusButton.innerHTML = atOne ? '<i class="fa-solid fa-trash-can" aria-hidden="true"></i>' : '<span class="stepIcon" aria-hidden="true"></span>';
+    minusButton.setAttribute("aria-label", atOne ? "Product verwijderen" : "Aantal verlagen");
+    minusButton.title = atOne ? "Product verwijderen" : "Aantal verlagen";
     minusButton.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
+      if (Math.max(1, Number(item.quantity) || 1) <= 1) {
+        await removeProductWithUndo(index);
+        return;
+      }
       await changeProductQuantity(index, -1);
     });
 
@@ -8980,23 +9025,12 @@ function showList(animationType = "") {
     quantityWrap.appendChild(plusButton);
     productWrap.appendChild(quantityWrap);
 
-    const trashButton = document.createElement("button");
-    trashButton.type = "button";
-    trashButton.className = "product-row-trash-can";
-    trashButton.setAttribute("aria-label", "Product verwijderen");
-    trashButton.title = "Product verwijderen";
-    trashButton.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i>';
-    trashButton.addEventListener("click", async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      boodschappen.splice(index, 1);
-      selectedIndex = -1;
-      showList();
-      await saveList();
-    });
-    productWrap.appendChild(trashButton);
 
     div.appendChild(productWrap);
+    if (typeof window.__dealLineFor === "function") {
+      const dl = window.__dealLineFor(item);
+      if (dl) { div.appendChild(dl); div.classList.add("hasDeal"); }
+    }
 
     // In zowel de familielijst als een Deellijst is zichtbaar wie een product heeft voltooid.
     if (item.completed && item.completedBy) {
@@ -13487,7 +13521,9 @@ window.renderRecipeCatalog=function(){
  const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")+" "+(r.tags||[]).join(" ")).toLocaleLowerCase("nl").includes(q)&&recipeMatchesFilter(r));
  const cnt=document.getElementById("plannerRecipeCount");if(cnt)cnt.textContent=found.length+(found.length===1?" recept":" recepten");
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
- box.innerHTML=found.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('');
+ const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
+ const __shown=__lim?found.slice(0,3):found;
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -13766,6 +13802,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const note=document.getElementById("budgetSupermarketNote");
     if(note)note.textContent="Keuze opgeslagen: "+select.options[select.selectedIndex].text.replace(/ \(zonder aanbiedingen\)/,"")+".";
     window.__updateDealsAvail();
+    if(window.__fillExpenseStores)window.__fillExpenseStores();
   };
   window.__updateDealsAvail=function(){
     const sel=document.getElementById("budgetSupermarket");if(!sel)return;
@@ -13788,13 +13825,26 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const d=read();d.budget=Math.round(value*100)/100;write(d);renderBudget();document.getElementById("budgetStatus").textContent="Je weekbudget is opgeslagen.";
   };
   window.addBudgetExpense=function(){
-    const name=document.getElementById("budgetExpenseName"),price=document.getElementById("budgetExpensePrice"),category=document.getElementById("budgetExpenseCategory");
+    const name=document.getElementById("budgetExpenseName"),price=document.getElementById("budgetExpensePrice"),storeSel=document.getElementById("budgetExpenseStore");
     const label=name.value.trim(),amount=Number(price.value);
     if(!label){name.focus();document.getElementById("budgetStatus").textContent="Vul een omschrijving in voor deze uitgave.";return;}
     if(!price.value.trim()||!Number.isFinite(amount)||amount<=0){price.focus();document.getElementById("budgetStatus").textContent="Vul een bedrag groter dan € 0 in.";return;}
-    const d=read();d.expenses.unshift({id:Date.now()+Math.random(),name:label,amount:Math.round(amount*100)/100,category:category.value,date:new Date().toISOString()});write(d);
-    name.value="";price.value="";renderBudget();document.getElementById("budgetStatus").textContent="Uitgave toegevoegd.";
+    const d=read();d.expenses.unshift({id:Date.now()+Math.random(),name:label,amount:Math.round(amount*100)/100,store:storeSel&&storeSel.value?storeSel.value:"Andere winkel",date:new Date().toISOString()});write(d);
+    name.value="";price.value="";if(storeSel){storeSel.__touched=false;fillStores();}renderBudget();document.getElementById("budgetStatus").textContent="Uitgave toegevoegd.";
   };
+  // Winkel-keuze bij een uitgave: dezelfde supermarkten als "Mijn vaste supermarkt"; standaard je vaste supermarkt.
+  function fillStores(){
+    const sel=document.getElementById("budgetExpenseStore"),fav=document.getElementById("budgetSupermarket");if(!sel||!fav)return;
+    const keep=sel.__touched?sel.value:"";
+    if(!sel.options.length){
+      [...fav.options].forEach(o=>{if(o.value==="other")return;const x=document.createElement("option");x.value=o.text;x.textContent=o.text;sel.appendChild(x);});
+      const other=document.createElement("option");other.value="Andere winkel";other.textContent="Andere winkel";sel.appendChild(other);
+      sel.addEventListener("change",()=>{sel.__touched=true;});
+    }
+    const favName=fav.value==="other"?"Andere winkel":(fav.selectedOptions[0]?fav.selectedOptions[0].text:"Andere winkel");
+    sel.value=keep||favName;
+  }
+  window.__fillExpenseStores=fillStores;
   window.removeBudgetExpense=function(id){const d=read();d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));write(d);renderBudget();};
   window.clearBudgetExpenses=function(){const d=read();if(!d.expenses.length)return;if(!confirm("Weet je zeker dat je alle uitgaven wilt wissen?"))return;d.expenses=[];write(d);renderBudget();document.getElementById("budgetStatus").textContent="Alle uitgaven zijn gewist.";};
 
@@ -13901,7 +13951,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
   };
   const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
   const niceDate=iso=>{const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return"";const d=new Date(+m[1],+m[2]-1,+m[3]);return LONG_DAYS[d.getDay()]+" "+(+m[3])+" "+MONTHS[+m[2]-1];};
-  function dealCard(p,label){
+  function dealCard(p,label,searchTerm){
     const card=document.createElement("div");card.className="dealItem";
     if(label){const l=document.createElement("span");l.className="dealLabel";l.textContent=label;card.appendChild(l);}
     const name=document.createElement("div");name.className="dealName";name.textContent=p.name||p.product_name||p.title||"Product";card.appendChild(name);
@@ -13918,8 +13968,9 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     if(!badge){const f=document.createElement("span");f.className="dealFolder";f.textContent="Folderactie";priceRow.appendChild(f);}
     card.appendChild(priceRow);
     const meta=document.createElement("div");meta.className="dealMeta";
-    meta.textContent=[promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
+    meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:retailerName()}));
     return card;
   }
   window.searchBudgetLivePrices=async function(){
@@ -13938,12 +13989,12 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
       results.replaceChildren();
       const list=document.createElement("div");list.className="dealList";results.appendChild(list);
       const FIRST=4;
-      rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p)));
+      rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p,null,term)));
       if(rows.length>FIRST){
         const more=document.createElement("button");more.type="button";more.className="dealMore";
         const rest=Math.min(rows.length,12)-FIRST;
         more.textContent="Toon "+rest+" meer";
-        more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p)));more.remove();});
+        more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p,null,term)));more.remove();});
         results.appendChild(more);
       }
     }catch(err){results.textContent=dealError(err);}
@@ -14003,9 +14054,11 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const progress=document.getElementById("budgetProgress");if(progress)progress.style.width=pct+"%";
     const ring=document.getElementById("budgetRing");if(ring){const over=d.budget>0&&spent>d.budget;ring.style.background=d.budget>0?`conic-gradient(${over?"#c95b52":"#57956c"} 0 ${pct}%, #83b8e8 ${pct}% 100%)`:"conic-gradient(#dfe9e2 0 100%)";ring.setAttribute("aria-label",`Uitgegeven ${euro(spent)} van ${euro(d.budget)}`);}
     const status=document.getElementById("budgetStatus");if(status){if(!d.budget)status.textContent="Stel je weekbudget in en voeg je uitgaven toe.";else if(spent>d.budget)status.textContent="Je zit "+euro(spent-d.budget)+" boven je weekbudget.";else if(pct>=80)status.textContent="Let op: je hebt al "+Math.round(pct)+"% van je weekbudget gebruikt.";else status.textContent="Je hebt nog "+euro(remaining)+" van je weekbudget over.";}
-    const totals={};d.expenses.forEach(x=>{const cat=x.category||"Overig";totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
-    const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Je categorieën verschijnen zodra je uitgaven toevoegt.</p>';}
-    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(x.category||"Overig")} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
+    fillStores();
+    const storeOf=x=>x.store||"Zonder winkel";
+    const totals={};d.expenses.forEach(x=>{const cat=storeOf(x);totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
+    const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Zodra je uitgaven toevoegt, zie je hier per winkel wat je uitgeeft.</p>';}
+    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
   window.__refreshBudgetUI=function(){try{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();}catch(e){console.warn(e);}};
   document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();});
@@ -15475,18 +15528,32 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     new MutationObserver(mark).observe(st,{childList:true,characterData:true,subtree:true});mark();}
 
   /* Vaak gekocht: producten uit je geschiedenis en opgeslagen lijsten */
-  var cache=null,cacheAt=0,busy=false;
+  var cache=null,cacheAt=0,busy=false,BOOT=Date.now(),STORE="boodschappenStripCache";
+  // Laatste voorstellen op de telefoon bewaren, zodat ze bij het openen meteen klaarstaan.
+  var saved=null;try{saved=JSON.parse(localStorage.getItem(STORE)||"null");}catch(e){}
+  function persist(patch){try{var o=saved||{};Object.keys(patch).forEach(function(k){o[k]=patch[k];});saved=o;localStorage.setItem(STORE,JSON.stringify(o));}catch(e){}}
   function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
   async function load(){
     if(cache&&Date.now()-cacheAt<60000)return cache;
-    if(busy)return cache||[];busy=true;
+    if(!(cache&&cache.length)&&saved&&Array.isArray(saved.freq)&&saved.freq.length&&!busy){
+      // Eerst de bewaarde voorstellen tonen; op de achtergrond de echte geschiedenis ophalen.
+      fresh().then(function(r){if(r.length)later();});
+      return saved.freq;
+    }
+    return fresh();
+  }
+  async function fresh(){
+    if(busy)return (cache&&cache.length)?cache:((saved&&saved.freq)||[]);busy=true;
     var sources=[];
     try{if(typeof readOverviewHistory==="function"){var h=await readOverviewHistory();sources=sources.concat((h||[]).map(function(x){return x.items||[];}));}}catch(e){}
     try{if(typeof readSavedLists==="function"){var sv=await readSavedLists();sources=sources.concat((sv||[]).map(function(x){return x.items||[];}));}}catch(e){}
     var counts={};
     sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;(counts[k]=counts[k]||{text:t,n:0}).n++;});});
     cache=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n||a.text.localeCompare(b.text,"nl");});
-    cacheAt=cache.length?Date.now():0;busy=false;return cache;   // lege uitkomst niet vasthouden
+    cacheAt=cache.length?Date.now():0;busy=false;
+    if(cache.length)persist({freq:cache.slice(0,40)});
+    else if(Date.now()-BOOT<15000&&saved&&Array.isArray(saved.freq))return saved.freq;   // geschiedenis nog niet binnen
+    return cache;   // lege uitkomst niet vasthouden
   }
   function onList(){var m={};try{(Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)m[norm(x.text)]=1;});}catch(e){}return m;}
   function icon(t){try{return productIconMarkup(getProductIcon(t));}catch(e){return "";}}
@@ -15499,6 +15566,10 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     var all=await load(),have=onList();
     var pick=all.filter(function(p){return !have[norm(p.text)];}).slice(0,4);
     var routine=[];try{if(window.__routineCandidates)routine=await window.__routineCandidates();}catch(e){}
+    var proOn=!window.isProActive||window.isProActive();
+    if(routine.length)persist({routine:routine});
+    else if(proOn&&Date.now()-BOOT<15000&&saved&&Array.isArray(saved.routine))routine=saved.routine.filter(function(x){return !have[norm(x)];});
+    else if(Date.now()-BOOT>=15000)persist({routine:[]});
     var showR=routine.length>=2;
     if(!pick.length&&!showR){box.hidden=true;return;}
     box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+
@@ -15520,6 +15591,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
   if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);later();return r;};}
   ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){if(typeof window[fn]==="function"){var of=window[fn];window[fn]=function(){var r=of.apply(this,arguments);later();return r;};}});
   window.addEventListener("resize",later);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(render,0);});else setTimeout(render,0);
   setTimeout(render,1500);
 })();
 </script>
@@ -15544,6 +15616,9 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
         var st=document.getElementById("status");if(st&&!st.innerHTML&&c.status)st.innerHTML=c.status;
         if(Array.isArray(c.items)&&typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&!boodschappen.length&&c.items.length){
           c.items.forEach(function(x){boodschappen.push(x);});restored=true;
+          try{showList();}catch(e){}
+        }else if(Array.isArray(c.items)&&!c.items.length){
+          // Lege lijst: meteen "0 boodschappen" tonen in plaats van een lege kaart
           try{showList();}catch(e){}
         }
       }
@@ -15719,7 +15794,8 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       out.push({id:"deal:"+norm(name)+":"+(p.valid_until||""),type:"deal",prio:orig>price?(orig-price)/orig:0.1,product:nice(name),
         title:nice(name)+" is in de aanbieding",
         text:String(p.name||name)+" · "+money(price)+(orig>price?" (was "+money(orig)+")":"")+(promo?" · "+promo:"")+" bij "+sm.name+untilTxt(p.valid_until)+".",
-        action:onList(name)?"":"Op lijst",onListAlready:onList(name)});
+        action:onList(name)?"":"Op lijst",onListAlready:onList(name),
+        deal:{name:String(p.name||name),term:name,price:price,was:orig,promo:String(p.promotional_keywords&&p.promotional_keywords[0]||""),until:p.valid_until||"",store:sm.name}});
     });
     return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,3);
   }
@@ -15834,6 +15910,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       if(oth&&tip)oth.onclick=function(e){e.stopPropagation();cookSkip[tip.recipe.id]=1;el.classList.add("leaving");setTimeout(after,180);};
       if(add)add.onclick=async function(e){
         e.stopPropagation();add.disabled=true;var name=add.getAttribute("data-p");
+        if(tip&&tip.type==="deal"&&tip.deal&&window.__addDealToList){try{await window.__addDealToList(tip.deal);}catch(err){}dismiss(id,7);after();return;}
         try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:name}]);}catch(err){}
         dismiss(id,7);toast(esc(name)+" staat op je boodschappenlijst.");after();
       };
@@ -15865,7 +15942,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     document.querySelectorAll("#assistantPanel .assistSwitch").forEach(function(cb){cb.checked=!!s[cb.getAttribute("data-k")];});
     var sm=window.__assistantSupermarket?window.__assistantSupermarket():{};
     var note=document.getElementById("assistantDealNote");
-    if(note)note.textContent=sm.supported?"Aanbiedingen bij "+sm.name+" (kies je supermarkt in de budgetplanner).":"Kies in de budgetplanner je supermarkt om aanbiedingen te zien.";
+    if(note)note.textContent=sm.supported?"Aanbiedingen bij "+sm.name+" (je supermarkt kies je in de budgetplanner bij Aanbiedingen).":"Kies in de budgetplanner bij Aanbiedingen je supermarkt om aanbiedingen te zien.";
   }
   function renderAll(){renderOverviewTip();renderPanel();}
 
@@ -15973,6 +16050,189 @@ html body #list #listProgress{position:sticky!important;top:-10px!important;z-in
 body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
 /* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
 html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
+</style>
+<script id="proScreens">
+/* Pro-onderdelen openen als eigen scherm (met "‹ Pro" terug) in plaats van uit te klappen tussen de andere kaarten.
+   Binnen de weekplanner en de budgetplanner: tabbladen. */
+(function(){
+  var SUB=document.getElementById("proMenuSub");if(!SUB)return;
+  var P=[
+    {id:"smartPlannerPanel",title:"Slimme weekplanner",fn:"toggleSmartPlanner"},
+    {id:"budgetPlannerPanel",title:"Prijs- en budgetplanner",fn:"toggleBudgetPlanner"},
+    {id:"pantryPanel",title:"Voorraadbeheer",fn:"togglePantry"},
+    {id:"assistantPanel",title:"Persoonlijke assistent",fn:"toggleAssistant"}
+  ];
+  var bar=document.createElement("div");bar.className="proScreenBar";bar.hidden=true;
+  bar.innerHTML='<button type="button" class="familyMenuBack proScreenBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Pro</span></button><div class="proScreenTitle" role="heading" aria-level="2"></div>';
+  SUB.insertBefore(bar,SUB.firstChild);
+  var current=null,busy=false;
+  function panel(id){return document.getElementById(id);}
+  function scrollTop(){try{SUB.scrollTop=0;}catch(e){}try{var mv=document.getElementById("moreView");if(mv)mv.scrollTop=0;}catch(e){}try{var m=document.getElementById("familyMenu");if(m)m.scrollTop=0;}catch(e){}try{window.scrollTo(0,0);}catch(e){}}
+  function closePanel(c){var el=panel(c.id);if(!el||el.hidden)return;busy=true;
+    try{if(window.isProActive&&!window.isProActive())el.hidden=true;else if(typeof window[c.fn]==="function")window[c.fn]();else el.hidden=true;}catch(e){el.hidden=true;}
+    if(!el.hidden)el.hidden=true;busy=false;}
+  function sync(){
+    if(busy)return;
+    var open=P.filter(function(c){var el=panel(c.id);return el&&!el.hidden;});
+    if(open.length>1){ // er mag er maar één open staan: de oude sluiten
+      var keep=open.filter(function(c){return c!==current;})[0]||open[open.length-1];
+      open.forEach(function(c){if(c!==keep)closePanel(c);});open=[keep];
+    }
+    var c=open[0]||null,was=current;current=c;
+    SUB.classList.toggle("proScreen",!!c);
+    P.forEach(function(x){var el=panel(x.id);if(el)el.classList.toggle("proScreenActive",x===c);});
+    bar.hidden=!c;
+    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;if(c!==was)setTimeout(scrollTop,0),setTimeout(scrollTop,90);}
+    else if(was)setTimeout(scrollTop,0);
+  }
+  var mo=new MutationObserver(sync);
+  P.forEach(function(c){var el=panel(c.id);if(el)mo.observe(el,{attributes:true,attributeFilter:["hidden"]});});
+  bar.querySelector(".proScreenBack").addEventListener("click",function(e){e.stopPropagation();if(current)closePanel(current);sync();});
+  // Als je het Pro-menu verlaat, de open onderdelen sluiten zodat je de volgende keer weer bij het overzicht begint
+  if(typeof closeProSubmenu==="function"){var oc=closeProSubmenu;closeProSubmenu=function(){P.forEach(closePanel);sync();return oc.apply(this,arguments);};}
+  window.__proScreenClose=function(){P.forEach(closePanel);sync();};
+
+  /* ---------- Tabbladen ---------- */
+  var lastTab={};
+  function setTab(panelId,tab){
+    var el=panel(panelId);if(!el)return;
+    el.querySelectorAll(".proTab").forEach(function(b){var on=b.getAttribute("data-tab")===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
+    el.querySelectorAll(".proTabPane").forEach(function(pn){pn.hidden=pn.getAttribute("data-pane")!==tab;});
+    lastTab[panelId]=tab;
+    if(panelId==="smartPlannerPanel"&&tab==="recipes"&&typeof renderRecipeCatalog==="function")renderRecipeCatalog();
+  }
+  window.__proSetTab=setTab;
+  document.querySelectorAll(".proTabs").forEach(function(t){
+    var pid=t.getAttribute("data-for");
+    t.querySelectorAll(".proTab").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setTab(pid,b.getAttribute("data-tab"));scrollTop();});});
+  });
+  var link=document.querySelector(".plannerToRecipes");
+  if(link)link.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();setTab("smartPlannerPanel","recipes");scrollTop();});
+  // "Kies recept" vult de maaltijd in: dan terug naar "Mijn week"
+  if(typeof window.choosePlannerRecipe==="function"){
+    var oc2=window.choosePlannerRecipe;
+    window.choosePlannerRecipe=function(){setTab("smartPlannerPanel","week");var r=oc2.apply(this,arguments);
+      setTimeout(function(){var m=document.getElementById("plannerMeal");if(m)m.scrollIntoView({behavior:"smooth",block:"center"});},60);return r;};
+  }
+})();
+</script>
+<style id="pro-screens-style">
+.proScreenBar[hidden]{display:none!important}
+.proScreenBar .proScreenTitle{display:block!important;margin:6px 2px 14px;font-size:22px;font-weight:800;line-height:1.25;color:var(--text-color,#2f4a38)}
+body.dark-theme .proScreenBar .proScreenTitle{color:#edf5ef}
+#proMenuSub.proScreen > .familyMenuBack:not(.proScreenBack),
+#proMenuSub.proScreen > .proHero,
+#proMenuSub.proScreen > .proFeatureCard,
+#proMenuSub.proScreen > .proFootnote,
+#proMenuSub.proScreen > section:not(.proScreenActive){display:none!important}
+#proMenuSub.proScreen > section.proScreenActive{margin-top:0!important}
+/* Rustige kaarten: hele kaart is de knop, met een pijltje */
+body:not(.proFree) #proMenuSub .proFeatureCard > div > button{display:none!important}
+body:not(.proFree) #proMenuSub .proFeatureCard{position:relative;align-items:center;cursor:pointer;padding-right:40px}
+body:not(.proFree) #proMenuSub .proFeatureCard::after{content:"\f054";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:14px;color:#8aa293}
+body:not(.proFree) #proMenuSub .proFeatureCard p{margin-bottom:0}
+body:not(.proFree) #proMenuSub .proFeatureCard:active{transform:scale(.99)}
+/* Tabbladen */
+.proTabs{display:flex;gap:4px;padding:4px;margin:0 0 14px;border-radius:14px;background:#eef3ef}
+.proTab{flex:1;min-height:40px;border:0;border-radius:11px;background:transparent;color:#5b6d61;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.proTab.active{background:#fff;color:#2f4a38;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.proTabPane[hidden]{display:none!important}
+body.dark-theme .proTabs{background:#1b221d}
+body.dark-theme .proTab{color:#a9b8ad}
+body.dark-theme .proTab.active{background:#2c372f;color:#edf5ef}
+.plannerFormTitle{margin-top:22px!important}
+.plannerToRecipes{color:#3f7a50;font-weight:700;text-decoration:underline}
+.recipeShowAll{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;margin:4px 0 6px;border:1px solid #d5e4d9;border-radius:14px;background:#f4f8f5;color:#3f6b4b;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.recipeShowAll i{font-size:12px}
+body.dark-theme .recipeShowAll{background:#222a24;border-color:#38453b;color:#9fd3ac}
+</style>
+<script id="dealToList">
+/* Aanbiedingen op je boodschappenlijst: knop "+ Op lijst" en een klein regeltje onder het product. */
+(function(){
+  var MON=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function todayIso(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+  function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  var PCT=/^(tot\s*)?-?\s*\d+([.,]\d+)?\s*%(\s*korting)?$/i;
+  function tidyPromo(p){
+    p=String(p||"").trim();if(!p||PCT.test(p))return "";
+    if(/=/.test(p))return p.toUpperCase();
+    p=p.replace(/\b[A-Z]{2,}\b/g,function(w){return w.toLowerCase();});
+    p=p.replace(/\b(\d+)(E|DE)\b/g,function(_,n,x){return n+x.toLowerCase();});
+    if(p===p.toUpperCase()&&/[A-Z]/.test(p)){p=p.toLowerCase();}
+    // "2 voor 5.00" -> "2 voor € 5,00"
+    p=p.replace(/\bvoor\s*€?\s*(\d+)[.,](\d{2})\b/gi,function(_,a,b){return "voor € "+a+","+b;});
+    return p.replace(/\s*\+\s*/g," + ");
+  }
+  window.__tidyPromo=tidyPromo;
+  // Hoeveel moet je kopen om de korting te krijgen?
+  function qtyForPromo(p){
+    p=String(p||"").toLowerCase();
+    var m=p.match(/(\d+)\s*\+\s*(\d+)\s*gratis/);if(m)return Math.min(12,+m[1]+ +m[2]);
+    if(/(2e|2de|tweede)\s*(halve\s*prijs|gratis|voor\s*de\s*halve|\d+\s*%)/.test(p))return 2;
+    m=p.match(/^(\d+)\s*(stuks\s*)?voor\b/);if(m)return Math.min(12,+m[1]);
+    return 1;
+  }
+  window.__qtyForPromo=qtyForPromo;
+  function untilTxt(iso){var m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);return m?"t/m "+(+m[3])+" "+MON[+m[2]-1]:"";}
+  function active(d){return d&&Number.isFinite(Number(d.price))&&(!d.until||d.until>=todayIso());}
+  window.__dealLineFor=function(item){
+    if(!item||item.completed||!active(item.deal))return null;
+    var d=item.deal,el=document.createElement("span");el.className="productDeal";
+    var parts=[money(d.price)];var pr=tidyPromo(d.promo);if(pr)parts.push(pr);
+    var fav="";try{var fs=document.getElementById("budgetSupermarket");fav=fs&&fs.selectedOptions[0]?fs.selectedOptions[0].text:"";}catch(e){}
+    if(d.store&&d.store!==fav)parts.push("bij "+d.store);var u=untilTxt(d.until);if(u)parts.push(u);
+    var pct=Number(d.was)>Number(d.price)?Math.round((1-Number(d.price)/Number(d.was))*100):0;
+    el.innerHTML=(pct>0?'<span class="productDealBadge">-'+pct+'%</span>':'<i class="fa-solid fa-tag" aria-hidden="true"></i>')+esc(parts.join(" · "));
+    return el;
+  };
+  function same(a,b){try{if(window.__pantryApi&&window.__pantryApi.same)return window.__pantryApi.same(a,b);}catch(e){}return String(a).trim().toLowerCase()===String(b).trim().toLowerCase();}
+  function findOnList(names){
+    try{var L=Array.isArray(boodschappen)?boodschappen:[];
+      for(var i=0;i<names.length;i++){if(!names[i])continue;for(var j=0;j<L.length;j++){if(L[j]&&!L[j].completed&&same(L[j].text,names[i]))return L[j];}}}catch(e){}
+    return null;
+  }
+  window.__dealOnList=function(d){var it=findOnList([d.name,d.term]);return !!(it&&it.deal&&Number(it.deal.price)===Number(d.price));};
+  // d = {name, term, price, promo, until, store}
+  window.__addDealToList=async function(d){
+    var deal={price:Number(d.price),promo:String(d.promo||""),until:String(d.until||"").slice(0,10),store:String(d.store||"")};
+    if(Number(d.was)>Number(d.price))deal.was=Number(d.was);
+    var it=findOnList([d.name,d.term]),added=false;
+    if(!it){
+      try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:d.name}]);}catch(e){}
+      it=findOnList([d.name]);added=true;
+    }
+    if(!it)return false;
+    it.deal=deal;
+    var need=qtyForPromo(deal.promo);if(need>(Number(it.quantity)||1))it.quantity=need;
+    try{showList();}catch(e){}
+    try{await saveList();}catch(e){console.warn(e);}
+    var msg=added?esc(it.text)+" staat op je boodschappenlijst":"De aanbieding staat nu bij "+esc(it.text);
+    if(need>1)msg+=" ("+need+" stuks voor de actie)";
+    try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(msg+".");}catch(e){}
+    return true;
+  };
+  window.__dealButton=function(d){
+    var b=document.createElement("button");b.type="button";b.className="dealAddBtn";
+    function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst';}
+    if(window.__dealOnList(d))done();else b.innerHTML='<span class="plus">+</span> Op lijst';
+    b.addEventListener("click",async function(e){e.preventDefault();e.stopPropagation();if(b.disabled)return;b.disabled=true;var ok=await window.__addDealToList(d);if(ok)done();else b.disabled=false;});
+    return b;
+  };
+})();
+</script>
+<style id="deal-to-list-style">
+#list .item .productDeal .productDealBadge{flex:0 0 auto;font-size:11px;font-weight:800;color:#fff;background:#d9534f;border-radius:999px;padding:1px 7px;line-height:1.35}
+#list .item .productDeal{display:flex;align-items:center;gap:5px;margin:-2px 0 2px 30px;font-size:13px!important;font-weight:600;line-height:1.3;color:#b04545;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.productDeal i{font-size:11px}
+body.dark-theme .productDeal{color:#f2a3a3}
+.dealAddBtn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:38px;padding:0 14px;border:0;border-radius:11px;background:#3F5B45;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.dealAddBtn .plus{font-weight:800}
+.dealAddBtn.done{background:#e3f4e7;color:#2f6b45;cursor:default}
+body.dark-theme .dealAddBtn.done{background:#2c3d31;color:#9fd3ac}
+html body #list .itemProductContent{grid-template-columns:19px minmax(0,1fr) 32px 92px !important}
+.quantityButton.qtyTrash{background:#f9e9e7!important;color:#b85a52!important;font-size:13px!important}
+body.dark-theme .quantityButton.qtyTrash{background:#3d2a28!important;color:#f0a49c!important}
 </style>
 <script id="expPicker">
 /* "Houdbaar tot": snelknoppen in plaats van meteen de kalender van de telefoon.
