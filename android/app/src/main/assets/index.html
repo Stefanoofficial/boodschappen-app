@@ -8261,6 +8261,11 @@ function updateListProgress() {
   const completed = boodschappen.filter(item => item && item.completed).length;
   const percentage = total ? Math.round((completed / total) * 100) : 0;
 
+  if (!total && window.__listLoading) {
+    progress.innerHTML = '<span class="listProgressText listLoadingText"><i class="fa-solid fa-spinner fa-spin"></i> Je lijst wordt geladen…</span>';
+    progress.style.setProperty("--progress", "0%");
+    return;
+  }
   if (!total) {
     progress.innerHTML = '<span class="listProgressText"><i class="fa-solid fa-basket-shopping"></i> 0 boodschappen</span>';
     progress.style.setProperty("--progress", "0%");
@@ -15535,6 +15540,28 @@ html body.dark-theme #list .item.completed .productName{color:#8fa096!important}
 html body.dark-theme #list .item .completedMeta{color:#a9b8ad!important}
 html body.dark-theme #list .item .productDeal{color:#f2a3a3!important}
 </style>
+<script id="login-smooth">
+/* Na het inloggen: "Je lijst wordt geladen…" in plaats van "0 boodschappen", en je naam alvast ophalen voor de begroeting. */
+(function(){
+  if(typeof auth==="undefined"||!auth||typeof auth.onAuthStateChanged!=="function")return;
+  var timer=null;
+  function done(){if(!window.__listLoading)return;window.__listLoading=false;clearTimeout(timer);try{updateListProgress();}catch(e){}}
+  function hasItems(){try{return Array.isArray(boodschappen)&&boodschappen.length>0;}catch(e){return false;}}
+  // Familielijst: klaar zodra die van internet is geladen
+  if(typeof window.loadList==="function"){var oL=window.loadList;
+    window.loadList=async function(){try{return await oL.apply(this,arguments);}finally{setTimeout(function(){if(hasItems()||!(typeof isPrivateMode==="function"&&isPrivateMode()))done();},0);}};}
+  // Privélijst komt via de accountsynchronisatie binnen: wachten tot er producten zijn, of hooguit 3 seconden
+  if(typeof window.loadPrivateList==="function"){var oP=window.loadPrivateList;
+    window.loadPrivateList=async function(){try{return await oP.apply(this,arguments);}finally{if(hasItems())setTimeout(done,0);else if(window.__listLoading){clearTimeout(timer);timer=setTimeout(done,3000);}}};}
+  if(typeof showList==="function"){var oS=showList;showList=function(){var r=oS.apply(this,arguments);if(window.__listLoading&&hasItems())done();return r;};}
+  auth.onAuthStateChanged(function(user){
+    if(!user){done();return;}
+    var empty=true;try{empty=!(Array.isArray(boodschappen)&&boodschappen.length);}catch(e){}
+    if(empty){window.__listLoading=true;try{updateListProgress();}catch(e){}clearTimeout(timer);timer=setTimeout(done,8000);}
+    try{if(typeof refreshOverviewGreeting==="function")refreshOverviewGreeting();}catch(e){}
+  });
+})();
+</script>
 <script id="proScreens">
 /* Pro-onderdelen openen als eigen scherm (met "‹ Pro" terug) in plaats van uit te klappen tussen de andere kaarten.
    Binnen de weekplanner en de budgetplanner: tabbladen. */
