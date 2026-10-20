@@ -5228,16 +5228,29 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
       <button type="button" class="proUnlockHero" onclick="event.stopPropagation();showProUpsell()"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ontdek Pro</button>
     </div>
-    <div class="proFeatureCard proPlannerLaunch">
+    <div class="proFeatureCard proPlannerLaunch" onclick="toggleSmartPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSmartPlanner(event)}">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="smartPlannerPanel" class="smartPlannerPanel" hidden onclick="event.stopPropagation()">
-      <h3>Mijn weekplanning</h3>
-      <p class="plannerHelp">Kies een recept of vul zelf een maaltijd in. Kies daarna de dag en tik op “Maaltijd opslaan”.</p>
-
+      <div class="proTabs" role="tablist" data-for="smartPlannerPanel"><button type="button" role="tab" class="proTab active" data-tab="week">Mijn week</button><button type="button" role="tab" class="proTab" data-tab="recipes">Recepten</button></div>
+      <div class="proTabPane" data-pane="week">
+      <h3>Deze week</h3>
+      <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
+      <button type="button" class="proPlannerButton plannerAddListButton" onclick="event.stopPropagation(); addPlannerIngredientsToShoppingList(event)">Ingrediënten aan boodschappenlijst toevoegen</button>
+      <h3 class="plannerFormTitle">Maaltijd toevoegen</h3>
+      <p class="plannerHelp">Vul zelf een maaltijd in, of kies er een bij <a href="#" class="plannerToRecipes">Recepten</a>. Kies daarna de dag en tik op “Maaltijd opslaan”.</p>
+      <label for="plannerDay">Dag</label>
+      <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
+      <label for="plannerMeal">Maaltijd</label>
+      <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
+      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
+      <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
+      <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
+      <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
+      </div>
+      <div class="proTabPane" data-pane="recipes" hidden>
       <div class="plannerRecipeBox">
-        <h3>Recepten kiezen</h3>
-        <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het meteen in te vullen.</p>
+        <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het in je week te zetten.</p>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
         <div id="plannerRecipeChips" class="recipeChips">
           <button type="button" class="recipeChip active" data-f="all" onclick="setRecipeFilter('all',event)">Alle recepten</button>
@@ -5249,17 +5262,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <p id="plannerRecipeCount" class="recipeCount"></p>
         <div id="plannerRecipeCatalog" class="plannerRecipeCatalog"></div>
       </div>
-      <label for="plannerDay">Dag</label>
-      <select id="plannerDay" class="plannerInput"><option>Maandag</option><option>Dinsdag</option><option>Woensdag</option><option>Donderdag</option><option>Vrijdag</option><option>Zaterdag</option><option>Zondag</option></select>
-      <label for="plannerMeal">Maaltijd</label>
-      <input id="plannerMeal" class="plannerInput" placeholder="Bijv. pasta bolognese" maxlength="80">
-      <label for="plannerIngredients">Ingrediënten (één per regel)</label>
-      <textarea id="plannerIngredients" class="plannerInput" rows="4" placeholder="Pasta&#10;Tomaten&#10;Gehakt"></textarea>
-      <button type="button" class="proPlannerButton plannerSaveButton" onclick="event.stopPropagation(); saveSmartMeal(event)">Maaltijd opslaan</button>
-      <div id="smartPlannerStatus" class="plannerStatus" aria-live="polite"></div>
-      <h3>Geplande maaltijden</h3>
-      <div id="smartPlannerMeals"><p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p></div>
-      <button type="button" class="proPlannerButton plannerAddListButton" onclick="event.stopPropagation(); addPlannerIngredientsToShoppingList(event)">Ingrediënten aan boodschappenlijst toevoegen</button>
+      </div>
     </section>
     <div class="proFeatureCard budgetPlannerLaunch" onclick="toggleBudgetPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBudgetPlanner(event)}">
       <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je budget en boodschappenuitgaven bij.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5269,6 +5272,31 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <div><h3>Mijn boodschappenbudget</h3><p>Houd je uitgaven bij en zie wat je nog over hebt.</p></div>
         <i class="fa-solid fa-wallet" aria-hidden="true"></i>
       </div>
+      <div class="proTabs" role="tablist" data-for="budgetPlannerPanel"><button type="button" role="tab" class="proTab active" data-tab="budget">Mijn budget</button><button type="button" role="tab" class="proTab" data-tab="deals">Aanbiedingen</button></div>
+      <div class="proTabPane" data-pane="budget">
+      <label for="budgetAmount">Budget per week (€)</label>
+      <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
+      <div class="budgetSummaryCard">
+        <div class="budgetRing" id="budgetRing" role="img" aria-label="Uitgaven als deel van het budget"><div class="budgetRingInner"><span>Uitgegeven</span><strong id="budgetSpent">€ 0,00</strong><small id="budgetOf">van € 0,00</small></div></div>
+        <div class="budgetStats"><div><span>Uitgegeven</span><strong id="budgetSpentSmall">€ 0,00</strong></div><div><span>Nog beschikbaar</span><strong id="budgetRemaining">€ 0,00</strong></div></div>
+        <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
+        <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
+      </div>
+      <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
+      <label for="budgetExpenseName">Product of omschrijving</label>
+      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. weekboodschappen">
+      <div class="budgetFormRow">
+        <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
+        <div><label for="budgetExpenseStore">Winkel</label><select id="budgetExpenseStore" class="budgetInput"></select></div>
+      </div>
+      <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
+      <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
+      <div id="budgetCategories" class="budgetCategories"></div>
+      <h3 class="budgetSectionTitle">Recente uitgaven</h3>
+      <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
+      <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
+      </div>
+      <div class="proTabPane" data-pane="deals" hidden>
       <label for="budgetSupermarket">Mijn vaste supermarkt</label>
       <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
         <option value="ah">Albert Heijn</option>
@@ -5306,27 +5334,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
         <div id="weekplanDealsResults" aria-live="polite"></div>
         <p class="budgetStatus budgetSource">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
       </div>
-      <label for="budgetAmount">Budget per week (€)</label>
-      <div class="budgetSetRow"><input id="budgetAmount" class="budgetInput" type="number" min="0" step="0.01" placeholder="Bijv. 100,00"><button type="button" class="budgetActionButton" onclick="saveBudgetAmount()">Budget opslaan</button></div>
-      <div class="budgetSummaryCard">
-        <div class="budgetRing" id="budgetRing" role="img" aria-label="Uitgaven als deel van het budget"><div class="budgetRingInner"><span>Uitgegeven</span><strong id="budgetSpent">€ 0,00</strong><small id="budgetOf">van € 0,00</small></div></div>
-        <div class="budgetStats"><div><span>Uitgegeven</span><strong id="budgetSpentSmall">€ 0,00</strong></div><div><span>Nog beschikbaar</span><strong id="budgetRemaining">€ 0,00</strong></div></div>
-        <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
-        <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
       </div>
-      <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
-      <label for="budgetExpenseName">Product of omschrijving</label>
-      <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. weekboodschappen">
-      <div class="budgetFormRow">
-        <div><label for="budgetExpensePrice">Bedrag (€)</label><input id="budgetExpensePrice" class="budgetInput" type="number" min="0.01" step="0.01" placeholder="0,00"></div>
-        <div><label for="budgetExpenseStore">Winkel</label><select id="budgetExpenseStore" class="budgetInput"></select></div>
-      </div>
-      <button type="button" class="budgetActionButton budgetAddButton" onclick="addBudgetExpense()">Uitgave toevoegen</button>
-      <div class="budgetCategoryHeader"><h3 class="budgetSectionTitle">Waar ging je geld naartoe?</h3><button type="button" class="budgetTextButton" onclick="clearBudgetExpenses()">Wis uitgaven</button></div>
-      <div id="budgetCategories" class="budgetCategories"></div>
-      <h3 class="budgetSectionTitle">Recente uitgaven</h3>
-      <div id="budgetExpenseList" class="budgetExpenseList"><p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p></div>
-      <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
     </section>
     <div class="proFeatureCard pantryLaunch" onclick="togglePantry(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePantry(event)}">
       <i class="fa-solid fa-cube"></i><div><strong>Voorraadbeheer</strong><p>Houd bij wat je thuis hebt en zet wat op is met één tik op je lijst.</p><button type="button" class="budgetLaunchButton pantryLaunchButton" onclick="event.stopPropagation();togglePantry(event)">Open voorraad <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -5788,7 +5796,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
       <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
       <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>. Een verwijderd product komt niet in je geschiedenis.</p>
-      <p>Zie je een aanbieding in de budgetplanner, tik dan op <strong>+ Op lijst</strong>. Onder het product zie je dan de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
+      <p>Zie je een aanbieding in de budgetplanner (tabblad <strong>Aanbiedingen</strong>), tik dan op <strong>+ Op lijst</strong>. Onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed.</p>
       <p><strong>Opgeslagen lijsten</strong> zijn lijsten die je bewust bewaart om later opnieuw te gebruiken. Je geschiedenis bevat de lijsten die automatisch zijn bewaard toen je de volledige lijst wiste.</p>
     </div>
     <div class="helpSection">
@@ -5803,6 +5811,10 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> kies je snel 3 dagen, 1 week, 2 weken of 1 maand, of een eigen datum. Is iets op, dan zet je het met één tik op je lijst.</p>
       <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en budget <b class="aboutProBadge">PRO</b></span></div>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -7738,7 +7750,8 @@ function normalizeBoodschappen(data) {
           price: Number(item.deal.price),
           promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
           until: item.deal.until ? String(item.deal.until).slice(0, 10) : "",
-          store: item.deal.store ? String(item.deal.store).slice(0, 30) : ""
+          store: item.deal.store ? String(item.deal.store).slice(0, 30) : "",
+          ...(Number(item.deal.was) > Number(item.deal.price) ? { was: Number(item.deal.was) } : {})
         } } : {})
       };
     }
@@ -13508,7 +13521,9 @@ window.renderRecipeCatalog=function(){
  const found=recipes.filter(r=>(r.name+" "+r.ingredients.join(" ")+" "+(r.tags||[]).join(" ")).toLocaleLowerCase("nl").includes(q)&&recipeMatchesFilter(r));
  const cnt=document.getElementById("plannerRecipeCount");if(cnt)cnt.textContent=found.length+(found.length===1?" recept":" recepten");
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
- box.innerHTML=found.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('');
+ const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
+ const __shown=__lim?found.slice(0,3):found;
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -13955,7 +13970,7 @@ body.dark-theme .budgetLaunchButton,body.dark-theme .budgetActionButton{backgrou
     const meta=document.createElement("div");meta.className="dealMeta";
     meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
-    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:retailerName()}));
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:retailerName()}));
     return card;
   }
   window.searchBudgetLivePrices=async function(){
@@ -15780,7 +15795,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
         title:nice(name)+" is in de aanbieding",
         text:String(p.name||name)+" · "+money(price)+(orig>price?" (was "+money(orig)+")":"")+(promo?" · "+promo:"")+" bij "+sm.name+untilTxt(p.valid_until)+".",
         action:onList(name)?"":"Op lijst",onListAlready:onList(name),
-        deal:{name:String(p.name||name),term:name,price:price,promo:String(p.promotional_keywords&&p.promotional_keywords[0]||""),until:p.valid_until||"",store:sm.name}});
+        deal:{name:String(p.name||name),term:name,price:price,was:orig,promo:String(p.promotional_keywords&&p.promotional_keywords[0]||""),until:p.valid_until||"",store:sm.name}});
     });
     return out.sort(function(a,b){return b.prio-a.prio;}).slice(0,3);
   }
@@ -15927,7 +15942,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
     document.querySelectorAll("#assistantPanel .assistSwitch").forEach(function(cb){cb.checked=!!s[cb.getAttribute("data-k")];});
     var sm=window.__assistantSupermarket?window.__assistantSupermarket():{};
     var note=document.getElementById("assistantDealNote");
-    if(note)note.textContent=sm.supported?"Aanbiedingen bij "+sm.name+" (kies je supermarkt in de budgetplanner).":"Kies in de budgetplanner je supermarkt om aanbiedingen te zien.";
+    if(note)note.textContent=sm.supported?"Aanbiedingen bij "+sm.name+" (je supermarkt kies je in de budgetplanner bij Aanbiedingen).":"Kies in de budgetplanner bij Aanbiedingen je supermarkt om aanbiedingen te zien.";
   }
   function renderAll(){renderOverviewTip();renderPanel();}
 
@@ -16036,6 +16051,101 @@ body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
 /* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
 html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
 </style>
+<script id="proScreens">
+/* Pro-onderdelen openen als eigen scherm (met "‹ Pro" terug) in plaats van uit te klappen tussen de andere kaarten.
+   Binnen de weekplanner en de budgetplanner: tabbladen. */
+(function(){
+  var SUB=document.getElementById("proMenuSub");if(!SUB)return;
+  var P=[
+    {id:"smartPlannerPanel",title:"Slimme weekplanner",fn:"toggleSmartPlanner"},
+    {id:"budgetPlannerPanel",title:"Prijs- en budgetplanner",fn:"toggleBudgetPlanner"},
+    {id:"pantryPanel",title:"Voorraadbeheer",fn:"togglePantry"},
+    {id:"assistantPanel",title:"Persoonlijke assistent",fn:"toggleAssistant"}
+  ];
+  var bar=document.createElement("div");bar.className="proScreenBar";bar.hidden=true;
+  bar.innerHTML='<button type="button" class="familyMenuBack proScreenBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Pro</span></button><div class="proScreenTitle" role="heading" aria-level="2"></div>';
+  SUB.insertBefore(bar,SUB.firstChild);
+  var current=null,busy=false;
+  function panel(id){return document.getElementById(id);}
+  function scrollTop(){try{SUB.scrollTop=0;}catch(e){}try{var mv=document.getElementById("moreView");if(mv)mv.scrollTop=0;}catch(e){}try{var m=document.getElementById("familyMenu");if(m)m.scrollTop=0;}catch(e){}try{window.scrollTo(0,0);}catch(e){}}
+  function closePanel(c){var el=panel(c.id);if(!el||el.hidden)return;busy=true;
+    try{if(window.isProActive&&!window.isProActive())el.hidden=true;else if(typeof window[c.fn]==="function")window[c.fn]();else el.hidden=true;}catch(e){el.hidden=true;}
+    if(!el.hidden)el.hidden=true;busy=false;}
+  function sync(){
+    if(busy)return;
+    var open=P.filter(function(c){var el=panel(c.id);return el&&!el.hidden;});
+    if(open.length>1){ // er mag er maar één open staan: de oude sluiten
+      var keep=open.filter(function(c){return c!==current;})[0]||open[open.length-1];
+      open.forEach(function(c){if(c!==keep)closePanel(c);});open=[keep];
+    }
+    var c=open[0]||null,was=current;current=c;
+    SUB.classList.toggle("proScreen",!!c);
+    P.forEach(function(x){var el=panel(x.id);if(el)el.classList.toggle("proScreenActive",x===c);});
+    bar.hidden=!c;
+    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;if(c!==was)setTimeout(scrollTop,0),setTimeout(scrollTop,90);}
+    else if(was)setTimeout(scrollTop,0);
+  }
+  var mo=new MutationObserver(sync);
+  P.forEach(function(c){var el=panel(c.id);if(el)mo.observe(el,{attributes:true,attributeFilter:["hidden"]});});
+  bar.querySelector(".proScreenBack").addEventListener("click",function(e){e.stopPropagation();if(current)closePanel(current);sync();});
+  // Als je het Pro-menu verlaat, de open onderdelen sluiten zodat je de volgende keer weer bij het overzicht begint
+  if(typeof closeProSubmenu==="function"){var oc=closeProSubmenu;closeProSubmenu=function(){P.forEach(closePanel);sync();return oc.apply(this,arguments);};}
+  window.__proScreenClose=function(){P.forEach(closePanel);sync();};
+
+  /* ---------- Tabbladen ---------- */
+  var lastTab={};
+  function setTab(panelId,tab){
+    var el=panel(panelId);if(!el)return;
+    el.querySelectorAll(".proTab").forEach(function(b){var on=b.getAttribute("data-tab")===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
+    el.querySelectorAll(".proTabPane").forEach(function(pn){pn.hidden=pn.getAttribute("data-pane")!==tab;});
+    lastTab[panelId]=tab;
+    if(panelId==="smartPlannerPanel"&&tab==="recipes"&&typeof renderRecipeCatalog==="function")renderRecipeCatalog();
+  }
+  window.__proSetTab=setTab;
+  document.querySelectorAll(".proTabs").forEach(function(t){
+    var pid=t.getAttribute("data-for");
+    t.querySelectorAll(".proTab").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setTab(pid,b.getAttribute("data-tab"));scrollTop();});});
+  });
+  var link=document.querySelector(".plannerToRecipes");
+  if(link)link.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();setTab("smartPlannerPanel","recipes");scrollTop();});
+  // "Kies recept" vult de maaltijd in: dan terug naar "Mijn week"
+  if(typeof window.choosePlannerRecipe==="function"){
+    var oc2=window.choosePlannerRecipe;
+    window.choosePlannerRecipe=function(){setTab("smartPlannerPanel","week");var r=oc2.apply(this,arguments);
+      setTimeout(function(){var m=document.getElementById("plannerMeal");if(m)m.scrollIntoView({behavior:"smooth",block:"center"});},60);return r;};
+  }
+})();
+</script>
+<style id="pro-screens-style">
+.proScreenBar[hidden]{display:none!important}
+.proScreenBar .proScreenTitle{display:block!important;margin:6px 2px 14px;font-size:22px;font-weight:800;line-height:1.25;color:var(--text-color,#2f4a38)}
+body.dark-theme .proScreenBar .proScreenTitle{color:#edf5ef}
+#proMenuSub.proScreen > .familyMenuBack:not(.proScreenBack),
+#proMenuSub.proScreen > .proHero,
+#proMenuSub.proScreen > .proFeatureCard,
+#proMenuSub.proScreen > .proFootnote,
+#proMenuSub.proScreen > section:not(.proScreenActive){display:none!important}
+#proMenuSub.proScreen > section.proScreenActive{margin-top:0!important}
+/* Rustige kaarten: hele kaart is de knop, met een pijltje */
+body:not(.proFree) #proMenuSub .proFeatureCard > div > button{display:none!important}
+body:not(.proFree) #proMenuSub .proFeatureCard{position:relative;align-items:center;cursor:pointer;padding-right:40px}
+body:not(.proFree) #proMenuSub .proFeatureCard::after{content:"\f054";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:14px;color:#8aa293}
+body:not(.proFree) #proMenuSub .proFeatureCard p{margin-bottom:0}
+body:not(.proFree) #proMenuSub .proFeatureCard:active{transform:scale(.99)}
+/* Tabbladen */
+.proTabs{display:flex;gap:4px;padding:4px;margin:0 0 14px;border-radius:14px;background:#eef3ef}
+.proTab{flex:1;min-height:40px;border:0;border-radius:11px;background:transparent;color:#5b6d61;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.proTab.active{background:#fff;color:#2f4a38;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.proTabPane[hidden]{display:none!important}
+body.dark-theme .proTabs{background:#1b221d}
+body.dark-theme .proTab{color:#a9b8ad}
+body.dark-theme .proTab.active{background:#2c372f;color:#edf5ef}
+.plannerFormTitle{margin-top:22px!important}
+.plannerToRecipes{color:#3f7a50;font-weight:700;text-decoration:underline}
+.recipeShowAll{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;margin:4px 0 6px;border:1px solid #d5e4d9;border-radius:14px;background:#f4f8f5;color:#3f6b4b;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.recipeShowAll i{font-size:12px}
+body.dark-theme .recipeShowAll{background:#222a24;border-color:#38453b;color:#9fd3ac}
+</style>
 <script id="dealToList">
 /* Aanbiedingen op je boodschappenlijst: knop "+ Op lijst" en een klein regeltje onder het product. */
 (function(){
@@ -16047,7 +16157,11 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
   function tidyPromo(p){
     p=String(p||"").trim();if(!p||PCT.test(p))return "";
     if(/=/.test(p))return p.toUpperCase();
+    p=p.replace(/\b[A-Z]{2,}\b/g,function(w){return w.toLowerCase();});
+    p=p.replace(/\b(\d+)(E|DE)\b/g,function(_,n,x){return n+x.toLowerCase();});
     if(p===p.toUpperCase()&&/[A-Z]/.test(p)){p=p.toLowerCase();}
+    // "2 voor 5.00" -> "2 voor € 5,00"
+    p=p.replace(/\bvoor\s*€?\s*(\d+)[.,](\d{2})\b/gi,function(_,a,b){return "voor € "+a+","+b;});
     return p.replace(/\s*\+\s*/g," + ");
   }
   window.__tidyPromo=tidyPromo;
@@ -16068,7 +16182,8 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
     var parts=[money(d.price)];var pr=tidyPromo(d.promo);if(pr)parts.push(pr);
     var fav="";try{var fs=document.getElementById("budgetSupermarket");fav=fs&&fs.selectedOptions[0]?fs.selectedOptions[0].text:"";}catch(e){}
     if(d.store&&d.store!==fav)parts.push("bij "+d.store);var u=untilTxt(d.until);if(u)parts.push(u);
-    el.innerHTML='<i class="fa-solid fa-tag" aria-hidden="true"></i>'+esc(parts.join(" · "));
+    var pct=Number(d.was)>Number(d.price)?Math.round((1-Number(d.price)/Number(d.was))*100):0;
+    el.innerHTML=(pct>0?'<span class="productDealBadge">-'+pct+'%</span>':'<i class="fa-solid fa-tag" aria-hidden="true"></i>')+esc(parts.join(" · "));
     return el;
   };
   function same(a,b){try{if(window.__pantryApi&&window.__pantryApi.same)return window.__pantryApi.same(a,b);}catch(e){}return String(a).trim().toLowerCase()===String(b).trim().toLowerCase();}
@@ -16081,6 +16196,7 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
   // d = {name, term, price, promo, until, store}
   window.__addDealToList=async function(d){
     var deal={price:Number(d.price),promo:String(d.promo||""),until:String(d.until||"").slice(0,10),store:String(d.store||"")};
+    if(Number(d.was)>Number(d.price))deal.was=Number(d.was);
     var it=findOnList([d.name,d.term]),added=false;
     if(!it){
       try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:d.name}]);}catch(e){}
@@ -16106,6 +16222,7 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
 })();
 </script>
 <style id="deal-to-list-style">
+#list .item .productDeal .productDealBadge{flex:0 0 auto;font-size:11px;font-weight:800;color:#fff;background:#d9534f;border-radius:999px;padding:1px 7px;line-height:1.35}
 #list .item .productDeal{display:flex;align-items:center;gap:5px;margin:-2px 0 2px 30px;font-size:13px!important;font-weight:600;line-height:1.3;color:#b04545;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .productDeal i{font-size:11px}
 body.dark-theme .productDeal{color:#f2a3a3}
