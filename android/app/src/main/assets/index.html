@@ -5251,6 +5251,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <div class="proTabPane" data-pane="recipes" hidden>
       <div class="plannerRecipeBox">
         <p class="plannerHelp">Tik op een recept voor alle details, of op “Kies recept” om het in je week te zetten.</p>
+        <div class="plannerServDefault"><span>Wij eten meestal met</span><div class="servStepper"><button type="button" class="servBtn" onclick="changeDefaultServings(-1,event)" aria-label="Minder personen"><span class="stepIcon" aria-hidden="true"></span></button><span class="servVal"><b id="plannerDefServ">2</b> <span id="plannerDefServWord">personen</span></span><button type="button" class="servBtn" onclick="changeDefaultServings(1,event)" aria-label="Meer personen"><span class="stepIcon plus" aria-hidden="true"></span></button></div></div>
         <input id="plannerRecipeSearch" class="plannerInput" type="search" placeholder="Zoek een recept of ingrediënt" oninput="renderRecipeCatalog()" aria-label="Zoek recepten">
         <div id="plannerRecipeChips" class="recipeChips">
           <button type="button" class="recipeChip active" data-f="all" onclick="setRecipeFilter('all',event)">Alle recepten</button>
@@ -5814,7 +5815,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en budget <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; bij <strong>Recepten</strong> zoek en kies je recepten. Tik op een label zoals <strong>Italiaans</strong> om alle recepten met dat label te zien. Stel bij <strong>Wij eten meestal met</strong> in voor hoeveel personen je kookt; in een recept kun je het aantal porties ook per keer aanpassen. De hoeveelheden rekenen dan vanzelf mee, ook op je boodschappenlijst. In de budgetplanner houd je bij <strong>Mijn budget</strong> je uitgaven per winkel bij en vind je bij <strong>Aanbiedingen</strong> de acties van jouw supermarkt.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -13503,6 +13504,7 @@ function write(items){localStorage.setItem(KEY,JSON.stringify(items))}
 var recipeFilter="all";
 function recipeMatchesFilter(r){
  const t=r.tags||[];
+ if(String(recipeFilter).indexOf("tag:")===0)return t.indexOf(recipeFilter.slice(4))>-1;
  if(recipeFilter==="nl")return t.indexOf("Nederlands")>-1;
  if(recipeFilter==="veg")return t.indexOf("Vegetarisch")>-1;
  if(recipeFilter==="budget")return t.indexOf("Budget")>-1;
@@ -13512,7 +13514,15 @@ function recipeMatchesFilter(r){
 window.setRecipeFilter=function(f,event){
  if(event)event.stopPropagation();
  recipeFilter=f;
- document.querySelectorAll("#plannerRecipeChips .recipeChip").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-f")===f);});
+ const old=document.getElementById("recipeTagChip");
+ if(String(f).indexOf("tag:")===0){
+  const chips=document.getElementById("plannerRecipeChips");
+  const c=old||document.createElement("button");c.type="button";c.id="recipeTagChip";c.className="recipeChip active recipeTagChip";
+  c.innerHTML=esc(f.slice(4))+' <span aria-hidden="true">×</span>';c.setAttribute("aria-label","Filter "+f.slice(4)+" weghalen");
+  c.onclick=function(e){window.setRecipeFilter("all",e);};
+  if(!old&&chips)chips.appendChild(c);
+ }else if(old)old.remove();
+ document.querySelectorAll("#plannerRecipeChips .recipeChip:not(.recipeTagChip)").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-f")===f);});
  renderRecipeCatalog();
 };
 window.renderRecipeCatalog=function(){
@@ -13523,7 +13533,7 @@ window.renderRecipeCatalog=function(){
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
  const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
  const __shown=__lim?found.slice(0,3):found;
- box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -13535,15 +13545,22 @@ window.openRecipeSheet=function(id){
  +'<button type="button" class="recipeSheetClose" onclick="closeRecipeSheet()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>'
  +'<div class="recipeSheetHero"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||"🍽️")+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" onerror="this.remove()"></div>'
  +'<div class="recipeSheetBody"><h3>'+esc(r.name)+'</h3>'
- +'<p class="rsMeta">⏱ '+r.time+' min · 👥 '+r.servings+' porties</p>'
- +'<div class="recipeTags">'+(r.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>'
+ +'<p class="rsMeta">⏱ '+r.time+' min · 👥 <span class="rsServMeta">'+defServ(r)+'</span> porties</p>'
+ +'<div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('')+'</div>'
  +'<p class="rsDesc">'+esc(r.desc||"")+'</p>'
- +'<button type="button" class="recipeSheetChoose" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;);closeRecipeSheet();">Kies dit recept</button>'
- +'<section class="rsCard"><h4><i class="fa-solid fa-basket-shopping"></i> Ingrediënten ('+r.servings+' porties)</h4><ul class="rsIngredients">'+r.ingredients.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul></section>'
+ +'<button type="button" class="recipeSheetChoose" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;,window.__rsServ);closeRecipeSheet();">Kies dit recept</button>'
+ +'<section class="rsCard"><div class="rsIngHead"><h4><i class="fa-solid fa-basket-shopping"></i> Ingrediënten</h4><div class="servStepper" aria-label="Aantal porties"><button type="button" class="servBtn" data-d="-1" aria-label="Minder porties"><span class="stepIcon" aria-hidden="true"></span></button><span class="servVal"><b class="rsServVal">'+defServ(r)+'</b> porties</span><button type="button" class="servBtn" data-d="1" aria-label="Meer porties"><span class="stepIcon plus" aria-hidden="true"></span></button></div></div><ul class="rsIngredients">'+scaleIngredients(r.ingredients,defServ(r)/r.servings).map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul></section>'
  +'<section class="rsCard"><h4><i class="fa-solid fa-utensils"></i> Bereidingswijze</h4><ol class="rsSteps">'+steps.map(st=>'<li>'+esc(st)+'</li>').join('')+'</ol>'
  +(r.tip?'<div class="rsTip"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><div class="rsTipText"><strong>Tip</strong><span>'+esc(r.tip)+'</span></div></div>':'')+'</section>'
  +'</div></div>';
  document.body.appendChild(ov);
+ window.__rsServ=defServ(r);
+ ov.querySelectorAll(".servBtn").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();
+  window.__rsServ=Math.max(1,Math.min(12,window.__rsServ+Number(b.getAttribute("data-d"))));
+  ov.querySelector(".rsServVal").textContent=window.__rsServ;ov.querySelector(".rsServMeta").textContent=window.__rsServ;
+  ov.querySelector(".rsIngredients").innerHTML=scaleIngredients(r.ingredients,window.__rsServ/r.servings).map(i=>'<li>'+esc(i)+'</li>').join('');});});
+ ov.querySelectorAll(".recipeTagBtn").forEach(function(t){t.addEventListener("click",function(e){e.stopPropagation();closeRecipeSheet();
+  try{if(window.__proSetTab)window.__proSetTab("smartPlannerPanel","recipes");}catch(err){}window.filterRecipeTag(t.getAttribute("data-tag"));});});
  document.body.style.overflow="hidden";
  requestAnimationFrame(function(){ov.classList.add("open");});
 };
@@ -13555,7 +13572,7 @@ window.closeRecipeSheet=function(immediate){
  ov.classList.remove("open");
  setTimeout(function(){ov.remove();},220);
 };
-window.choosePlannerRecipe=function(id){const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=r.ingredients.join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
+window.choosePlannerRecipe=function(id,serv){const r=recipes.find(x=>x.id===id);if(!r)return;const n=Math.max(1,Number(serv)||defServ(r));pendingServ={meal:r.name,servings:n};document.getElementById("plannerMeal").value=r.name;document.getElementById("plannerIngredients").value=scaleIngredients(r.ingredients,n/r.servings).join("\n");const status=document.getElementById("smartPlannerStatus");if(status)status.textContent='Recept ingevuld voor '+n+(n===1?' persoon':' personen')+'. Kies de dag en tik op “Maaltijd opslaan”.';document.getElementById("plannerMeal")?.scrollIntoView({behavior:"smooth",block:"center"});};
 window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
  const panel=document.getElementById("smartPlannerPanel"); if(!panel)return;
  panel.hidden=!panel.hidden;
@@ -13570,7 +13587,7 @@ window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  const status=document.getElementById("smartPlannerStatus");
  if(!meal){status.textContent="Vul eerst de naam van de maaltijd in.";return}
  if(!ingredients.length){status.textContent="Vul minimaal één ingrediënt in.";return}
- const items=read();items.push({id:Date.now(),day,meal,ingredients});items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);
+ const items=read();const entry={id:Date.now(),day,meal,ingredients};if(pendingServ&&pendingServ.meal===meal)entry.servings=pendingServ.servings;pendingServ=null;items.push(entry);items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);
  document.getElementById("plannerMeal").value="";document.getElementById("plannerIngredients").value="";
  status.textContent="Maaltijd opgeslagen.";render();
 };
@@ -13578,12 +13595,57 @@ window.removeSmartMeal=function(id){write(read().filter(x=>x.id!==id));const st=
 window.__refreshPlannerUI=function(){try{render();}catch(e){console.warn(e);}};
 // Voor de persoonlijke assistent: recepten lezen en een maaltijd inplannen
 window.__plannerRecipes=recipes;
+/* ---------- Porties ---------- */
+var pendingServ=null;
+var SERV_KEY="plannerDefaultServings";
+function defServAll(){var v=parseInt(localStorage.getItem(SERV_KEY)||"",10);return v>=1&&v<=12?v:2;}
+function defServ(r){return defServAll();}
+var PL_W={"blik":"blikken","pak":"pakken","zak":"zakken","potje":"potjes","bosje":"bosjes","teen":"tenen","teentje":"teentjes","sneetje":"sneetjes","plak":"plakken","ui":"uien","rode ui":"rode uien","ei":"eieren","paprika":"paprika's","citroen":"citroenen","courgette":"courgettes","wortel":"wortels","zalmfilet":"zalmfilets","kipfilet":"kipfilets","bosui":"bosuien","limoen":"limoenen","tomaat":"tomaten","aubergine":"aubergines","wrap":"wraps","avocado":"avocado's","banaan":"bananen","appel":"appels","prei":"preien","krop":"kroppen","struik":"struiken","rookworst":"rookworsten","stuk":"stuks"};
+var SG_W={};Object.keys(PL_W).forEach(function(k){SG_W[PL_W[k]]=k;});
+function nlNum(v){var r=Math.round(v*10)/10;return String(r).replace(".",",");}
+function niceRound(v){var st=v<=10?1:v<50?5:v<250?10:v<1000?25:50;return Math.max(st,Math.round(v/st)*st);}
+function swapWord(rest,n){
+ var low=rest.toLowerCase();
+ var keys=Object.keys(PL_W).concat(Object.keys(SG_W)).sort(function(a,b){return b.length-a.length;});
+ for(var i=0;i<keys.length;i++){var k=keys[i];
+  if(low===k||low.indexOf(k+" ")===0||low.indexOf(k+"(")===0){
+   var tail=rest.slice(k.length);
+   if(n>1&&PL_W[k])return PL_W[k]+tail;
+   if(n===1&&SG_W[k])return SG_W[k]+tail;
+   return rest;
+  }}
+ return rest;
+}
+function scaleLine(line,f){
+ var m=String(line).trim().match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+ if(!m||f===1)return String(line);
+ var q=parseFloat(m[1].replace(",",".")),rest=m[2];if(!isFinite(q))return String(line);
+ var u=rest.match(/^(g|gr|gram|ml|cl|dl)\b\s*(.*)$/i);
+ if(u){var nv=niceRound(q*f),un=u[1].toLowerCase();
+  if((un==="g"||un==="gr"||un==="gram")&&nv>=1000)return nlNum(nv/1000)+" kg "+u[2];
+  if(un==="ml"&&nv>=1000)return nlNum(nv/1000)+" l "+u[2];
+  return nv+" "+u[1]+" "+u[2];}
+ u=rest.match(/^(kg|l)\b\s*(.*)$/i);
+ if(u)return nlNum(Math.max(0.1,q*f))+" "+u[1]+" "+u[2];
+ u=rest.match(/^(el|tl|eetlepels?|theelepels?)\b\s*(.*)$/i);
+ if(u){var v=Math.max(0.5,Math.round(q*f*2)/2);return nlNum(v)+" "+u[1]+" "+u[2];}
+ if(/^(snufje|scheutje|handje|hand)\b/i.test(rest))return String(line);
+ var n=Math.max(1,Math.ceil(q*f-0.001));
+ return n+" "+swapWord(rest,n);
+}
+function scaleIngredients(lines,f){return (lines||[]).map(function(l){return scaleLine(l,f);});}
+window.__scaleIngredients=scaleIngredients;
+window.__recipeScaled=function(r){var n=defServAll();return {servings:n,ingredients:scaleIngredients(r.ingredients,n/(r.servings||n))};};
+window.filterRecipeTag=function(tag){if(!tag)return;window.setRecipeFilter("tag:"+tag);try{var b=document.getElementById("plannerRecipeChips");if(b)b.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}};
+window.changeDefaultServings=function(d,event){if(event)event.stopPropagation();var v=Math.max(1,Math.min(12,defServAll()+d));try{localStorage.setItem(SERV_KEY,String(v));}catch(e){}
+ var el=document.getElementById("plannerDefServ");if(el)el.textContent=v;var w=document.getElementById("plannerDefServWord");if(w)w.textContent=v===1?"persoon":"personen";renderRecipeCatalog();};
+document.addEventListener("DOMContentLoaded",function(){var el=document.getElementById("plannerDefServ");if(el)el.textContent=defServAll();var w=document.getElementById("plannerDefServWord");if(w)w.textContent=defServAll()===1?"persoon":"personen";});
 window.__plannerMeals=function(){return read();};
-window.__plannerAddMeal=function(day,meal,ingredients){const items=read();items.push({id:Date.now(),day:day,meal:meal,ingredients:ingredients.slice()});items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);try{render();}catch(e){}};
+window.__plannerAddMeal=function(day,meal,ingredients,servings){const items=read();const entry={id:Date.now(),day:day,meal:meal,ingredients:ingredients.slice()};if(servings)entry.servings=servings;items.push(entry);items.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));write(items);try{render();}catch(e){}};
 function render(){
  const box=document.getElementById("smartPlannerMeals");if(!box)return;
  const items=read();if(!items.length){box.innerHTML='<p class="plannerEmpty">Je hebt nog geen maaltijden gepland.</p>';return}
- box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
+ box.innerHTML=items.map(x=>'<div class="plannerMealRow"><strong>'+esc(x.day)+' · '+esc(x.meal)+(x.servings?' <span class="plannerServ">· '+Number(x.servings)+(Number(x.servings)===1?' portie':' porties')+'</span>':'')+'</strong><p>'+x.ingredients.map(esc).join('\n')+'</p><button class="plannerMealRemove" type="button" onclick="removeSmartMeal('+Number(x.id)+')">Verwijderen</button></div>').join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function normName(v){return String(v).toLocaleLowerCase("nl").replace(/\s+/g," ").trim()}
@@ -15899,7 +15961,7 @@ body.dark-theme .frequentChip .plus{color:#9fd3ac}
       if(cook&&tip)cook.onclick=async function(e){
         e.stopPropagation();cook.disabled=true;
         var r=tip.recipe,day=DAYNAMES[new Date().getDay()];
-        try{if(window.__plannerAddMeal)window.__plannerAddMeal(day,r.name,r.ingredients);}catch(err){console.warn(err);}
+        try{if(window.__plannerAddMeal){var sc=window.__recipeScaled?window.__recipeScaled(r):{ingredients:r.ingredients,servings:0};window.__plannerAddMeal(day,r.name,sc.ingredients,sc.servings);}}catch(err){console.warn(err);}
         var n=0;
         try{if(tip.missing.length&&window.__pantryApi)n=await window.__pantryApi.addNamesToShoppingList(tip.missing.map(function(m){return {name:m};}));}catch(err){}
         dismiss(id,30);
@@ -16051,19 +16113,34 @@ body.dark-theme #list #listProgress{background:rgb(32,38,32)!important}
 /* 3. Geen losse 'Ontdek Pro'-knop: elk onderdeel heeft al 'Ontgrendel met Pro' */
 html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important}
 </style>
+<style id="servings-style">
+.servStepper{display:inline-flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:#eef3ef}
+.servBtn{display:inline-flex;align-items:center;justify-content:center;padding:0;width:32px;height:32px;border:0;border-radius:50%;background:#fff;color:#3f6b4b;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.servVal{min-width:24px;text-align:center;font-size:14px;color:var(--text-color,#2f4a38);padding:0 4px;white-space:nowrap}
+.servVal b{font-size:16px}
+.plannerServDefault{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:0 0 12px;font-size:15px;font-weight:600;color:var(--text-color,#2f4a38)}
+.rsIngHead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.rsIngHead h4{margin:0!important}
+.plannerServ{font-weight:600;color:var(--muted-text,#66766c)}
+.recipeTagBtn{cursor:pointer}
+.recipeTagChip span{margin-left:4px;font-weight:800}
+body.dark-theme .servStepper{background:#1b221d}
+body.dark-theme .servBtn{background:#2c372f;color:#cfe6d5}
+body.dark-theme .servVal,body.dark-theme .plannerServDefault{color:#edf5ef}
+</style>
 <script id="proScreens">
 /* Pro-onderdelen openen als eigen scherm (met "‹ Pro" terug) in plaats van uit te klappen tussen de andere kaarten.
    Binnen de weekplanner en de budgetplanner: tabbladen. */
 (function(){
   var SUB=document.getElementById("proMenuSub");if(!SUB)return;
   var P=[
-    {id:"smartPlannerPanel",title:"Slimme weekplanner",fn:"toggleSmartPlanner"},
-    {id:"budgetPlannerPanel",title:"Prijs- en budgetplanner",fn:"toggleBudgetPlanner"},
-    {id:"pantryPanel",title:"Voorraadbeheer",fn:"togglePantry"},
-    {id:"assistantPanel",title:"Persoonlijke assistent",fn:"toggleAssistant"}
+    {id:"smartPlannerPanel",title:"Slimme weekplanner",fn:"toggleSmartPlanner",sub:"Plan je maaltijden en zet alle ingrediënten in één keer op je lijst."},
+    {id:"budgetPlannerPanel",title:"Prijs- en budgetplanner",fn:"toggleBudgetPlanner",sub:"Houd je uitgaven bij en zie wat je nog over hebt."},
+    {id:"pantryPanel",title:"Voorraadbeheer",fn:"togglePantry",sub:"Houd bij wat je thuis hebt. Is iets op, dan zet je het met één tik op je lijst."},
+    {id:"assistantPanel",title:"Persoonlijke assistent",fn:"toggleAssistant",sub:"Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten."}
   ];
   var bar=document.createElement("div");bar.className="proScreenBar";bar.hidden=true;
-  bar.innerHTML='<button type="button" class="familyMenuBack proScreenBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Pro</span></button><div class="proScreenTitle" role="heading" aria-level="2"></div>';
+  bar.innerHTML='<button type="button" class="familyMenuBack proScreenBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Pro</span></button><div class="proScreenTitle" role="heading" aria-level="2"></div><p class="proScreenSub"></p>';
   SUB.insertBefore(bar,SUB.firstChild);
   var current=null,busy=false;
   function panel(id){return document.getElementById(id);}
@@ -16082,7 +16159,7 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
     SUB.classList.toggle("proScreen",!!c);
     P.forEach(function(x){var el=panel(x.id);if(el)el.classList.toggle("proScreenActive",x===c);});
     bar.hidden=!c;
-    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;if(c!==was)setTimeout(scrollTop,0),setTimeout(scrollTop,90);}
+    if(c){bar.querySelector(".proScreenTitle").textContent=c.title;bar.querySelector(".proScreenSub").textContent=c.sub||"";if(c!==was)setTimeout(scrollTop,0),setTimeout(scrollTop,90);}
     else if(was)setTimeout(scrollTop,0);
   }
   var mo=new MutationObserver(sync);
@@ -16118,6 +16195,10 @@ html body .proUnlockHero,html body.proFree .proUnlockHero{display:none!important
 </script>
 <style id="pro-screens-style">
 .proScreenBar[hidden]{display:none!important}
+.proScreenBar .proScreenSub{margin:-8px 2px 16px;font-size:14px;line-height:1.45;color:var(--muted-text,#66766c)}
+body.dark-theme .proScreenBar .proScreenSub{color:#b8c6bc}
+html body #proMenuSub.proScreen > section.proScreenActive{border:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important}
+html body #proMenuSub.proScreen > section.proScreenActive > .budgetPanelHeading{display:none!important}
 .proScreenBar .proScreenTitle{display:block!important;margin:6px 2px 14px;font-size:22px;font-weight:800;line-height:1.25;color:var(--text-color,#2f4a38)}
 body.dark-theme .proScreenBar .proScreenTitle{color:#edf5ef}
 #proMenuSub.proScreen > .familyMenuBack:not(.proScreenBack),
