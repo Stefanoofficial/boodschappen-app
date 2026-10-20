@@ -5201,7 +5201,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
-      <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en productfoto’s bij suggesties en scannen.</p>
+      <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook of jij Pro hebt.</p>
@@ -5247,7 +5247,7 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
-      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op Toevoegen.</p>
+      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op Toevoegen. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-circle-check"></i><span>Een product afvinken</span></div>
@@ -6977,7 +6977,7 @@ function openProductSuggestionSettings() {
   const enabled = localStorage.getItem("boodschappenSuggestionsEnabled") !== "false";
   const overlay = familyDialogBase(
     "fa-wand-magic-sparkles", "Suggesties",
-    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Productfoto\'s tonen</span><button type="button" class="settingsToggle photosToggle ' + (productPhotosEnabled() ? 'on' : '') + '" aria-label="Productfoto\'s tonen"></button></div><div class="familyDialogText" style="margin-top:8px;font-size:13px;opacity:.8;">Staat dit uit, dan zie je bij elk product een icoon in plaats van een foto.</div>',
+    '<div class="familyDialogText">Laat automatische productsuggesties zien terwijl je typt.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Automatische suggesties</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Automatische suggesties"></button></div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Productfoto\'s tonen</span><button type="button" class="settingsToggle photosToggle ' + (productPhotosEnabled() ? 'on' : '') + '" aria-label="Productfoto\'s tonen"></button></div><div class="familyDialogText" style="margin-top:8px;font-size:13px;opacity:.8;">Aan: echte productfoto’s bij suggesties en in je lijst, als die er zijn. Uit: overal de iconen van de app.</div>',
     '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
   );
   const toggle = overlay.querySelector(".settingsToggle:not(.photosToggle)");
@@ -6996,6 +6996,7 @@ function openProductSuggestionSettings() {
     photosToggle.classList.toggle("on", next);
     try { localStorage.setItem("boodschappenProductPhotos", next ? "true" : "false"); } catch (_) {}
     if (typeof showList === "function") showList();
+    try { if (typeof updateProductSuggestions === "function" && document.getElementById("product").value.trim()) updateProductSuggestions(); } catch (_) {}
   });
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
@@ -7786,7 +7787,8 @@ function productAisle(text) {
 }
 
 function productPhotosEnabled() {
-  try { return localStorage.getItem("boodschappenProductPhotos") !== "false"; } catch (_) { return true; }
+  // Standaard uit: overal de rustige iconen van de app. Aanzetten kan bij Instellingen → Suggesties.
+  try { return localStorage.getItem("boodschappenProductPhotos") === "true"; } catch (_) { return false; }
 }
 
 
@@ -8131,8 +8133,9 @@ async function fetchOnlineProductSuggestions(query) {
 }
 
 function renderOnlineProductSuggestion(button, product) {
+  // Standaard de iconen van de app (rustig). Met de schakelaar "Productfoto's tonen" zie je echte foto's.
   const photo = product.imageUrl && productPhotosEnabled() && !isLooseProduce(product.name)
-    ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    ? `<img class="productSuggestionPhoto" src="${escapeHtmlSafe(product.imageUrl)}" alt="" loading="lazy" data-fallback="${escapeHtmlSafe('<span class="productSuggestionIcon">' + productIconMarkup(getProductIcon(product.name)) + '</span>')}" onerror="this.outerHTML=this.getAttribute('data-fallback')">`
     : `<span class="productSuggestionIcon">${productIconMarkup(getProductIcon(product.name))}</span>`;
 
   button.innerHTML =
@@ -8170,6 +8173,7 @@ async function updateProductSuggestions() {
     if (requestId !== productSuggestionRequestId) return;
 
     if (online.length) {
+      box.innerHTML = "";
       online.forEach(product => {
         const button = document.createElement("button");
         button.type = "button";
@@ -15749,6 +15753,20 @@ body.dark-theme .multiAddType input{background:#1d241f;border-color:#3c4b40;colo
 body.dark-theme .multiAddType button{background:#2c372f;color:#cfe6d5}
 body.dark-theme .expPick.estimated .expShow{color:#9fd3ac}
 </style>
+<style id="suggestions-polish">
+/* Suggesties: los van het invoerveld, rustig, en goed leesbaar in licht en donker */
+html body #productSuggestions.productSuggestions{margin-top:10px!important;border-radius:18px!important;border:1px solid #dbe7df!important;box-shadow:0 10px 30px rgba(31,61,40,.12)!important;overflow:hidden}
+html body #productSuggestions .productSuggestionLoading{padding:14px 16px;font-size:14px;color:#7c8c82}
+html body #productSuggestions .productSuggestionIcon{flex:0 0 28px;width:28px;display:inline-flex;align-items:center;justify-content:center}
+html body #productSuggestions .productSuggestionContent > .productSuggestionIcon,html body #productSuggestions .productSuggestionContent > .productSuggestionPhoto{flex:0 0 40px!important;width:40px!important;height:40px!important;border-radius:10px!important;object-fit:cover}
+html body.dark-theme #productSuggestions.productSuggestions{background:#222a24!important;border-color:#38453b!important;box-shadow:0 10px 30px rgba(0,0,0,.45)!important}
+html body.dark-theme #productSuggestions .productSuggestion{background:transparent!important;border-color:rgba(255,255,255,.07)!important;color:#edf5ef!important}
+html body.dark-theme #productSuggestions .productSuggestion:hover,html body.dark-theme #productSuggestions .productSuggestion:active{background:#2c372f!important}
+html body.dark-theme #productSuggestions .productSuggestionName{color:#edf5ef!important}
+html body.dark-theme #productSuggestions .productSuggestionBrand{color:#a9b8ad!important}
+html body.dark-theme #productSuggestions .productSuggestionIcon .fa-chevron-right{color:#8fa096!important}
+html body.dark-theme #productSuggestions .productSuggestionLoading{color:#a9b8ad}
+</style>
 <script id="login-smooth">
 /* Na het inloggen: "Je lijst wordt geladen…" in plaats van "0 boodschappen", en je naam alvast ophalen voor de begroeting. */
 (function(){
@@ -15763,10 +15781,13 @@ body.dark-theme .expPick.estimated .expShow{color:#9fd3ac}
   if(typeof window.loadPrivateList==="function"){var oP=window.loadPrivateList;
     window.loadPrivateList=async function(){try{return await oP.apply(this,arguments);}finally{if(hasItems())setTimeout(done,0);else if(window.__listLoading){clearTimeout(timer);timer=setTimeout(done,3000);}}};}
   if(typeof showList==="function"){var oS=showList;showList=function(){var r=oS.apply(this,arguments);if(window.__listLoading&&hasItems())done();return r;};}
+  // Alleen na een echte (nieuwe) inlog tonen; bij gewoon openen staat je lijst al klaar vanaf de telefoon
+  var fresh=true;try{fresh=localStorage.getItem("boodschappenWasLoggedIn")!=="1";}catch(e){}
   auth.onAuthStateChanged(function(user){
-    if(!user){done();return;}
+    if(!user){fresh=true;done();return;}
     var empty=true;try{empty=!(Array.isArray(boodschappen)&&boodschappen.length);}catch(e){}
-    if(empty){window.__listLoading=true;try{updateListProgress();}catch(e){}clearTimeout(timer);timer=setTimeout(done,8000);}
+    var show=fresh;fresh=false;
+    if(empty&&show){window.__listLoading=true;try{updateListProgress();}catch(e){}clearTimeout(timer);timer=setTimeout(done,8000);}
     try{if(typeof refreshOverviewGreeting==="function")refreshOverviewGreeting();}catch(e){}
   });
 })();
