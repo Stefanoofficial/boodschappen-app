@@ -6254,6 +6254,10 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
 .overviewHistoryWipe{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:6px 0 2px;padding:12px;border:0;border-radius:14px;background:#fdecec;color:#b42318;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
 body.dark-theme .overviewHistoryWipe{background:#3d2a28;color:#f0a49c}
 </style>
+<style id="saved-lists-sheet">
+.overviewSavedManage{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:6px 0 2px;padding:12px;border:0;border-radius:14px;background:#eef4ef;color:#3F5B45;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+body.dark-theme .overviewSavedManage{background:#25302a;color:#cfe6d5}
+</style>
 </head>
 
 <body>
@@ -7049,11 +7053,11 @@ body.dark-theme .overviewHistoryWipe{background:#3d2a28;color:#f0a49c}
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
       <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. </p>
-      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
+      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Alleen de maker kan de lijst verwijderen met de prullenbak bovenaan; wie meedoet, ziet daar een deur-icoon om de lijst te verlaten. Verwijdert de maker de lijst, dan ga je vanzelf terug naar je eigen lijst. Heb je de lijst eerder als vaste lijst bewaard, dan blijft die kopie gewoon bij je Opgeslagen lijsten staan. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>. Anders dan bij de geschiedenis kies je zelf welke lijsten je bewaart.</p>
+      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>: tik op <strong>Lijst openen</strong> om er een te gebruiken, of op <strong>Lijsten beheren</strong> om er een te verwijderen. Anders dan bij de geschiedenis kies je zelf welke lijsten je bewaart.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
@@ -7811,10 +7815,7 @@ async function refreshActiveSharedListSilently(event){
     const snap=await database.ref("sharedLists/" + id).once("value");
     const data=snap.val();
     if(!data || !data.members || data.members[user.uid]!==true){
-      activeListType="family";
-      currentSharedListId=null;
-      if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
-      await loadList();
+      await __sharedListGone(id, data ? "removed" : "deleted", currentListName);
       return;
     }
     boodschappen=normalizeBoodschappen(data.boodschappen||[]);
@@ -8758,7 +8759,7 @@ async function loadSavedListById(savedId) {
 }
 
 async function loadSavedListRecord(saved) {
-  const proceed = await familyConfirm("Lijst laden", 'Wil je de huidige lijst vervangen door "' + (saved.name || "deze lijst") + '"?');
+  const proceed = await familyConfirm("Lijst openen", 'Wil je je huidige boodschappenlijst vervangen door “' + (saved.name || "deze lijst") + '”? De opgeslagen lijst zelf blijft bewaard.', false, { icon: "fa-folder-open", label: "Vervangen" });
   if (!proceed) return;
 
   mainListLoadGeneration++;
@@ -11063,8 +11064,14 @@ async function renderSharedLists(){
       const results=await Promise.all(ids.map(async id=>{
         try{
           const snap=await database.ref("sharedLists/" + id).once("value");
-          return snap.exists() ? [id,snap.val()] : null;
-        }catch(e){ return null; }
+          if (snap.exists()) return [id,snap.val()];
+          // Lijst bestaat niet meer (verwijderd door de maker): uit je eigen overzicht halen.
+          database.ref("userSharedLists/" + user.uid + "/" + id).remove().catch(()=>{});
+          return null;
+        }catch(e){
+          if (e && String(e.code||"").toUpperCase().indexOf("PERMISSION")>=0) database.ref("userSharedLists/" + user.uid + "/" + id).remove().catch(()=>{});
+          return null;
+        }
       }));
       if(renderGeneration !== __sharedListsRenderGeneration) return;
       mine=results.filter(Boolean).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0))
@@ -11209,6 +11216,43 @@ async function showSharedListMembers(){
   }
 }
 
+// Een gedeelde lijst die je open had, bestaat niet meer (verwijderd door de maker) of je bent eruit gehaald:
+// netjes terug naar je eigen lijst, de lijst uit je overzicht halen en het even melden.
+let __sharedGoneBusy = false;
+async function __sharedListGone(id, reason, name){
+  if (__sharedGoneBusy) return;
+  __sharedGoneBusy = true;
+  try {
+    const user = auth && auth.currentUser;
+    if (currentSharedListUnsubscribe) { try { currentSharedListUnsubscribe(); } catch (_) {} currentSharedListUnsubscribe = null; }
+    try { localStorage.removeItem("activeSharedListId"); localStorage.removeItem("sharedListInviteCode:" + id); localStorage.removeItem("activeSharedListName:" + id); } catch (_) {}
+    if (user) { try { await database.ref("userSharedLists/" + user.uid + "/" + id).remove(); } catch (_) {} }
+    try { delete __sharedSnap[id]; } catch (_) {}
+    try { if (__sharedCache && __sharedCache.mine) __sharedCache.mine = __sharedCache.mine.filter(x => x[0] !== id); } catch (_) {}
+    mainListLoadGeneration++;
+    currentSharedListId = null;
+    currentSharedListInviteCode = null;
+    boodschappen = [];
+    selectedIndex = -1;
+    currentListName = "Boodschappenlijst";
+    if (currentHouseholdId && !(typeof isPrivateMode === "function" && isPrivateMode())) {
+      setActiveListState("family", null, "Boodschappenlijst"); activeListType = "family"; await loadList();
+    } else {
+      setActiveListState("private", null, "Boodschappenlijst"); activeListType = "private"; await loadPrivateList();
+    }
+    updateSharedDeleteButton(false);
+    try { renderSharedLists(); } catch (_) {}
+    const label = name && name !== "Boodschappenlijst" ? "“" + name + "”" : "De gedeelde lijst";
+    await familyAlert("Gedeelde lijst",
+      reason === "removed"
+        ? "Je doet niet meer mee met " + label + ". Je eigen boodschappenlijst is weer geopend."
+        : label + " is verwijderd door de maker. Je eigen boodschappenlijst is weer geopend. Heb je de lijst bewaard als vaste lijst, dan staat die nog bij Opgeslagen lijsten.",
+      "fa-circle-info");
+  } finally {
+    __sharedGoneBusy = false;
+  }
+}
+
 async function leaveCurrentSharedList(){
   const user = auth.currentUser;
   const listId = currentSharedListId;
@@ -11225,7 +11269,7 @@ async function leaveCurrentSharedList(){
       await familyAlert("Eigenaar van gedeelde lijst", "Als eigenaar kun je deze lijst niet verlaten terwijl hij blijft bestaan. Verwijder de gedeelde lijst als je deze wilt beëindigen. Een overdracht van eigenaarschap is nog niet beschikbaar.", "fa-crown");
       return;
     } else {
-      const confirmed = await familyConfirm("Gedeelde lijst verlaten", "Wil je deze gedeelde lijst verlaten? Je verliest daarna toegang tot de gedeelde boodschappen.", true);
+      const confirmed = await familyConfirm("Gedeelde lijst verlaten", "Wil je “" + (list.name || "deze gedeelde lijst") + "” verlaten? Je verliest daarna toegang tot de gedeelde boodschappen. De lijst blijft voor de anderen bestaan.", true, { icon: "fa-right-from-bracket", label: "Verlaten" });
       if (!confirmed) return;
       const updates = {};
       updates["sharedLists/" + listId + "/members/" + user.uid] = null;
@@ -11236,15 +11280,27 @@ async function leaveCurrentSharedList(){
     try { localStorage.removeItem("sharedListInviteCode:" + listId); } catch (_) {}
     const overlay = document.querySelector(".familyDialogOverlay");
     if (overlay) closeFamilyDialog(overlay);
+    if (currentSharedListUnsubscribe) { try { currentSharedListUnsubscribe(); } catch (_) {} currentSharedListUnsubscribe = null; }
+    try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
     currentSharedListId = null;
     currentSharedListInviteCode = null;
     boodschappen = [];
     selectedIndex = -1;
-    setActiveListState("private", null, "Boodschappenlijst");
-    activeListType = "private";
-    await loadPrivateList();
+    currentListName = "Boodschappenlijst";
+    // Terug naar je eigen lijst (familielijst als je in een familie zit, anders je persoonlijke lijst).
+    if (currentHouseholdId && !(typeof isPrivateMode === "function" && isPrivateMode())) {
+      setActiveListState("family", null, "Boodschappenlijst");
+      activeListType = "family";
+      await loadList();
+    } else {
+      setActiveListState("private", null, "Boodschappenlijst");
+      activeListType = "private";
+      await loadPrivateList();
+    }
+    updateSharedDeleteButton(false);
+    try { if (typeof showMainListView === "function") showMainListView(); } catch (_) {}
     await renderSharedLists();
-    await familyAlert("Gedeelde lijst verlaten", "Je hebt de gedeelde lijst verlaten. Je persoonlijke boodschappenlijst is weer geopend.", "fa-right-from-bracket");
+    await familyAlert("Gedeelde lijst verlaten", "Je hebt de gedeelde lijst verlaten. Je eigen boodschappenlijst is weer geopend.", "fa-right-from-bracket");
   } catch (error) {
     console.error("Deellijst verlaten mislukt:", error);
     const detail = error && error.code ? " (" + error.code + ")" : "";
@@ -11336,24 +11392,26 @@ async function openSharedList(id, showInvite, opts){
       if (ownName !== stored) { try { await database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(ownName); } catch (_) {} }
     }
 
-    currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
-      if (activeListType !== "shared" || currentSharedListId !== id) return;
-      const data=s.val()||{};
+    const __liveRef = database.ref("sharedLists/" + id);
+    const __liveCb = __liveRef.on("value",s=>{
+      if (!s || activeListType !== "shared" || currentSharedListId !== id) return;
+      const raw=s.val();
+      const data=raw||{};
       if(!data.members || data.members[user.uid]!==true){
-        currentSharedListId=null;
-        if(currentSharedListUnsubscribe){ currentSharedListUnsubscribe(); currentSharedListUnsubscribe=null; }
-        if (activeListType === "shared" && currentSharedListId === id) {
-          mainListLoadGeneration++;
-          setActiveListState("family", null, "Boodschappenlijst");
-          loadList();
-        }
+        // De maker heeft de lijst verwijderd, of jij bent eruit gehaald.
+        __sharedListGone(id, raw ? "removed" : "deleted", (__sharedSnap[id] && __sharedSnap[id].name) || currentListName);
         return;
       }
+      try { __sharedSnap[id] = data; } catch (_) {}
       boodschappen=normalizeBoodschappen(data.boodschappen||[]);
       showList();
       const header=document.querySelector(".headerBar h1"); if(header) header.textContent=data.name||"Gedeelde lijst";
       updateSharedMemberCount(data);
+    }, () => {
+      // Geen toegang meer (bijv. lijst verwijderd terwijl je hem open had).
+      if (activeListType === "shared" && currentSharedListId === id) __sharedListGone(id, "deleted", currentListName);
     });
+    currentSharedListUnsubscribe = () => { try { __liveRef.off("value", __liveCb); } catch (_) {} };
     if(showInvite){
       // Zelfde Deelcode-venster als in het menu (code kopiëren of een bericht met de code delen).
       setTimeout(()=>{ try{ showSharedListCode(); }catch(_){} },250);
@@ -11373,16 +11431,21 @@ function updateSharedDeleteButton(isOwner){
   const btn = document.getElementById("mainListTrashButton");
   if(!btn) return;
 
+  const icon = btn.querySelector("i");
   if(activeListType === "shared" && currentSharedListId){
-    // Gebruik exact dezelfde prullenbakknop als op de gewone boodschappenlijst.
-    // Zo ontstaat er geen tweede prullenbak in de header.
+    // Gedeelde lijst: de maker kan de lijst verwijderen (prullenbak),
+    // deelnemers kunnen alleen zelf vertrekken (deur-icoon).
     btn.style.display = "inline-flex";
     btn.classList.add("sharedModeTrashButton");
-    btn.setAttribute("aria-label", "Gedeelde lijst verwijderen");
-    btn.setAttribute("title", "Gedeelde lijst verwijderen");
-    btn.onclick = deleteCurrentSharedList;
+    btn.classList.toggle("sharedLeaveButton", !isOwner);
+    if (icon) icon.className = isOwner ? "fa-solid fa-trash-can" : "fa-solid fa-right-from-bracket";
+    const label = isOwner ? "Gedeelde lijst verwijderen" : "Gedeelde lijst verlaten";
+    btn.setAttribute("aria-label", label);
+    btn.setAttribute("title", label);
+    btn.onclick = isOwner ? deleteCurrentSharedList : leaveCurrentSharedList;
   } else {
-    btn.classList.remove("sharedModeTrashButton");
+    btn.classList.remove("sharedModeTrashButton", "sharedLeaveButton");
+    if (icon) icon.className = "fa-solid fa-trash-can";
     btn.setAttribute("aria-label", "Lijst wissen");
     btn.setAttribute("title", "Lijst wissen");
     btn.onclick = openClearListConfirm;
@@ -11421,7 +11484,8 @@ async function deleteCurrentSharedList(){
 
   const ok=await familyConfirm(
     "Gedeelde lijst verwijderen",
-    "Weet je zeker dat je “" + (list.name || "Gedeelde lijst") + "” wilt verwijderen? Deze actie kan niet ongedaan worden."
+    "Weet je zeker dat je “" + (list.name || "Gedeelde lijst") + "” wilt verwijderen? De lijst verdwijnt dan voor iedereen die meedoet. Dit kan niet ongedaan worden gemaakt.",
+    true, { icon: "fa-trash-can", label: "Verwijderen" }
   );
   if(!ok) return;
 
@@ -13173,16 +13237,47 @@ async function openQuickAddFromOverview(){
   __overviewOpenSheet(overlay);
 }
 
-function openSavedListsFromOverview(){
-  // Open de bestaande pagina onder Meer, zodat opgeslagen lijsten op één plek beheerd worden.
-  showMoreView();
-  setTimeout(function(){
-    try {
-      if(typeof openSavedListsSubmenu === 'function') {
-        openSavedListsSubmenu({preventDefault:function(){}, stopPropagation:function(){}});
-      }
-    } catch(e) { console.error('Opgeslagen lijsten openen mislukt:', e); }
-  }, 60);
+// Opgeslagen lijsten openen als venster binnen Overzicht (net als Geschiedenis en Snel opnieuw toevoegen).
+async function openSavedListsFromOverview(){
+  var overlay=__overviewOverlay("Opgeslagen lijsten");
+  var body=overlay.querySelector(".overviewActionBody");
+  var lists=[];
+  try{ lists=await readSavedLists(); }catch(_){ lists=[]; }
+  body.innerHTML="";
+  if(!lists.length){
+    overlay.classList.add("overview-history-empty");
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen opgeslagen lijsten</strong></div><p>Bewaar een lijst om hem later opnieuw te gebruiken: tik op je boodschappenlijst bovenaan op ⋮ en kies <strong>Vaste lijst bewaren</strong>.</p></div>';
+    __overviewOpenSheet(overlay);
+    return;
+  }
+  lists.forEach(function(saved){
+    var items=(saved.items||[]).map(function(x){return typeof x==="string"?x:(x&&x.text)||"";}).filter(Boolean);
+    var card=document.createElement("div");
+    card.className="overviewHistoryCard";
+    card.innerHTML='<div class="overviewHistoryCardTop"><strong></strong><small></small></div><div class="overviewHistoryItems"></div><button type="button" class="overviewHistoryUse">Lijst openen</button>';
+    card.querySelector("strong").textContent=saved.name||"Opgeslagen lijst";
+    card.querySelector("small").textContent=items.length+" product"+(items.length===1?"":"en");
+    card.querySelector(".overviewHistoryItems").textContent=items.slice(0,6).join(" · ")+(items.length>6?" · …":"");
+    card.querySelector(".overviewHistoryUse").addEventListener("click",async function(){
+      if(overlay.__closeSheet) overlay.__closeSheet(); else overlay.remove();
+      await new Promise(function(r){setTimeout(r,180);});
+      await loadSavedListRecord(saved);
+    });
+    body.appendChild(card);
+  });
+  var manage=document.createElement("button");
+  manage.type="button"; manage.className="overviewSavedManage";
+  manage.innerHTML='<i class="fa-solid fa-pen" aria-hidden="true"></i> Lijsten beheren';
+  manage.addEventListener("click",function(){
+    if(overlay.__closeSheet) overlay.__closeSheet(); else overlay.remove();
+    showMoreView();
+    setTimeout(function(){
+      try{ if(typeof openSavedListsSubmenu==="function") openSavedListsSubmenu({preventDefault:function(){},stopPropagation:function(){}}); }
+      catch(e){ console.error("Opgeslagen lijsten openen mislukt:",e); }
+    },60);
+  });
+  body.appendChild(manage);
+  __overviewOpenSheet(overlay);
 }
 
 async function openShoppingHistoryFromOverview(){
