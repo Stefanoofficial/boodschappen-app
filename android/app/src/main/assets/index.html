@@ -6206,10 +6206,17 @@ body.dark-theme .appCalToday{color:#9fd3ac}
 </style>
 <style id="pro-free-badge">
 .proFreeBadge{display:inline-flex;align-items:center;gap:5px;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:999px;background:#fff1cc;color:#8a5a00;font-size:11px!important;font-weight:800;line-height:1.5;letter-spacing:.01em;white-space:nowrap}
+.proMenuCard .proFreeBadge.proFreeCard{display:inline-flex!important;align-self:flex-start;width:auto!important;margin:7px 0 0!important;white-space:nowrap}
 .proFreeBadge.proFreeHero{margin:2px auto 8px;padding:4px 12px;font-size:13px!important}
 .proFreeBadge i{font-size:11px;color:#c58a00}
 body.dark-theme .proFreeBadge{background:#3a3120;color:#f3d38a}
 body.dark-theme .proFreeBadge i{color:#f3c35a}
+</style>
+<style id="product-icon-equal">
+/* Alle producticonen even groot: emoji vullen hetzelfde vak als de getekende iconen. */
+.productEmojiIcon{display:inline-flex!important;align-items:center;justify-content:center;container-type:size;line-height:1!important;overflow:visible;flex:0 0 auto}
+.productEmojiIcon>span{display:block;font-size:22px;line-height:1;font-style:normal}
+@supports (font-size:1cqh){.productEmojiIcon>span{font-size:84cqh}}
 </style>
 </head>
 
@@ -6332,7 +6339,7 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
   <div id="familyMenuMain" class="familyMenuPage">
     <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
       <i class="fa-solid fa-crown"></i>
-      <span><strong>Mijn Boodschappen Pro <b class="proFreeBadge">Tijdelijk gratis</b></strong><small>Weekplanner, budget en aanbiedingen.</small></span>
+      <span><strong>Mijn Boodschappen Pro</strong><small>Weekplanner, budget en aanbiedingen.</small><b class="proFreeBadge proFreeCard">Tijdelijk gratis</b></span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
     <div class="moreMenuSectionLabel">SAMEN</div>
@@ -9155,7 +9162,7 @@ function normalizeProductName(text) {
 
 function productIconMarkup(icon) {
   if (icon === "apple") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="4.3 3.9 55.4 55.4" aria-hidden="true">
       <path d="M33 19c-3-7 2-11 8-12" fill="none" stroke="#5f7f45" stroke-width="3" stroke-linecap="round"/>
       <path d="M35 12c4-5 10-4 14-1-2 5-7 7-14 1z" fill="#79a95b"/>
       <path d="M32 18c-12-5-23 4-21 18 2 14 10 21 21 21s19-7 21-21c2-14-9-23-21-18z" fill="#d9413f" stroke="#b52b2a" stroke-width="1.5"/>
@@ -9164,7 +9171,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "banana") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="3.4 8.0 57.8 57.8" aria-hidden="true">
       <path d="M12 20c8 19 19 29 37 27 5-1 8-4 9-8-2 11-10 18-21 18-15 0-27-11-31-28-1-4 1-7 6-9z" fill="#f6c84c" stroke="#c59b27" stroke-width="1.5"/>
       <path d="M13 20c2-2 5-3 8-2" fill="none" stroke="#8f7421" stroke-width="3" stroke-linecap="round"/>
       <path d="M51 39c3-1 5-3 7-6" fill="none" stroke="#8f7421" stroke-width="3" stroke-linecap="round"/>
@@ -9172,7 +9179,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "tomatoes") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="6.8 8.3 52.5 52.5" aria-hidden="true">
       <circle cx="24" cy="38" r="15" fill="#e34b43" stroke="#b92e2a" stroke-width="1.5"/>
       <circle cx="43" cy="37" r="14" fill="#ef5a4f" stroke="#b92e2a" stroke-width="1.5"/>
       <path d="M24 23l3-7 5 5 5-5 1 8" fill="#5f984d" stroke="#47783a" stroke-width="1.5" stroke-linejoin="round"/>
@@ -9181,7 +9188,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "butter-pack") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="7.9 6.9 48.2 48.2" aria-hidden="true">
       <path d="M10 20h44v31H10z" rx="4" fill="#f6c94a" stroke="#c89d24" stroke-width="1.5"/>
       <path d="M10 20l9-9h35l-10 9z" fill="#ffe27a" stroke="#c89d24" stroke-width="1.5"/>
       <rect x="16" y="28" width="32" height="15" rx="4" fill="#fff7cf"/>
@@ -9190,7 +9197,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "egg-carton") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="5.8 7.8 52.5 52.5" aria-hidden="true">
       <path d="M8 22h48l-4 34H12z" fill="#c9b49a" stroke="#9f8a73" stroke-width="1.5"/>
       <path d="M8 22l4-10h40l4 10z" fill="#dbc7ae" stroke="#9f8a73" stroke-width="1.5"/>
       <ellipse cx="20" cy="30" rx="7" ry="6" fill="#f8f3e8" stroke="#b9a58d"/>
@@ -9203,7 +9210,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "bread-loaf") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="6.8 7.8 50.4 50.4" aria-hidden="true">
       <path d="M12 27c0-10 9-17 20-17s20 7 20 17v23c0 4-3 6-7 6H19c-4 0-7-2-7-6z" fill="#d89a4a" stroke="#a96e2f" stroke-width="1.5"/>
       <path d="M16 27c2-7 8-11 16-11s14 4 16 11" fill="#efbc70"/>
       <path d="M23 25c2-4 5-6 9-6" fill="none" stroke="#c27f36" stroke-width="2.5" stroke-linecap="round"/>
@@ -9213,7 +9220,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "cheese-block") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="9.9 8.9 46.1 46.1" aria-hidden="true">
       <path d="M12 24l25-12 17 12v28H12z" fill="#f4c84b" stroke="#bd9429" stroke-width="1.5"/>
       <path d="M12 24l25 12 17-12" fill="none" stroke="#d9aa32" stroke-width="1.5"/>
       <circle cx="27" cy="31" r="3" fill="#d59f26"/>
@@ -9224,7 +9231,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "jam-jar") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="2.5 4.3 59.1 59.1" aria-hidden="true">
       <ellipse cx="32" cy="12" rx="20" ry="6" fill="#d9413f"/>
       <rect x="12" y="10" width="40" height="10" rx="4" fill="#ef5a55"/>
       <path d="M13 18h38v33c0 6-5 10-11 10H24c-6 0-11-4-11-10z" fill="#d92f2d" stroke="#b52b2a" stroke-width="1.5"/>
@@ -9235,7 +9242,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "peanut-butter-jar") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="1.9 4.3 60.2 60.2" aria-hidden="true">
       <ellipse cx="32" cy="12" rx="19" ry="6" fill="#7a4a24"/>
       <rect x="13" y="9" width="38" height="10" rx="4" fill="#8b5529"/>
       <path d="M14 18h36v33c0 7-5 11-12 11H26c-7 0-12-4-12-11z" fill="#c88732" stroke="#9d6428" stroke-width="1.5"/>
@@ -9246,7 +9253,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "quark-cup") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="6.8 7.8 50.4 50.4" aria-hidden="true">
       <path d="M10 17h44l-4 39H14z" fill="#f7fbff" stroke="#cbd7df" stroke-width="1.5"/>
       <ellipse cx="32" cy="17" rx="22" ry="7" fill="#eaf6ff" stroke="#cbd7df" stroke-width="1.5"/>
       <path d="M12 38h40l-2 18H14z" fill="#9ad7f3"/>
@@ -9257,7 +9264,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "toothpaste-tube") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="4.4 6.4 55.1 55.1" aria-hidden="true">
       <path d="M18 12h28l-4 42H22z" fill="#f8fbff" stroke="#cfd8df" stroke-width="1.5"/>
       <path d="M18 12h28l-2 12H20z" fill="#dff1fb"/>
       <path d="M20 29h24l-2 13H22z" fill="#4aa8dc"/>
@@ -9268,7 +9275,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "red-bell-pepper") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="4.8 3.2 54.3 54.3" aria-hidden="true">
       <path d="M31 14c-1.7-4.4 1.1-8.2 5.1-9.2 1.3-.3 2.6.7 2.4 2-.3 2.3-1.8 4.1-4 5.1l-.4 2.1z" fill="#4f6b42"/>
       <path d="M27 15c-10.8-.8-19 6.8-19 17.8C8 46 17.7 56 31.8 56S56 46 56 32.8C56 21.4 47.1 14.2 37 15c-3.1.3-6.7.3-10 0Z" fill="#e94a3f"/>
       <path d="M12 30c1.7-7.2 7.6-11.7 14.7-12.5" fill="none" stroke="#f46c5f" stroke-width="3" stroke-linecap="round"/>
@@ -9277,7 +9284,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "curry-sauce") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="5.6 5.5 52.7 52.7" aria-hidden="true">
       <path d="M22 13h20l-2 8v35H24V21z" fill="#e23a2f" stroke="#b92522" stroke-width="1.5"/>
       <rect x="24" y="7" width="16" height="9" rx="3" fill="#ef3e2f"/>
       <path d="M24 28h16v21H24z" fill="#fff"/>
@@ -9287,7 +9294,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "ketchup-bottle") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="5.1 4.5 53.8 53.8" aria-hidden="true">
       <path d="M22 17h20l-2 9v30H24V26z" fill="#e62d28" stroke="#b51e20" stroke-width="1.5"/>
       <path d="M25 9h14l2 9H23z" fill="#e83a2f"/>
       <rect x="27" y="6" width="10" height="6" rx="2" fill="#d72724"/>
@@ -9297,7 +9304,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "mayonnaise-bottle") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="5.1 4.5 53.8 53.8" aria-hidden="true">
       <path d="M22 17h20l-2 9v30H24V26z" fill="#f5e7b5" stroke="#c9b97b" stroke-width="1.5"/>
       <path d="M25 9h14l2 9H23z" fill="#f1df91"/>
       <rect x="27" y="6" width="10" height="6" rx="2" fill="#e8cd6a"/>
@@ -9307,7 +9314,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "toilet-paper") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="6.9 6.8 50.4 50.4" aria-hidden="true">
       <ellipse cx="28" cy="22" rx="16" ry="13" fill="#fff" stroke="#d9d9d9" stroke-width="1.5"/>
       <path d="M12 22v18c0 9 7 15 16 15s16-6 16-15V22" fill="#fff" stroke="#d9d9d9" stroke-width="1.5"/>
       <ellipse cx="28" cy="22" rx="6" ry="5" fill="#c9a77a"/>
@@ -9317,7 +9324,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "milk-carton") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="6.8 8.8 50.4 50.4" aria-hidden="true">
       <path d="M19 17h26v40H19z" fill="#f8fbff" stroke="#cfd8df" stroke-width="1.5"/>
       <path d="M19 28h26v29H19z" fill="#d9efff"/>
       <path d="M19 28h26v8H19z" fill="#65b6e8"/>
@@ -9329,7 +9336,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "pringles-tube") {
-    return `<svg class="productInlineIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="productInlineIcon" viewBox="2.5 2.6 59.1 59.1" aria-hidden="true">
       <path d="M19 9h26v47H19z" fill="#d92e2e" stroke="#a91f24" stroke-width="1.5"/>
       <ellipse cx="32" cy="9" rx="13" ry="4" fill="#f4d9a4" stroke="#a91f24" stroke-width="1.5"/>
       <ellipse cx="32" cy="56" rx="13" ry="4" fill="#b51f25"/>
@@ -9342,7 +9349,7 @@ function productIconMarkup(icon) {
   }
 
   if (icon === "chips-bag") {
-    return `<svg class="chipsBagIcon" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="chipsBagIcon" viewBox="6.0 6.0 51.9 51.9" aria-hidden="true">
       <defs>
         <linearGradient id="chipsBagRed" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stop-color="#f0443e"/>
@@ -9356,6 +9363,8 @@ function productIconMarkup(icon) {
       <path d="M21 39c2-5 7-5 10 0s7 5 10 0c1-2 4-2 5 1" fill="none" stroke="#f8c34a" stroke-width="5" stroke-linecap="round"/>
     </svg>`;
   }
+  // Emoji krijgen hetzelfde vak als de getekende iconen, zodat alles even groot is.
+  if (icon && !/^\s*</.test(String(icon))) return `<span class="productInlineIcon productEmojiIcon" aria-hidden="true"><span>${icon}</span></span>`;
   return icon || "";
 }
 
@@ -9927,33 +9936,8 @@ async function updateProductSuggestions() {
 
   const requestId = ++productSuggestionRequestId;
 
-  if (query.length >= 2) {
-    box.innerHTML = '<div class="productSuggestionLoading">Producten zoeken…</div>';
-    box.classList.add("open");
-
-    const online = await fetchOnlineProductSuggestions(query);
-    if (requestId !== productSuggestionRequestId) return;
-
-    if (online.length) {
-      box.innerHTML = "";
-      online.forEach(product => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "productSuggestion";
-        renderOnlineProductSuggestion(button, product);
-        button.addEventListener("click", () => {
-          selectedProductSuggestion = product;
-          input.value = product.name;
-          box.classList.remove("open");
-        });
-        box.appendChild(button);
-      });
-      box.classList.add("open");
-      return;
-    }
-  }
-
-  /* Fallback naar de bestaande lokale suggesties als er geen online resultaat is. */
+  /* Eerst meteen de eigen suggesties van de app tonen; online producten (Open Food Facts) komen er
+     daarna onder bij. Zo hoef je nooit te wachten op "Producten zoeken…". */
   let suggestionResults = getProductSuggestions(query);
   if (query === "aardbei" || query === "aardbeien") {
     suggestionResults = [
@@ -9969,18 +9953,24 @@ async function updateProductSuggestions() {
       ...suggestionResults
     ];
   }
+  // Precies wat je typt eerst ("Water" vóór "Watermeloen"), daarna wat ermee begint.
+  const __q = normalizeProductLookup(query);
+  const __rank = n => { const k = normalizeProductLookup(n); return k === __q ? 0 : (k.indexOf(__q) === 0 ? 1 : 2); };
+  suggestionResults = suggestionResults.map((x, i) => [x, i]).sort((a, b) => (__rank(a[0].name) - __rank(b[0].name)) || (a[1] - b[1])).map(x => x[0]);
+  const matches = suggestionResults.slice(0, 8).map(({name, icon}) => [name, icon || getProductIcon(name)]);
+  const shown = {};
+  const keyOf = t => normalizeProductLookup(String(t || ""));
 
-  const matches = suggestionResults.slice(0, 30).map(({name, icon}) => [name, icon || getProductIcon(name)]);
-  box.innerHTML = "";
-  matches.forEach(([name, icon]) => {
+  function addLocal([name, icon]) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "productSuggestion";
     button.innerHTML =
       `<span class="productSuggestionContent">` +
+        `<span class="productSuggestionIcon">${productIconMarkup(icon)}</span>` +
         `<span class="productSuggestionText"><span class="productSuggestionName">${escapeHtmlSafe(name.charAt(0).toUpperCase() + name.slice(1))}</span></span>` +
       `</span>` +
-      `<span class="productSuggestionIcon">${productIconMarkup(icon)}</span>`;
+      `<span class="productSuggestionIcon"><i class="fa-solid fa-chevron-right"></i></span>`;
     button.addEventListener("click", () => {
       input.value = name.charAt(0).toUpperCase() + name.slice(1);
       selectedProductSuggestion = null;
@@ -9988,8 +9978,44 @@ async function updateProductSuggestions() {
       input.focus();
     });
     box.appendChild(button);
-  });
+    shown[keyOf(name)] = 1;
+  }
+  function addOnline(product) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "productSuggestion";
+    renderOnlineProductSuggestion(button, product);
+    button.addEventListener("click", () => {
+      selectedProductSuggestion = product;
+      input.value = product.name;
+      box.classList.remove("open");
+    });
+    box.appendChild(button);
+    shown[keyOf(product.name)] = 1;
+  }
+
+  box.innerHTML = "";
+  matches.forEach(addLocal);
   if (matches.length) box.classList.add("open");
+
+  if (query.length < 2) {
+    if (!matches.length) box.classList.remove("open");
+    return;
+  }
+
+  if (!matches.length) {
+    box.innerHTML = '<div class="productSuggestionLoading">Producten zoeken…</div>';
+    box.classList.add("open");
+  }
+
+  let online = [];
+  try { online = await fetchOnlineProductSuggestions(query); } catch (_) { online = []; }
+  if (requestId !== productSuggestionRequestId) return;
+
+  const extra = (online || []).filter(p => p && p.name && !shown[keyOf(p.name)]);
+  if (!matches.length) box.innerHTML = "";
+  extra.slice(0, 20).forEach(addOnline);
+  if (box.children.length) box.classList.add("open");
   else box.classList.remove("open");
 }
 
@@ -15982,7 +16008,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   /* ---------- Eigenaar van de app ----------
      Alleen het account van de maker ziet de Testinstellingen (Pro aan/uit).
      In de code staat alleen een SHA-256-vingerafdruk van het e-mailadres, niet het adres zelf. */
-  var OWNER_HASH="68ba313926b8ab93ee249309b85cda998e94365e63c79f4270db1b613e9badcc";
+  var OWNER_HASHES=["68ba313926b8ab93ee249309b85cda998e94365e63c79f4270db1b613e9badcc"];
   function sha256(str){
     function r(n,x){return (x>>>n)|(x<<(32-n));}
     var K=[],H=[],i,j,p=2;
@@ -16004,7 +16030,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   var ownerMail=null,ownerVal=false;
   function isOwner(){
     var m="";try{m=auth&&auth.currentUser&&auth.currentUser.email?String(auth.currentUser.email).trim().toLowerCase():"";}catch(e){}
-    if(m!==ownerMail){ownerMail=m;ownerVal=!!m&&sha256(m)===OWNER_HASH;}
+    if(m!==ownerMail){ownerMail=m;ownerVal=!!m&&OWNER_HASHES.indexOf(sha256(m))>=0;}
     return ownerVal;
   }
   window.__isAppOwner=isOwner;
