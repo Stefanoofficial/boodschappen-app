@@ -6843,6 +6843,7 @@ body.dark-theme .appCalToday{color:#9fd3ac}
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
       <div class="aboutInfoLine"><i class="fa-solid fa-list-check"></i><span>Producten toevoegen met slimme productsuggesties.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-users"></i><span>Samenwerken met je familie.</span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-camera"></i><span>Je account persoonlijk maken met je naam en een profielfoto.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten maken voor vrienden, familie of een feestje.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-folder-open"></i><span>Lijsten opslaan en later opnieuw gebruiken.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-chart-column"></i><span>Een overzicht bekijken van je boodschappen.</span></div>
@@ -6883,11 +6884,11 @@ body.dark-theme .appCalToday{color:#9fd3ac}
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 20 oktober 2026</p>
+      <p><strong>Versie:</strong> 21 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
-        <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID.</li>
+        <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID. Stel je een profielfoto in, dan wordt een verkleinde versie daarvan bij je account bewaard. Je kunt die foto altijd weer verwijderen.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen. Zet je een aanbieding op je lijst, dan worden de prijs, de actie en de einddatum bij dat product bewaard.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
         <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen supermarkt en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
@@ -6904,14 +6905,14 @@ body.dark-theme .appCalToday{color:#9fd3ac}
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
       <h4>Delen met anderen</h4>
-      <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook of jij Pro hebt.</p>
+      <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook je naam, je profielfoto (als je die hebt ingesteld) en of jij Pro hebt.</p>
       <h4>Bewaren en verwijderen</h4>
       <p>Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen.</p>
       <h4>Jouw rechten</h4>
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 20 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 21 oktober 2026.</p>
     </div>
   </div>
 
@@ -7001,6 +7002,10 @@ body.dark-theme .appCalToday{color:#9fd3ac}
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-crown"></i><span>Pro en je familie</span></div>
       <p>Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
+      <p>Ga naar <strong>Meer → Mijn account → Profielfoto</strong> en tik op <strong>Foto kiezen</strong>. Verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Je familieleden zien je foto bij <strong>Mijn familie</strong>. Via hetzelfde scherm kun je de foto ook weer verwijderen. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
@@ -8039,14 +8044,26 @@ function cropProfilePhoto(file) {
   });
 }
 
+// Eigen profielfoto onthouden (alleen in het geheugen), zodat "Profielfoto" meteen opent.
+var __myPhoto = { uid: null, url: "" };
+function __loadMyPhoto() {
+  const user = auth && auth.currentUser;
+  if (!user) return Promise.resolve("");
+  const uid = user.uid;
+  return database.ref("users/" + uid + "/photoURL").once("value").then(snap => {
+    const url = String(snap.val() || "");
+    if (auth.currentUser && auth.currentUser.uid === uid) __myPhoto = { uid, url };
+    return url;
+  });
+}
 async function manageProfilePhoto() {
   const user = auth && auth.currentUser;
   if (!user) return;
   closeFamilyMenuForDialog();
   let photoURL = "";
   try {
-    const snap = await database.ref("users/" + user.uid + "/photoURL").once("value");
-    photoURL = String(snap.val() || "");
+    if (__myPhoto.uid === user.uid) { photoURL = __myPhoto.url; __loadMyPhoto().catch(() => {}); }
+    else photoURL = await __loadMyPhoto();
   } catch (error) {
     console.error("Profielfoto laden mislukt", error);
     await familyAlert("Foto niet geladen", "De profielfoto kon niet worden geladen. Controleer je internetverbinding en probeer het opnieuw.", "fa-triangle-exclamation");
@@ -8111,6 +8128,7 @@ async function manageProfilePhoto() {
       }
       chooseButton.textContent = "Opslaan…";
       await database.ref("users/" + user.uid + "/photoURL").set(dataURL);
+      __myPhoto = { uid: user.uid, url: dataURL };
       const previewContainer = overlay.querySelector("#profilePhotoPreview");
       if (previewContainer) {
         previewContainer.innerHTML = `<img src="${dataURL}" alt="Profielfoto" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #dff5df">`;
@@ -8140,6 +8158,7 @@ async function manageProfilePhoto() {
     if (!ok) return;
     try {
       await database.ref("users/" + user.uid + "/photoURL").remove();
+      __myPhoto = { uid: user.uid, url: "" };
       closeFamilyDialog(overlay);
       await familyAlert("Profielfoto verwijderd", "Je standaardpictogram wordt weer getoond.", "fa-circle-check");
     } catch (error) {
@@ -16929,7 +16948,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       var u=(typeof auth!=="undefined"&&auth)?auth.currentUser:null;
       if(u&&done!==u.uid){
         done=u.uid;
-        var go=function(){try{readOverviewHistory().catch(function(){});readSavedLists().catch(function(){});if(typeof renderSharedLists==="function"&&!__sharedCacheFor())renderSharedLists();}catch(e){}};
+        var go=function(){try{readOverviewHistory().catch(function(){});readSavedLists().catch(function(){});if(typeof renderSharedLists==="function"&&!__sharedCacheFor())renderSharedLists();if(typeof __loadMyPhoto==="function")__loadMyPhoto().catch(function(){});}catch(e){}};
         if(window.requestIdleCallback) requestIdleCallback(go,{timeout:2500}); else setTimeout(go,800);
       }
       if(!u) done="";
