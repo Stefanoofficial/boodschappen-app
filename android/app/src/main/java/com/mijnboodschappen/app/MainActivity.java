@@ -44,6 +44,8 @@ public class MainActivity extends Activity {
     private boolean pendingTestNotification = false;
     private String pendingReminderDay = null;
     private String pendingReminderTime = null;
+    private String pendingPantryAlerts = null;
+    private String pendingNotificationJs = null;
     private static final int BACKGROUND_COLOR = Color.rgb(238, 248, 241);
     private boolean pageReady = false;
     private boolean splashRemoved = false;
@@ -86,6 +88,7 @@ public class MainActivity extends Activity {
                 if ("file:///android_asset/index.html".equals(url)) {
                     pageReady = true;
                     tryRemoveSplash();
+                    deliverPendingNotificationAction(1500);
                 }
             }
         });
@@ -117,12 +120,51 @@ public class MainActivity extends Activity {
         showAppSplash();
         setContentView(root);
         webView.loadUrl("file:///android_asset/index.html");
+        handleNotificationIntent(getIntent());
         root.postDelayed(() -> {
             if (!splashRemoved) {
                 removeSplash();
             }
         }, MAX_SPLASH_DURATION);
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    /** Een tik op een voorraadmelding (of een knop als "Op" / "Nog goed") doorgeven aan de app. */
+    private void handleNotificationIntent(Intent intent) {
+        if (intent == null) return;
+        String action = intent.getStringExtra(NotificationReceiver.EXTRA_ACTION);
+        if (action == null) return;
+        String ids = intent.getStringExtra(NotificationReceiver.EXTRA_IDS);
+        int notificationId = intent.getIntExtra(NotificationReceiver.EXTRA_NOTIFICATION_ID, 0);
+        intent.removeExtra(NotificationReceiver.EXTRA_ACTION);
+        if (notificationId != 0) {
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) manager.cancel(notificationId);
+        }
+        pendingNotificationJs = "if(window.__onNativeNotification){window.__onNativeNotification('"
+                + jsEscape(action) + "','" + jsEscape(ids == null ? "" : ids) + "');}"
+                + "else{window.__pendingNativeNotification=['" + jsEscape(action) + "','" + jsEscape(ids == null ? "" : ids) + "'];}";
+        if (pageReady) deliverPendingNotificationAction(300);
+    }
+
+    private void deliverPendingNotificationAction(long delay) {
+        if (pendingNotificationJs == null || webView == null) return;
+        final String js = pendingNotificationJs;
+        pendingNotificationJs = null;
+        webView.postDelayed(() -> {
+            if (webView != null) webView.evaluateJavascript(js, null);
+        }, delay);
+    }
+
+    private static String jsEscape(String value) {
+        return value.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", " ");
+    }
+
     private void showAppSplash() {
         splash = new FrameLayout(this);
         splash.setBackgroundColor(BACKGROUND_COLOR);
@@ -213,12 +255,17 @@ public class MainActivity extends Activity {
                     scheduleWeeklyReminder(pendingReminderDay, pendingReminderTime);
                     notifyWebStatus("Boodschappenherinnering ingepland.");
                 }
+                if (pendingPantryAlerts != null) {
+                    AlertScheduler.setPantryAlerts(this, pendingPantryAlerts);
+                    notifyWebStatus("Voorraadmeldingen staan aan.");
+                }
             } else {
                 notifyWebStatus("Meldingen zijn niet toegestaan. Zet meldingen aan bij de Android-instellingen.");
             }
             pendingTestNotification = false;
             pendingReminderDay = null;
             pendingReminderTime = null;
+            pendingPantryAlerts = null;
             return;
         }
 
@@ -332,54 +379,14 @@ public class MainActivity extends Activity {
 
     private void scheduleWeeklyReminder(String day, String time) {
         try {
-            String[] parts = (time == null ? "18:00" : time).split(":");
-            int hour = Integer.parseInt(parts[0]);
-            int minute = Integer.parseInt(parts[1]);
-            int requestedDay = Integer.parseInt(day);
-
-            java.util.Calendar calendar = java.util.Calendar.getInstance();
-            calendar.set(java.util.Calendar.DAY_OF_WEEK, requestedDay);
-            calendar.set(java.util.Calendar.HOUR_OF_DAY, hour);
-            calendar.set(java.util.Calendar.MINUTE, minute);
-            calendar.set(java.util.Calendar.SECOND, 0);
-            calendar.set(java.util.Calendar.MILLISECOND, 0);
-            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-                calendar.add(java.util.Calendar.DAY_OF_YEAR, 7);
-            }
-
-            Intent intent = new Intent(this, NotificationReceiver.class);
-            intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    this, REMINDER_REQUEST_CODE, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            );
-
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            if (alarmManager != null) {
-                alarmManager.cancel(pendingIntent);
-                // Wekelijkse herinnering; Android kan deze tijdens batterijbesparing iets uitstellen.
-                alarmManager.setRepeating(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.getTimeInMillis(),
-                        AlarmManager.INTERVAL_DAY * 7L,
-                        pendingIntent
-                );
-            }
+            AlertScheduler.scheduleWeekly(this, day, time);
         } catch (Exception e) {
             notifyWebStatus("Herinnering kon niet worden ingepland. Controleer de gekozen dag en tijd.");
         }
     }
 
     private void cancelWeeklyReminder() {
-        Intent intent = new Intent(this, NotificationReceiver.class);
-        intent.setAction(NotificationReceiver.ACTION_WEEKLY_REMINDER);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this, REMINDER_REQUEST_CODE, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (alarmManager != null) alarmManager.cancel(pendingIntent);
-        pendingIntent.cancel();
+        AlertScheduler.cancelWeekly(this);
     }
 
     private void notifyWebStatus(String message) {
@@ -438,6 +445,31 @@ public class MainActivity extends Activity {
                 cancelWeeklyReminder();
                 notifyWebStatus("Boodschappenherinnering uitgeschakeld.");
             });
+        }
+
+        /** Voorraadmeldingen vervangen door deze lijst (JSON). Een lege lijst "[]" zet ze allemaal uit. */
+        @JavascriptInterface
+        public void setPantryAlerts(String json) {
+            runOnUiThread(() -> {
+                boolean hasAlerts = json != null && json.trim().length() > 2;
+                if (hasAlerts && Build.VERSION.SDK_INT >= 33
+                        && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    pendingPantryAlerts = json;
+                    requestPermissions(
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            NOTIFICATION_PERMISSION_REQUEST
+                    );
+                    return;
+                }
+                AlertScheduler.setPantryAlerts(MainActivity.this, json);
+            });
+        }
+
+        @JavascriptInterface
+        public boolean notificationsAllowed() {
+            return Build.VERSION.SDK_INT < 33
+                    || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
         }
 
         @JavascriptInterface
