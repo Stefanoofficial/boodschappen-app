@@ -6218,6 +6218,10 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
 .productEmojiIcon>span{display:block;font-size:22px;line-height:1;font-style:normal}
 @supports (font-size:1cqh){.productEmojiIcon>span{font-size:84cqh}}
 </style>
+<style id="shared-open-pill">
+.savedListRow.isOpenList>span{flex:1 1 auto!important;min-width:0;text-align:left!important}.savedListRow .sharedOpenPill{flex:0 0 auto;margin-left:8px;margin-right:6px;padding:2px 9px;border-radius:999px;background:#e3efe6;color:#3F5B45;font-size:12px;font-weight:800}
+body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
+</style>
 </head>
 
 <body>
@@ -6615,12 +6619,16 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
   <div id="sharedListsMenuSub" class="familyMenuPage sharedListsMenuPage" style="display:none;">
     <button type="button" class="settingsMenuBack familyListBackButton" onclick="returnToFamilyListFromSharedMenu(event)">
       <span class="familyListBackCircle"><i class="fa-solid fa-chevron-left"></i></span>
-      <span>Familielijst</span>
+      <span>Boodschappenlijst</span>
     </button>
     <div class="familyMenuSubTitle">Gedeelde lijsten</div>
     <button type="button" class="familyMenuItem savedListSaveBtn" onclick="createSharedList()">
       <i class="fa-solid fa-plus"></i>
       <span>Nieuwe lijst</span>
+    </button>
+    <button type="button" class="familyMenuItem savedListSaveBtn" onclick="joinSharedListByCode()">
+      <i class="fa-solid fa-keyboard"></i>
+      <span>Meedoen met een code</span>
     </button>
     <div class="familyMenuSubTitle refreshableMenuTitle"><span>Mijn gedeelde lijsten</span><button type="button" class="silentRefreshBtn" id="refreshSharedListsBtn" aria-label="Gedeelde lijsten verversen" title="Verversen" onclick="refreshSharedListsSilently(event)"><i class="fa-solid fa-rotate"></i></button></div>
     <div id="sharedListsContainer" class="savedListsContainer"></div>
@@ -6632,6 +6640,11 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
       <span>Gedeelde lijsten</span>
     </button>
     <div class="familyMenuSubTitle"><span id="sharedListActiveMenuTitle">Gedeelde lijst</span></div>
+    <button type="button" class="familyMenuItem familyMenuPrimary sharedOpenListBtn" onclick="openActiveSharedList(event)">
+      <i class="fa-solid fa-list-check"></i>
+      <span id="sharedOpenListLabel">Lijst openen</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <button type="button" class="familyMenuItem" onclick="showSharedListMembers()">
       <i class="fa-solid fa-user-group"></i>
       <span>Personen (<span id="sharedMemberCountActive">0</span>)</span>
@@ -6639,10 +6652,6 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
     <button type="button" class="familyMenuItem" onclick="showSharedListCode()">
       <i class="fa-solid fa-key"></i>
       <span>Deelcode</span>
-    </button>
-    <button type="button" class="familyMenuItem" onclick="joinSharedListByCode()">
-      <i class="fa-solid fa-keyboard"></i>
-      <span>Code invoeren</span>
     </button>
   </div>
 
@@ -6980,7 +6989,7 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
-      <p>Maak een aparte lijst voor bijvoorbeeld een feestje. Je kunt deelnemers toevoegen en de lijst samen gebruiken.</p>
+      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Zij tikken op <strong>Meedoen met een code</strong>. Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker heeft een kroontje.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
@@ -8197,6 +8206,7 @@ async function showAccountName() {
     if(!next){ input.focus(); return; }
     try {
       await database.ref("users/" + user.uid + "/name").set(next);
+      __syncMyNameToSharedLists(next);
       __overviewNameCacheUid = user.uid;
       __overviewNameCache = next;
       closeFamilyDialog(overlay);
@@ -10786,6 +10796,32 @@ function makeSharedListLink(code){
   return base + "?code=" + encodeURIComponent(code);
 }
 
+// Eigen naam voor gedeelde lijsten: de naam uit je account (Mijn naam), anders je accountnaam.
+const __NAME_PLACEHOLDER = "Naam niet ingesteld";
+async function __mySharedName(user){
+  let n = "";
+  try { const s = await database.ref("users/" + user.uid + "/name").once("value"); n = String(s.val() || "").trim(); } catch (_) {}
+  if (!n) n = String(user.displayName || "").trim();
+  if (n.includes("@")) n = "";
+  return n;
+}
+// Je naam in al je gedeelde lijsten bijwerken (bijv. nadat je hem bij Mijn naam hebt aangepast).
+async function __syncMyNameToSharedLists(name){
+  const user = auth && auth.currentUser;
+  if (!user) return;
+  name = String(name || "").trim() || (await __mySharedName(user));
+  if (!name) return;
+  try {
+    const idx = await database.ref("userSharedLists/" + user.uid).once("value");
+    const ids = Object.keys(idx.val() || {}).filter(id => (idx.val() || {})[id] === true);
+    await Promise.all(ids.map(id => database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(name).catch(() => {})));
+  } catch (_) {}
+}
+window.openActiveSharedList = function(event){
+  if (event) event.stopPropagation();
+  if (currentSharedListId) openSharedList(currentSharedListId);
+};
+
 async function createSharedList(){
   const user=auth.currentUser;
   if(!user){ await familyAlert("Inloggen vereist","Je bent niet ingelogd.","fa-user"); return; }
@@ -10806,7 +10842,7 @@ async function createSharedList(){
         owner:user.uid,
         inviteCode:candidate,
         members:{[user.uid]:true},
-        memberNames:{[user.uid]: "Naam niet ingesteld"},
+        memberNames:{[user.uid]: (await __mySharedName(user)) || "Naam niet ingesteld"},
         createdAt:Date.now(),
         boodschappen:[]
       };
@@ -10889,6 +10925,11 @@ function __drawSharedRows(box, mine){
     btn.innerHTML='<i class="fa-solid fa-people-group"></i><span></span><i class="fa-solid fa-chevron-right familyMenuArrow"></i>';
     btn.querySelector("span").textContent=v.name||"Gedeelde lijst";
     btn.dataset.sharedListId = id;
+    if (activeListType === "shared" && currentSharedListId === id) {
+      btn.classList.add("isOpenList");
+      const pill=document.createElement("small"); pill.className="sharedOpenPill"; pill.textContent="Open";
+      btn.querySelector("span").after(pill);
+    }
     btn.onclick = async function(){
       const selectedId=this.dataset.sharedListId;
       const user=auth.currentUser;
@@ -11078,12 +11119,17 @@ async function showSharedListMembers(){
     const memberIds=Object.keys(list.members).filter(uid=>list.members[uid]===true).sort((a,b)=>a===ownerUid?-1:b===ownerUid?1:0);
     const names=list.memberNames || {};
     const wrap=document.createElement("div"); wrap.className="familyDialogList";
+    const myName = await __mySharedName(user);
+    if (myName && String(names[user.uid] || "") !== myName) { try { database.ref("sharedLists/" + listId + "/memberNames/" + user.uid).set(myName); } catch (_) {} }
     for(const uid of memberIds){
       let name=String(names[uid]||"").trim();
-      if(!name || name.includes("@")) {
+      if(name===__NAME_PLACEHOLDER || name.includes("@")) name="";
+      if(uid===user.uid) name = myName || name;
+      if(!name) {
         try { const ns=await database.ref("users/"+uid+"/name").once("value"); name=String(ns.val()||"").trim(); } catch(_){}
       }
-      if(!name) name=uid===user.uid ? (user.displayName||"Jij") : "Naam niet ingesteld";
+      if(!name) name=uid===user.uid ? "Jij" : __NAME_PLACEHOLDER;
+      else if(uid===user.uid) name += " (jij)";
       const row=document.createElement("div"); row.className="familyDialogMember";
       row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
       const label=document.createElement("span"); label.textContent=(uid===ownerUid?"👑 ":"👤 ")+name; row.appendChild(label);
@@ -11241,12 +11287,11 @@ async function openSharedList(id, showInvite){
     }
     const activeTitle=document.getElementById("sharedListActiveMenuTitle");
     if(activeTitle) activeTitle.textContent=v.name||"Gedeelde lijst";
-    if (!v.memberNames || !v.memberNames[user.uid]) {
-      let ownName = "";
-      try { const ownNameSnap = await database.ref("users/" + user.uid + "/name").once("value"); ownName = String(ownNameSnap.val() || "").trim(); } catch (_) {}
-      if(!ownName) ownName = String(user.displayName || "").trim();
-      if(!ownName) ownName = "Naam niet ingesteld";
-      try { await database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(ownName); } catch (_) {}
+    {
+      const stored = String((v.memberNames && v.memberNames[user.uid]) || "").trim();
+      let ownName = await __mySharedName(user);
+      if (!ownName) ownName = stored || __NAME_PLACEHOLDER;
+      if (ownName !== stored) { try { await database.ref("sharedLists/" + id + "/memberNames/" + user.uid).set(ownName); } catch (_) {} }
     }
 
     currentSharedListUnsubscribe=database.ref("sharedLists/" + id).on("value",s=>{
