@@ -6249,6 +6249,11 @@ body.dark-theme .pantryNotifyTimes button.on{background:#4f8a62;border-color:#4f
 body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48)!important}
 .familyDialogOverlay.familyDialogShown.familyDialogClosing,.platform-ios .familyDialogOverlay.familyDialogShown.familyDialogClosing,body.dark-theme .familyDialogOverlay.familyDialogShown.familyDialogClosing{background:rgba(22,30,25,0)!important;-webkit-backdrop-filter:blur(0px)!important;backdrop-filter:blur(0px)!important}
 </style>
+<style id="status-icon-size">html body #status i.fa-circle-check{font-size:14px!important;margin-right:6px!important;vertical-align:-1px}</style>
+<style id="history-wipe-style">
+.overviewHistoryWipe{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:6px 0 2px;padding:12px;border:0;border-radius:14px;background:#fdecec;color:#b42318;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+body.dark-theme .overviewHistoryWipe{background:#3d2a28;color:#f0a49c}
+</style>
 </head>
 
 <body>
@@ -6360,7 +6365,7 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
 
   <div class="headerBar">
   <h1>Boodschappenlijst</h1>
-  <script>/* Meteen de naam van de laatst geopende gedeelde lijst tonen (bijv. "BBQ") */try{var __bc=JSON.parse(localStorage.getItem("boodschappenBootCache")||"null");if(__bc&&__bc.type==="shared"&&__bc.sid&&__bc.name&&localStorage.getItem("boodschappenWasLoggedIn")==="1"&&localStorage.getItem("activeSharedListId")===__bc.sid){document.currentScript.previousElementSibling.textContent=__bc.name;}}catch(e){}</script>
+  <script>/* Meteen de naam van de laatst geopende gedeelde lijst tonen (bijv. "BBQ") */try{var __bc=JSON.parse(localStorage.getItem("boodschappenBootCache")||"null");if(__bc&&__bc.type==="shared"&&__bc.sid&&__bc.name&&localStorage.getItem("boodschappenWasLoggedIn")==="1"&&localStorage.getItem("activeSharedListId")===__bc.sid){document.currentScript.previousElementSibling.textContent=__bc.name;window.__bootSharedPending=true;setTimeout(function(){window.__bootSharedPending=false;},12000);}}catch(e){}</script>
     <button type="button" id="mainListTrashButton" class="listOptionsButton mainListTrashButton" onclick="openClearListConfirm(event)" aria-label="Lijst wissen" title="Lijst wissen">
       <i class="fa-solid fa-trash-can"></i>
     </button>
@@ -6915,7 +6920,7 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
       <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.0.0</div>
-      <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je al hebt en gebruik de scanner wanneer je sneller een product wilt toevoegen.</p>
+      <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je in je mandje legt en gebruik de scanner als je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
       <div class="aboutInfoSectionTitle">Wat kun je ermee?</div>
@@ -6932,7 +6937,7 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
       <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-gift"></i><span>Alle Pro-onderdelen zijn tijdelijk gratis.</span></div>
     </div>
-    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span><span>Iconen: <a href="https://fontawesome.com" target="_blank" rel="noopener">Font&nbsp;Awesome</a> <span class="nowrap">(CC&nbsp;BY&nbsp;4.0)</span></span></div>
+    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -6986,7 +6991,7 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
       <h4>Delen met anderen</h4>
       <p>Gegevens uit een gedeelde familie- of boodschappenlijst, en een voorraad die je met je familie deelt, kunnen zichtbaar zijn voor de personen die jij toegang geeft tot die gedeelde lijst. Leden van je familie zien ook je naam, je profielfoto (als je die hebt ingesteld) en of jij Pro hebt.</p>
       <h4>Bewaren en verwijderen</h4>
-      <p>Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen.</p>
+      <p>Je kunt je geschiedenis wissen via <strong>Overzicht → Geschiedenis → Geschiedenis wissen</strong>. Je kunt je account vanuit <strong>Meer → Mijn account → Account verwijderen</strong> verwijderen.</p>
       <h4>Jouw rechten</h4>
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
@@ -7043,7 +7048,8 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
-      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
+      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. </p>
+      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
@@ -7051,11 +7057,11 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis.</p>
+      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis. Wil je alles weghalen? Tik in <strong>Overzicht → Geschiedenis</strong> onderaan op <strong>Geschiedenis wissen</strong> en bevestig.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
-      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld. Onder je lijst tik je op <strong>Meer</strong> om alle producten te zien.</p>
+      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld. Onder je lijst tik je op <strong>Meer</strong> om alle producten te zien. In een gedeelde lijst (zoals een BBQ-lijst) staat het niet onder de lijst.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
@@ -7063,7 +7069,8 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand aanpassen, of via <strong>Andere datum</strong> een dag kiezen in de kalender (veeg opzij voor een andere maand). Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand aanpassen, of via <strong>Andere datum</strong> een dag kiezen in de kalender (veeg opzij voor een andere maand). </p>
+      <p>Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
       <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
     </div>
     <div class="helpSection">
@@ -7089,7 +7096,9 @@ body.dark-theme .familyDialogOverlay.familyDialogShown{background:rgba(0,0,0,.48
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
       <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd.</p>
-      <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten en een tijdstip kiezen. <strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Heeft de app de datum geschat, dan vraagt hij op die dag of je het even wilt checken; tik op <strong>Op</strong> of <strong>Nog goed</strong> (dan vraagt de app het over 3 dagen opnieuw en onthoudt hij dat het langer goed blijft). <strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst. Producten in de vriezer met een geschatte datum geven geen melding.</p>
+      <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten en een tijdstip kiezen.</p>
+      <p><strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Heeft de app de datum geschat, dan vraagt hij op die dag of je het even wilt checken; tik op <strong>Op</strong> of <strong>Nog goed</strong> (dan vraagt de app het over 3 dagen opnieuw en onthoudt hij dat het langer goed blijft). Producten in de vriezer met een geschatte datum geven geen melding.</p>
+      <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
       <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
     </div>
   </div>
@@ -11480,6 +11489,8 @@ async function returnToFamilyListFromSharedMenu(event){
 
   // Deze knop staat bovenaan het Deellijst-menu en moet rechtstreeks naar
   // de gewone boodschappenlijst gaan, niet één niveau terug in het menu.
+  // Ook onthouden: bij het volgende openen van de app start je weer in je eigen lijst.
+  try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
   activeListType="family";
   if(currentSharedListId){ try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){} }
   currentSharedListId=null;
@@ -11515,6 +11526,7 @@ async function returnToFamilyList(event){
   // Shared-list UI verdwijnt direct; er is geen tussenframe met een slide.
   document.querySelectorAll("#deleteSharedListBtn,.sharedDeleteIconButton").forEach(el=>el.remove());
 
+  try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
   activeListType="family";
   if(currentSharedListId){ try{ localStorage.removeItem("sharedListInviteCode:"+currentSharedListId); }catch(_){} }
   currentSharedListId=null;
@@ -11732,7 +11744,8 @@ function familyAlert(title, message, icon="fa-circle-info") {
   });
 }
 
-function familyConfirm(title, message, danger=false) {
+function familyConfirm(title, message, danger=false, opts={}) {
+  opts = opts || {};
   if (message === undefined) {
     message = title;
     title = "Familie";
@@ -11741,11 +11754,11 @@ function familyConfirm(title, message, danger=false) {
   return new Promise(resolve => {
     closeFamilyMenuForDialog();
     const overlay = familyDialogBase(
-      danger ? "fa-right-from-bracket" : "fa-circle-question",
+      opts.icon || (danger ? "fa-right-from-bracket" : "fa-circle-question"),
       title,
       `<div class="familyDialogText">${message}</div>`,
       `<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>
-       <button type="button" class="familyDialogBtn ${danger ? "familyDialogDanger" : "familyDialogPrimary"}">Doorgaan</button>`
+       <button type="button" class="familyDialogBtn ${danger ? "familyDialogDanger" : "familyDialogPrimary"}">${opts.label || "Doorgaan"}</button>`
     );
     const finish=value=>{ closeFamilyDialog(overlay, () => resolve(value)); };
     overlay.querySelector(".familyDialogCancel").addEventListener("click",()=>finish(false));
@@ -12081,8 +12094,10 @@ async function showFamilyMembers() {
 
     if (isOwner) {
       const confirmOwner = await familyConfirm(
-        "Weet je zeker dat je de familie wilt verlaten?\n\n" +
-        "Je bent de hoofdeigenaar. Als je vertrekt, wordt de familie beëindigd en worden alle andere leden losgekoppeld. Zij kunnen daarna zelf een nieuwe familie maken of een andere familiecode gebruiken."
+        "Familie verlaten",
+        "Weet je zeker dat je de familie wilt verlaten?<br><br>" +
+        "Je bent de hoofdpersoon. Als je vertrekt, wordt de familie beëindigd en worden de andere leden losgekoppeld. Zij kunnen daarna zelf een nieuwe familie maken of met een andere code meedoen.",
+        true, { icon: "fa-right-from-bracket", label: "Verlaten" }
       );
       if (!confirmOwner) return;
 
@@ -12101,8 +12116,10 @@ async function showFamilyMembers() {
       await familyAlert("Familie beëindigd", "De familie is beëindigd. Alle familieleden zijn losgekoppeld.", "fa-right-from-bracket");
     } else {
       const confirmMember = await familyConfirm(
-        "Weet je zeker dat je de familie wilt verlaten?\n\n" +
-        "Je wordt losgekoppeld en kunt daarna zelf een nieuwe familie maken of een andere familiecode invoeren."
+        "Familie verlaten",
+        "Weet je zeker dat je de familie wilt verlaten?<br><br>" +
+        "Je wordt losgekoppeld en kunt daarna zelf een nieuwe familie maken of met een andere code meedoen.",
+        true, { icon: "fa-right-from-bracket", label: "Verlaten" }
       );
       if (!confirmMember) return;
 
@@ -12698,6 +12715,7 @@ function toggleRegisterPassword(fieldId, button) {
         } catch (restoreSharedError) {
           console.warn("Gedeelde lijst na vernieuwen herstellen mislukt:", restoreSharedError);
         }
+        window.__bootSharedPending = false;
         const householdId = await householdPromise;
         if (activeListType !== "shared" || currentSharedListId !== rememberedSharedId) {
           try { localStorage.removeItem("activeSharedListId"); } catch (_) {}
@@ -12705,6 +12723,7 @@ function toggleRegisterPassword(fieldId, button) {
           else { localStorage.setItem("boodschappenUseMode_" + user.uid, "private"); await loadPrivateList(); }
         }
       } else {
+        window.__bootSharedPending = false;
         const householdId = await householdPromise;
         if (householdId) {
           activeListType = "family";
@@ -13198,7 +13217,35 @@ async function openShoppingHistoryFromOverview(){
     });
     body.appendChild(card);
   });
+  // Hele geschiedenis wissen (met bevestiging)
+  const wipe=document.createElement("button");
+  wipe.type="button"; wipe.className="overviewHistoryWipe";
+  wipe.innerHTML='<i class="fa-solid fa-trash-can" aria-hidden="true"></i> Geschiedenis wissen';
+  wipe.addEventListener("click",async function(){
+    if(overlay.__closeSheet) overlay.__closeSheet(); else overlay.remove();
+    await new Promise(r=>setTimeout(r,180));
+    const ok=await familyConfirm("Geschiedenis wissen","Weet je zeker dat je je hele geschiedenis wilt wissen? Je eerdere boodschappenrondes verdwijnen dan ook uit Snel opnieuw toevoegen en de tips. Dit kan niet ongedaan worden gemaakt.",true,{icon:"fa-trash-can",label:"Wissen"});
+    if(!ok) return;
+    try{
+      await clearShoppingHistory();
+      await familyAlert("Geschiedenis gewist","Je geschiedenis is gewist.","fa-circle-check");
+    }catch(e){
+      console.error("Geschiedenis wissen mislukt:",e);
+      await familyAlert("Wissen mislukt","De geschiedenis kon niet worden gewist. Controleer je internetverbinding en probeer het opnieuw.","fa-triangle-exclamation");
+    }
+  });
+  body.appendChild(wipe);
   __overviewOpenSheet(overlay);
+}
+
+async function clearShoppingHistory(){
+  const user=(typeof auth!=="undefined" && auth) ? auth.currentUser : null;
+  if(user && typeof database!=="undefined") await database.ref("users/"+user.uid+"/shoppingHistory").remove();
+  try{ localStorage.removeItem(__overviewAccountKey("history")); }catch(_){}
+  try{ __ovHistCache=[]; __ovHistUid=__ovUid(); __ovHistAt=Date.now(); }catch(_){}
+  try{ const sc=JSON.parse(localStorage.getItem("boodschappenStripCache")||"{}"); delete sc.freq; localStorage.setItem("boodschappenStripCache",JSON.stringify(sc)); }catch(_){}
+  try{ if(window.__frequentClear) window.__frequentClear(); }catch(_){}
+  try{ if(typeof updateOverviewDashboard==="function") await updateOverviewDashboard(); }catch(_){}
 }
 
 /* Klikbare onderdelen in het overzicht gebruiken deze functies direct. */
@@ -16426,6 +16473,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   function onListView(){var a=document.querySelector(".app");return a&&!a.classList.contains("overview-active")&&!a.classList.contains("more-active");}
   async function render(){
     var box=document.getElementById("frequentStrip");if(!box)return;
+    // Alleen bij je eigen boodschappenlijst, niet in een gedeelde lijst (zoals "BBQ").
+    try{if((typeof activeListType!=="undefined"&&activeListType==="shared")||window.__bootSharedPending){box.hidden=true;return;}}catch(e){}
     var items=[];try{items=Array.isArray(boodschappen)?boodschappen:[];}catch(e){}
     if(items.length>5){box.hidden=true;return;}
     var all=await load(),have=onList();
@@ -16454,6 +16503,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   var t=null;function later(){clearTimeout(t);t=setTimeout(render,120);}
   window.__frequentRefresh=later;
   window.__frequentInvalidate=function(){cache=null;cacheAt=0;later();};
+  window.__frequentClear=function(){cache=null;cacheAt=0;try{if(saved){delete saved.freq;persist({});}}catch(e){}later();};
   if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);later();return r;};}
   ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){if(typeof window[fn]==="function"){var of=window[fn];window[fn]=function(){var r=of.apply(this,arguments);later();return r;};}});
   window.addEventListener("resize",later);
