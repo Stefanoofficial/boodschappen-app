@@ -6156,6 +6156,54 @@ body.dark-theme .smartPlannerPanel .plannerStatus { color:#a8e0b5 !important; }
   };
 })();
 </script>
+<style id="app-calendar-style">
+.expOther .expNative{pointer-events:none!important}
+.appCalOverlay{position:fixed;inset:0;z-index:100005;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,28,22,.38);opacity:0;transition:opacity .16s ease;-webkit-tap-highlight-color:transparent}
+.appCalOverlay.show{opacity:1}
+.appCal{width:min(360px,100%);box-sizing:border-box;background:#fff;color:#29322c;border-radius:22px;box-shadow:0 18px 45px rgba(0,0,0,.24);padding:16px 14px 14px;transform:translateY(10px) scale(.98);transition:transform .18s cubic-bezier(.22,1,.36,1);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.appCalOverlay.show .appCal{transform:none}
+.appCalHead{display:flex;align-items:center;gap:10px;padding:0 4px 10px}
+.appCalIcon{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#eaf2ec;color:#3F5B45;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.appCalTitles{flex:1;min-width:0}
+.appCalTitle{font-size:16px;font-weight:800;line-height:1.2}
+.appCalSel{font-size:13px;color:#6b7a70;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appCalSel b{color:#3F5B45;font-weight:700}
+.appCalNav{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 8px}
+.appCalMonth{font-size:15px;font-weight:800;color:#344d3b;text-transform:capitalize}
+.appCalArrows{display:flex;gap:6px}
+.appCalArrow{width:36px;height:36px;border:0;border-radius:50%;background:#f1f6f2;color:#3F5B45;font-size:14px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.appCalArrow:active{transform:scale(.94)}
+.appCalArrow:disabled{opacity:.35}
+.appCalWeek,.appCalGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.appCalWeek span{font-size:11px;font-weight:700;color:#8a988f;text-transform:uppercase;letter-spacing:.04em;padding:4px 0 6px}
+.appCalGrid{min-height:calc(6 * 42px + 10px)}
+.appCalDay{height:42px;border:0;background:none;font:inherit;font-size:15px;font-weight:600;color:#29322c;border-radius:50%;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;position:relative;transition:background-color .12s ease,color .12s ease}
+.appCalDay>span{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.appCalDay.past{color:#b7c0ba}
+.appCalDay.today>span{box-shadow:inset 0 0 0 1.5px #3F5B45;color:#3F5B45;font-weight:800}
+.appCalDay.sel>span{background:#3F5B45;color:#fff;box-shadow:none;font-weight:800}
+.appCalDay:active>span{background:#e6efe8}
+.appCalDay.sel:active>span{background:#35503b}
+.appCalEmpty{height:42px}
+.appCalFoot{display:flex;align-items:center;gap:8px;margin-top:10px;padding:0 2px}
+.appCalToday{border:0;background:none;color:#3F5B45;font:inherit;font-size:14px;font-weight:700;padding:8px 6px;cursor:pointer;margin-right:auto}
+.appCalFoot .familyDialogBtn{min-width:96px}
+.appCalFoot .familyDialogPrimary:disabled{opacity:.45}
+body.dark-theme .appCalOverlay{background:rgba(0,0,0,.5)}
+body.dark-theme .appCal{background:#252b26;color:#f1f4f1}
+body.dark-theme .appCalIcon{background:#2f3a32;color:#9fd3ac}
+body.dark-theme .appCalSel{color:#a9b8ae}
+body.dark-theme .appCalSel b{color:#9fd3ac}
+body.dark-theme .appCalMonth{color:#edf5ef}
+body.dark-theme .appCalArrow{background:#2f3a32;color:#cfe6d5}
+body.dark-theme .appCalWeek span{color:#8fa096}
+body.dark-theme .appCalDay{color:#edf5ef}
+body.dark-theme .appCalDay.past{color:#5d6b61}
+body.dark-theme .appCalDay.today>span{box-shadow:inset 0 0 0 1.5px #9fd3ac;color:#9fd3ac}
+body.dark-theme .appCalDay.sel>span{background:#4f8a62;color:#fff}
+body.dark-theme .appCalDay:active>span{background:#33403a}
+body.dark-theme .appCalToday{color:#9fd3ac}
+</style>
 </head>
 
 <body>
@@ -6935,7 +6983,7 @@ body.dark-theme .smartPlannerPanel .plannerStatus { color:#a8e0b5 !important; }
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand of een eigen datum aanpassen. Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand aanpassen, of via <strong>Andere datum</strong> een dag kiezen in de kalender (veeg opzij voor een andere maand). Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
       <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
     </div>
     <div class="helpSection">
@@ -14620,7 +14668,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 })();
 </script>
 <script>document.addEventListener("touchstart",function(){},{passive:true});</script>
-<script>(function(){var stop=function(e){e.preventDefault();};["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,stop,{passive:false});});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});var last=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-last<300&&!(e.target.closest&&e.target.closest("input,textarea,select")))e.preventDefault();last=now;},{passive:false});})();</script>
+<script>(function(){var stop=function(e){e.preventDefault();};["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,stop,{passive:false});});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});var last=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-last<300&&!(e.target.closest&&e.target.closest("input,textarea,select,button,a,label,[role=button],.appCal")))e.preventDefault();last=now;},{passive:false});})();</script>
 
 
 
@@ -16783,6 +16831,91 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   };
   function init(){window.__enhanceExp(document.getElementById("pantryExp"));}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script id="app-calendar">
+/* Eigen kalender van de app (in plaats van de datumkiezer van de telefoon).
+   window.openAppCalendar({value:"2026-10-28", title:"Houdbaar tot"}) geeft een Promise met de gekozen datum ("JJJJ-MM-DD") of null bij annuleren. */
+(function(){
+  var MONTHS=["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
+  var WD=["ma","di","wo","do","vr","za","zo"],DAYS=["zo","ma","di","wo","do","vr","za"],MON=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+  function pad(n){return (n<10?"0":"")+n;}
+  function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+  function parse(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+  function today(){var d=new Date();d.setHours(0,0,0,0);return d;}
+  function rel(d){var n=Math.round((d-today())/86400000);
+    if(n===0)return "vandaag";if(n===1)return "morgen";if(n===-1)return "gisteren";
+    if(n<0)return (-n)+" dagen geleden";if(n<14)return "over "+n+" dagen";if(n<60)return "over "+Math.round(n/7)+" weken";return "over "+Math.round(n/30)+" maanden";}
+  window.openAppCalendar=function(opts){
+    opts=opts||{};
+    return new Promise(function(resolve){
+      var sel=parse(opts.value),t=today();
+      var view=new Date((sel||t).getFullYear(),(sel||t).getMonth(),1);
+      var ov=document.createElement("div");ov.className="appCalOverlay";
+      ov.innerHTML='<div class="appCal" role="dialog" aria-modal="true" aria-label="Datum kiezen">'+
+        '<div class="appCalHead"><span class="appCalIcon" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span><div class="appCalTitles"><div class="appCalTitle"></div><div class="appCalSel" aria-live="polite"></div></div></div>'+
+        '<div class="appCalNav"><div class="appCalMonth"></div><div class="appCalArrows"><button type="button" class="appCalArrow" data-m="-1" aria-label="Vorige maand"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="appCalArrow" data-m="1" aria-label="Volgende maand"><i class="fa-solid fa-chevron-right"></i></button></div></div>'+
+        '<div class="appCalWeek">'+WD.map(function(w){return "<span>"+w+"</span>";}).join("")+'</div>'+
+        '<div class="appCalGrid" role="grid"></div>'+
+        '<div class="appCalFoot"><button type="button" class="appCalToday">Vandaag</button><button type="button" class="familyDialogBtn familyDialogCancel" data-b="cancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="ok">Kiezen</button></div>'+
+        '</div>';
+      ov.querySelector(".appCalTitle").textContent=opts.title||"Kies een datum";
+      var grid=ov.querySelector(".appCalGrid"),month=ov.querySelector(".appCalMonth"),selEl=ov.querySelector(".appCalSel"),ok=ov.querySelector('[data-b="ok"]');
+      function draw(){
+        month.textContent=MONTHS[view.getMonth()]+" "+view.getFullYear();
+        var first=(view.getDay()+6)%7,days=new Date(view.getFullYear(),view.getMonth()+1,0).getDate(),h="";
+        for(var i=0;i<first;i++)h+='<span class="appCalEmpty"></span>';
+        for(var d=1;d<=days;d++){
+          var dt=new Date(view.getFullYear(),view.getMonth(),d),c="appCalDay";
+          if(dt<t)c+=" past";if(+dt===+t)c+=" today";if(sel&&+dt===+sel)c+=" sel";
+          h+='<button type="button" class="'+c+'" data-d="'+iso(dt)+'" aria-label="'+DAYS[dt.getDay()]+" "+d+" "+MONTHS[dt.getMonth()]+'"'+(sel&&+dt===+sel?' aria-pressed="true"':'')+'><span>'+d+'</span></button>';
+        }
+        grid.innerHTML=h;
+        selEl.innerHTML=sel?'<b>'+DAYS[sel.getDay()]+" "+sel.getDate()+" "+MON[sel.getMonth()]+" "+sel.getFullYear()+'</b> · '+rel(sel):"Tik op een dag";
+        ok.disabled=!sel;
+      }
+      function go(n){view=new Date(view.getFullYear(),view.getMonth()+n,1);draw();}
+      var done=false;
+      function close(v){if(done)return;done=true;ov.classList.remove("show");setTimeout(function(){ov.remove();},170);document.removeEventListener("keydown",key,true);resolve(v);}
+      function key(e){if(e.key==="Escape"){e.preventDefault();close(null);}}
+      ["click","pointerdown","touchstart","mousedown"].forEach(function(ev){ov.addEventListener(ev,function(e){e.stopPropagation();});});
+      ov.addEventListener("click",function(e){
+        if(e.target===ov){close(null);return;}
+        var b=e.target.closest("button");if(!b)return;
+        if(b.dataset.m){go(+b.dataset.m);return;}
+        if(b.dataset.d){sel=parse(b.dataset.d);draw();return;}
+        if(b.classList.contains("appCalToday")){sel=today();view=new Date(sel.getFullYear(),sel.getMonth(),1);draw();return;}
+        if(b.dataset.b==="cancel"){close(null);return;}
+        if(b.dataset.b==="ok"&&sel){close(iso(sel));}
+      });
+      // Vegen naar links/rechts = andere maand
+      var sx=null,sy=0;
+      ov.addEventListener("touchstart",function(e){var p=e.touches[0];sx=p.clientX;sy=p.clientY;},{passive:true});
+      ov.addEventListener("touchend",function(e){if(sx===null)return;var p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)go(dx<0?1:-1);},{passive:true});
+      document.addEventListener("keydown",key,true);
+      draw();document.body.appendChild(ov);
+      requestAnimationFrame(function(){ov.classList.add("show");});
+    });
+  };
+  // "Andere datum" opent voortaan deze kalender, ook in Meerdere toevoegen en Bewerken.
+  var setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
+  document.addEventListener("click",function(e){
+    var chip=e.target&&e.target.closest&&e.target.closest(".expOther");if(!chip)return;
+    var input=chip.querySelector("input.expNative");if(!input)return;
+    e.preventDefault();
+    var title="Houdbaar tot";
+    try{var row=chip.closest(".maRow");var nm=row&&row.querySelector(".maName");if(nm&&nm.textContent)title="Houdbaar tot · "+nm.textContent.trim();}catch(_){}
+    window.openAppCalendar({value:input.value,title:title}).then(function(v){
+      if(!v||!input.isConnected)return;
+      if(input.value===v)return;
+      if(input.dataset)delete input.dataset.est;
+      try{input.value=v;}catch(_){setter.call(input,v);}
+      input.dispatchEvent(new Event("input",{bubbles:true}));input.dispatchEvent(new Event("change",{bubbles:true}));
+    });
+  },true);
+  function lock(root){(root||document).querySelectorAll("input.expNative").forEach(function(i){i.tabIndex=-1;i.setAttribute("aria-hidden","true");});}
+  new MutationObserver(function(){lock();}).observe(document.documentElement,{childList:true,subtree:true});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){lock();});else lock();
 })();
 </script>
 <script id="prefetch-lists">
