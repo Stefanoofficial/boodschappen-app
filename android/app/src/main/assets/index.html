@@ -6135,6 +6135,27 @@ body.dark-theme .smartPlannerPanel .plannerMealRow p { color:#c0cec4 !important;
 body.dark-theme .smartPlannerPanel .plannerStatus { color:#a8e0b5 !important; }
 
 </style>
+<script id="recipe-photo-names">
+/* Receptfoto's: de app vindt de foto ook als hij eindigt op .JPG, .jpg, .JPEG of .png
+   (een iPhone bewaart foto's vaak als .JPG). De gevonden naam wordt onthouden. */
+(function(){
+  var EXT=[".jpeg",".JPG",".jpg",".JPEG",".png",".PNG"],ok={};
+  try{ok=JSON.parse(localStorage.getItem("recipePhotoExt")||"{}")||{};}catch(e){}
+  function base(src){return String(src||"").replace(/\.(jpe?g|png)$/i,"");}
+  window.__recipeImgSrc=function(src){var b=base(src);return ok[b]?b+ok[b]:src;};
+  window.__recipeImgFallback=function(img){
+    var b=img.getAttribute("data-base")||base(img.getAttribute("src"));img.setAttribute("data-base",b);
+    var tried=(img.getAttribute("data-tried")||"").split("|").filter(Boolean);
+    var cur=img.getAttribute("src").slice(b.length);if(tried.indexOf(cur)<0)tried.push(cur);
+    if(ok[b]===cur){delete ok[b];}
+    var next=EXT.filter(function(e){return tried.indexOf(e)<0;})[0];
+    if(!next){img.remove();return;}
+    img.setAttribute("data-tried",tried.join("|"));
+    img.onload=function(){if(ok[b]!==next){ok[b]=next;try{localStorage.setItem("recipePhotoExt",JSON.stringify(ok));}catch(e){}}};
+    img.src=b+next;
+  };
+})();
+</script>
 </head>
 
 <body>
@@ -14365,7 +14386,7 @@ window.renderRecipeCatalog=function(){
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
  const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
  const __shown=__lim?found.slice(0,3):found;
- box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" loading="lazy" onerror="this.remove()"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" loading="lazy" onerror="__recipeImgFallback(this)"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -14375,7 +14396,7 @@ window.openRecipeSheet=function(id){
  const steps=Array.isArray(r.steps)?r.steps:[r.steps];
  ov.innerHTML='<div class="recipeSheetPanel" role="dialog" aria-modal="true" aria-label="'+esc(r.name)+'">'
  +'<button type="button" class="recipeSheetClose" onclick="closeRecipeSheet()" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button>'
- +'<div class="recipeSheetHero"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||"🍽️")+'</span><img src="'+r.img+'" alt="'+esc(r.name)+'" onerror="this.remove()"></div>'
+ +'<div class="recipeSheetHero"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||"🍽️")+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" onerror="__recipeImgFallback(this)"></div>'
  +'<div class="recipeSheetBody"><h3>'+esc(r.name)+'</h3>'
  +'<p class="rsMeta">⏱ '+r.time+' min · 👥 <span class="rsServMeta">'+defServ(r)+'</span> porties</p>'
  +'<div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('')+'</div>'
