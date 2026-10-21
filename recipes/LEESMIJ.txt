@@ -1,0 +1,35 @@
+Zet hier de receptfoto's neer (JPEG, liggend 16:10, ongeveer 1200x750 px en 150-250 KB).
+De bestandsnaam moet exact zijn:
+
+tomato-pasta.jpeg       Pasta met tomaat en basilicum
+veggie-wraps.jpeg       Groentewraps met bonen
+fried-rice.jpeg         Gebakken rijst met ei
+potato-carrot.jpeg      Aardappel-wortelstamppot
+chickpea-curry.jpeg     Milde kikkererwtencurry
+salmon-veg.jpeg         Ovenschotel met zalm en groente
+lentil-soup.jpeg        Tomaten-linzensoep
+chicken-traybake.jpeg   Kip met paprika uit de oven
+pesto-pasta.jpeg        Pasta pesto met spinazie
+bean-chili.jpeg         Snelle chili sin carne
+omelette.jpeg           Groenteomelet met brood
+couscous.jpeg           Couscous met geroosterde groente
+boerenkool-worst.jpeg   Boerenkoolstamppot met rookworst
+pancakes.jpeg           Hollandse pannenkoeken
+witlof-ham.jpeg         Witlof met ham en kaas uit de oven
+hutspot.jpeg            Hutspot met draadjesvlees
+andijvie-spek.jpeg      Andijviestamppot met spekjes
+erwtensoep.jpeg         Erwtensoep (snert)
+kip-kerrie.jpeg         Kip-kerrie met rijst
+carbonara.jpeg          Pasta carbonara
+kip-wraps.jpeg          Wraps met kip en guacamole
+nasi-goreng.jpeg        Nasi goreng met ei
+groene-curry.jpeg       Thaise groene curry met kip
+lasagne.jpeg            Lasagne
+shakshuka.jpeg          Shakshuka
+kibbeling-bowl.jpeg     Kibbeling-bowl met friet
+zalm-teriyaki.jpeg      Zalm teriyaki met rijst
+macaroni.jpeg           Macaroni met ham en kaas
+turkse-pizza.jpeg       Pizza's op Turks brood
+gehaktballen.jpeg       Gehaktballen in jus
+
+Ontbreekt een foto, dan toont de app automatisch een emoji op een groene achtergrond.
