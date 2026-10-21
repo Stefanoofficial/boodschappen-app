@@ -6222,6 +6222,23 @@ body.dark-theme .proFreeBadge i{color:#f3c35a}
 .savedListRow.isOpenList>span{flex:1 1 auto!important;min-width:0;text-align:left!important}.savedListRow .sharedOpenPill{flex:0 0 auto;margin-left:8px;margin-right:6px;padding:2px 9px;border-radius:999px;background:#e3efe6;color:#3F5B45;font-size:12px;font-weight:800}
 body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
 </style>
+<style id="pantry-notify-style">
+.pantryNotifyBlock{margin-top:18px;padding-top:16px;border-top:1px solid #e1ece4}
+.pantryNotifyHead{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:#3F5B45}
+.pantryNotifyHead i{width:30px;height:30px;border-radius:10px;background:#e3f2e7;color:#4f7658;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.pantryNotifyHead .aboutProBadge{margin-left:2px}
+.pantryNotifyDesc{font-size:13px;line-height:1.45;opacity:.76;margin:6px 0 4px}
+body.dark-theme .pantryNotifyHead{color:#cfe6d5}
+body.dark-theme .pantryNotifyHead i{background:#2f3a32;color:#9fd3ac}
+.pantryNotifyBlock .notificationSwitchRow + .notificationSwitchRow{border-top:0}
+.pantryNotifyTimes{display:flex;flex-wrap:wrap;gap:6px}
+.pantryNotifyTimes button{min-height:36px;min-width:50px;padding:0 9px;border:1px solid #d5e4d9;border-radius:999px;background:#f4f8f5;color:#3f6b4b;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.pantryNotifyTimes button.on{background:#3F5B45;border-color:#3F5B45;color:#fff}
+.pantryNotifyBlock.off .pantryNotifyTimes{opacity:.5}
+body.dark-theme .pantryNotifyBlock{border-top-color:#33403a}
+body.dark-theme .pantryNotifyTimes button{background:#25302a;border-color:#3c4b40;color:#cfe6d5}
+body.dark-theme .pantryNotifyTimes button.on{background:#4f8a62;border-color:#4f8a62;color:#fff}
+</style>
 </head>
 
 <body>
@@ -6602,7 +6619,7 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
 
     <div class="familyMenuItem" onclick="enterFamilyCode()">
       <i class="fa-solid fa-keyboard"></i>
-      <span>Code invoeren</span>
+      <span>Meedoen met een code</span>
     </div>
 
     <div class="familyMenuItem" onclick="createNewFamily()">
@@ -6782,9 +6799,35 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
         </div>
       </div>
 
+      <div class="pantryNotifyBlock" id="pantryNotifyBlock">
+        <div class="pantryNotifyHead"><i class="fa-solid fa-cube" aria-hidden="true"></i><span>Voorraad</span><b class="aboutProBadge">PRO</b></div>
+        <div class="pantryNotifyDesc">Een seintje als iets bijna over de datum is of bijna op.</div>
+        <label class="notificationSwitchRow">
+          <span>
+            <strong>Bijna over de datum</strong>
+            <small>De dag ervoor. Is de datum geschat, dan vraagt de app of je het even wilt checken.</small>
+          </span>
+          <input type="checkbox" id="pantryNotifyExp" onchange="savePantryNotifySettings()">
+        </label>
+        <label class="notificationSwitchRow pantryNotifyLowRow">
+          <span>
+            <strong>Bijna op</strong>
+            <small>Als je minder hebt dan je minimum. Met één tik zet je het op je lijst.</small>
+          </span>
+          <input type="checkbox" id="pantryNotifyLow" onchange="savePantryNotifySettings()">
+        </label>
+        <div class="notificationField">
+          <label>Tijdstip</label>
+          <div class="pantryNotifyTimes" id="pantryNotifyTimes" role="radiogroup" aria-label="Tijdstip voor voorraadmeldingen">
+            <button type="button" data-t="08:00">8:00</button><button type="button" data-t="09:00">9:00</button><button type="button" data-t="12:00">12:00</button><button type="button" data-t="17:00">17:00</button><button type="button" data-t="20:00">20:00</button>
+          </div>
+        </div>
+        <div id="pantryNotifyStatus" class="notificationSettingsStatus" aria-live="polite"></div>
+      </div>
+
       <div class="notificationInfo">
         <strong>Over deze functie</strong>
-        <p>De herinnering wordt op je telefoon zelf ingesteld. Je hebt er geen internet voor nodig.</p>
+        <p>Meldingen worden op je telefoon zelf ingesteld. Je hebt er geen internet voor nodig.</p>
         <p>Krijg je geen melding? Controleer dan of meldingen voor Mijn Boodschappen aan staan in de instellingen van je telefoon.</p>
       </div>
     </div>
@@ -6874,7 +6917,7 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
       <div class="aboutInfoLine"><i class="fa-solid fa-bolt"></i><span>Producten die je vaak koopt snel opnieuw toevoegen.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Maaltijden plannen met de weekplanner en 30 recepten (van stamppot tot curry), voor het aantal personen dat jij kiest. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Je weekbudget per winkel bijhouden en aanbiedingen op je lijst zetten. <b class="aboutProBadge">PRO</b></span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie, met een melding als iets bijna over de datum of bijna op is (Android). <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-gift"></i><span>Alle Pro-onderdelen zijn tijdelijk gratis.</span></div>
     </div>
@@ -6917,7 +6960,7 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen. Zet je een aanbieding op je lijst, dan worden de prijs, de actie en de einddatum bij dat product bewaard.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
         <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen supermarkt en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
-        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
+        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard. Zet je voorraadmeldingen aan, dan plant de Android-app die op je telefoon zelf in, met de namen van de producten in de melding; daarvoor wordt niets naar een server gestuurd. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
@@ -6985,11 +7028,11 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
-      <p>Via Mijn familie kun je een nieuwe familie maken of met een familiecode meedoen met een bestaande familie. Je kunt de app ook gewoon alleen gebruiken.</p>
+      <p>Via <strong>Mijn familie</strong> maak je een nieuwe familie, of doe je met <strong>Meedoen met een code</strong> mee met een bestaande familie. Bij <strong>Familielid</strong> zie je wie erbij hoort; de hoofdpersoon staat bovenaan. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
-      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Zij tikken op <strong>Meedoen met een code</strong>. Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker heeft een kroontje.</p>
+      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet; de maker heeft een kroontje.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
@@ -7033,9 +7076,10 @@ body.dark-theme .savedListRow .sharedOpenPill{background:#2f3a32;color:#9fd3ac}
       <p>Ga naar <strong>Meer → Mijn account → Profielfoto</strong> en tik op <strong>Foto kiezen</strong>. Verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Je familieleden zien je foto bij <strong>Mijn familie</strong>. Via hetzelfde scherm kun je de foto ook weer verwijderen. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Boodschappenherinnering instellen</span></div>
-      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. </p>
-      <p id="helpReminderPlatform">De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
+      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd.</p>
+      <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten en een tijdstip kiezen. <strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Heeft de app de datum geschat, dan vraagt hij op die dag of je het even wilt checken; tik op <strong>Op</strong> of <strong>Nog goed</strong> (dan vraagt de app het over 3 dagen opnieuw en onthoudt hij dat het langer goed blijft). <strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst. Producten in de vriezer met een geschatte datum geven geen melding.</p>
+      <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
     </div>
   </div>
 </div>
@@ -11045,7 +11089,6 @@ async function showSharedListCode(){
   currentSharedListInviteCode=code;
   try{ localStorage.setItem("sharedListInviteCode:"+currentSharedListId,code); }catch(_){}
 
-  const link=makeSharedListLink(code);
 
   const overlay=familyDialogBase(
     "fa-link",
@@ -11055,7 +11098,6 @@ async function showSharedListCode(){
        <div class="sharedListInviteCode" id="sharedCodeDisplay">${code}</div>
        <div class="sharedListActionRow">
          <button type="button" class="sharedListAction" id="copyCurrentSharedCode">📋 Kopiëren</button>
-         <button type="button" class="sharedListAction sharedListShareButton" id="shareCurrentSharedLink">🔗 Deellink</button>
        </div>
      </div>`,
     `<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeCurrentSharedCode">Sluiten</button>`
@@ -11086,23 +11128,6 @@ async function showSharedListCode(){
     copyText(code,"De deelcode is gekopieerd.");
   };
 
-  overlay.querySelector("#shareCurrentSharedLink").onclick=async()=>{
-    try{
-      if(navigator.share){
-        await navigator.share({
-          title:list.name || "Gedeelde lijst",
-          text:"Doe mee met deze gedeelde lijst",
-          url:link
-        });
-      }else{
-        await copyText(link,"Deellink is gekopieerd.");
-      }
-    }catch(e){
-      if(e && e.name==="AbortError") return;
-      await copyText(link,"Deellink is gekopieerd.");
-    }
-  };
-
   overlay.querySelector("#closeCurrentSharedCode").onclick=()=>{
     closeFamilyDialog(overlay);
   };
@@ -11121,22 +11146,22 @@ async function showSharedListMembers(){
     const wrap=document.createElement("div"); wrap.className="familyDialogList";
     const myName = await __mySharedName(user);
     if (myName && String(names[user.uid] || "") !== myName) { try { database.ref("sharedLists/" + listId + "/memberNames/" + user.uid).set(myName); } catch (_) {} }
+    // Foto's: alleen van jezelf en je familieleden zijn ze leesbaar; anderen krijgen hun eerste letter.
+    const infos = {};
+    await Promise.all(memberIds.map(uid => __personInfo(uid).then(r => { infos[uid] = r; }).catch(() => {})));
     for(const uid of memberIds){
       let name=String(names[uid]||"").trim();
       if(name===__NAME_PLACEHOLDER || name.includes("@")) name="";
       if(uid===user.uid) name = myName || name;
-      if(!name) {
-        try { const ns=await database.ref("users/"+uid+"/name").once("value"); name=String(ns.val()||"").trim(); } catch(_){}
-      }
+      if(!name) name = (infos[uid] && infos[uid].name) || "";
       if(!name) name=uid===user.uid ? "Jij" : __NAME_PLACEHOLDER;
       else if(uid===user.uid) name += " (jij)";
-      const row=document.createElement("div"); row.className="familyDialogMember";
-      row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
-      const label=document.createElement("span"); label.textContent=(uid===ownerUid?"👑 ":"👤 ")+name; row.appendChild(label);
+      const row = __personRow({ name, photo: (infos[uid] && infos[uid].photo) || "", subtitle: uid===ownerUid ? "Maker van de lijst" : "Doet mee" });
       if(user.uid===ownerUid && uid!==ownerUid){
         const btn=document.createElement("button"); btn.type="button"; btn.className="familyDialogBtn familyDialogRemove"; btn.textContent="Verwijderen";
+        const plain = name;
         btn.addEventListener("click",async()=>{
-          const confirmed = await familyConfirm("Lid verwijderen", "Wil je " + name + " uit deze gedeelde lijst verwijderen?", true);
+          const confirmed = await familyConfirm("Lid verwijderen", "Wil je " + plain + " uit deze gedeelde lijst verwijderen?", true);
           if (!confirmed) return;
           try{
             const updates={};
@@ -11146,7 +11171,7 @@ async function showSharedListMembers(){
             await database.ref().update(updates);
             closeFamilyDialog(row.closest(".familyDialogOverlay"));
             await showSharedListMembers();
-            await familyAlert("Lid verwijderd",name+" heeft geen toegang meer tot deze gedeelde lijst.","fa-user-check");
+            await familyAlert("Lid verwijderd",plain+" heeft geen toegang meer tot deze gedeelde lijst.","fa-user-check");
           }catch(e){
             console.error("Lid verwijderen mislukt:",e);
             await familyAlert("Verwijderen mislukt","Je hebt geen toestemming om dit te verwijderen.","fa-triangle-exclamation");
@@ -11155,6 +11180,12 @@ async function showSharedListMembers(){
         row.appendChild(btn);
       }
       wrap.appendChild(row);
+      if (uid === ownerUid && memberIds.length > 1) {
+        const separator = document.createElement("div");
+        separator.setAttribute("aria-hidden", "true");
+        separator.style.cssText = "height:1px;background:rgba(63,91,69,.13);margin:8px 8px 10px";
+        wrap.appendChild(separator);
+      }
     }
     const overlay=familyDialogBase("fa-user-group","Personen","",'<button type="button" class="familyDialogBtn familyDialogPrimary" id="closeSharedMembers">Sluiten</button>');
     overlay.querySelector(".familyDialogBody").replaceChildren(wrap);
@@ -11313,12 +11344,8 @@ async function openSharedList(id, showInvite){
       updateSharedMemberCount(data);
     });
     if(showInvite){
-      const link=makeSharedListLink(v.inviteCode);
-      const overlay=familyDialogBase("fa-people-group",v.name||"Gedeelde lijst",`<div class="familyDialogText">Deel deze code of link met anderen.</div><div class="sharedListInviteBox"><div>Deelcode</div><div class="sharedListInviteCode">${v.inviteCode}</div><div class="sharedListActionRow"><button type="button" class="sharedListAction" id="copySharedCode">📋 Kopiëren</button><button type="button" class="sharedListAction" id="copySharedLink">🔗 Link kopiëren</button></div></div>`,`<button type="button" class="familyDialogBtn familyDialogPrimary">Openen</button>`);
-      const copy=async(text,msg)=>{try{await navigator.clipboard.writeText(text);await familyAlert("Gekopieerd",msg,"fa-check");}catch(e){await familyAlert("Kopiëren","Kopiëren wordt niet ondersteund op dit apparaat. Gebruik de code: "+text,"fa-copy");}};
-      overlay.querySelector("#copySharedCode").onclick=()=>copy(v.inviteCode,"De code is gekopieerd.");
-      overlay.querySelector("#copySharedLink").onclick=()=>copy(link,"De link is gekopieerd.");
-      overlay.querySelector(".familyDialogPrimary").onclick=()=>closeFamilyDialog(overlay);
+      // Zelfde Deelcode-venster als in het menu (code kopiëren of een bericht met de code delen).
+      setTimeout(()=>{ try{ showSharedListCode(); }catch(_){} },250);
     }
   } catch(error) {
     console.error("Deellijst openen mislukt:", error);
@@ -11746,6 +11773,73 @@ function familyPrompt(title, message, icon="fa-keyboard", initial="") {
     setTimeout(()=>input.focus(),30);
   });
 }
+// Namen en profielfoto's van familieleden/deelnemers onthouden (alleen in het geheugen),
+// zodat Familielid en Personen meteen openen. Ophalen gebeurt parallel.
+const __people = {};
+let __hhCache = { id: null, data: null };
+function __personInfo(uid, fresh) {
+  const c = __people[uid];
+  if (c && c.done && !fresh) return Promise.resolve(c);
+  if (c && c.p) return c.p;
+  const p = Promise.all([
+    database.ref("users/" + uid + "/name").once("value").then(s => String(s.val() || "").trim()).catch(() => ""),
+    database.ref("users/" + uid + "/photoURL").once("value").then(s => String(s.val() || "")).catch(() => "")
+  ]).then(([name, photo]) => { const r = { name, photo, done: true }; __people[uid] = r; return r; });
+  __people[uid] = Object.assign({}, c || {}, { p });
+  return p;
+}
+async function __household(fresh) {
+  if (!currentHouseholdId) return {};
+  if (!fresh && __hhCache.id === currentHouseholdId && __hhCache.data) {
+    __household(true).catch(() => {});
+    return __hhCache.data;
+  }
+  const id = currentHouseholdId;
+  const snap = await database.ref("households/" + id).once("value");
+  const data = snap.val() || {};
+  if (currentHouseholdId === id) __hhCache = { id, data };
+  return data;
+}
+window.__prefetchPeople = function () {
+  try {
+    const user = auth && auth.currentUser; if (!user) return;
+    __personInfo(user.uid);
+    if (currentHouseholdId) __household(true).then(h => Object.keys(h.members || {}).forEach(u => __personInfo(u))).catch(() => {});
+  } catch (_) {}
+};
+function __personRow(o) {
+  const row = document.createElement("div");
+  row.className = "familyDialogMember";
+  row.style.cssText = "display:flex;align-items:center;justify-content:flex-start";
+  const avatar = document.createElement("div");
+  avatar.style.cssText = "width:54px;height:54px;flex:0 0 54px;border-radius:50%;overflow:hidden;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800";
+  if (o.photo) {
+    const img = document.createElement("img");
+    img.src = o.photo; img.alt = "Profielfoto van " + o.name;
+    img.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;border-radius:50%";
+    img.onerror = () => { avatar.replaceChildren(); avatar.textContent = (o.name || "?").trim().charAt(0).toUpperCase(); };
+    avatar.appendChild(img);
+  } else {
+    const first = (o.name || "").replace(/\s*\(jij\)$/, "").trim().charAt(0).toUpperCase();
+    if (first && /[A-Z0-9À-Ý]/.test(first)) avatar.textContent = first;
+    else avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+  }
+  row.appendChild(avatar);
+  const label = document.createElement("div");
+  label.style.cssText = "flex:1;min-width:0;display:flex;flex-direction:column;gap:3px";
+  const nameLine = document.createElement("span");
+  nameLine.style.cssText = "font-weight:600;line-height:1.3";
+  nameLine.textContent = o.name;
+  if (o.isPro) { const b = document.createElement("b"); b.className = "aboutProBadge familyProBadge"; b.textContent = "PRO"; nameLine.appendChild(b); }
+  label.appendChild(nameLine);
+  const sub = document.createElement("span");
+  sub.style.cssText = "font-size:13px;line-height:1.3;color:var(--muted,#6f7d73)";
+  sub.textContent = o.subtitle || "";
+  label.appendChild(sub);
+  row.appendChild(label);
+  return row;
+}
+
 async function showFamilyMembers() {
   const user = auth.currentUser;
   if (!user) return;
@@ -11756,9 +11850,7 @@ async function showFamilyMembers() {
     let members = {};
     let ownerUid = user.uid;
     if (currentHouseholdId) {
-      const ref = database.ref("households/" + currentHouseholdId);
-      const snap = await ref.once("value");
-      household = snap.val() || {};
+      household = await __household();
       members = household.members || {};
       ownerUid = String(household.owner || user.uid);
     } else {
@@ -11767,9 +11859,11 @@ async function showFamilyMembers() {
     const ids = Object.keys(members).filter(uid => members[uid] === true).sort((a, b) => a === ownerUid ? -1 : b === ownerUid ? 1 : 0);
     const wrap = document.createElement("div");
     wrap.className = "familyDialogList";
+    const infos = {};
+    await Promise.all(ids.map(uid => __personInfo(uid).then(r => { infos[uid] = r; })));
+    ids.forEach(uid => __personInfo(uid, true).catch(() => {}));
     for (const uid of ids) {
-      let name = "";
-      try { const ns = await database.ref("users/" + uid + "/name").once("value"); name = String(ns.val() || "").trim(); } catch (_) {}
+      let name = (infos[uid] && infos[uid].name) || "";
       if (!name) name = uid === user.uid ? (user.displayName || "Jij") : "Onbekend";
       const row = document.createElement("div");
       row.className = "familyDialogMember";
@@ -11779,8 +11873,7 @@ async function showFamilyMembers() {
       row.style.justifyContent = "flex-start";
       const avatar = document.createElement("div");
       avatar.style.cssText = "width:54px;height:54px;flex:0 0 54px;border-radius:50%;overflow:hidden;background:#dff5df;color:#3F5B45;display:flex;align-items:center;justify-content:center;font-size:18px";
-      let photoURL = "";
-      try { const ps = await database.ref("users/" + uid + "/photoURL").once("value"); photoURL = String(ps.val() || ""); } catch (_) {}
+      let photoURL = (infos[uid] && infos[uid].photo) || "";
       if (photoURL) {
         const img = document.createElement("img");
         img.src = photoURL; img.alt = "Profielfoto van " + name;
@@ -14442,17 +14535,17 @@ document.addEventListener('visibilitychange',function(){
   const info = document.querySelector(".notificationInfo");
   const helpReminderPlatform = document.getElementById("helpReminderPlatform");
   if (isIOS && helpReminderPlatform) {
-    helpReminderPlatform.textContent = "Op de iPhone is de boodschappenherinnering nog niet beschikbaar. Deze functie werkt nu alleen in de Android-app.";
+    helpReminderPlatform.textContent = "Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken nu alleen in de Android-app.";
   } else if (helpReminderPlatform) {
-    helpReminderPlatform.textContent = "De geplande herinnering werkt in de Android-app als een lokale melding op je telefoon.";
+    helpReminderPlatform.textContent = "Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.";
   }
   if (isIOS) {
     const testButton = document.querySelector(".notificationTestButton");
     if (testButton) testButton.setAttribute("aria-label", "Testmelding voor iPhone");
     if (info) {
       const paragraphs = info.querySelectorAll("p");
-      if (paragraphs[0]) paragraphs[0].textContent = "Op de iPhone is de boodschappenherinnering nog niet beschikbaar. Deze functie werkt nu alleen in de Android-app.";
-      if (paragraphs[1]) paragraphs[1].textContent = "We werken eraan om herinneringen ook op de iPhone mogelijk te maken.";
+      if (paragraphs[0]) paragraphs[0].textContent = "Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken nu alleen in de Android-app.";
+      if (paragraphs[1]) paragraphs[1].textContent = "We werken eraan om meldingen ook op de iPhone mogelijk te maken.";
     }
     const status = document.getElementById("notificationSettingsStatus");
     if (status && /Android-app/i.test(status.textContent)) {
@@ -17055,6 +17148,180 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){lock();});else lock();
 })();
 </script>
+<script id="pantry-notify">
+/* Voorraadmeldingen (Android-app): "Bijna over de datum" en "Bijna op".
+   De app rekent uit wanneer welke melding moet komen en geeft die lijst aan de telefoon
+   (AndroidApp.setPantryAlerts). De telefoon zet daarvoor wekkers; er is geen server nodig.
+   Tikken op een melding of een knop ("Op", "Nog goed", "Op mijn lijst") komt hier binnen via
+   window.__onNativeNotification(actie, ids). */
+(function(){
+  var KEY="boodschappenPantryNotify", LOW_SENT="boodschappenPantryLowSent";
+  var DAY=86400000;
+  function get(){try{var s=JSON.parse(localStorage.getItem(KEY)||"{}")||{};return {exp:!!s.exp,low:!!s.low,time:/^\d\d:\d\d$/.test(s.time||"")?s.time:"09:00"};}catch(e){return {exp:false,low:false,time:"09:00"};}}
+  function put(s){try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+  function native(){return !!(window.AndroidApp&&typeof window.AndroidApp.setPantryAlerts==="function");}
+  function isIOS(){var ua=navigator.userAgent||"";return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);}
+  function api(){return window.__pantryApi||null;}
+  function access(){try{return window.hasPantryAccess?window.hasPantryAccess():true;}catch(e){return true;}}
+  function parse(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+  function at(day,time){var p=time.split(":"),d=new Date(day.getFullYear(),day.getMonth(),day.getDate(),+p[0],+p[1],0,0);return d.getTime();}
+  function low1(n){n=String(n||"").trim();return (n.length>1&&n.charAt(1)===n.charAt(1).toLowerCase())?n.charAt(0).toLowerCase()+n.slice(1):n;}
+  function list(names){names=names.map(low1);if(names.length===1)return names[0];if(names.length<=3)return names.slice(0,-1).join(", ")+" en "+names[names.length-1];return names.slice(0,2).join(", ")+" en "+(names.length-2)+" andere producten";}
+  function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+  function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return Math.abs(h)%4000;}
+
+  function compute(){
+    var s=get(),A=api(),out=[];
+    if(!A||!access()||(!s.exp&&!s.low))return out;
+    var items=(A.read().items||[]).filter(function(i){return i&&i.name&&(parseInt(i.qty,10)||0)>0;});
+    var now=Date.now(),today=new Date();today.setHours(0,0,0,0);
+    var real={},est={};
+    if(s.exp){
+      items.forEach(function(i){
+        var d=parse(i.exp);if(!d)return;
+        if(i.estExp){
+          if(i.loc==="freezer")return;                       // vriezer-schattingen: geen melding
+          var t=at(d,s.time);if(t<=now||t-now>45*DAY)return;
+          (est[t]=est[t]||[]).push(i);
+        }else{
+          var prev=new Date(d.getTime()-DAY),t2=at(prev,s.time),when="morgen";
+          if(t2<=now){ if(+d===+today&&at(today,s.time)>now){t2=at(today,s.time);when="vandaag";} else return; }
+          if(t2-now>45*DAY)return;
+          var k=t2+"|"+when;(real[k]=real[k]||[]).push(i);
+        }
+      });
+      Object.keys(real).forEach(function(k){
+        var parts=k.split("|"),g=real[k],names=g.map(function(i){return i.name;});
+        out.push({at:+parts[0],kind:"exp",nid:hash("exp"+k),title:"Bijna over de datum",
+          text:"Je "+list(names)+(g.length===1?" gaat ":" gaan ")+parts[1]+" over de datum.",
+          ids:g.map(function(i){return i.id;}).join(","),actions:[{a:"used",label:"Op"},{a:"open",label:"Bekijken"}]});
+      });
+      Object.keys(est).forEach(function(t){
+        var g=est[t],names=g.map(function(i){return i.name;}),text;
+        if(g.length===1){
+          var i=g[0],e=window.__pantryEstimate?window.__pantryEstimate(i.name,i.loc):null;
+          var dur=e&&e.label?String(e.label).replace(/^±\s*/,"ongeveer "):"een tijdje";
+          text="Je "+low1(i.name)+" staat al "+dur+" "+((A.LOC_IN&&A.LOC_IN[i.loc])||"in huis")+". Even checken of het nog goed is?";
+        }else{
+          var locs={};g.forEach(function(i){locs[i.loc]=1;});var lk=Object.keys(locs);
+          text="Je "+list(names)+" staan al een tijdje "+(lk.length===1&&A.LOC_IN&&A.LOC_IN[lk[0]]?A.LOC_IN[lk[0]]:"in huis")+". Even checken of ze nog goed zijn?";
+        }
+        out.push({at:+t,kind:"est",nid:hash("est"+t),title:"Even checken?",text:text,
+          ids:g.map(function(i){return i.id;}).join(","),actions:[{a:"used",label:"Op"},{a:"ok",label:"Nog goed"}]});
+      });
+    }
+    if(s.low){
+      var lows=items.concat((A.read().items||[]).filter(function(i){return (parseInt(i.qty,10)||0)<=0;}))
+        .filter(function(i){var m=parseInt(i.min,10)||0;return m>0&&(parseInt(i.qty,10)||0)<m&&!(A.onShoppingList&&A.onShoppingList(i.name));});
+      var seen={};lows=lows.filter(function(i){if(seen[i.id])return false;seen[i.id]=1;return true;});
+      if(lows.length){
+        var sig=lows.map(function(i){return A.norm(i.name);}).sort().join("|"),sent={};
+        try{sent=JSON.parse(localStorage.getItem(LOW_SENT)||"{}")||{};}catch(e){}
+        var t3=at(today,s.time);if(t3<=now+60000)t3+=DAY;
+        if(!(sent.sig===sig&&sent.at&&sent.at<=now)){
+          var txt;
+          if(lows.length===1){var x=lows[0],q=parseInt(x.qty,10)||0;txt=q>0?(cap(x.name)+": nog "+q+" in huis, je wilt er minimaal "+x.min+". Op je boodschappenlijst zetten?"):(cap(low1(x.name))+" is op. Op je boodschappenlijst zetten?");}
+          else txt=cap(list(lows.map(function(i){return i.name;})))+" zijn bijna op. Op je boodschappenlijst zetten?";
+          out.push({at:t3,kind:"low",nid:hash("low"),title:"Bijna op",text:txt,ids:lows.map(function(i){return i.id;}).join(","),actions:[{a:"tolist",label:"Op mijn lijst"},{a:"open",label:"Bekijken"}]});
+          try{localStorage.setItem(LOW_SENT,JSON.stringify({sig:sig,at:t3}));}catch(e){}
+        }
+      }
+    }
+    out.sort(function(a,b){return a.at-b.at;});
+    return out.slice(0,40);
+  }
+  window.__pantryNotifyCompute=compute;
+
+  var timer=null,last="";
+  function schedule(force){
+    clearTimeout(timer);
+    timer=setTimeout(function(){
+      if(!native())return;
+      var json=JSON.stringify(compute());
+      if(!force&&json===last)return;
+      last=json;
+      try{window.AndroidApp.setPantryAlerts(json);}catch(e){console.warn("Voorraadmeldingen inplannen mislukt",e);}
+    },force?50:600);
+  }
+  window.__pantryNotifySchedule=schedule;
+
+  // Opnieuw uitrekenen als de voorraad verandert, de app weer opent of de familievoorraad binnenkomt.
+  var prevAfter=window.__pantryAfterWrite;
+  window.__pantryAfterWrite=function(){var r;if(typeof prevAfter==="function")r=prevAfter.apply(this,arguments);schedule();return r;};
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)schedule();});
+  setTimeout(function(){schedule(true);},4000);
+
+  /* ---------- Instellingen (Meer → Instellingen → Meldingen) ---------- */
+  function status(msg){var el=document.getElementById("pantryNotifyStatus");if(el)el.textContent=msg||"";}
+  function load(){
+    var s=get(),e=document.getElementById("pantryNotifyExp"),l=document.getElementById("pantryNotifyLow"),box=document.getElementById("pantryNotifyBlock");
+    if(e)e.checked=s.exp;if(l)l.checked=s.low;
+    if(box)box.classList.toggle("off",!s.exp&&!s.low);
+    document.querySelectorAll("#pantryNotifyTimes button").forEach(function(b){var on=b.getAttribute("data-t")===s.time;b.classList.toggle("on",on);b.setAttribute("aria-checked",String(on));b.setAttribute("role","radio");});
+    if(!native()) status(isIOS()?"Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken in de Android-app.":(window.AndroidApp?"Installeer de nieuwste versie van de app om voorraadmeldingen te gebruiken.":"Voorraadmeldingen werken in de Android-app."));
+    else if(!access()) status("Voorraadmeldingen horen bij Pro.");
+    else status("");
+  }
+  window.loadPantryNotifySettings=load;
+  window.savePantryNotifySettings=function(){
+    var s=get(),e=document.getElementById("pantryNotifyExp"),l=document.getElementById("pantryNotifyLow");
+    s.exp=!!(e&&e.checked);s.low=!!(l&&l.checked);put(s);load();
+    if(!native())return;
+    schedule(true);
+    var n=compute().length;
+    status(s.exp||s.low?("Voorraadmeldingen staan aan."+(n?" Er "+(n===1?"staat 1 melding":"staan "+n+" meldingen")+" klaar.":"")):"Voorraadmeldingen staan uit.");
+  };
+  document.addEventListener("click",function(ev){
+    var b=ev.target&&ev.target.closest&&ev.target.closest("#pantryNotifyTimes button");if(!b)return;
+    ev.preventDefault();var s=get();s.time=b.getAttribute("data-t");put(s);load();schedule(true);
+    if(native()&&(s.exp||s.low))status("Meldingen komen voortaan om "+s.time.replace(/^0/,"")+".");
+  });
+  // Bij openen van Meldingen de schakelaars goed zetten
+  var origOpen=window.openNotificationSettings;
+  if(typeof origOpen==="function"){window.openNotificationSettings=function(){var r=origOpen.apply(this,arguments);try{load();}catch(e){}return r;};}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+
+  /* ---------- Tik op een melding of knop ---------- */
+  function openPantry(){
+    try{if(typeof window.openPantryFromOverview==="function"){window.openPantryFromOverview();return;}}catch(e){}
+    try{showMoreView();openProSubmenu();togglePantry();}catch(e){}
+  }
+  function handle(action,idsCsv,tries){
+    var A=api();
+    if(!A||!document.body.classList.contains("logged-in")){
+      if((tries||0)<40){setTimeout(function(){handle(action,idsCsv,(tries||0)+1);},250);}
+      return;
+    }
+    var ids=String(idsCsv||"").split(",").filter(Boolean);
+    var d=A.read(),its=d.items.filter(function(i){return ids.indexOf(i.id)>=0;});
+    var names=list(its.map(function(i){return i.name;}));
+    if(action==="used"&&its.length){
+      its.forEach(function(it){var before=parseInt(it.qty,10)||0;it.qty=0;it.updatedAt=Date.now();d.log=d.log||[];d.log.push({k:A.norm(it.name),n:it.name,t:"out",q:before,at:Date.now()});});
+      A.write(d);openPantry();try{A.render();}catch(e){}
+      setTimeout(function(){A.toast(A.esc(cap(names))+(its.length===1?" is":" zijn")+" uit je voorraad gehaald.",its.some(function(i){return !A.onShoppingList(i.name);})?"Op lijst zetten":null,async function(){await A.addNamesToShoppingList(its);schedule(true);A.toast(A.esc(cap(names))+(its.length===1?" staat":" staan")+" op je boodschappenlijst.");});},350);
+      return;
+    }
+    if(action==="ok"&&its.length){
+      its.forEach(function(it){
+        var dd=parse(it.exp)||new Date();dd=new Date(dd.getTime()+3*DAY);
+        it.exp=dd.getFullYear()+"-"+("0"+(dd.getMonth()+1)).slice(-2)+"-"+("0"+dd.getDate()).slice(-2);it.estExp=true;it.updatedAt=Date.now();
+        try{var e=window.__pantryEstimate&&window.__pantryEstimate(it.name,it.loc);if(e&&window.__pantryLearn)window.__pantryLearn(it.name,it.loc,e.days+3);}catch(_){}
+      });
+      A.write(d);openPantry();try{A.render();}catch(e){}
+      setTimeout(function(){A.toast("Fijn! Over 3 dagen vragen we het nog eens. De app onthoudt dat "+A.esc(names)+" langer goed "+(its.length===1?"blijft":"blijven")+".");},350);
+      return;
+    }
+    if(action==="tolist"&&its.length){
+      openPantry();
+      A.addNamesToShoppingList(its).then(function(n){schedule(true);A.toast(n?A.esc(cap(names))+(its.length===1?" staat":" staan")+" op je boodschappenlijst.":"Dit staat al op je boodschappenlijst.");try{A.render();}catch(e){}});
+      return;
+    }
+    openPantry();
+  }
+  window.__onNativeNotification=function(action,ids){handle(action,ids,0);};
+  if(window.__pendingNativeNotification){var p=window.__pendingNativeNotification;window.__pendingNativeNotification=null;handle(p[0],p[1],0);}
+})();
+</script>
 <script id="prefetch-lists">
 /* Na het inloggen alvast geschiedenis, opgeslagen en gedeelde lijsten ophalen, zodat Overzicht, Snel opnieuw toevoegen,
    Geschiedenis en Voorraad > Meerdere toevoegen meteen openen. */
@@ -17066,7 +17333,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       var u=(typeof auth!=="undefined"&&auth)?auth.currentUser:null;
       if(u&&done!==u.uid){
         done=u.uid;
-        var go=function(){try{readOverviewHistory().catch(function(){});readSavedLists().catch(function(){});if(typeof renderSharedLists==="function"&&!__sharedCacheFor())renderSharedLists();if(typeof __loadMyPhoto==="function")__loadMyPhoto().catch(function(){});}catch(e){}};
+        var go=function(){try{readOverviewHistory().catch(function(){});readSavedLists().catch(function(){});if(typeof renderSharedLists==="function"&&!__sharedCacheFor())renderSharedLists();if(typeof __loadMyPhoto==="function")__loadMyPhoto().catch(function(){});if(window.__prefetchPeople)setTimeout(window.__prefetchPeople,1500);}catch(e){}};
         if(window.requestIdleCallback) requestIdleCallback(go,{timeout:2500}); else setTimeout(go,800);
       }
       if(!u) done="";
