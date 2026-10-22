@@ -21,6 +21,7 @@ import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.animation.LinearInterpolator;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -35,6 +36,10 @@ public class MainActivity extends Activity {
     private WebView webView;
     private FrameLayout root;
     private FrameLayout splash;
+    // Android 15+: gekleurde stroken achter de statusbalk en de veegbalk van Android.
+    private View topScrim;
+    private View bottomScrim;
+    private int statusBarScrimColor = Color.rgb(238, 248, 241);
     private SplashRing ring;
     private PermissionRequest pendingPermissionRequest;
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
@@ -117,6 +122,9 @@ public class MainActivity extends Activity {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
         ));
+        if (Build.VERSION.SDK_INT >= 35) {
+            setupEdgeToEdge();
+        }
         showAppSplash();
         setContentView(root);
         webView.loadUrl("file:///android_asset/index.html");
@@ -476,21 +484,83 @@ public class MainActivity extends Activity {
         public void setMenuDimmed(final boolean dimmed) {
             runOnUiThread(() -> {
                 Window window = getWindow();
-                if (dimmed) {
-                    window.setStatusBarColor(Color.rgb(200, 211, 204));
-                } else {
-                    window.setStatusBarColor(BACKGROUND_COLOR);
-                }
+                statusBarScrimColor = dimmed ? Color.rgb(200, 211, 204) : BACKGROUND_COLOR;
+                window.setStatusBarColor(statusBarScrimColor);
+                if (topScrim != null) topScrim.setBackgroundColor(statusBarScrimColor);
             });
         }
     }
+    /**
+     * Vanaf Android 15 tekent Android de app tot onder de statusbalk en de veegbalk door.
+     * We houden de app er netjes tussen, met dezelfde kleur erachter als voorheen,
+     * en schuiven de app omhoog als het toetsenbord opent.
+     */
+    @android.annotation.TargetApi(35)
+    private void setupEdgeToEdge() {
+        root.setBackgroundColor(BACKGROUND_COLOR);
+        topScrim = new View(this);
+        topScrim.setBackgroundColor(statusBarScrimColor);
+        bottomScrim = new View(this);
+        bottomScrim.setBackgroundColor(BACKGROUND_COLOR);
+        root.addView(topScrim, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.TOP));
+        root.addView(bottomScrim, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.BOTTOM));
+        try {
+            android.view.WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                int light = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(light, light);
+            }
+        } catch (Exception ignored) {
+        }
+        root.setOnApplyWindowInsetsListener((v, insets) -> applyEdgeInsets(insets));
+        root.requestApplyInsets();
+    }
+
+    @android.annotation.TargetApi(35)
+    private WindowInsets applyEdgeInsets(WindowInsets insets) {
+        android.graphics.Insets bars = insets.getInsets(
+                WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+        android.graphics.Insets ime = insets.getInsets(WindowInsets.Type.ime());
+        int bottom = Math.max(bars.bottom, ime.bottom);
+        if (webView != null) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) webView.getLayoutParams();
+            if (lp.leftMargin != bars.left || lp.topMargin != bars.top
+                    || lp.rightMargin != bars.right || lp.bottomMargin != bottom) {
+                lp.setMargins(bars.left, bars.top, bars.right, bottom);
+                webView.setLayoutParams(lp);
+            }
+        }
+        if (topScrim != null) {
+            FrameLayout.LayoutParams tp = (FrameLayout.LayoutParams) topScrim.getLayoutParams();
+            if (tp.height != bars.top) { tp.height = bars.top; topScrim.setLayoutParams(tp); }
+        }
+        if (bottomScrim != null) {
+            FrameLayout.LayoutParams bp = (FrameLayout.LayoutParams) bottomScrim.getLayoutParams();
+            if (bp.height != bars.bottom) { bp.height = bars.bottom; bottomScrim.setLayoutParams(bp); }
+        }
+        return WindowInsets.CONSUMED;
+    }
+
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
+        if (webView == null) {
             super.onBackPressed();
+            return;
         }
+        // Eerst de app vragen of er een pop-up open staat; die sluit dan in plaats van de app.
+        webView.evaluateJavascript(
+                "(function(){try{return !!(window.__appBack&&window.__appBack());}catch(e){return false;}})()",
+                value -> {
+                    if ("true".equals(value)) return;
+                    if (webView != null && webView.canGoBack()) {
+                        webView.goBack();
+                    } else {
+                        MainActivity.super.onBackPressed();
+                    }
+                });
     }
     @Override
     protected void onDestroy() {
