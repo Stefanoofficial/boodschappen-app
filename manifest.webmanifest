@@ -1,6 +1,6 @@
 {
-  "name": "Boodschappenlijst",
-  "short_name": "Boodschappenlijst",
+  "name": "Mijn Boodschappen",
+  "short_name": "Boodschappen",
   "lang": "nl",
   "start_url": "./",
   "display": "standalone",
