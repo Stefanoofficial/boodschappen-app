@@ -6299,6 +6299,8 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
 body.dark-theme .mbDialogClose{background:#26302a;color:#cfe0d4}
 body.dark-theme .mbDialogClose:active{background:#2f3a33}
 
+/* Het Meer-scherm hoort alleen bij de Meer-tab, nooit op Lijst of Overzicht. */
+.app:not(.more-active) #moreView{display:none!important}
 /* Het maanknopje verdwijnt even zolang er een pop-up open staat. */
 body:has(.familyDialogOverlay.familyDialogShown:not(.familyDialogClosing)) #themeButton{opacity:0!important;pointer-events:none!important;transition:opacity .15s ease}
 /* Eigen keuzelijst in plaats van het lijstje van de telefoon. */
@@ -14604,9 +14606,10 @@ document.addEventListener('visibilitychange',function(){
       more.appendChild(menu);
     }
     if(more){
-      more.style.display="block";
-      more.style.visibility="visible";
-      more.style.opacity="1";
+      // Niet meer vast op "zichtbaar" zetten: dan bleef het Meer-scherm ook op Lijst en Overzicht staan.
+      more.style.removeProperty("display");
+      more.style.removeProperty("visibility");
+      more.style.removeProperty("opacity");
       more.scrollTop=0;
     }
 
