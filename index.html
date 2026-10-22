@@ -10147,7 +10147,8 @@ async function updateProductSuggestions() {
     button.addEventListener("click", () => {
       input.value = name.charAt(0).toUpperCase() + name.slice(1);
       selectedProductSuggestion = null;
-      box.classList.remove("open");
+      closeProductSuggestions();
+      window.__suppressSuggestOnFocus = Date.now();
       input.focus();
     });
     box.appendChild(button);
@@ -10161,7 +10162,7 @@ async function updateProductSuggestions() {
     button.addEventListener("click", () => {
       selectedProductSuggestion = product;
       input.value = product.name;
-      box.classList.remove("open");
+      closeProductSuggestions();
     });
     box.appendChild(button);
     shown[keyOf(product.name)] = 1;
@@ -10192,6 +10193,14 @@ async function updateProductSuggestions() {
   else box.classList.remove("open");
 }
 
+/* Suggestielijst dicht, en suggesties die nog onderweg zijn (online) niet meer tonen. */
+function closeProductSuggestions() {
+  clearTimeout(productSuggestionTimer);
+  productSuggestionRequestId++;
+  const box = document.getElementById("productSuggestions");
+  if (box) { box.classList.remove("open"); box.innerHTML = ""; }
+}
+
 function initProductSuggestions() {
   const input = document.getElementById("product");
   if (!input) return;
@@ -10202,6 +10211,8 @@ function initProductSuggestions() {
   });
   input.addEventListener("focus", () => {
     clearTimeout(productSuggestionTimer);
+    // Net een suggestie gekozen? Dan de lijst niet meteen weer openen.
+    if (window.__suppressSuggestOnFocus && Date.now() - window.__suppressSuggestOnFocus < 800) return;
     updateProductSuggestions();
   });
   input.addEventListener("keydown", (e) => {
@@ -10617,6 +10628,9 @@ async function addProduct() {
   const text = input.value.trim();
 
   if (text === "") return;
+
+  // Toegevoegd: suggestielijst meteen dicht (ook als er nog online suggesties onderweg zijn).
+  try { closeProductSuggestions(); } catch (_) {}
 
   if (activeListType !== "shared" && !currentHouseholdId && !isPrivateMode()) {
     const householdId = await getOrCreateHousehold();
