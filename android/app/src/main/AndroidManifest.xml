@@ -31,6 +31,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:label="Boodschappen"
             android:exported="true"
             android:theme="@style/AppTheme.Splash"
             android:screenOrientation="portrait"
