@@ -6318,6 +6318,22 @@ body.dark-theme .mbSelOpt{color:#e9eee9}
 body.dark-theme .mbSelOpt.sel{color:#9fd3ac}
 body.dark-theme .mbSelOpt i{color:#9fd3ac}
 body.dark-theme .mbSelOpt:active,body.dark-theme .mbSelOpt:focus-visible{background:#2a332d}
+/* Dag- en tijdkiezer van de app zelf (iPhone en Android gelijk). */
+.mbPickDialog .familyDialog{display:flex;flex-direction:column;overflow:hidden!important;padding:0!important;width:min(380px,calc(100vw - 32px))!important}
+.mbPickDialog .familyDialogHeader{flex:0 0 auto;margin:0!important;padding:18px 18px 14px;border-bottom:1px solid #e1ece4}
+.mbPickBody{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:10px 12px 14px}
+.mbPickDialog .familyDialogActions{flex:0 0 auto;margin:0!important;padding:12px 18px 16px;border-top:1px solid #e1ece4}
+.mbTimePreview{text-align:center;font-size:40px;font-weight:800;letter-spacing:.02em;color:#1f2a22;padding:6px 0 4px;font-variant-numeric:tabular-nums}
+.mbTimeLabel{font-size:13px;font-weight:700;color:#3f5b45;margin:12px 6px 8px}
+.mbTimeGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;padding:0 4px}
+.mbTimeChip{min-width:0!important;width:100%;padding:0!important;margin:0!important;box-sizing:border-box;height:42px;border-radius:13px;border:1px solid #d9e6dc;background:#fff;font:inherit;font-size:15px;font-weight:650;color:#2f4a36;cursor:pointer;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;transition:background .12s ease,color .12s ease,transform .1s ease}
+.mbTimeChip:active{transform:scale(.94)}
+.mbTimeChip.on{background:#3f5b45;border-color:#3f5b45;color:#fff}
+body.dark-theme .mbPickDialog .familyDialogHeader,body.dark-theme .mbPickDialog .familyDialogActions{border-color:#3a443d}
+body.dark-theme .mbTimePreview{color:#e9eee9}
+body.dark-theme .mbTimeLabel{color:#9fd3ac}
+body.dark-theme .mbTimeChip{background:#1f2421;border-color:#3a443d;color:#dfe8e1}
+body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#fff}
 </style>
 </head>
 
@@ -7680,7 +7696,7 @@ function saveNotificationSettings() {
   if (!window.AndroidApp) {
     const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || "") ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    setNotificationStatus(isIOSDevice ? "Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken in de Android-app." : "Meldingen werken in de Android-app.", true);
+    setNotificationStatus(isIOSDevice ? "Je keuze is bewaard. De melding komt nu alleen nog in de Android-app." : "Meldingen werken in de Android-app.", !isIOSDevice);
     return;
   }
 
@@ -9055,6 +9071,7 @@ async function loadList() {
     }
 
     const user = auth.currentUser;
+    try { if (currentHouseholdId && user) localStorage.setItem("boodschappenLastListType_" + user.uid, "family"); } catch (_) {}
     if (!currentHouseholdId && user && localStorage.getItem("boodschappenUseMode_" + user.uid) === "skip") {
       openAppWithoutList();
       return true;
@@ -12516,6 +12533,7 @@ async function loadPrivateList() {
   const user = auth.currentUser;
   currentListName = "Boodschappenlijst";
   if (!user) return;
+  try { localStorage.setItem("boodschappenLastListType_" + user.uid, "private"); } catch (_) {}
 
   try {
     const saved = localStorage.getItem("boodschappenPrivate_" + user.uid);
@@ -12835,10 +12853,27 @@ function toggleRegisterPassword(fieldId, button) {
       // Zo hoeft de gebruiker niet te wachten op de extra Firebase-controle
       // voor een eventuele familie. Als er wél een familie is, schakelen we
       // daarna automatisch over naar de familielijst.
+      // Zat je de vorige keer in een familie? Dan tonen we niet eerst je (oude) persoonlijke
+      // lijst, maar wachten we kort op je familielijst. Zo zie je nooit een verkeerde lijst.
+      let skippedPrivatePreview = false;
       if (freshLogin) {
-        localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
-        activeListType = "private";
-        await loadPrivateList();
+        let lastType = null;
+        try { lastType = localStorage.getItem("boodschappenLastListType_" + user.uid); } catch (_) {}
+        // Alleen als we zeker weten dat je de vorige keer je persoonlijke lijst gebruikte, tonen we die
+        // meteen. Anders wachten we kort, zodat je nooit iets in de verkeerde lijst zet.
+        if (lastType !== "private") {
+          skippedPrivatePreview = true;
+          activeListType = "family";
+          boodschappen = [];
+          try { if (typeof showList === "function") showList(); } catch (_) {}
+          const st = document.getElementById("status");
+          if (st) st.textContent = "Je lijst wordt geladen…";
+          if (typeof window.__setListLoadingLock === "function") window.__setListLoadingLock(true);
+        } else {
+          localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
+          activeListType = "private";
+          await loadPrivateList();
+        }
       }
 
       // Stond je de vorige keer in een gedeelde lijst? Open die meteen (tegelijk met het ophalen
@@ -12865,15 +12900,17 @@ function toggleRegisterPassword(fieldId, button) {
           activeListType = "family";
           await loadList();
           if (freshLogin && typeof showMainListView === "function") showMainListView();
-        } else if (!freshLogin) {
-          // Herstelde sessie zonder familie: persoonlijke lijst laden.
+        } else if (!freshLogin || skippedPrivatePreview) {
+          // Herstelde sessie zonder familie (of familie inmiddels verlaten): persoonlijke lijst laden.
           localStorage.setItem("boodschappenUseMode_" + user.uid, "private");
           await loadPrivateList();
         }
       }
+      if (typeof window.__setListLoadingLock === "function") window.__setListLoadingLock(false);
       await updateMemberCount();
       watchMemberCount();
     } catch (error) {
+      if (typeof window.__setListLoadingLock === "function") window.__setListLoadingLock(false);
       console.error("Herstellen van de ingelogde sessie mislukt:", error);
       // Alleen bij een echte Firebase-authfout tonen we het login-scherm.
       if (error && String(error.code || "").startsWith("auth/")) {
@@ -17460,7 +17497,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     if(e)e.checked=s.exp;if(l)l.checked=s.low;
     if(box)box.classList.toggle("off",!s.exp&&!s.low);
     document.querySelectorAll("#pantryNotifyTimes button").forEach(function(b){var on=b.getAttribute("data-t")===s.time;b.classList.toggle("on",on);b.setAttribute("aria-checked",String(on));b.setAttribute("role","radio");});
-    if(!native()) status(isIOS()?"Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken in de Android-app.":(window.AndroidApp?"Installeer de nieuwste versie van de app om voorraadmeldingen te gebruiken.":"Voorraadmeldingen werken in de Android-app."));
+    if(!native()) status(isIOS()?"":(window.AndroidApp?"Installeer de nieuwste versie van de app om voorraadmeldingen te gebruiken.":"Voorraadmeldingen werken in de Android-app."));
     else if(!access()) status("Voorraadmeldingen horen bij Pro.");
     else status("");
   }
@@ -17468,7 +17505,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   window.savePantryNotifySettings=function(){
     var s=get(),e=document.getElementById("pantryNotifyExp"),l=document.getElementById("pantryNotifyLow");
     s.exp=!!(e&&e.checked);s.low=!!(l&&l.checked);put(s);load();
-    if(!native())return;
+    if(!native()){if(isIOS())status("Je keuze is bewaard. De melding komt nu alleen nog in de Android-app.");return;}
     schedule(true);
     var n=compute().length;
     status(s.exp||s.low?("Voorraadmeldingen staan aan."+(n?" Er "+(n===1?"staat 1 melding":"staan "+n+" meldingen")+" klaar.":"")):"Voorraadmeldingen staan uit.");
@@ -17666,11 +17703,101 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   },true);
   window.addEventListener("resize",function(){if(open)closeSel();});
 
+
+  /* ---------- Dag- en tijdkiezer voor de boodschappenherinnering ---------- */
+  var DAYS=[["2","Maandag"],["3","Dinsdag"],["4","Woensdag"],["5","Donderdag"],["6","Vrijdag"],["7","Zaterdag"],["1","Zondag"]];
+  var picker=null;
+  function parentDialog(on){try{if(typeof notificationFamilyDialog!=="undefined"&&notificationFamilyDialog)notificationFamilyDialog.classList.toggle("picker-child-open",on);}catch(_){}}
+  function closePicker(){
+    if(!picker)return false;var ov=picker;picker=null;
+    ov.style.pointerEvents="none";ov.classList.add("familyDialogClosing");
+    setTimeout(function(){if(ov.isConnected)ov.remove();},260);
+    parentDialog(false);return true;
+  }
+  function makePicker(icon,title,bodyHtml,actionsHtml){
+    closePicker();
+    var ov=document.createElement("div");ov.className="familyDialogOverlay mbPickDialog";
+    ov.innerHTML='<div class="familyDialog" role="dialog" aria-modal="true">'+
+      '<div class="familyDialogHeader"><div class="familyDialogIcon"><i class="fa-solid '+icon+'" aria-hidden="true"></i></div><div class="familyDialogTitle">'+title+'</div>'+
+      '<button type="button" class="mbDialogClose" aria-label="Sluiten"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>'+
+      '<div class="mbPickBody">'+bodyHtml+'</div>'+(actionsHtml?'<div class="familyDialogActions">'+actionsHtml+'</div>':'')+'</div>';
+    ov.style.zIndex="12500";
+    document.body.appendChild(ov);picker=ov;parentDialog(true);
+    ov.addEventListener("click",function(e){if(e.target===ov||e.target.closest(".mbDialogClose")||e.target.closest("[data-pick='cancel']")){e.stopPropagation();closePicker();}});
+    requestAnimationFrame(function(){ov.classList.add("familyDialogShown");});
+    return ov;
+  }
+  window.openReminderDayPicker=function(event){
+    if(event){event.preventDefault&&event.preventDefault();event.stopPropagation&&event.stopPropagation();}
+    var input=document.getElementById("shoppingReminderDay");var cur=input?String(input.value||"2"):"2";
+    var html=DAYS.map(function(d){return '<button type="button" class="mbSelOpt'+(d[0]===cur?' sel':'')+'" role="option" aria-selected="'+(d[0]===cur)+'" data-day="'+d[0]+'"><i class="fa-solid fa-check" aria-hidden="true"></i><span>'+d[1]+'</span></button>';}).join("");
+    var ov=makePicker("fa-calendar-days","Dag kiezen",html,"");
+    ov.querySelector(".mbPickBody").addEventListener("click",function(e){
+      var b=e.target.closest("[data-day]");if(!b)return;e.stopPropagation();
+      if(input)input.value=b.getAttribute("data-day");
+      try{updateReminderPickerLabels();}catch(_){}
+      closePicker();
+      try{saveNotificationSettings();}catch(_){}
+    });
+    var sel=ov.querySelector(".mbSelOpt.sel");if(sel)try{sel.focus({preventScroll:true});}catch(_){}
+  };
+  window.openReminderTimePicker=function(event){
+    if(event){event.preventDefault&&event.preventDefault();event.stopPropagation&&event.stopPropagation();}
+    var input=document.getElementById("shoppingReminderTime");
+    var p=String((input&&input.value)||"18:00").split(":");var h=("0"+(parseInt(p[0],10)||0)).slice(-2),m=("0"+(parseInt(p[1],10)||0)).slice(-2);
+    var mins=[];for(var i=0;i<60;i+=5)mins.push(("0"+i).slice(-2));if(mins.indexOf(m)<0){mins.push(m);mins.sort();}
+    var hrs=[];for(var j=0;j<24;j++)hrs.push(("0"+j).slice(-2));
+    var html='<div class="mbTimePreview" aria-live="polite"></div>'+
+      '<div class="mbTimeLabel">Uur</div><div class="mbTimeGrid" data-g="h">'+hrs.map(function(x){return '<button type="button" class="mbTimeChip" data-v="'+x+'">'+x+'</button>';}).join("")+'</div>'+
+      '<div class="mbTimeLabel">Minuten</div><div class="mbTimeGrid" data-g="m">'+mins.map(function(x){return '<button type="button" class="mbTimeChip" data-v="'+x+'">'+x+'</button>';}).join("")+'</div>';
+    var ov=makePicker("fa-clock","Tijd kiezen",html,'<button type="button" class="familyDialogBtn familyDialogCancel" data-pick="cancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-pick="ok">Opslaan</button>');
+    function draw(){
+      ov.querySelector(".mbTimePreview").textContent=h+":"+m;
+      ov.querySelectorAll('[data-g="h"] .mbTimeChip').forEach(function(b){var on=b.getAttribute("data-v")===h;b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));});
+      ov.querySelectorAll('[data-g="m"] .mbTimeChip').forEach(function(b){var on=b.getAttribute("data-v")===m;b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));});
+    }
+    ov.querySelector(".mbPickBody").addEventListener("click",function(e){
+      var b=e.target.closest(".mbTimeChip");if(!b)return;e.stopPropagation();
+      if(b.parentNode.getAttribute("data-g")==="h")h=b.getAttribute("data-v");else m=b.getAttribute("data-v");draw();
+    });
+    ov.querySelector('[data-pick="ok"]').addEventListener("click",function(e){
+      e.stopPropagation();
+      if(input)input.value=h+":"+m;
+      try{updateReminderPickerLabels();}catch(_){}
+      closePicker();
+      try{saveNotificationSettings();}catch(_){}
+    });
+    draw();
+    var on=ov.querySelector('[data-g="h"] .mbTimeChip.on');if(on){var body=ov.querySelector(".mbPickBody");body.scrollTop=Math.max(0,on.offsetTop-body.clientHeight/2);}
+  };
+  var oldCloseDay=window.closeReminderDayPicker,oldCloseTime=window.closeReminderTimePicker;
+  window.closeReminderDayPicker=function(){closePicker();try{if(oldCloseDay)oldCloseDay();}catch(_){}};
+  window.closeReminderTimePicker=function(){closePicker();try{if(oldCloseTime)oldCloseTime();}catch(_){}};
+  window.__closeAppPicker=closePicker;
+
+  /* ---------- Tijdens "Je lijst wordt geladen…" kun je nog niets toevoegen ---------- */
+  var lockTimer=null;
+  window.__setListLoadingLock=function(on){
+    window.__listLoadingLock=!!on;
+    var inp=document.getElementById("product"),btn=document.querySelector("button.add");
+    if(inp){inp.disabled=!!on;if(on)inp.setAttribute("aria-busy","true");else inp.removeAttribute("aria-busy");}
+    if(btn)btn.disabled=!!on;
+    clearTimeout(lockTimer);
+    if(on)lockTimer=setTimeout(function(){window.__setListLoadingLock(false);},12000);
+  };
+  function wrapAdd(){
+    if(typeof window.addProduct!=="function"||window.addProduct.__lockWrapped)return;
+    var orig=window.addProduct;
+    var w=function(){if(window.__listLoadingLock)return;return orig.apply(this,arguments);};
+    w.__lockWrapped=true;window.addProduct=w;
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",wrapAdd);else wrapAdd();
   /* ---------- Terugknop van Android: sluit eerst de bovenste pop-up ---------- */
   function visible(el){return el&&el.isConnected&&!el.hidden&&getComputedStyle(el).display!=="none";}
   window.__appBack=function(){
     try{
       if(closeSel())return true;
+      if(closePicker())return true;
       var cal=document.querySelector(".appCalOverlay.show");
       if(cal){var c=cal.querySelector('[data-b="cancel"]');if(c){c.click();return true;}}
       var td=document.getElementById("reminderTimeDialog");
