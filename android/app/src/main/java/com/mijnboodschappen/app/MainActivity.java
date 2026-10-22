@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private FrameLayout root;
     private FrameLayout splash;
+    private ImageView splashIcon;
     // Android 15+: gekleurde stroken achter de statusbalk en de veegbalk van Android.
     private View topScrim;
     private View bottomScrim;
@@ -59,7 +60,7 @@ public class MainActivity extends Activity {
     private long splashStartTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen.installSplashScreen(this);
+        SplashScreen systemSplash = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         splashStartTime = android.os.SystemClock.uptimeMillis();
         Window window = getWindow();
@@ -127,6 +128,21 @@ public class MainActivity extends Activity {
         }
         showAppSplash();
         setContentView(root);
+        // Naadloze overgang: ons logo komt precies op de plek van het logo van Android
+        // te staan, en pas daarna verdwijnt het opstartscherm van Android (zonder animatie).
+        try {
+            systemSplash.setOnExitAnimationListener(provider -> {
+                Runnable swap = () -> {
+                    View iconView = null;
+                    try { iconView = provider.getIconView(); } catch (Exception ignored) { }
+                    alignSplashTo(iconView);
+                    provider.remove();
+                    revealSplashRing();
+                };
+                if (splash != null && splash.getWidth() == 0) splash.post(swap); else swap.run();
+            });
+        } catch (Exception ignored) {
+        }
         webView.loadUrl("file:///android_asset/index.html");
         handleNotificationIntent(getIntent());
         root.postDelayed(() -> {
@@ -181,15 +197,17 @@ public class MainActivity extends Activity {
         icon.setImageResource(R.drawable.splash_icon);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
         // Houd het logo gecentreerd; pas de grootte aan indien nodig.
+        // Even groot als het logo op het opstartscherm van Android (52% van 288dp ≈ 150dp).
         int iconSize = dp(150);
         FrameLayout.LayoutParams iconParams =
                 new FrameLayout.LayoutParams(iconSize, iconSize);
         iconParams.gravity = Gravity.CENTER;
-        iconParams.topMargin = dp(10);
         splash.addView(icon, iconParams);
+        splashIcon = icon;
         ring = new SplashRing(this);
         ring.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        ring.setAlpha(1f);
+        // Het ringetje komt pas zacht in beeld als het opstartscherm van Android weg is.
+        ring.setAlpha(0f);
         ring.setVisibility(View.VISIBLE);
         int ringSize = dp(230);
         FrameLayout.LayoutParams ringParams =
@@ -202,6 +220,45 @@ public class MainActivity extends Activity {
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
         ));
+        // Alvast midden op het hele scherm zetten (zoals Android het doet), ook als
+        // de statusbalk of navigatiebalk buiten de app valt.
+        splash.post(() -> alignSplashTo(null));
+        // Vangnet: komt het seintje van Android niet, laat het ringetje dan toch zien.
+        splash.postDelayed(this::revealSplashRing, 700);
+    }
+
+    /** Zet ons logo en ringetje met het midden precies op het midden van target (of van het scherm). */
+    private void alignSplashTo(View target) {
+        if (splash == null || splash.getWidth() == 0) return;
+        float cx;
+        float cy;
+        int[] pos = new int[2];
+        if (target != null && target.getWidth() > 0 && target.getHeight() > 0) {
+            target.getLocationOnScreen(pos);
+            cx = pos[0] + target.getWidth() / 2f;
+            cy = pos[1] + target.getHeight() / 2f;
+        } else {
+            View decor = getWindow().getDecorView();
+            decor.getLocationOnScreen(pos);
+            cx = pos[0] + decor.getWidth() / 2f;
+            cy = pos[1] + decor.getHeight() / 2f;
+        }
+        splash.getLocationOnScreen(pos);
+        float dx = cx - (pos[0] + splash.getWidth() / 2f);
+        float dy = cy - (pos[1] + splash.getHeight() / 2f);
+        if (splashIcon != null) {
+            splashIcon.setTranslationX(dx);
+            splashIcon.setTranslationY(dy);
+        }
+        if (ring != null) {
+            ring.setTranslationX(dx);
+            ring.setTranslationY(dy);
+        }
+    }
+
+    private void revealSplashRing() {
+        if (ring == null || splashRemoved || ring.getAlpha() > 0f) return;
+        ring.animate().alpha(1f).setDuration(220).start();
     }
     private void tryRemoveSplash() {
         if (!pageReady || splashRemoved) {
