@@ -126,6 +126,9 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 35) {
             setupEdgeToEdge();
         }
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerBackCallback();
+        }
         showAppSplash();
         setContentView(root);
         // Naadloze overgang: ons logo komt precies op de plek van het logo van Android
@@ -601,13 +604,15 @@ public class MainActivity extends Activity {
         return WindowInsets.CONSUMED;
     }
 
-    @Override
-    public void onBackPressed() {
+    /**
+     * Terugknop / terugveeg. Eerst sluit de app een open pop-up; is er niets open, dan
+     * gaat de app naar de achtergrond (zoals Android dat normaal doet).
+     */
+    private void handleBack(final Runnable systemDefault) {
         if (webView == null) {
-            super.onBackPressed();
+            systemDefault.run();
             return;
         }
-        // Eerst de app vragen of er een pop-up open staat; die sluit dan in plaats van de app.
         webView.evaluateJavascript(
                 "(function(){try{return !!(window.__appBack&&window.__appBack());}catch(e){return false;}})()",
                 value -> {
@@ -615,9 +620,23 @@ public class MainActivity extends Activity {
                     if (webView != null && webView.canGoBack()) {
                         webView.goBack();
                     } else {
-                        MainActivity.super.onBackPressed();
+                        systemDefault.run();
                     }
                 });
+    }
+
+    /** Android 13 en nieuwer (verplicht vanaf Android 16): de nieuwe manier om de terugknop op te vangen. */
+    @android.annotation.TargetApi(33)
+    private void registerBackCallback() {
+        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                () -> handleBack(() -> moveTaskToBack(true)));
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Android 12 en ouder.
+        handleBack(() -> MainActivity.super.onBackPressed());
     }
     @Override
     protected void onDestroy() {
