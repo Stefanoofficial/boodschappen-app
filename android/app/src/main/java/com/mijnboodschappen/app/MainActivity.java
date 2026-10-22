@@ -42,6 +42,10 @@ public class MainActivity extends Activity {
     private View bottomScrim;
     private int statusBarScrimColor = Color.rgb(238, 248, 241);
     private SplashRing ring;
+    // Het ringetje dat draait: een geanimeerde vector (soepel, op de grafische taak van Android)
+    // of, op oudere toestellen, het zelfgetekende ringetje.
+    private View ringView;
+    private android.graphics.drawable.Animatable ringAnim;
     private PermissionRequest pendingPermissionRequest;
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 1002;
@@ -207,17 +211,32 @@ public class MainActivity extends Activity {
         iconParams.gravity = Gravity.CENTER;
         splash.addView(icon, iconParams);
         splashIcon = icon;
-        ring = new SplashRing(this);
-        ring.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        // Het ringetje komt pas zacht in beeld als het opstartscherm van Android weg is.
-        ring.setAlpha(0f);
-        ring.setVisibility(View.VISIBLE);
         int ringSize = dp(230);
         FrameLayout.LayoutParams ringParams =
                 new FrameLayout.LayoutParams(ringSize, ringSize);
         ringParams.gravity = Gravity.CENTER;
-        splash.addView(ring, ringParams);
-        ring.start();
+        int avdId = Build.VERSION.SDK_INT >= 25
+                ? getResources().getIdentifier("splash_ring_anim", "drawable", getPackageName())
+                : 0;
+        if (avdId != 0) {
+            // Android 7.1+: de animatie draait op de RenderThread en hapert dus niet
+            // als de app tegelijk aan het laden is.
+            ImageView ringImage = new ImageView(this);
+            ringImage.setImageResource(avdId);
+            ringImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            ringView = ringImage;
+            if (ringImage.getDrawable() instanceof android.graphics.drawable.Animatable) {
+                ringAnim = (android.graphics.drawable.Animatable) ringImage.getDrawable();
+            }
+        } else {
+            ring = new SplashRing(this);
+            ring.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            ringView = ring;
+        }
+        ringView.setAlpha(0f);
+        ringView.setVisibility(View.VISIBLE);
+        splash.addView(ringView, ringParams);
+        if (ringAnim != null) ringAnim.start(); else if (ring != null) ring.start();
 
         root.addView(splash, new FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -253,15 +272,24 @@ public class MainActivity extends Activity {
             splashIcon.setTranslationX(dx);
             splashIcon.setTranslationY(dy);
         }
+        if (ringView != null) {
+            ringView.setTranslationX(dx);
+            ringView.setTranslationY(dy);
+        }
+    }
+
+    private void stopSplashRing() {
+        if (ringAnim != null) {
+            try { ringAnim.stop(); } catch (Exception ignored) { }
+        }
         if (ring != null) {
-            ring.setTranslationX(dx);
-            ring.setTranslationY(dy);
+            ring.stop();
         }
     }
 
     private void revealSplashRing() {
-        if (ring == null || splashRemoved || ring.getAlpha() > 0f) return;
-        ring.animate().alpha(1f).setDuration(220).start();
+        if (ringView == null || splashRemoved || ringView.getAlpha() > 0f) return;
+        ringView.animate().alpha(1f).setDuration(220).start();
     }
     private void tryRemoveSplash() {
         if (!pageReady || splashRemoved) {
@@ -287,14 +315,14 @@ public class MainActivity extends Activity {
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        if (ring != null) {
-                            ring.stop();
-                        }
+                        stopSplashRing();
                         if (root != null && splash != null) {
                             root.removeView(splash);
                         }
                         splash = null;
                         ring = null;
+                        ringView = null;
+                        ringAnim = null;
                     }
                 })
                 .start();
@@ -640,9 +668,7 @@ public class MainActivity extends Activity {
     }
     @Override
     protected void onDestroy() {
-        if (ring != null) {
-            ring.stop();
-        }
+        stopSplashRing();
         if (webView != null) {
             webView.destroy();
             webView = null;
