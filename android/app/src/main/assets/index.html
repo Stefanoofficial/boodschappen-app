@@ -6149,7 +6149,7 @@ body.dark-theme .smartPlannerPanel .plannerStatus { color:#a8e0b5 !important; }
     var cur=img.getAttribute("src").slice(b.length);if(tried.indexOf(cur)<0)tried.push(cur);
     if(ok[b]===cur){delete ok[b];}
     var next=EXT.filter(function(e){return tried.indexOf(e)<0;})[0];
-    if(!next){img.remove();return;}
+    if(!next){var par=img.parentNode;if(par&&par.classList)par.classList.add("noPhoto");img.remove();return;}
     img.setAttribute("data-tried",tried.join("|"));
     img.onload=function(){if(ok[b]!==next){ok[b]=next;try{localStorage.setItem("recipePhotoExt",JSON.stringify(ok));}catch(e){}}};
     img.src=b+next;
@@ -6334,6 +6334,14 @@ body.dark-theme .mbTimePreview{color:#e9eee9}
 body.dark-theme .mbTimeLabel{color:#9fd3ac}
 body.dark-theme .mbTimeChip{background:#1f2421;border-color:#3a443d;color:#dfe8e1}
 body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#fff}
+</style>
+<style id="recipe-photo-smooth">
+/* Receptfoto's: geen emoji meer zien flitsen. De emoji verschijnt alleen als er echt geen foto is. */
+.recipeThumb .recipeThumbEmoji,.recipeSheetHero .recipeThumbEmoji{opacity:0;transition:opacity .2s ease}
+.recipeThumb.noPhoto .recipeThumbEmoji,.recipeSheetHero.noPhoto .recipeThumbEmoji{opacity:1}
+.recipeThumb img,.recipeSheetHero img{opacity:0;transition:opacity .16s ease}
+.recipeThumb img.mbLoaded,.recipeSheetHero img.mbLoaded{opacity:1}
+.recipeThumb img.mbInstant,.recipeSheetHero img.mbInstant{transition:none}
 </style>
 </head>
 
@@ -14828,7 +14836,7 @@ document.addEventListener('visibilitychange',function(){
 (function(){
 const KEY="boodschappen_pro_smart_weekplanner_v1";
 const days=["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
-const recipes=[
+const recipes=window.__recipeList=[
 {id:"tomato-pasta",img:"recipes/tomato-pasta.jpeg",emoji:"🍝",desc:"Klassieke pasta met een frisse tomatensaus en verse basilicum.",tags:["Vegetarisch", "Makkelijk", "Italiaans"],name:"Pasta met tomaat en basilicum",time:25,servings:2,ingredients:["200 g pasta","1 blik tomatenblokjes (400 g)","1 ui","2 tenen knoflook","1 el olijfolie","Verse basilicum","Geraspte kaas"] ,steps:["Zet een grote pan met water op het vuur en voeg een flinke theelepel zout toe. Snipper de ui fijn en snijd of pers de knoflook.", "Kook de pasta in ongeveer 10 minuten (of volgens de verpakking) beetgaar. Bewaar een kopje kookwater voordat je afgiet.", "Verhit ondertussen de olijfolie in een koekenpan op middelhoog vuur. Bak de ui 3 minuten tot hij glazig is en bak de knoflook de laatste minuut mee, zonder dat die bruin wordt.", "Voeg de tomatenblokjes toe met een snufje zout en peper. Laat 12 tot 15 minuten zacht pruttelen met het deksel half op de pan, tot de saus dikker wordt.", "Meng de pasta door de saus. Is het te droog, voeg dan een scheutje kookwater toe.", "Scheur de basilicum met je handen en roer de helft door de pasta. Serveer met de rest van de basilicum en geraspte kaas."],tip:"Een mespuntje suiker haalt de zuurheid uit de tomaten."},
 {id:"veggie-wraps",img:"recipes/veggie-wraps.jpeg",emoji:"🌯",desc:"Kleine wraps gevuld met groenten, bonen en een frisse yoghurtdressing.",tags:["Vegetarisch", "Snel klaar", "Budget"],name:"Groentewraps met bonen",time:20,servings:2,ingredients:["4 wraps","1 blik kidneybonen (400 g)","1 paprika","1 blik mais (140 g)","100 g sla","4 el yoghurt","Paprikapoeder"],steps:["Spoel de bonen en de mais af in een zeef en laat goed uitlekken. Snijd de paprika in dunne reepjes en scheur of snijd de sla.", "Verhit een beetje olie in een koekenpan op middelhoog vuur. Bak de paprika 4 minuten.", "Voeg de bonen, de mais en 1 theelepel paprikapoeder toe. Bak nog 4 tot 5 minuten en breng op smaak met peper en zout. Prak een paar bonen licht fijn, dan plakt het mengsel beter.", "Verwarm de wraps kort in een droge pan (ongeveer 20 seconden per kant) of 30 seconden in de magnetron, zodat ze soepel worden.", "Besmeer elke wrap met yoghurt, leg er sla en het bonenmengsel op en vouw de onderkant en zijkanten naar binnen voordat je oprolt."],tip:"Lekker met een scheutje limoensap of een snufje komijn in de yoghurt."},
 {id:"fried-rice",img:"recipes/fried-rice.jpeg",emoji:"🍚",desc:"Snel en makkelijk gerecht met rijst, ei en veel groente.",tags:["Snel klaar", "Budget", "Aziatisch"],name:"Gebakken rijst met ei",time:20,servings:2,ingredients:["150 g rijst","2 eieren","200 g roerbakgroente","2 el sojasaus","1 el olie","1 bosui"],steps:["Kook de rijst volgens de verpakking (ongeveer 10 tot 12 minuten). Giet af, spreid uit op een bord en laat 10 minuten uitdampen. Gekoelde rijst van de dag ervoor werkt nog beter.", "Snijd de bosui in ringetjes en houd het witte en groene deel apart.", "Verhit de olie in een wok of grote koekenpan op hoog vuur. Roerbak de groente met het witte deel van de bosui 4 minuten.", "Schuif de groente opzij, breek de eieren in de vrije ruimte en roer ze 1 minuut tot ze gaar zijn.", "Voeg de rijst toe en roerbak 3 tot 4 minuten, tot alles heet is en de korrels los zijn.", "Schenk de sojasaus erbij, roer goed door en proef. Serveer met het groene deel van de bosui erover."],tip:"Gebruik niet te veel sojasaus: begin met de helft en proef dan pas."},
@@ -14894,7 +14902,7 @@ window.renderRecipeCatalog=function(){
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
  const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
  const __shown=__lim?found.slice(0,3):found;
- box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" loading="lazy" onerror="__recipeImgFallback(this)"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" decoding="sync" onerror="__recipeImgFallback(this)"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -17815,6 +17823,46 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     }catch(_){}
     return false;
   };
+})();
+</script>
+<script id="recipe-photo-preload">
+(function(){
+  /* 1. Foto's die al klaar zijn, meteen tonen (zonder fade); andere zacht laten verschijnen. */
+  function mark(img,instant){if(instant)img.classList.add("mbInstant");img.classList.add("mbLoaded");}
+  function scan(root){
+    (root.querySelectorAll?root:document).querySelectorAll(".recipeThumb img,.recipeSheetHero img").forEach(function(img){
+      if(img.classList.contains("mbLoaded"))return;
+      if(img.complete&&img.naturalWidth>0){mark(img,true);return;}
+      if(!img.__mbWatch){img.__mbWatch=1;img.addEventListener("load",function(){mark(img,false);});}
+    });
+  }
+  new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var n=ms[i].addedNodes;for(var j=0;j<n.length;j++){if(n[j].nodeType===1)scan(n[j]);}}})
+    .observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener("load",function(e){var t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest(".recipeThumb,.recipeSheetHero"))mark(t,false);},true);
+
+  /* 2. Alle receptfoto's alvast op de achtergrond laden, zodat ze klaarstaan als je Recepten opent. */
+  var keep=[];
+  function preload(){
+    var list=window.__recipeList||[];
+    var i=0;
+    function next(){
+      if(i>=list.length)return;
+      var r=list[i++];if(!r||!r.img){next();return;}
+      var img=new Image();img.decoding="async";
+      img.onload=function(){keep.push(img);try{img.decode&&img.decode().catch(function(){});}catch(_){}setTimeout(next,30);};
+      img.onerror=function(){try{window.__recipeImgFallback&&window.__recipeImgFallback(img);}catch(_){}
+        // __recipeImgFallback probeert de volgende extensie; lukt het, dan volgt onload hierboven niet meer, dus ga gewoon door.
+        setTimeout(next,30);};
+      img.src=window.__recipeImgSrc?window.__recipeImgSrc(r.img):r.img;
+    }
+    next();
+  }
+  function start(){
+    var go=function(){if("requestIdleCallback" in window)requestIdleCallback(preload,{timeout:3000});else setTimeout(preload,300);};
+    setTimeout(go,1500);
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
+  window.__recipePreload=preload;
 })();
 </script>
 </body>
