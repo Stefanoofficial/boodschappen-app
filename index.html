@@ -6367,6 +6367,11 @@ html.platform-android #overviewActionOverlay.is-open{background:rgba(22,30,25,.3
 html.platform-android body.dark-theme #overviewActionOverlay.is-open{background:rgba(0,0,0,.56)!important}
 html.platform-android .familyDialog{will-change:transform,opacity;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 
+
+/* Android: pop-ups schuiven van rechts naar binnen met een vaste animatie. Een overgang (transition) sloeg de
+   Android-app soms over, waardoor het venster ineens in beeld stond. */
+@keyframes mbDlgIn{from{opacity:0;transform:translateX(70px) scale(.985)}to{opacity:1;transform:none}}
+html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing) > .familyDialog{animation:mbDlgIn .3s cubic-bezier(.22,.8,.3,1) both!important}
 /* "‹ Mijn familie" (en "‹ Pro") even groot als de andere terugknoppen. */
 html body .familyMenuBack span{font-size:17px!important;font-weight:700!important}
 html body .familyMenuBack i{font-size:14px!important}
@@ -12633,27 +12638,26 @@ async function savePrivateList() {
 }
 
 function updatePrivateStatus() {
-  const user = auth.currentUser;
   const status = document.getElementById("status");
   if (!status) return;
-
-  let savedAt = user ? localStorage.getItem("boodschappenPrivateLastUpdate_" + user.uid) : null;
-  // Na opnieuw installeren of op een andere telefoon: de tijd uit je account gebruiken.
-  if (!savedAt && user) {
-    const cloudTs = Number(localStorage.getItem("boodschappenPrivate_" + user.uid + "__updatedAt")) || 0;
-    if (cloudTs > 0) savedAt = new Date(cloudTs).toISOString();
-  }
-  let timeText = "";
-
-  if (savedAt) {
-    const date = new Date(savedAt);
-    const hour = String(date.getHours()).padStart(2, "0");
-    const minute = String(date.getMinutes()).padStart(2, "0");
-    timeText = ` om ${hour}:${minute}`;
-  }
-
-  status.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Bijgewerkt' + timeText;
+  // Net als bij de familielijst: de tijd waarop je lijst voor het laatst is geladen of opgeslagen.
+  const now = new Date();
+  const hour = String(now.getHours()).padStart(2, "0");
+  const minute = String(now.getMinutes()).padStart(2, "0");
+  status.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Bijgewerkt om ' + hour + ":" + minute;
 }
+
+/* Kom je terug in de app (bijvoorbeeld na een paar uur)? Dan wordt je lijst opnieuw bijgewerkt en loopt de tijd mee. */
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) return;
+  try {
+    if (!auth || !auth.currentUser || !document.body.classList.contains("logged-in")) return;
+    const status = document.getElementById("status");
+    if (!status || !/Bijgewerkt/.test(status.textContent || "")) return;
+    if (typeof isPrivateMode === "function" && isPrivateMode()) updatePrivateStatus();
+    else if (typeof updateStatus === "function") updateStatus();
+  } catch (_) {}
+});
 
 function openRegister() {
   const modal = document.getElementById("registerModal");
@@ -13503,6 +13507,8 @@ async function clearShoppingHistory(){
   try{ __ovHistCache=[]; __ovHistUid=__ovUid(); __ovHistAt=Date.now(); }catch(_){}
   try{ const sc=JSON.parse(localStorage.getItem("boodschappenStripCache")||"{}"); delete sc.freq; localStorage.setItem("boodschappenStripCache",JSON.stringify(sc)); }catch(_){}
   try{ if(window.__frequentClear) window.__frequentClear(); }catch(_){}
+  // Ook de tekst bij "Geschiedenis" op het Overzicht meteen bijwerken.
+  try{ const hs=document.getElementById("overviewHistorySummary"); if(hs) hs.textContent=overviewHistoryText(0); localStorage.setItem("boodschappenHistCount","0"); }catch(_){}
   try{ if(typeof updateOverviewDashboard==="function") await updateOverviewDashboard(); }catch(_){}
 }
 
@@ -17787,7 +17793,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   /* ---------- Dag- en tijdkiezer voor de boodschappenherinnering ---------- */
   var DAYS=[["2","Maandag"],["3","Dinsdag"],["4","Woensdag"],["5","Donderdag"],["6","Vrijdag"],["7","Zaterdag"],["1","Zondag"]];
   var picker=null;
-  function parentDialog(on){try{if(typeof notificationFamilyDialog!=="undefined"&&notificationFamilyDialog)notificationFamilyDialog.classList.toggle("picker-child-open",on);}catch(_){}}
+  // Het Meldingen-venster blijft gewoon staan; de kiezer komt er netjes overheen.
+  function parentDialog(on){}
   function closePicker(){
     if(!picker)return false;var ov=picker;picker=null;
     ov.style.pointerEvents="none";ov.classList.add("familyDialogClosing");
@@ -17872,6 +17879,15 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     w.__lockWrapped=true;window.addProduct=w;
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",wrapAdd);else wrapAdd();
+
+  /* Een nieuw venster eerst in zijn beginstand laten berekenen, zodat het inschuiven nooit wordt overgeslagen
+     (de Android-app deed dat soms, waardoor een venster ineens in beeld stond). */
+  try{new MutationObserver(function(ms){
+    for(var i=0;i<ms.length;i++){var a=ms[i].addedNodes;for(var j=0;j<a.length;j++){var n=a[j];if(n.nodeType!==1)continue;
+      var t=(n.matches&&n.matches(".familyDialogOverlay,#overviewActionOverlay,.overviewActionSheet"))?n:(n.querySelector?n.querySelector(".familyDialogOverlay,.overviewActionSheet"):null);
+      if(t){var c=t.querySelector(".familyDialog,.overviewActionSheet")||t;void t.offsetWidth;try{getComputedStyle(c).transform;}catch(_){}void c.offsetWidth;}
+    }}
+  }).observe(document.body,{childList:true,subtree:true});}catch(_){}
   /* ---------- Terugknop van Android: sluit eerst de bovenste pop-up ---------- */
   function visible(el){return el&&el.isConnected&&!el.hidden&&getComputedStyle(el).display!=="none";}
   window.__appBack=function(){
