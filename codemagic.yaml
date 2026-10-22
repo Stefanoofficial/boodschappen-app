@@ -87,6 +87,46 @@ workflows:
           cp android_system_splash_icon.png android/app/src/main/res/drawable/android_system_splash_icon.png
           cp icon-512-maskable.png android/app/src/main/res/drawable/ic_launcher_foreground.png
 
+          echo "=== PREPARE SPLASH RING (soepele animatie) ==="
+          cat > android/app/src/main/res/drawable/splash_ring_anim.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:aapt="http://schemas.android.com/aapt">
+              <aapt:attr name="android:drawable">
+                  <vector
+                      android:width="230dp"
+                      android:height="230dp"
+                      android:viewportWidth="230"
+                      android:viewportHeight="230">
+                      <group
+                          android:name="spin"
+                          android:pivotX="115"
+                          android:pivotY="115">
+                          <path
+                              android:pathData="M115,11 A104,104 0 0,1 212.73,79.43"
+                              android:strokeColor="#FF14BE4B"
+                              android:strokeWidth="5"
+                              android:strokeLineCap="round"
+                              android:fillColor="#00000000" />
+                      </group>
+                  </vector>
+              </aapt:attr>
+              <target android:name="spin">
+                  <aapt:attr name="android:animation">
+                      <objectAnimator
+                          android:propertyName="rotation"
+                          android:valueFrom="0"
+                          android:valueTo="360"
+                          android:valueType="floatType"
+                          android:duration="800"
+                          android:repeatCount="infinite"
+                          android:repeatMode="restart"
+                          android:interpolator="@android:anim/linear_interpolator" />
+                  </aapt:attr>
+              </target>
+          </animated-vector>
+          EOF
+
           echo "=== PREPARE NOTIFICATION ICON ==="
           # Monochroom statusbalk-icoon voor Android-meldingen.
           cat > android/app/src/main/res/drawable/ic_notification.xml <<'EOF'
@@ -165,6 +205,7 @@ workflows:
           test -f android/app/src/main/res/drawable/ic_launcher_foreground.png
           test -f android/app/src/main/res/values/colors.xml
           test -f android/app/src/main/res/drawable/ic_notification.xml
+          test -f android/app/src/main/res/drawable/splash_ring_anim.xml
           test -f android/app/src/main/res/values/styles.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
