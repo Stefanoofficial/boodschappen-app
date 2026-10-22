@@ -12604,7 +12604,12 @@ function updatePrivateStatus() {
   const status = document.getElementById("status");
   if (!status) return;
 
-  const savedAt = user ? localStorage.getItem("boodschappenPrivateLastUpdate_" + user.uid) : null;
+  let savedAt = user ? localStorage.getItem("boodschappenPrivateLastUpdate_" + user.uid) : null;
+  // Na opnieuw installeren of op een andere telefoon: de tijd uit je account gebruiken.
+  if (!savedAt && user) {
+    const cloudTs = Number(localStorage.getItem("boodschappenPrivate_" + user.uid + "__updatedAt")) || 0;
+    if (cloudTs > 0) savedAt = new Date(cloudTs).toISOString();
+  }
   let timeText = "";
 
   if (savedAt) {
@@ -17616,8 +17621,23 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   function navSpace(){
     var n=document.querySelector(".bottomNav");var v=0;
     if(n){var cs=getComputedStyle(n);if(cs.display!=="none"&&cs.visibility!=="hidden"){var r=n.getBoundingClientRect();if(r.height>0)v=Math.max(0,Math.round(window.innerHeight-r.top));}}
-    root.style.setProperty("--mbNavSpace",v+"px");return v;
+    root.style.setProperty("--mbNavSpace",v+"px");
+    syncAndroidNavBar(v>0);
+    return v;
   }
+  /* Android: de strook achter de knoppen van Android krijgt dezelfde kleur als wat erboven staat. */
+  var lastBar="";
+  function hex(c){var m=String(c||"").match(/\d+(\.\d+)?/g);if(!m||m.length<3)return null;return "#"+[0,1,2].map(function(i){return ("0"+Math.round(+m[i]).toString(16)).slice(-2);}).join("");}
+  function syncAndroidNavBar(navVisible){
+    try{
+      if(!window.AndroidApp||typeof AndroidApp.setNavBarColor!=="function"||!document.body)return;
+      var dark=document.body.classList.contains("dark-theme");
+      var color=navVisible?(dark?"#191e1a":"#ffffff"):(hex(getComputedStyle(document.body).backgroundColor)||(dark?"#141a16":"#eef8f1"));
+      var key=color+"|"+dark;if(key===lastBar)return;lastBar=key;
+      AndroidApp.setNavBarColor(color,!dark);
+    }catch(_){}
+  }
+  var navT=null;try{new MutationObserver(function(){navSpace();clearTimeout(navT);navT=setTimeout(navSpace,450);}).observe(document.body||root,{attributes:true,attributeFilter:["class"]});}catch(_){}
   window.__mbNavSpace=navSpace;
   window.addEventListener("resize",navSpace);
   new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].addedNodes.length){navSpace();return;}}}).observe(document.body||root,{childList:true});
