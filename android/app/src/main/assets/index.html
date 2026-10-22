@@ -6360,12 +6360,13 @@ html.platform-android .barcodeOverlay,
 html.platform-android .androidReminderDialog,
 html.platform-android .appCalOverlay{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.platform-android .familyDialogOverlay{transition:background-color .2s ease,visibility 0s linear .3s!important}
+/* Bij openen meteen zichtbaar (pas bij sluiten even wachten), anders schoof het venster onzichtbaar in. */
+html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing){transition-delay:0s!important}
 html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing){background:rgba(22,30,25,.38)!important}
 html.platform-android body.dark-theme .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing){background:rgba(0,0,0,.56)!important}
 html.platform-android #overviewActionOverlay{transition:background-color .2s ease!important}
 html.platform-android #overviewActionOverlay.is-open{background:rgba(22,30,25,.34)!important}
 html.platform-android body.dark-theme #overviewActionOverlay.is-open{background:rgba(0,0,0,.56)!important}
-html.platform-android .familyDialog{will-change:transform,opacity;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 
 
 /* Android: pop-ups schuiven van rechts naar binnen met een vaste animatie. Een overgang (transition) sloeg de
