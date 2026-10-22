@@ -6287,6 +6287,38 @@ body.dark-theme .notificationSwitchRow input{background:#59635c!important}
 body.dark-theme .notificationSwitchRow input:checked{background:#4f8a62!important}
 body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important}
 </style>
+<style id="app-popups-style">
+/* Pop-ups blijven altijd boven de navigatiebalk (iPhone en Android gelijk). */
+.familyDialogOverlay{padding-bottom:calc(var(--mbNavSpace,0px) + 14px)!important;padding-top:calc(env(safe-area-inset-top) + 14px)!important;box-sizing:border-box}
+.familyDialogOverlay > .familyDialog{max-height:100%!important;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.notificationFamilyDialog .familyDialog{display:flex!important;flex-direction:column;max-height:100%!important;overflow:hidden!important;padding:0!important}
+.notificationFamilyDialog .familyDialogHeader{flex:0 0 auto;margin:0!important;padding:18px 18px 14px!important;position:relative}
+.notificationFamilyDialog .notificationFamilyDialogBody{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 18px 20px}
+.mbDialogClose{margin-left:auto;flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:0;background:#eef4f0;color:#3f5b45;display:inline-flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s ease,transform .12s ease}
+.mbDialogClose:active{transform:scale(.92);background:#e1ece4}
+body.dark-theme .mbDialogClose{background:#26302a;color:#cfe0d4}
+body.dark-theme .mbDialogClose:active{background:#2f3a33}
+
+/* Het maanknopje verdwijnt even zolang er een pop-up open staat. */
+body:has(.familyDialogOverlay.familyDialogShown:not(.familyDialogClosing)) #themeButton{opacity:0!important;pointer-events:none!important;transition:opacity .15s ease}
+/* Eigen keuzelijst in plaats van het lijstje van de telefoon. */
+select:not([multiple]){pointer-events:none}
+.mbSelBackdrop{position:fixed;inset:0;z-index:2147483000;background:transparent;-webkit-tap-highlight-color:transparent}
+.mbSelPop{position:fixed;box-sizing:border-box;background:#fff;border-radius:18px;box-shadow:0 18px 50px rgba(20,35,25,.22),0 2px 8px rgba(20,35,25,.08);border:1px solid rgba(63,91,69,.08);padding:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;opacity:0;transform:scale(.96);transition:opacity .14s ease,transform .18s cubic-bezier(.22,.8,.3,1)}
+.mbSelPop.show{opacity:1;transform:scale(1)}
+.mbSelOpt{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:10px 14px 10px 12px;border:0;background:transparent;border-radius:12px;font:inherit;font-size:16px;color:#1f2a22;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mbSelOpt i{width:18px;flex:0 0 18px;font-size:14px;color:#3f7a50;visibility:hidden}
+.mbSelOpt.sel{font-weight:700;color:#2f5a3a}
+.mbSelOpt.sel i{visibility:visible}
+.mbSelOpt:active,.mbSelOpt:focus-visible{background:#eef4f0;outline:none}
+.mbSelOpt:disabled{opacity:.4}
+.mbSelGroup{padding:10px 14px 4px 40px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#87928B}
+body.dark-theme .mbSelPop{background:#1f2622;border-color:rgba(255,255,255,.07);box-shadow:0 18px 50px rgba(0,0,0,.5)}
+body.dark-theme .mbSelOpt{color:#e9eee9}
+body.dark-theme .mbSelOpt.sel{color:#9fd3ac}
+body.dark-theme .mbSelOpt i{color:#9fd3ac}
+body.dark-theme .mbSelOpt:active,body.dark-theme .mbSelOpt:focus-visible{background:#2a332d}
+</style>
 </head>
 
 <body>
@@ -7001,7 +7033,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 21 oktober 2026</p>
+      <p><strong>Versie:</strong> 22 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
@@ -7029,7 +7061,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 21 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 22 oktober 2026.</p>
     </div>
   </div>
 
@@ -7041,7 +7073,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 21 oktober 2026</p>
+      <p><strong>Versie:</strong> 22 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
@@ -7053,7 +7085,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
       <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
       <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 21 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 22 oktober 2026.</p>
     </div>
   </div>
 
@@ -7101,6 +7133,11 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
       <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
+      <p>Een pop-up sluit je met het kruisje <strong>✕</strong> rechtsboven, of door naast de pop-up op het scherm te tikken. Op Android kan het ook met de terugknop van je telefoon. Wat je instelt, wordt meteen bewaard.</p>
+      <p>Keuzelijsten, zoals de winkel in de budgetplanner, openen als lijstje van de app zelf. Tik op je keuze; tik je ernaast, dan verandert er niets. Zo werkt het op iPhone en Android hetzelfde.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand aanpassen, of via <strong>Andere datum</strong> een dag kiezen in de kalender (veeg opzij voor een andere maand). </p>
       <p>Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
@@ -7128,7 +7165,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
-      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd.</p>
+      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je keuzes worden meteen bewaard; sluit het venster met <strong>✕</strong> of door ernaast te tikken.</p>
       <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten en een tijdstip kiezen.</p>
       <p><strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Heeft de app de datum geschat, dan vraagt hij op die dag of je het even wilt checken; tik op <strong>Op</strong> of <strong>Nog goed</strong> (dan vraagt de app het over 3 dagen opnieuw en onthoudt hij dat het langer goed blijft). Producten in de vriezer met een geschatte datum geven geen melding.</p>
       <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
@@ -7701,11 +7738,9 @@ function openNotificationSettings(event) {
       <div class="familyDialogHeader">
         <div class="familyDialogIcon"><i class="fa-solid fa-bell"></i></div>
         <div class="familyDialogTitle" id="notificationFamilyDialogTitle">Meldingen</div>
+        <button type="button" class="mbDialogClose" id="notificationFamilyDialogDone" aria-label="Sluiten"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <div class="familyDialogBody notificationFamilyDialogBody"></div>
-      <div class="familyDialogActions">
-        <button type="button" class="familyDialogBtn familyDialogPrimary" id="notificationFamilyDialogDone">Klaar</button>
-      </div>
     </div>`;
 
   document.body.appendChild(overlay);
@@ -7718,6 +7753,10 @@ function openNotificationSettings(event) {
 
   overlay.querySelector("#notificationFamilyDialogDone").addEventListener("click", () => {
     closeNotificationSettings();
+  });
+  // Naast de pop-up tikken sluit hem ook (instellingen zijn al bewaard).
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay && !overlay.classList.contains("picker-child-open")) closeNotificationSettings();
   });
 
   requestAnimationFrame(() => overlay.classList.add("familyDialogShown"));
@@ -17504,6 +17543,151 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     setTimeout(tick,tries<20?1500:6000);
   }
   setTimeout(tick,1200);
+})();
+</script>
+<script id="app-popups">
+(function(){
+  /* Ruimte van de navigatiebalk, zodat pop-ups er nooit achter vallen. */
+  var root=document.documentElement;
+  function navSpace(){
+    var n=document.querySelector(".bottomNav");var v=0;
+    if(n){var cs=getComputedStyle(n);if(cs.display!=="none"&&cs.visibility!=="hidden"){var r=n.getBoundingClientRect();if(r.height>0)v=Math.max(0,Math.round(window.innerHeight-r.top));}}
+    root.style.setProperty("--mbNavSpace",v+"px");return v;
+  }
+  window.__mbNavSpace=navSpace;
+  window.addEventListener("resize",navSpace);
+  new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].addedNodes.length){navSpace();return;}}}).observe(document.body||root,{childList:true});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",navSpace);else navSpace();
+
+  /* ---------- Eigen keuzelijst voor alle <select>-velden ---------- */
+  var open=null;
+  function bottomLimit(){return window.innerHeight-Math.max(navSpace(),0)-8;}
+  function closeSel(){
+    if(!open)return false;var o=open;open=null;
+    o.pop.classList.remove("show");
+    setTimeout(function(){if(o.bd.isConnected)o.bd.remove();},150);
+    try{o.sel.focus({preventScroll:true});}catch(_){}
+    return true;
+  }
+  function choose(sel,value){
+    if(sel.value!==value){
+      sel.value=value;
+      sel.dispatchEvent(new Event("input",{bubbles:true}));
+      sel.dispatchEvent(new Event("change",{bubbles:true}));
+    }
+    closeSel();
+  }
+  function openSel(sel){
+    if(!sel||sel.disabled||sel.multiple)return;
+    closeSel();
+    var bd=document.createElement("div");bd.className="mbSelBackdrop";
+    var pop=document.createElement("div");pop.className="mbSelPop";pop.setAttribute("role","listbox");
+    var lbl=sel.getAttribute("aria-label")||(sel.labels&&sel.labels[0]&&sel.labels[0].textContent.trim())||"";
+    if(lbl)pop.setAttribute("aria-label",lbl);
+    var cur=null;
+    Array.prototype.forEach.call(sel.children,function(ch){
+      function add(opt){
+        if(opt.hidden)return;
+        var b=document.createElement("button");b.type="button";b.className="mbSelOpt";b.setAttribute("role","option");
+        b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i><span></span>';
+        b.lastChild.textContent=opt.textContent;
+        if(opt.disabled)b.disabled=true;
+        if(opt.selected){b.classList.add("sel");b.setAttribute("aria-selected","true");cur=b;}
+        b.addEventListener("click",function(e){e.stopPropagation();choose(sel,opt.value);});
+        pop.appendChild(b);
+      }
+      if(ch.tagName==="OPTGROUP"){var g=document.createElement("div");g.className="mbSelGroup";g.textContent=ch.label||"";pop.appendChild(g);Array.prototype.forEach.call(ch.children,add);}
+      else if(ch.tagName==="OPTION")add(ch);
+    });
+    bd.appendChild(pop);document.body.appendChild(bd);
+    var openedAt=Date.now();
+    bd.addEventListener("click",function(e){e.stopPropagation();if(e.target===bd&&Date.now()-openedAt>350)closeSel();});
+    ["pointerdown","touchstart","mousedown"].forEach(function(ev){bd.addEventListener(ev,function(e){e.stopPropagation();},{passive:true});});
+    // Plaatsing: onder het veld, of erboven als daar meer ruimte is.
+    var r=sel.getBoundingClientRect(),vw=window.innerWidth;
+    var minTop=8+safeTop(),maxBottom=bottomLimit();
+    var w=Math.min(Math.max(r.width,220),vw-24);
+    var left=Math.min(Math.max(12,r.left),vw-12-w);
+    pop.style.width=w+"px";pop.style.left=left+"px";
+    var need=pop.scrollHeight+2;
+    var below=maxBottom-(r.bottom+6),above=(r.top-6)-minTop;
+    var h,y,origin;
+    if(below>=Math.min(need,320)||below>=above){h=Math.min(need,below);y=r.bottom+6;origin="top";}
+    else{h=Math.min(need,above);y=r.top-6-h;origin="bottom";}
+    if(h<140){h=Math.min(need,maxBottom-minTop);y=Math.max(minTop,Math.min(r.top,maxBottom-h));origin="center";}
+    pop.style.top=Math.round(y)+"px";pop.style.maxHeight=Math.round(h)+"px";pop.style.transformOrigin=(r.left+r.width/2-left)+"px "+origin;
+    if(cur){var c=cur.offsetTop-(h-cur.offsetHeight)/2;pop.scrollTop=Math.max(0,c);}
+    open={sel:sel,bd:bd,pop:pop};
+    requestAnimationFrame(function(){pop.classList.add("show");});
+    try{(cur||pop.querySelector(".mbSelOpt:not(:disabled)")).focus({preventScroll:true});}catch(_){}
+  }
+  function safeTop(){
+    var t=document.createElement("div");t.style.cssText="position:fixed;top:0;height:env(safe-area-inset-top);visibility:hidden";document.body.appendChild(t);var v=t.offsetHeight;t.remove();return v;
+  }
+  window.__openAppSelect=openSel;
+  function selectAt(x,y){
+    var list=document.querySelectorAll("select:not([multiple])");
+    for(var i=list.length-1;i>=0;i--){
+      var s=list[i];if(s.disabled)continue;
+      var r=s.getBoundingClientRect();if(!r.width||!r.height)continue;
+      if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){
+        var hit=document.elementFromPoint(x,y);
+        // Alleen als er geen andere pop-up overheen ligt.
+        if(hit&&(hit===s.parentNode||s.parentNode.contains(hit)||hit.contains(s)))return s;
+        if(hit&&hit.closest&&hit.closest("label")&&hit.closest("label").control===s)return s;
+      }
+    }
+    return null;
+  }
+  var down=null;
+  document.addEventListener("pointerdown",function(e){if(open)return;down={x:e.clientX,y:e.clientY,t:Date.now()};},true);
+  document.addEventListener("pointerup",function(e){
+    if(!down||open)return;var d=down;down=null;
+    if(Math.abs(e.clientX-d.x)>10||Math.abs(e.clientY-d.y)>10||Date.now()-d.t>800)return;
+    var s=selectAt(e.clientX,e.clientY);if(!s)return;
+    e.preventDefault();openSel(s);
+  },true);
+  // Een label dat bij een keuzelijst hoort, opent onze lijst (niet die van de telefoon).
+  document.addEventListener("click",function(e){
+    var l=e.target&&e.target.closest&&e.target.closest("label");
+    if(l&&l.control&&l.control.tagName==="SELECT"){e.preventDefault();if(!open&&e.detail===0)openSel(l.control);}
+  },true);
+  document.addEventListener("keydown",function(e){
+    if(open){
+      if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeSel();return;}
+      if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+        var bs=[].slice.call(open.pop.querySelectorAll(".mbSelOpt:not(:disabled)"));var i=bs.indexOf(document.activeElement);
+        i=e.key==="ArrowDown"?Math.min(bs.length-1,i+1):Math.max(0,i-1);if(bs[i])bs[i].focus();e.preventDefault();
+      }
+      return;
+    }
+    var t=e.target;
+    if(t&&t.tagName==="SELECT"&&!t.multiple&&(e.key==="Enter"||e.key===" "||e.key==="ArrowDown"||e.key==="ArrowUp"||(e.altKey&&e.key==="ArrowDown"))){e.preventDefault();openSel(t);}
+  },true);
+  window.addEventListener("resize",function(){if(open)closeSel();});
+
+  /* ---------- Terugknop van Android: sluit eerst de bovenste pop-up ---------- */
+  function visible(el){return el&&el.isConnected&&!el.hidden&&getComputedStyle(el).display!=="none";}
+  window.__appBack=function(){
+    try{
+      if(closeSel())return true;
+      var cal=document.querySelector(".appCalOverlay.show");
+      if(cal){var c=cal.querySelector('[data-b="cancel"]');if(c){c.click();return true;}}
+      var td=document.getElementById("reminderTimeDialog");
+      if(visible(td)&&typeof closeReminderTimePicker==="function"){closeReminderTimePicker();return true;}
+      var dd=document.getElementById("reminderDayDialog");
+      if(visible(dd)&&typeof closeReminderDayPicker==="function"){closeReminderDayPicker();return true;}
+      var ovs=[].slice.call(document.querySelectorAll(".familyDialogOverlay.familyDialogShown:not(.familyDialogClosing)"));
+      var ov=ovs[ovs.length-1];
+      if(ov){
+        if(ov.classList.contains("notificationFamilyDialog")&&typeof closeNotificationSettings==="function"){closeNotificationSettings();return true;}
+        var b=ov.querySelector(".mbDialogClose,.familyDialogCancel,[data-b='cancel']");
+        if(!b)b=[].slice.call(ov.querySelectorAll("button")).filter(function(x){return /^(Klaar|Sluiten|Annuleren|Niet nu)$/.test((x.textContent||"").trim());})[0];
+        if(b){b.click();return true;}
+      }
+    }catch(_){}
+    return false;
+  };
 })();
 </script>
 </body>
