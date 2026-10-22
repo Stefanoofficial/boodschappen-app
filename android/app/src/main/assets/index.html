@@ -6347,6 +6347,30 @@ body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#ff
 .recipeThumb img.mbLoaded,.recipeSheetHero img.mbLoaded{opacity:1}
 .recipeThumb img.mbInstant,.recipeSheetHero img.mbInstant{transition:none}
 </style>
+<style id="android-smooth-popups">
+/* Android: geen wazige achtergrond achter pop-ups. Dat vervagen kost de Android-app veel rekenkracht
+   en liet de animatie haperen. In plaats daarvan een rustige donkere waas; alleen het venster beweegt. */
+html.platform-android .familyDialogOverlay,
+html.platform-android .familyDialogOverlay.familyDialogShown,
+html.platform-android #overviewActionOverlay,
+html.platform-android #overviewActionOverlay.is-open,
+html.platform-android .overviewActionOverlay,
+html.platform-android .clearListBackdrop,
+html.platform-android .barcodeOverlay,
+html.platform-android .androidReminderDialog,
+html.platform-android .appCalOverlay{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.platform-android .familyDialogOverlay{transition:background-color .2s ease,visibility 0s linear .3s!important}
+html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing){background:rgba(22,30,25,.38)!important}
+html.platform-android body.dark-theme .familyDialogOverlay.familyDialogShown:not(.familyDialogClosing){background:rgba(0,0,0,.56)!important}
+html.platform-android #overviewActionOverlay{transition:background-color .2s ease!important}
+html.platform-android #overviewActionOverlay.is-open{background:rgba(22,30,25,.34)!important}
+html.platform-android body.dark-theme #overviewActionOverlay.is-open{background:rgba(0,0,0,.56)!important}
+html.platform-android .familyDialog{will-change:transform,opacity;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+
+/* "‹ Mijn familie" (en "‹ Pro") even groot als de andere terugknoppen. */
+html body .familyMenuBack span{font-size:17px!important;font-weight:700!important}
+html body .familyMenuBack i{font-size:14px!important}
+</style>
 </head>
 
 <body>
