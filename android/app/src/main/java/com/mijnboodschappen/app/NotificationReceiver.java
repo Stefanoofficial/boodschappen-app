@@ -27,6 +27,12 @@ public class NotificationReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "shopping_reminders";
     static final String PANTRY_CHANNEL_ID = "pantry_alerts";
 
+    /** Statusbalk-icoon; valt terug op het app-icoon als ic_notification ontbreekt. */
+    static int smallIcon(Context context) {
+        int id = context.getResources().getIdentifier("ic_notification", "drawable", context.getPackageName());
+        return id != 0 ? id : context.getApplicationInfo().icon;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Build.VERSION.SDK_INT >= 33
@@ -72,7 +78,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             builder = new android.app.Notification.Builder(context)
                     .setPriority(android.app.Notification.PRIORITY_HIGH);
         }
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(smallIcon(context))
                 .setContentTitle("Tijd voor je boodschappen")
                 .setContentText("Bekijk je boodschappenlijst en werk deze bij.")
                 .setAutoCancel(true);
@@ -124,7 +130,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         } else {
             builder = new android.app.Notification.Builder(context);
         }
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(smallIcon(context))
                 .setContentTitle(title)
                 .setContentText(text)
                 .setStyle(new android.app.Notification.BigTextStyle().bigText(text))
@@ -140,7 +146,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 String label = a.optString("label", "Openen");
                 PendingIntent pi = openAppIntent(context, key, ids, notificationId, notificationId * 10 + i + 1);
                 builder.addAction(new android.app.Notification.Action.Builder(
-                        R.drawable.ic_notification, label, pi).build());
+                        smallIcon(context), label, pi).build());
             }
         }
 

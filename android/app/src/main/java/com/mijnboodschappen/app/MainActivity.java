@@ -366,7 +366,7 @@ public class MainActivity extends Activity {
             builder = new android.app.Notification.Builder(this)
                     .setPriority(android.app.Notification.PRIORITY_HIGH);
         }
-        builder.setSmallIcon(R.drawable.ic_notification)
+        builder.setSmallIcon(NotificationReceiver.smallIcon(this))
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new android.app.Notification.BigTextStyle().bigText(message))
