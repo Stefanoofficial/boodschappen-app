@@ -41,6 +41,10 @@ public class MainActivity extends Activity {
     private View topScrim;
     private View bottomScrim;
     private int statusBarScrimColor = Color.rgb(238, 248, 241);
+    // Kleur voor de strook achter de knoppen van Android; wordt pas na het opstartscherm toegepast.
+    private int navBarColor = Color.rgb(238, 248, 241);
+    private boolean navBarLight = true;
+    private boolean navBarColorSet = false;
     private SplashRing ring;
     // Het ringetje dat draait: een geanimeerde vector (soepel, op de grafische taak van Android)
     // of, op oudere toestellen, het zelfgetekende ringetje.
@@ -278,6 +282,30 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void applyNavBarColor() {
+        if (!navBarColorSet) return;
+        Window window = getWindow();
+        window.setNavigationBarColor(navBarColor);
+        if (bottomScrim != null) bottomScrim.setBackgroundColor(navBarColor);
+        if (Build.VERSION.SDK_INT >= 30) {
+            try {
+                android.view.WindowInsetsController c = window.getInsetsController();
+                if (c != null) {
+                    c.setSystemBarsAppearance(
+                            navBarLight ? android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS : 0,
+                            android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+                }
+            } catch (Exception ignored) {
+            }
+        } else if (Build.VERSION.SDK_INT >= 26) {
+            View decor = window.getDecorView();
+            int flags = decor.getSystemUiVisibility();
+            if (navBarLight) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            else flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            decor.setSystemUiVisibility(flags);
+        }
+    }
+
     private void stopSplashRing() {
         if (ringAnim != null) {
             try { ringAnim.stop(); } catch (Exception ignored) { }
@@ -316,6 +344,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         stopSplashRing();
+                        applyNavBarColor();
                         if (root != null && splash != null) {
                             root.removeView(splash);
                         }
@@ -566,6 +595,21 @@ public class MainActivity extends Activity {
         public boolean notificationsAllowed() {
             return Build.VERSION.SDK_INT < 33
                     || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        /** De app geeft door welke kleur onderaan hoort (wit onder de navigatiebalk, donker in donkere modus). */
+        @JavascriptInterface
+        public void setNavBarColor(final String hex, final boolean lightBackground) {
+            runOnUiThread(() -> {
+                try {
+                    navBarColor = Color.parseColor(hex);
+                } catch (Exception e) {
+                    return;
+                }
+                navBarLight = lightBackground;
+                navBarColorSet = true;
+                if (splashRemoved) applyNavBarColor();
+            });
         }
 
         @JavascriptInterface
