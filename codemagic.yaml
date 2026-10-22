@@ -10,7 +10,8 @@ workflows:
         - $HOME/.gradle/wrapper
 
     scripts:
-      - name: Prepare Android app
+      - &prepare_android_app
+        name: Prepare Android app
         script: |
           #!/usr/bin/env bash
           set -e
@@ -170,7 +171,8 @@ workflows:
 
           echo "Resource check complete."
 
-      - name: Set Android SDK location
+      - &set_android_sdk
+        name: Set Android SDK location
         script: |
           set -e
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
@@ -199,3 +201,49 @@ workflows:
 
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
+
+  android-playstore:
+    name: Android AAB - Play Store (Mijn Boodschappen)
+    instance_type: mac_mini_m2
+
+    environment:
+      android_signing:
+        - mijnboodschappen_upload
+
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
+
+    scripts:
+      - *prepare_android_app
+      - *set_android_sdk
+
+      - name: Build Android App Bundle (Play Store)
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/android"
+          chmod +x ./gradlew
+
+          echo "========================================"
+          echo "       BUILD PLAY STORE BUNDLE (.aab)"
+          echo "========================================"
+
+          if [ -z "$CM_KEYSTORE_PATH" ]; then
+            echo "Geen ondertekensleutel gevonden. Voeg in Codemagic (Team settings > Code signing identities > Android keystores) een sleutel toe met de naam mijnboodschappen_upload."
+            exit 1
+          fi
+
+          ./gradlew bundleRelease \
+            --build-cache \
+            --parallel \
+            --stacktrace
+
+          echo "=== AAB FILES ==="
+          find app/build/outputs/bundle/release \
+            -type f \
+            -name "*.aab" \
+            -print
+
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab
