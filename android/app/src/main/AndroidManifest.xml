@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Mijn Boodschappen"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true">
         <receiver
             android:name=".NotificationReceiver"
             android:enabled="true"
