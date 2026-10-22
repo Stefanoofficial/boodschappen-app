@@ -4,7 +4,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Mijn Boodschappen</title>
 <style id="icons-inline">/* Font Awesome Free 6.5.1 (alleen de gebruikte iconen, in de app ingebouwd) - https://fontawesome.com - License: Icons CC BY 4.0, Fonts SIL OFL 1.1, Code MIT */
@@ -6270,6 +6270,16 @@ body.dark-theme #overviewActionOverlay.is-open{background:rgba(0,0,0,.48)!import
 #overviewActionOverlay.is-closing .overviewActionSheet{opacity:0!important;transform:translateX(70px) scale(.985)!important}
 #overviewActionOverlay.is-closing{pointer-events:none!important}
 @media (prefers-reduced-motion: reduce){#overviewActionOverlay .overviewActionSheet{transform:none!important;transition:opacity .15s ease!important}}
+</style>
+<style id="safe-area-bottom">
+/* iPhone (zonder thuisknop) en Android met veeggebaren: de menubalk krijgt onderaan de "veilige ruimte"
+   van het toestel erbij, zodat je knoppen niet in de veegzone van het systeem zitten. Op toestellen zonder
+   veegbalk is die ruimte 0 en verandert er niets. */
+.bottomNav{height:calc(76px + env(safe-area-inset-bottom, 0px))!important;padding-bottom:calc(7px + env(safe-area-inset-bottom, 0px))!important}
+@media(max-width:600px){.app{padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important}}
+.overviewView,.moreView{padding-bottom:calc(115px + env(safe-area-inset-bottom, 0px))}
+/* Bovenkant: als de statusbalk over de app heen valt, schuift de inhoud eronder vandaan. */
+body{padding-top:env(safe-area-inset-top, 0px)}
 </style>
 </head>
 
