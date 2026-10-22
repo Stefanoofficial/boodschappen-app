@@ -6258,6 +6258,19 @@ body.dark-theme .overviewHistoryWipe{background:#3d2a28;color:#f0a49c}
 .overviewSavedManage{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:6px 0 2px;padding:12px;border:0;border-radius:14px;background:#eef4ef;color:#3F5B45;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
 body.dark-theme .overviewSavedManage{background:#25302a;color:#cfe6d5}
 </style>
+<style id="overview-sheet-slide">
+/* Overzicht-vensters (Snel opnieuw toevoegen, Opgeslagen lijsten, Geschiedenis):
+   zelfde rustige beweging als de Familie-vensters, van rechts naar links. */
+#overviewActionOverlay{opacity:1!important;pointer-events:none!important;background:rgba(24,37,29,0)!important;-webkit-backdrop-filter:blur(0px)!important;backdrop-filter:blur(0px)!important;transition:background-color .22s ease,-webkit-backdrop-filter .22s ease,backdrop-filter .22s ease!important}
+#overviewActionOverlay.is-open{pointer-events:auto!important;background:rgba(24,37,29,.22)!important;-webkit-backdrop-filter:blur(6px)!important;backdrop-filter:blur(6px)!important}
+.platform-ios #overviewActionOverlay.is-open{background:rgba(20,24,22,.24)!important;-webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important}
+body.dark-theme #overviewActionOverlay.is-open{background:rgba(0,0,0,.48)!important}
+#overviewActionOverlay .overviewActionSheet{opacity:0!important;transform:translateX(70px) scale(.985)!important;transition:opacity .22s ease,transform .30s cubic-bezier(.22,.8,.3,1)!important;will-change:transform,opacity}
+#overviewActionOverlay.is-open .overviewActionSheet{opacity:1!important;transform:translateX(0) scale(1)!important}
+#overviewActionOverlay.is-closing .overviewActionSheet{opacity:0!important;transform:translateX(70px) scale(.985)!important}
+#overviewActionOverlay.is-closing{pointer-events:none!important}
+@media (prefers-reduced-motion: reduce){#overviewActionOverlay .overviewActionSheet{transform:none!important;transition:opacity .15s ease!important}}
+</style>
 </head>
 
 <body>
@@ -13123,32 +13136,22 @@ function __overviewOverlay(title){
 
   // Important: the sheet is inserted but NOT animated yet.
   // Its complete contents are filled first; only then do we call open().
-  overlay.style.opacity="0";
-  overlay.style.pointerEvents="none";
-  sheet.style.transform="translate3d(0,110%,0)";
-  sheet.style.opacity="1";
-  sheet.style.transition="transform 140ms cubic-bezier(.22,1,.36,1)";
-  sheet.style.willChange="transform";
-
+  // Beweging (zoals de Familie-vensters): het venster schuift rustig van rechts naar binnen,
+  // de waas erachter bouwt zich geleidelijk op. Zie <style id="overview-sheet-slide">.
   var closeSheet=function(){
     if(overlay.dataset.closing==="1") return;
     overlay.dataset.closing="1";
     overlay.classList.remove("is-open");
     overlay.classList.add("is-closing");
-    overlay.style.opacity="0";
-    overlay.style.pointerEvents="none";
-    sheet.style.transform="translate3d(0,110%,0)";
-    setTimeout(function(){ if(overlay.parentNode) overlay.remove(); },150);
+    setTimeout(function(){ if(overlay.parentNode) overlay.remove(); },300);
   };
 
   var openSheet=function(){
     if(overlay.dataset.closing==="1" || overlay.dataset.opened==="1") return;
     overlay.dataset.opened="1";
-    overlay.style.pointerEvents="auto";
+    void sheet.offsetWidth;
     requestAnimationFrame(function(){
-      overlay.classList.add("is-open");
-      overlay.style.opacity="1";
-      sheet.style.transform="translate3d(0,0,0)";
+      requestAnimationFrame(function(){ overlay.classList.add("is-open"); });
     });
   };
 
