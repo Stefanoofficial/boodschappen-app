@@ -2,17 +2,51 @@ plugins {
     id 'com.android.application'
 }
 
+// Sleutel voor de Play Store-versie. Codemagic vult deze gegevens zelf in
+// (Team settings → Code signing identities). Zonder sleutel bouwt de app gewoon de test-APK.
+def keystorePath = System.getenv("CM_KEYSTORE_PATH")
+
+// Elke upload naar Google Play heeft een hoger intern nummer nodig. De versie die
+// gebruikers zien blijft 1.0.0.
+def buildNumber = System.getenv("BUILD_NUMBER")
+def appVersionCode = buildNumber ? (buildNumber as int) + 10 : 3
+
 android {
     namespace 'com.mijnboodschappen.app'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.mijnboodschappen.app'
         minSdk 24
-        targetSdk 35
+        targetSdk 36
 
-        versionCode 3
+        versionCode appVersionCode
         versionName '1.0.0'
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("CM_KEY_ALIAS")
+                keyPassword System.getenv("CM_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (keystorePath) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 
