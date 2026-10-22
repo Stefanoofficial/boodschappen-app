@@ -5252,7 +5252,7 @@ body.dark-theme .viaFamilyPro > div > p::after{color:#9fd3ac}
 .pantryShareRow.viaFamily{cursor:default}
 .pantryShareRow.viaFamily .pantryShareIcon{background:#fff2d0;color:#9a6f12}
 body.dark-theme .pantryShareRow.viaFamily .pantryShareIcon{background:#3a3424;color:#f0c065}
-html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;border-radius:10px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(63,91,69,.12)}
+html body .aboutInfoVersion{display:inline-block;padding:8px 12px;margin:-3px 0 -1px 27px!important;cursor:default;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;pointer-events:none}
 
 /* Geen klein slotje op het icoon: de knop "Ontgrendel met Pro" laat het slot al zien */
 .proLockedCard > i:first-child::after{content:none!important;display:none!important}
@@ -6952,7 +6952,7 @@ body.dark-theme .notificationSwitchRow input::after{background:#eef3ef!important
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion" role="button" tabindex="0">Versie 1.0.0</div>
+      <div class="aboutInfoVersion">Versie 1.0.0</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je in je mandje legt en gebruik de scanner als je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -16489,7 +16489,6 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     note(free?"Je ziet de app nu zonder Pro.":"Pro staat weer aan.");
   };
 
-  // Testinstellingen verschijnen na 5× tikken op het versienummer
   // Alleen voor de eigenaar: altijd zichtbaar onderaan Instellingen. Anderen zien ze nooit.
   function showDev(){var b=document.getElementById("devSettingsBlock");if(b)b.hidden=!isOwner();}
   window.toggleFamilyProTest=function(event){
@@ -16506,40 +16505,6 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     note("Teruggezet: Pro staat aan, familietest staat uit.");
   };
 
-  // Testinstellingen: 5× tikken óf 2 seconden ingedrukt houden op het versienummer.
-  // Eén luisteraar op het hele document (capture), zodat het altijd werkt, ook als
-  // andere onderdelen tikken tegenhouden. Snelle dubbeltikken worden door de app
-  // geblokkeerd tegen inzoomen; daarom tellen we touchend/pointerup zelf.
-  var taps=0,tapTimer=null,lastAt=0,holdTimer=null;
-  // Uitgeschakeld: de Testinstellingen zijn alleen voor het account van de eigenaar en staan daar altijd.
-  function onVersion(e){return false;}
-  function enableDev(){
-    taps=0;clearTimeout(holdTimer);
-    if(get(DEV_KEY)==="1"){note("De testinstellingen staan al aan. Je vindt ze onderaan Instellingen.");return;}
-    set(DEV_KEY,"1");showDev();
-    note("Testinstellingen staan aan. Je vindt ze onderaan Instellingen.");
-    try{if(navigator.vibrate)navigator.vibrate(30);}catch(_){}
-  }
-  function countTap(e){
-    if(!onVersion(e))return;
-    var now=Date.now();if(now-lastAt<80)return;lastAt=now;
-    clearTimeout(holdTimer);
-    taps++;clearTimeout(tapTimer);tapTimer=setTimeout(function(){taps=0;},3000);
-    if(taps>=5){enableDev();return;}
-    if(taps>=2&&get(DEV_KEY)!=="1")note("Nog "+(5-taps)+" keer tikken voor de testinstellingen.");
-  }
-  function startHold(e){
-    if(!onVersion(e))return;
-    clearTimeout(holdTimer);holdTimer=setTimeout(enableDev,2000);
-  }
-  function cancelHold(){clearTimeout(holdTimer);}
-  document.addEventListener("touchend",countTap,{capture:true,passive:true});
-  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")countTap(e);},true);
-  document.addEventListener("touchstart",startHold,{capture:true,passive:true});
-  document.addEventListener("pointerdown",function(e){if(e.pointerType!=="touch")startHold(e);},true);
-  ["touchmove","touchcancel","pointercancel"].forEach(function(t){document.addEventListener(t,cancelHold,{capture:true,passive:true});});
-  document.addEventListener("pointerup",function(e){if(e.pointerType!=="touch")cancelHold();},true);
-  document.addEventListener("touchend",cancelHold,{capture:true,passive:true});
   function bindVersion(){}
   // Tik op een vergrendelde kaart → ontgrendelscherm
   document.addEventListener("click",function(e){
