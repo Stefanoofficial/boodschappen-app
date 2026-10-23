@@ -612,6 +612,33 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Staat de telefoon op donker thema? (voor "Automatisch" in de app) */
+        @JavascriptInterface
+        public boolean isSystemDark() {
+            return systemDark();
+        }
+
+        /** Scherm aan laten zolang je lijst open staat (in de winkel). */
+        @JavascriptInterface
+        public void setKeepScreenOn(final boolean on) {
+            runOnUiThread(() -> {
+                if (on) getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                else getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            });
+        }
+
+        /** Korte tik als bevestiging (volgt de trilinstelling van je telefoon). */
+        @JavascriptInterface
+        public void haptic() {
+            runOnUiThread(() -> {
+                if (webView == null) return;
+                int type = Build.VERSION.SDK_INT >= 30
+                        ? android.view.HapticFeedbackConstants.CONFIRM
+                        : android.view.HapticFeedbackConstants.KEYBOARD_TAP;
+                webView.performHapticFeedback(type);
+            });
+        }
+
         @JavascriptInterface
         public void setMenuDimmed(final boolean dimmed) {
             runOnUiThread(() -> {
@@ -710,6 +737,22 @@ public class MainActivity extends Activity {
         // Android 12 en ouder.
         handleBack(() -> MainActivity.super.onBackPressed());
     }
+    private boolean systemDark() {
+        int mode = getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        return mode == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    /** Telefoon wisselt tussen licht en donker: de app hoeft niet opnieuw te starten, we geven het door. */
+    @Override
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "window.__onSystemDarkChanged&&window.__onSystemDarkChanged(" + systemDark() + ")", null);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         stopSplashRing();
