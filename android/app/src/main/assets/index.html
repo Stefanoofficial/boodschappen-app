@@ -8178,6 +8178,8 @@ function switchMenuPage(pageId, event) {
   menu.style.display = "block";
   __showOnlyMenuPage(pageId);
   page.scrollTop = 0;
+  /* Een nieuwe pagina in Meer begint altijd bovenaan. */
+  try { const mv = document.getElementById("moreView"); if (mv) mv.scrollTop = 0; } catch (_) {}
 }
 
 function returnMenuToMain(pageId, event) {
@@ -18135,11 +18137,13 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 })();
 </script>
 <style id="app-tour-style">
-#mbTour{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;opacity:0;transition:opacity .25s ease}
+#mbTour{position:fixed;inset:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .25s ease}
 #mbTour.show{opacity:1}
 #mbTour .tHole{position:fixed;border-radius:18px;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 0 200vmax rgba(14,22,17,.62);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease,border-radius .3s ease;pointer-events:none}
 #mbTour .tHole.none{width:0!important;height:0!important;left:50%!important;top:50%!important}
-#mbTour .tCard{position:fixed;left:16px;right:16px;max-width:380px;margin:0 auto;background:#fff;color:#24352a;border-radius:22px;padding:18px 18px 14px;box-shadow:0 18px 40px rgba(0,0,0,.25);transition:top .3s ease,bottom .3s ease}
+#mbTour .tBlk{position:fixed;pointer-events:auto;background:transparent}
+#mbTour.paused{opacity:0!important;visibility:hidden}
+#mbTour .tCard{pointer-events:auto;position:fixed;left:16px;right:16px;max-width:380px;margin:0 auto;background:#fff;color:#24352a;border-radius:22px;padding:18px 18px 14px;box-shadow:0 18px 40px rgba(0,0,0,.25);transition:top .3s ease,bottom .3s ease}
 #mbTour .tCard h3{margin:0 0 6px;font-size:18px;font-weight:800;color:#2f4a38;display:flex;align-items:center;gap:10px}
 #mbTour .tCard h3 i{width:36px;height:36px;border-radius:50%;background:#e2f3e5;color:#3c5c46;display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
 #mbTour .tCard p{margin:0;font-size:14.5px;line-height:1.45;color:#5d6b61}
@@ -18164,11 +18168,11 @@ body.dark-theme #mbTour .tNext{background:#4c7a5a}
 (function(){
   var steps=[
     {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In vijf korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
-    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Typ wat je nodig hebt en tik op Toevoegen. Tijdens het typen krijg je suggesties."},
-    {sel:".searchBox",t:"Zoeken en scannen",i:"fa-barcode",p:"Zoek in je lijst, of tik op het streepjescode-icoon om een product te scannen."},
+    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Probeer het maar: typ wat je nodig hebt en tik op Toevoegen. Tijdens het typen krijg je suggesties."},
+    {sel:".searchBox",t:"Zoeken en scannen",i:"fa-barcode",p:"Zoek in je lijst, of tik op het streepjescode-icoon om een product te scannen. Probeer het gerust."},
     {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Tik op het rondje naast een product om het af te vinken. Met − en + pas je het aantal aan."},
-    {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier zie je je voortgang, je opgeslagen lijsten en producten die je vaak koopt."},
-    {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, Pro met de weekplanner en 30 recepten, je instellingen en Help & uitleg.",last:true}
+    {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier zie je je voortgang, je opgeslagen lijsten en producten die je vaak koopt. Tik er gerust op.",tap:"next"},
+    {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, Pro met de weekplanner en 30 recepten, je instellingen en Help & uitleg. Tik er gerust op.",last:true,tap:"close"}
   ];
   var el=null,idx=0;
   function uid(){try{return (auth&&auth.currentUser&&auth.currentUser.uid)||"";}catch(_){return "";}}
@@ -18178,16 +18182,32 @@ body.dark-theme #mbTour .tNext{background:#4c7a5a}
     if(!el)return;
     var s=steps[idx],hole=el.querySelector(".tHole"),card=el.querySelector(".tCard");
     var tgt=s.sel?document.querySelector(s.sel):null,r=tgt?tgt.getBoundingClientRect():null;
-    if(!r||!r.width||!r.height){hole.classList.add("none");card.style.top="50%";card.style.bottom="auto";card.style.transform="translateY(-50%)";return;}
+    if(!r||!r.width||!r.height){hole.classList.add("none");blocks(null);card.style.top="50%";card.style.bottom="auto";card.style.transform="translateY(-50%)";return;}
     hole.classList.remove("none");
     var pad=6,vh=window.innerHeight;
     var top=Math.max(4,r.top-pad),h=Math.min(r.height+pad*2,vh*0.42);
     hole.style.left=(r.left-pad)+"px";hole.style.top=top+"px";hole.style.width=(r.width+pad*2)+"px";hole.style.height=h+"px";
     hole.style.borderRadius=(s.sel.indexOf("#nav")===0?"22px":"18px");
+    blocks({l:r.left-pad,t:top,w:r.width+pad*2,h:h});
     card.style.transform="none";
     var ch=card.offsetHeight||180;
     if(top+h+14+ch<vh-8){card.style.top=(top+h+14)+"px";card.style.bottom="auto";}
     else{card.style.top="auto";card.style.bottom=(vh-top+14)+"px";}
+  }
+  /* Vier onzichtbare vlakken rond het gat: alleen het uitgelichte deel is aan te tikken. */
+  function blocks(g){
+    var bs=el.querySelectorAll(".tBlk"),W=window.innerWidth,H=window.innerHeight;
+    var rs=g?[[0,0,W,Math.max(0,g.t)],[0,g.t+g.h,W,Math.max(0,H-g.t-g.h)],[0,g.t,Math.max(0,g.l),g.h],[g.l+g.w,g.t,Math.max(0,W-g.l-g.w),g.h]]:[[0,0,W,H],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    for(var k=0;k<4;k++){var b=bs[k];b.style.left=rs[k][0]+"px";b.style.top=rs[k][1]+"px";b.style.width=rs[k][2]+"px";b.style.height=rs[k][3]+"px";}
+  }
+  var tapTgt=null,tapFn=null;
+  function bindTap(){
+    if(tapTgt&&tapFn)tapTgt.removeEventListener("click",tapFn,true);
+    tapTgt=null;tapFn=null;
+    var s=steps[idx];if(!s.tap||!s.sel)return;
+    tapTgt=document.querySelector(s.sel);if(!tapTgt)return;
+    tapFn=function(){setTimeout(function(){if(!el)return;if(s.tap==="close")close();else{idx++;render();}},350);};
+    tapTgt.addEventListener("click",tapFn,true);
   }
   function render(){
     var s=steps[idx];
@@ -18197,24 +18217,34 @@ body.dark-theme #mbTour .tNext{background:#4c7a5a}
       '<button type="button" class="tNext">'+(idx===0?"Laat zien":(s.last?"Aan de slag":"Volgende"))+'</button></div>';
     el.querySelector(".tNext").onclick=function(e){e.stopPropagation();if(s.last)close();else{idx++;render();}};
     var sk=el.querySelector(".tSkip");if(sk)sk.onclick=function(e){e.stopPropagation();close();};
-    place();
+    bindTap();place();
   }
   function close(){
     markDone();
+    if(tapTgt&&tapFn)tapTgt.removeEventListener("click",tapFn,true);tapTgt=null;tapFn=null;
     if(!el)return;var x=el;el=null;x.classList.remove("show");setTimeout(function(){x.remove();},260);
   }
   window.startAppTour=function(){
     if(el)return;
     try{if(typeof showMainListView==="function")showMainListView();}catch(_){}
     idx=0;el=document.createElement("div");el.id="mbTour";el.setAttribute("role","dialog");el.setAttribute("aria-label","Rondleiding");
-    el.innerHTML='<div class="tHole none"></div><div class="tCard"></div>';
-    el.addEventListener("click",function(e){e.stopPropagation();});
+    el.innerHTML='<div class="tHole none"></div><div class="tBlk"></div><div class="tBlk"></div><div class="tBlk"></div><div class="tBlk"></div><div class="tCard"></div>';
+    el.querySelectorAll(".tBlk,.tCard").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();});});
     document.body.appendChild(el);
     try{if(document.activeElement)document.activeElement.blur();}catch(_){}
     render();requestAnimationFrame(function(){el&&el.classList.add("show");});
   };
   window.openAppTourFromHelp=function(e){if(e){e.preventDefault();e.stopPropagation();}setTimeout(window.startAppTour,250);};
   window.addEventListener("resize",function(){place();});
+  try{if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){place();});}catch(_){}
+  /* Scanner of pop-up open? Rondleiding even verbergen en daarna verder. Lijst gegroeid? Gat opnieuw plaatsen. */
+  setInterval(function(){
+    if(!el)return;
+    var bo=document.getElementById("barcodeOverlay");
+    var busy=(bo&&getComputedStyle(bo).display!=="none"&&getComputedStyle(bo).visibility!=="hidden"&&getComputedStyle(bo).opacity!=="0")||!!document.querySelector(".familyDialogOverlay.familyDialogShown:not(.familyDialogClosing),.mbSelPop");
+    el.classList.toggle("paused",busy);
+    if(!busy)place();
+  },300);
   /* Terugknop van Android sluit de rondleiding */
   var ob=window.__appBack;window.__appBack=function(){if(el){close();return true;}return ob?ob():false;};
   /* Automatisch één keer bij een nieuw account */
