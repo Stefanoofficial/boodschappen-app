@@ -6348,6 +6348,17 @@ body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#ff
 /* Lege lijst: geen "0 boodschappen" erboven. Tijdens laden nog geen "Bijgewerkt om". */
 html.list-empty #listProgress{display:none!important}
 html.list-loading #status{visibility:hidden!important}
+@keyframes mbNameIn{from{opacity:0}to{opacity:1}}
+#moreAccountName.mbNameIn{animation:mbNameIn .25s ease}
+/* Weergave-keuze in dezelfde stijl als Lijstopties */
+.mbThemeRow{width:100%;text-align:left;background:rgba(255,255,255,.42)!important;border:0;font:inherit}
+.mbThemeRow>span{flex:1 1 auto;min-width:0}
+.mbThemeRow .mbThemeCheck{opacity:0;color:#3c5c46;margin-left:auto;font-size:16px;width:auto!important;height:auto!important;background:none!important}
+.mbThemeRow.sel .mbThemeCheck{opacity:1}
+.mbThemeRow.sel{box-shadow:inset 0 0 0 2px rgba(60,92,70,.35)}
+body.dark-theme .mbThemeRow{background:rgba(255,255,255,.05)!important}
+body.dark-theme .mbThemeRow .mbThemeCheck{color:#bfe3c8}
+body.dark-theme .mbThemeRow.sel{box-shadow:inset 0 0 0 2px rgba(191,227,200,.35)}
 .listEmptyHint{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:22px 18px 14px;color:#5d6b61;font-size:14px;line-height:1.45}
 .listEmptyHint strong{font-size:17px;color:#2f4a38}
 .listEmptyHint b{color:#2f4a38}
@@ -6536,7 +6547,7 @@ html body .familyMenuBack i{font-size:14px!important}
   <div id="familyMenuMain" class="familyMenuPage">
     <button type="button" class="moreAccountHeader" id="moreAccountHeader" onclick="openAccountSubmenu(event)" aria-label="Mijn account">
       <span class="moreAccountAvatar" id="moreAccountAvatar"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
-      <span class="moreAccountText"><strong id="moreAccountName">Mijn account</strong><small id="moreAccountEmail"></small></span>
+      <span class="moreAccountText"><strong id="moreAccountName">&nbsp;</strong><small id="moreAccountEmail"></small></span>
       <i class="fa-solid fa-chevron-right familyMenuArrow" aria-hidden="true"></i>
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
@@ -18008,8 +18019,11 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       if(!nameEl||!av)return;
       var name="";try{var g=JSON.parse(localStorage.getItem("boodschappenGreetingName")||"null");var cu=(typeof auth!=="undefined"&&auth.currentUser)||null;if(g&&g.name&&(!cu||g.uid===cu.uid))name=g.name;}catch(_){}
       if(mailEl)mailEl.textContent=u.email||"";
-      var paint=function(n,photo){
-        nameEl.textContent=n||u.displayName||"Mijn account";
+      var paint=function(n,photo,final){
+        var t=n||u.displayName||(final?"Mijn account":"");
+        /* Nog geen naam bekend: even leeg laten in plaats van eerst "Mijn account" te tonen. */
+        if(t){if(nameEl.textContent!==t){nameEl.textContent=t;nameEl.classList.remove("mbNameIn");void nameEl.offsetWidth;nameEl.classList.add("mbNameIn");}}
+        else nameEl.innerHTML="&nbsp;";
         if(photo){av.innerHTML='<img src="'+escH(photo)+'" alt="">';av.classList.add("hasPhoto");}
         else{var ch=(n||u.email||"?").trim().charAt(0).toUpperCase();av.innerHTML='<span>'+escH(ch)+'</span>';av.classList.remove("hasPhoto");}
       };
@@ -18017,27 +18031,31 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       paint(name,photo);
       var snap=await database.ref("users/"+u.uid+"/name").once("value");var n2=snap.val();
       var p2=photo;try{if(typeof __loadMyPhoto==="function")p2=await __loadMyPhoto();}catch(_){}
-      if(auth.currentUser&&auth.currentUser.uid===u.uid)paint(n2||name,p2);
-    }catch(_){}
+      if(auth.currentUser&&auth.currentUser.uid===u.uid)paint(n2||name,p2,true);
+    }catch(_){
+      try{var ne=document.getElementById("moreAccountName");if(ne&&!ne.textContent.trim())ne.textContent="Mijn account";}catch(__){}
+    }
   }
   window.__refreshAccountHeader=refreshAccountHeader;
+  /* Bij uitloggen de kop leegmaken, zodat de volgende inlog niet eerst oude gegevens toont. */
+  try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(u)return;var ne=document.getElementById("moreAccountName"),me=document.getElementById("moreAccountEmail"),av=document.getElementById("moreAccountAvatar");if(ne)ne.innerHTML="&nbsp;";if(me)me.textContent="";if(av){av.innerHTML="";av.classList.remove("hasPhoto");}});}catch(_){}
   if(typeof showMoreView==="function"){var __oMore=showMoreView;showMoreView=function(){var r=__oMore.apply(this,arguments);refreshAccountHeader();return r;};window.showMoreView=showMoreView;}
-  try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(u)setTimeout(refreshAccountHeader,800);});}catch(_){}
+  try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(u){setTimeout(refreshAccountHeader,0);setTimeout(refreshAccountHeader,800);}});}catch(_){}
 
   /* ---------- Weergave: Licht, Donker of Automatisch (zoals je telefoon) ---------- */
   window.openAppearanceSettings=function(event){
     if(event){event.preventDefault&&event.preventDefault();event.stopPropagation&&event.stopPropagation();}
     try{if(typeof closeFamilyMenuForDialog==="function")closeFamilyMenuForDialog();}catch(_){}
     var cur="light";try{cur=localStorage.getItem("boodschappenTheme")||"light";}catch(_){}
-    var opts=[["light","Licht","fa-sun"],["dark","Donker","fa-moon"],["system","Automatisch","fa-gear"]];
-    var html='<div class="familyDialogText" style="margin:0 6px 8px">Bij <b>Automatisch</b> volgt de app je telefoon: licht overdag, donker als je telefoon op donker staat.</div>'+
-      opts.map(function(o){return '<button type="button" class="mbSelOpt'+(o[0]===cur?' sel':'')+'" data-theme="'+o[0]+'"><i class="fa-solid fa-check" aria-hidden="true"></i><span>'+o[1]+'</span></button>';}).join("");
-    var ov=makePicker("fa-moon","Weergave",html,"");
-    ov.querySelector(".mbPickBody").addEventListener("click",function(e){
-      var b=e.target.closest("[data-theme]");if(!b)return;e.stopPropagation();
-      try{setTheme(b.getAttribute("data-theme"));}catch(_){}
-      closePicker();
-    });
+    var opts=[["light","Licht","fa-sun",""],["dark","Donker","fa-moon",""],["system","Automatisch","fa-wand-magic-sparkles","Volgt je telefoon: donker als je telefoon op donker staat."]];
+    var rows=opts.map(function(o,k){return '<button type="button" class="familyMenuItem mbThemeRow'+(o[0]===cur?' sel':'')+'" data-theme="'+o[0]+'" style="margin-top:'+(k?8:10)+'px"><i class="fa-solid '+o[2]+'" aria-hidden="true"></i><span>'+o[1]+(o[3]?'<small class="settingsToggleHint">'+o[3]+'</small>':'')+'</span><i class="fa-solid fa-check mbThemeCheck" aria-hidden="true"></i></button>';}).join("");
+    var ov=familyDialogBase("fa-moon","Weergave",'<div class="familyDialogText">Kies hoe de app eruitziet.</div>'+rows,'<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>');
+    ov.querySelectorAll(".mbThemeRow").forEach(function(b){b.addEventListener("click",function(e){
+      e.stopPropagation();var t=b.getAttribute("data-theme");
+      try{setTheme(t);}catch(_){}
+      ov.querySelectorAll(".mbThemeRow").forEach(function(x){x.classList.toggle("sel",x===b);});
+    });});
+    ov.querySelector(".familyDialogPrimary").addEventListener("click",function(){closeFamilyDialog(ov);});
   };
   window.__onSystemDarkChanged=function(){try{if((localStorage.getItem("boodschappenTheme")||"light")==="system")applyTheme();}catch(_){}};
   try{var mq=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)");if(mq&&mq.addEventListener)mq.addEventListener("change",window.__onSystemDarkChanged);}catch(_){}
