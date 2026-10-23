@@ -11774,9 +11774,11 @@ function familyTextPrompt(title,message,icon="fa-list"){
   });
 }
 
-async function showFamilyCode() {
+async function showFamilyCode(opts) {
+  opts = (opts && typeof opts === "object" && !opts.type) ? opts : {};
+  const familyCode = String(opts.code || currentHouseholdId || "");
 
-  if (!currentHouseholdId) {
+  if (!familyCode) {
     await familyAlert("Familiecode", "Nog geen familiecode beschikbaar.", "fa-key");
     return;
   }
@@ -11784,9 +11786,9 @@ async function showFamilyCode() {
   closeFamilyMenuForDialog();
   await new Promise(resolve => {
     const overlay=familyDialogBase(
-      "fa-key", "Familiecode",
-      `<div class="familyDialogText">Deel deze code met iemand die je aan je familie wilt toevoegen.</div>
-       <div class="familyDialogCode">${currentHouseholdId}</div>
+      opts.icon || "fa-key", opts.title || "Familiecode",
+      `<div class="familyDialogText">${opts.text || "Deel deze code met iemand die je aan je familie wilt toevoegen."}</div>
+       <div class="familyDialogCode">${familyCode}</div>
        <button type="button" class="sharedListAction" id="copyFamilyCodeBtn" style="margin-top:10px;">📋 Kopiëren</button>`,
       `<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>`
     );
@@ -11794,8 +11796,8 @@ async function showFamilyCode() {
     const copyFamilyBtn = overlay.querySelector("#copyFamilyCodeBtn");
     if (copyFamilyBtn) copyFamilyBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
-      try { await navigator.clipboard.writeText(String(currentHouseholdId)); await familyAlert("Gekopieerd", "De familiecode is gekopieerd.", "fa-check"); }
-      catch (err) { await familyAlert("Familiecode", "Kopiëren wordt niet ondersteund. Code: " + currentHouseholdId, "fa-copy"); }
+      try { await navigator.clipboard.writeText(familyCode); await familyAlert("Gekopieerd", "De familiecode is gekopieerd.", "fa-check"); }
+      catch (err) { await familyAlert("Familiecode", "Kopiëren wordt niet ondersteund. Code: " + familyCode, "fa-copy"); }
     });
     overlay.querySelector(".familyDialogActions button").addEventListener("click",finish);
     overlay.addEventListener("click",e=>{if(e.target===overlay)finish();});
@@ -11897,7 +11899,9 @@ async function showFamilyCode() {
     const menu = document.getElementById("familyMenu");
     if (menu) { menu.classList.remove("menu-open"); menu.style.display = "none"; }
 
-    await familyAlert("Nieuwe familie aangemaakt", "Jouw familiecode is:\n\n" + code, "fa-house");
+    // Zelfde venster als bij Familiecode: de code in het groene vak, met een knop om te kopiëren.
+    await showFamilyCode({ code: code, title: "Nieuwe familie aangemaakt", icon: "fa-house",
+      text: "Je familie is klaar. Deel deze code met iemand die je aan je familie wilt toevoegen." });
   } catch (error) {
     console.error("Nieuwe familie aanmaken mislukt:", error);
     const detail = error && error.code ? "\n\nFoutcode: " + error.code : "";
