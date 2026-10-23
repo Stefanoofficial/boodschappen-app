@@ -6345,6 +6345,9 @@ body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#ff
 #overviewQuickNew .frequentChip.added{opacity:.45}
 
 /* Lege lijst */
+/* Lege lijst: geen "0 boodschappen" erboven. Tijdens laden nog geen "Bijgewerkt om". */
+html.list-empty #listProgress{display:none!important}
+html.list-loading #status{visibility:hidden!important}
 .listEmptyHint{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:22px 18px 14px;color:#5d6b61;font-size:14px;line-height:1.45}
 .listEmptyHint strong{font-size:17px;color:#2f4a38}
 .listEmptyHint b{color:#2f4a38}
@@ -6514,7 +6517,7 @@ html body .familyMenuBack i{font-size:14px!important}
     <i class="fa-solid fa-moon"></i><span>Donker thema</span>
   </button>
 </div>
-<button type="button" id="themeButton" class="themeButton" onclick="toggleTheme()" aria-label="Nachtmodus aan/uit" aria-expanded="false">
+<button type="button" id="themeButton" class="themeButton" onclick="openAppearanceSettings(event)" aria-label="Weergave: licht, donker of automatisch" aria-expanded="false">
   <i id="themeButtonIcon" class="fa-solid fa-moon"></i>
 </button>
 
@@ -6876,11 +6879,7 @@ html body .familyMenuBack i{font-size:14px!important}
       <span>Meldingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
-    <button type="button" class="familyMenuItem settingsMenuItem" onclick="openAppearanceSettings(event)">
-      <i class="fa-solid fa-moon"></i>
-      <span>Weergave</span>
-      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
-    </button>    <div class="devSettingsBlock" id="devSettingsBlock" hidden>
+    <div class="devSettingsBlock" id="devSettingsBlock" hidden>
       <div class="familyMenuSubTitle devSettingsTitle">Testinstellingen</div>
       <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow" onclick="toggleProTestMode(event)" role="switch" aria-checked="true">
         <i class="fa-solid fa-crown"></i>
@@ -7242,7 +7241,7 @@ html body .familyMenuBack i{font-size:14px!important}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
-      <p>Ga naar <strong>Meer → Instellingen → Weergave</strong> en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>. Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
+      <p>Tik in <strong>Meer</strong> rechtsboven op het maantje (of zonnetje) en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>. Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
@@ -17979,13 +17978,21 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       var list=document.getElementById("list");if(!list)return;
       var old=list.querySelector(".listEmptyHint");
       var empty=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&boodschappen.length===0);
-      if(!empty||window.__listLoading||!document.body.classList.contains("logged-in")){if(old)old.remove();return;}
+      var de=document.documentElement;
+      de.classList.toggle("list-loading",!!window.__listLoading);
+      var inn=document.body.classList.contains("logged-in");
+      if(!inn)emptyHint.__ready=false;else if(window.__listLoading)emptyHint.__ready=true;
+      var ok=emptyHint.__ok||emptyHint.__ready;
+      de.classList.toggle("list-empty",empty&&!window.__listLoading&&inn&&(!!old||ok));
+      if(!empty||window.__listLoading||!inn){if(old)old.remove();return;}
       if(old)return;
+      /* Vlak na het inloggen even wachten: het laden begint net iets later. */
+      if(!ok){clearTimeout(emptyHint.__t);emptyHint.__t=setTimeout(function(){emptyHint.__ok=true;emptyHint();emptyHint.__ok=false;},400);return;}
       var d=document.createElement("div");d.className="listEmptyHint";
       d.innerHTML='<div class="listEmptyIcon" aria-hidden="true"><i class="fa-solid fa-basket-shopping"></i></div>'+
         '<strong>Je lijst is leeg</strong>'+
         '<span>Typ hierboven wat je nodig hebt en tik op <b>Toevoegen</b>, of scan een barcode met <i class="fa-solid fa-barcode" aria-hidden="true"></i>.</span>';
-      list.appendChild(d);
+      list.appendChild(d);emptyHint.__ready=true;de.classList.add("list-empty");
     }catch(_){}
   }
   if(typeof showList==="function"){var __oShow=showList;showList=function(){var r=__oShow.apply(this,arguments);emptyHint();return r;};}
