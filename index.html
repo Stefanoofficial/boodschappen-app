@@ -7208,6 +7208,11 @@ html body .familyMenuBack i{font-size:14px!important}
       <span>Help &amp; uitleg</span>
     </button>
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
+    <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" onclick="openAppTourFromHelp(event)">
+      <i class="fa-solid fa-hand-pointer"></i>
+      <span>Rondleiding bekijken</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
       <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op Toevoegen. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
@@ -18127,6 +18132,106 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     }catch(_){}
     return false;
   };
+})();
+</script>
+<style id="app-tour-style">
+#mbTour{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;opacity:0;transition:opacity .25s ease}
+#mbTour.show{opacity:1}
+#mbTour .tHole{position:fixed;border-radius:18px;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 0 200vmax rgba(14,22,17,.62);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease,border-radius .3s ease;pointer-events:none}
+#mbTour .tHole.none{width:0!important;height:0!important;left:50%!important;top:50%!important}
+#mbTour .tCard{position:fixed;left:16px;right:16px;max-width:380px;margin:0 auto;background:#fff;color:#24352a;border-radius:22px;padding:18px 18px 14px;box-shadow:0 18px 40px rgba(0,0,0,.25);transition:top .3s ease,bottom .3s ease}
+#mbTour .tCard h3{margin:0 0 6px;font-size:18px;font-weight:800;color:#2f4a38;display:flex;align-items:center;gap:10px}
+#mbTour .tCard h3 i{width:36px;height:36px;border-radius:50%;background:#e2f3e5;color:#3c5c46;display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
+#mbTour .tCard p{margin:0;font-size:14.5px;line-height:1.45;color:#5d6b61}
+#mbTour .tFoot{display:flex;align-items:center;gap:10px;margin-top:14px}
+#mbTour .tDots{display:flex;gap:5px;flex:1}
+#mbTour .tDots span{width:7px;height:7px;border-radius:50%;background:#d3ddd5}
+#mbTour .tDots span.on{background:#3c5c46;width:18px;border-radius:4px}
+#mbTour .tSkip{border:0;background:transparent;color:#718177;font:600 14px inherit;padding:10px 8px;cursor:pointer}
+#mbTour .tNext{border:0;background:#3c5c46;color:#fff;font:700 14.5px inherit;padding:11px 18px;border-radius:14px;cursor:pointer}
+body.dark-theme #mbTour .tHole{box-shadow:0 0 0 2px rgba(159,211,173,.75),0 0 18px 4px rgba(159,211,173,.25),0 0 0 200vmax rgba(0,0,0,.72)}
+body.dark-theme #mbTour .tCard{background:#26302a;color:#e9eee9}
+body.dark-theme #mbTour .tCard h3{color:#e9eee9}
+body.dark-theme #mbTour .tCard h3 i{background:#304b39;color:#dce9df}
+body.dark-theme #mbTour .tCard p{color:#b5c1b8}
+body.dark-theme #mbTour .tDots span{background:#43514a}
+body.dark-theme #mbTour .tDots span.on{background:#9fd3ad}
+body.dark-theme #mbTour .tSkip{color:#a9b6ad}
+body.dark-theme #mbTour .tNext{background:#4c7a5a}
+</style>
+<script id="app-tour">
+/* Korte rondleiding voor nieuwe gebruikers: wijst de echte knoppen in de app aan. */
+(function(){
+  var steps=[
+    {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In vijf korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
+    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Typ wat je nodig hebt en tik op Toevoegen. Tijdens het typen krijg je suggesties."},
+    {sel:".searchBox",t:"Zoeken en scannen",i:"fa-barcode",p:"Zoek in je lijst, of tik op het streepjescode-icoon om een product te scannen."},
+    {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Tik op het rondje naast een product om het af te vinken. Met − en + pas je het aantal aan."},
+    {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier zie je je voortgang, je opgeslagen lijsten en producten die je vaak koopt."},
+    {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, Pro met de weekplanner en 30 recepten, je instellingen en Help & uitleg.",last:true}
+  ];
+  var el=null,idx=0;
+  function uid(){try{return (auth&&auth.currentUser&&auth.currentUser.uid)||"";}catch(_){return "";}}
+  function doneKey(){return "boodschappenTourDone_"+uid();}
+  function markDone(){try{localStorage.setItem(doneKey(),"1");}catch(_){}}
+  function place(){
+    if(!el)return;
+    var s=steps[idx],hole=el.querySelector(".tHole"),card=el.querySelector(".tCard");
+    var tgt=s.sel?document.querySelector(s.sel):null,r=tgt?tgt.getBoundingClientRect():null;
+    if(!r||!r.width||!r.height){hole.classList.add("none");card.style.top="50%";card.style.bottom="auto";card.style.transform="translateY(-50%)";return;}
+    hole.classList.remove("none");
+    var pad=6,vh=window.innerHeight;
+    var top=Math.max(4,r.top-pad),h=Math.min(r.height+pad*2,vh*0.42);
+    hole.style.left=(r.left-pad)+"px";hole.style.top=top+"px";hole.style.width=(r.width+pad*2)+"px";hole.style.height=h+"px";
+    hole.style.borderRadius=(s.sel.indexOf("#nav")===0?"22px":"18px");
+    card.style.transform="none";
+    var ch=card.offsetHeight||180;
+    if(top+h+14+ch<vh-8){card.style.top=(top+h+14)+"px";card.style.bottom="auto";}
+    else{card.style.top="auto";card.style.bottom=(vh-top+14)+"px";}
+  }
+  function render(){
+    var s=steps[idx];
+    el.querySelector(".tCard").innerHTML='<h3><i class="fa-solid '+s.i+'" aria-hidden="true"></i><span>'+s.t+'</span></h3><p>'+s.p+'</p>'+
+      '<div class="tFoot"><div class="tDots">'+steps.map(function(_,k){return '<span'+(k===idx?' class="on"':'')+'></span>';}).join("")+'</div>'+
+      (s.last?'':'<button type="button" class="tSkip">Overslaan</button>')+
+      '<button type="button" class="tNext">'+(idx===0?"Laat zien":(s.last?"Aan de slag":"Volgende"))+'</button></div>';
+    el.querySelector(".tNext").onclick=function(e){e.stopPropagation();if(s.last)close();else{idx++;render();}};
+    var sk=el.querySelector(".tSkip");if(sk)sk.onclick=function(e){e.stopPropagation();close();};
+    place();
+  }
+  function close(){
+    markDone();
+    if(!el)return;var x=el;el=null;x.classList.remove("show");setTimeout(function(){x.remove();},260);
+  }
+  window.startAppTour=function(){
+    if(el)return;
+    try{if(typeof showMainListView==="function")showMainListView();}catch(_){}
+    idx=0;el=document.createElement("div");el.id="mbTour";el.setAttribute("role","dialog");el.setAttribute("aria-label","Rondleiding");
+    el.innerHTML='<div class="tHole none"></div><div class="tCard"></div>';
+    el.addEventListener("click",function(e){e.stopPropagation();});
+    document.body.appendChild(el);
+    try{if(document.activeElement)document.activeElement.blur();}catch(_){}
+    render();requestAnimationFrame(function(){el&&el.classList.add("show");});
+  };
+  window.openAppTourFromHelp=function(e){if(e){e.preventDefault();e.stopPropagation();}setTimeout(window.startAppTour,250);};
+  window.addEventListener("resize",function(){place();});
+  /* Terugknop van Android sluit de rondleiding */
+  var ob=window.__appBack;window.__appBack=function(){if(el){close();return true;}return ob?ob():false;};
+  /* Automatisch één keer bij een nieuw account */
+  function maybeAuto(){
+    try{
+      var u=uid();if(!u||el)return;
+      if(localStorage.getItem(doneKey())==="1")return;
+      if(!document.body.classList.contains("logged-in")||window.__listLoading)return;
+      var app=document.querySelector(".app");if(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")))return;
+      if(document.querySelector(".familyDialogOverlay.familyDialogShown"))return;
+      var hc=localStorage.getItem("boodschappenHistCount");
+      if((Array.isArray(boodschappen)&&boodschappen.length)||(hc&&hc!=="0")){markDone();return;}
+      window.startAppTour();
+    }catch(_){}
+  }
+  try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(!u){if(el){var x=el;el=null;x.remove();}return;}
+    var n=0;var iv=setInterval(function(){n++;if(!window.__listLoading&&n>=4){clearInterval(iv);maybeAuto();}else if(n>40)clearInterval(iv);},500);});}catch(_){}
 })();
 </script>
 <script id="recipe-photo-preload">
