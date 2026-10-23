@@ -17984,6 +17984,9 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   }).observe(document.body,{childList:true,subtree:true});}catch(_){}
 
   /* ---------- Lege lijst: korte uitleg in plaats van een leeg vak ---------- */
+  /* Gewoon openen (al ingelogd, lijst was leeg): meteen de uitleg tonen, zonder wachttijd. */
+  try{var __bc=JSON.parse(localStorage.getItem("boodschappenBootCache")||"null");
+    if(localStorage.getItem("boodschappenWasLoggedIn")==="1"&&__bc&&Array.isArray(__bc.items)&&!__bc.items.length&&__bc.type!=="shared"){emptyHint.__ready=true;emptyHint.__boot=true;}}catch(_){}
   function emptyHint(){
     try{
       var list=document.getElementById("list");if(!list)return;
@@ -17991,8 +17994,10 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       var empty=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&boodschappen.length===0);
       var de=document.documentElement;
       de.classList.toggle("list-loading",!!window.__listLoading);
-      var inn=document.body.classList.contains("logged-in");
-      if(!inn)emptyHint.__ready=false;else if(window.__listLoading)emptyHint.__ready=true;
+      var inn=document.body.classList.contains("logged-in")||(document.documentElement.classList.contains("boot-logged-in")&&emptyHint.__boot);
+      if(document.body.classList.contains("logged-in")&&!emptyHint.__wasIn){emptyHint.__wasIn=true;clearTimeout(emptyHint.__rt);emptyHint.__rt=setTimeout(function(){if(emptyHint.__wasIn)emptyHint.__ready=true;},1500);}
+      if(!inn&&emptyHint.__wasIn){emptyHint.__ready=false;emptyHint.__boot=false;emptyHint.__wasIn=false;}
+      else if(window.__listLoading)emptyHint.__ready=true;
       var ok=emptyHint.__ok||emptyHint.__ready;
       de.classList.toggle("list-empty",empty&&!window.__listLoading&&inn&&(!!old||ok));
       if(!empty||window.__listLoading||!inn){if(old)old.remove();return;}
@@ -18009,6 +18014,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   if(typeof showList==="function"){var __oShow=showList;showList=function(){var r=__oShow.apply(this,arguments);emptyHint();return r;};}
   if(typeof updateListProgress==="function"){var __oProg=updateListProgress;updateListProgress=function(){var r=__oProg.apply(this,arguments);emptyHint();return r;};}
   try{new MutationObserver(function(){emptyHint();}).observe(document.body,{attributes:true,attributeFilter:["class"]});}catch(_){}
+  emptyHint();
 
   /* ---------- Meer: je foto en naam bovenaan ---------- */
   function escH(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
