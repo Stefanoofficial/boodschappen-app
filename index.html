@@ -6338,6 +6338,40 @@ body.dark-theme .mbTimePreview{color:#e9eee9}
 body.dark-theme .mbTimeLabel{color:#9fd3ac}
 body.dark-theme .mbTimeChip{background:#1f2421;border-color:#3a443d;color:#dfe8e1}
 body.dark-theme .mbTimeChip.on{background:#5f9a6e;border-color:#5f9a6e;color:#fff}
+
+/* Overzicht: knopjes in "Snel opnieuw toevoegen" lopen netjes door op meerdere regels. */
+#overviewQuickNew .overviewQuickChips{flex-wrap:wrap;overflow:visible;padding:4px 0 0}
+#overviewQuickNew .frequentChip{min-height:38px;font-size:14px}
+#overviewQuickNew .frequentChip.added{opacity:.45}
+
+/* Lege lijst */
+.listEmptyHint{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:22px 18px 14px;color:#5d6b61;font-size:14px;line-height:1.45}
+.listEmptyHint strong{font-size:17px;color:#2f4a38}
+.listEmptyHint b{color:#2f4a38}
+.listEmptyIcon{width:54px;height:54px;border-radius:50%;background:#e4f3e8;color:#3f7a50;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:4px}
+body.dark-theme .listEmptyHint{color:#a9b6ad}
+body.dark-theme .listEmptyHint strong,body.dark-theme .listEmptyHint b{color:#e9eee9}
+body.dark-theme .listEmptyIcon{background:#26302a;color:#9fd3ac}
+
+/* Meer: accountkop bovenaan */
+.moreAccountHeader{display:flex;align-items:center;gap:14px;width:100%;margin:0 0 12px;padding:12px 14px;border:0;border-radius:18px;background:transparent;font:inherit;text-align:left;cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
+.moreAccountHeader:active{background:rgba(63,91,69,.06)}
+.moreAccountAvatar{flex:0 0 52px;width:52px;height:52px;border-radius:50%;background:#dff1e4;color:#3f5b45;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;overflow:hidden}
+.moreAccountAvatar img{width:100%;height:100%;object-fit:cover}
+.moreAccountText{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.moreAccountText strong{font-size:18px;color:#1f2a22;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.moreAccountText small{font-size:13px;color:#718177;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark-theme .moreAccountAvatar{background:#26302a;color:#9fd3ac}
+body.dark-theme .moreAccountText strong{color:#e9eee9}
+body.dark-theme .moreAccountText small{color:#a9b6ad}
+/* Meer: Uitloggen als rustige menuregel met rode tekst */
+html body .moreMenuLogout{background:transparent!important;border:0!important;box-shadow:none!important;color:#c0392b!important;justify-content:flex-start!important;font-weight:700!important;padding-left:14px!important;min-height:48px}
+html body .moreMenuLogout:active{background:rgba(192,57,43,.08)!important}
+html body.dark-theme .moreMenuLogout{background:transparent!important;color:#ff9b9b!important}
+
+.settingsMenuToggleRow>span{flex:1 1 auto;min-width:0;padding-right:12px}.settingsMenuToggleRow>.settingsToggle{flex:0 0 auto}
+.settingsToggleHint{display:block;white-space:normal;font-size:12.5px;font-weight:500;color:#718177;margin-top:3px;line-height:1.35}
+body.dark-theme .settingsToggleHint{color:#a9b6ad}
 </style>
 <style id="recipe-photo-smooth">
 /* Receptfoto's: geen emoji meer zien flitsen. De emoji verschijnt alleen als er echt geen foto is. */
@@ -6497,6 +6531,11 @@ html body .familyMenuBack i{font-size:14px!important}
     </button>
     <div id="familyMenu" class="familyMenu">
   <div id="familyMenuMain" class="familyMenuPage">
+    <button type="button" class="moreAccountHeader" id="moreAccountHeader" onclick="openAccountSubmenu(event)" aria-label="Mijn account">
+      <span class="moreAccountAvatar" id="moreAccountAvatar"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
+      <span class="moreAccountText"><strong id="moreAccountName">Mijn account</strong><small id="moreAccountEmail"></small></span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow" aria-hidden="true"></i>
+    </button>
     <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
       <i class="fa-solid fa-crown"></i>
       <span><strong>Mijn Boodschappen Pro</strong><small>Weekplanner, budget en aanbiedingen.</small><b class="proFreeBadge proFreeCard">Tijdelijk gratis</b></span>
@@ -6836,6 +6875,11 @@ html body .familyMenuBack i{font-size:14px!important}
       <i class="fa-solid fa-bell"></i>
       <span>Meldingen</span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+    <button type="button" class="familyMenuItem settingsMenuItem" onclick="openAppearanceSettings(event)">
+      <i class="fa-solid fa-moon"></i>
+      <span>Weergave</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>    <div class="devSettingsBlock" id="devSettingsBlock" hidden>
       <div class="familyMenuSubTitle devSettingsTitle">Testinstellingen</div>
       <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow" onclick="toggleProTestMode(event)" role="switch" aria-checked="true">
@@ -7100,7 +7144,7 @@ html body .familyMenuBack i{font-size:14px!important}
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen. Zet je een aanbieding op je lijst, dan worden de prijs, de actie en de einddatum bij dat product bewaard.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
         <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen supermarkt en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
-        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals thema, scanner en meldingen worden alleen op je eigen apparaat bewaard. Zet je voorraadmeldingen aan, dan plant de Android-app die op je telefoon zelf in, met de namen van de producten in de melding; daarvoor wordt niets naar een server gestuurd. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
+        <li><strong>Gegevens op je apparaat:</strong> instellingen zoals weergave (licht, donker of automatisch), scherm aan laten, trillen, scanner en meldingen worden alleen op je eigen apparaat bewaard. Zet je voorraadmeldingen aan, dan plant de Android-app die op je telefoon zelf in, met de namen van de producten in de melding; daarvoor wordt niets naar een server gestuurd. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
@@ -7192,6 +7236,15 @@ html body .familyMenuBack i{font-size:14px!important}
       <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
+      <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je boodschappenlijst open staat en er nog iets af te vinken is. Handig in de winkel. Ga je naar een ander scherm of is alles afgevinkt, dan werkt je telefoon weer zoals normaal.</p>
+      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan en werken in de Android-app.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
+      <p>Ga naar <strong>Meer → Instellingen → Weergave</strong> en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>. Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
       <p>Een pop-up sluit je met het kruisje <strong>✕</strong> rechtsboven, of door naast de pop-up op het scherm te tikken. Op Android kan het ook met de terugknop van je telefoon. Wat je instelt, wordt meteen bewaard.</p>
       <p>Keuzelijsten, zoals de winkel in de budgetplanner, openen als lijstje van de app zelf. Tik op je keuze; tik je ernaast, dan verandert er niets. Zo werkt het op iPhone en Android hetzelfde.</p>
@@ -7228,7 +7281,7 @@ html body .familyMenuBack i{font-size:14px!important}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
-      <p>Ga naar <strong>Meer → Mijn account → Profielfoto</strong> en tik op <strong>Foto kiezen</strong>. Verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Je familieleden zien je foto bij <strong>Mijn familie</strong>. Via hetzelfde scherm kun je de foto ook weer verwijderen. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien.</p>
+      <p>Bovenaan in <strong>Meer</strong> zie je je naam, e-mailadres en profielfoto; tik erop om naar <strong>Mijn account</strong> te gaan. Ga naar <strong>Meer → Mijn account → Profielfoto</strong> en tik op <strong>Foto kiezen</strong>. Verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Je familieleden zien je foto bij <strong>Mijn familie</strong>. Via hetzelfde scherm kun je de foto ook weer verwijderen. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
@@ -7379,6 +7432,7 @@ let currentListName = "Boodschappenlijst";
 function getActiveTheme() {
   const saved = localStorage.getItem("boodschappenTheme") || "light";
   if (saved === "system") {
+    try { if (window.AndroidApp && typeof AndroidApp.isSystemDark === "function") return AndroidApp.isSystemDark() ? "dark" : "light"; } catch (_) {}
     return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
   return saved;
@@ -8984,10 +9038,12 @@ function openListOptionsSettings() {
   const enabled = localStorage.getItem("boodschappenCompletedBottom") !== "false";
   const overlay = familyDialogBase(
     "fa-list-check", "Lijstopties",
-    '<div class="familyDialogText">Bepaal hoe je boodschappenlijst wordt weergegeven.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Voltooide producten onderaan</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Voltooide producten onderaan"></button></div>',
+    '<div class="familyDialogText">Bepaal hoe je boodschappenlijst wordt weergegeven.</div><div class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);"><span>Voltooide producten onderaan</span><button type="button" class="settingsToggle ' + (enabled ? 'on' : '') + '" aria-label="Voltooide producten onderaan"></button></div>' +
+    '<div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Scherm aan laten<small class="settingsToggleHint">Zolang je lijst open staat, gaat je scherm niet uit. Handig in de winkel.</small></span><button type="button" class="settingsToggle ' + (localStorage.getItem("boodschappenKeepAwake") !== "false" ? 'on' : '') + '" data-pref="boodschappenKeepAwake" aria-label="Scherm aan laten"></button></div>' +
+    '<div class="familyMenuItem settingsMenuToggleRow" style="margin-top:8px;background:rgba(255,255,255,.42);"><span>Trillen bij afvinken<small class="settingsToggleHint">Een korte tik als bevestiging.</small></span><button type="button" class="settingsToggle ' + (localStorage.getItem("boodschappenHaptics") !== "false" ? 'on' : '') + '" data-pref="boodschappenHaptics" aria-label="Trillen bij afvinken"></button></div>',
     '<button type="button" class="familyDialogBtn familyDialogPrimary">Klaar</button>'
   );
-  const toggle = overlay.querySelector(".settingsToggle");
+  const toggle = overlay.querySelector(".settingsToggle:not([data-pref])");
   toggle.addEventListener("click", e => {
     e.stopPropagation();
     const next = !toggle.classList.contains("on");
@@ -8995,6 +9051,13 @@ function openListOptionsSettings() {
     localStorage.setItem("boodschappenCompletedBottom", next ? "true" : "false");
     showList();
   });
+  overlay.querySelectorAll(".settingsToggle[data-pref]").forEach(t => t.addEventListener("click", e => {
+    e.stopPropagation();
+    const next = !t.classList.contains("on");
+    t.classList.toggle("on", next);
+    try { localStorage.setItem(t.getAttribute("data-pref"), next ? "true" : "false"); } catch (_) {}
+    try { if (window.__syncKeepAwake) window.__syncKeepAwake(); } catch (_) {}
+  }));
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
 
@@ -16735,7 +16798,23 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       if(!nav||!onListView())return;var limit=nav.getBoundingClientRect().top-(stEl?stEl.offsetHeight:0)-4;
       if(box.getBoundingClientRect().bottom>limit)box.hidden=true;});
   }
-  var t=null;function later(){clearTimeout(t);t=setTimeout(render,120);}
+  /* Overzicht: de producten die je vaak koopt meteen als knopjes in het kaartje "Snel opnieuw toevoegen". */
+  async function renderOverviewQuick(){
+    var box=document.getElementById("overviewQuickNew");if(!box)return;
+    var all=[];try{all=await load();}catch(e){}
+    var have=onList();
+    var pick=(all||[]).filter(function(p){return !have[norm(p.text)];}).slice(0,6);
+    if(!pick.length){
+      box.innerHTML='<div class="overview-new-muted">'+((all&&all.length)?'Alles wat je vaak koopt staat al op je lijst.':'Producten die je vaak koopt verschijnen hier na je eerste boodschappenronde.')+'</div>';
+      return;
+    }
+    box.innerHTML='<div class="frequentChips overviewQuickChips">'+pick.map(function(p){
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
+    box.querySelectorAll(".frequentChip").forEach(function(b){b.onclick=async function(e){
+      e.stopPropagation();var inp=document.getElementById("product");if(!inp||typeof addProduct!=="function")return;
+      inp.value=b.getAttribute("data-t");b.disabled=true;b.classList.add("added");await addProduct();};});
+  }
+  var t=null;function later(){clearTimeout(t);t=setTimeout(function(){render();renderOverviewQuick();},120);}
   window.__frequentRefresh=later;
   window.__frequentInvalidate=function(){cache=null;cacheAt=0;later();};
   window.__frequentClear=function(){cache=null;cacheAt=0;try{if(saved){delete saved.freq;persist({});}}catch(e){}later();};
@@ -17893,6 +17972,107 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       if(t){var c=t.querySelector(".familyDialog,.overviewActionSheet")||t;void t.offsetWidth;try{getComputedStyle(c).transform;}catch(_){}void c.offsetWidth;}
     }}
   }).observe(document.body,{childList:true,subtree:true});}catch(_){}
+
+  /* ---------- Lege lijst: korte uitleg in plaats van een leeg vak ---------- */
+  function emptyHint(){
+    try{
+      var list=document.getElementById("list");if(!list)return;
+      var old=list.querySelector(".listEmptyHint");
+      var empty=(typeof boodschappen!=="undefined"&&Array.isArray(boodschappen)&&boodschappen.length===0);
+      if(!empty||window.__listLoading||!document.body.classList.contains("logged-in")){if(old)old.remove();return;}
+      if(old)return;
+      var d=document.createElement("div");d.className="listEmptyHint";
+      d.innerHTML='<div class="listEmptyIcon" aria-hidden="true"><i class="fa-solid fa-basket-shopping"></i></div>'+
+        '<strong>Je lijst is leeg</strong>'+
+        '<span>Typ hierboven wat je nodig hebt en tik op <b>Toevoegen</b>, of scan een barcode met <i class="fa-solid fa-barcode" aria-hidden="true"></i>.</span>';
+      list.appendChild(d);
+    }catch(_){}
+  }
+  if(typeof showList==="function"){var __oShow=showList;showList=function(){var r=__oShow.apply(this,arguments);emptyHint();return r;};}
+  if(typeof updateListProgress==="function"){var __oProg=updateListProgress;updateListProgress=function(){var r=__oProg.apply(this,arguments);emptyHint();return r;};}
+  try{new MutationObserver(function(){emptyHint();}).observe(document.body,{attributes:true,attributeFilter:["class"]});}catch(_){}
+
+  /* ---------- Meer: je foto en naam bovenaan ---------- */
+  function escH(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  async function refreshAccountHeader(){
+    try{
+      var u=(typeof auth!=="undefined"&&auth)?auth.currentUser:null;if(!u)return;
+      var nameEl=document.getElementById("moreAccountName"),mailEl=document.getElementById("moreAccountEmail"),av=document.getElementById("moreAccountAvatar");
+      if(!nameEl||!av)return;
+      var name="";try{var g=JSON.parse(localStorage.getItem("boodschappenGreetingName")||"null");var cu=(typeof auth!=="undefined"&&auth.currentUser)||null;if(g&&g.name&&(!cu||g.uid===cu.uid))name=g.name;}catch(_){}
+      if(mailEl)mailEl.textContent=u.email||"";
+      var paint=function(n,photo){
+        nameEl.textContent=n||u.displayName||"Mijn account";
+        if(photo){av.innerHTML='<img src="'+escH(photo)+'" alt="">';av.classList.add("hasPhoto");}
+        else{var ch=(n||u.email||"?").trim().charAt(0).toUpperCase();av.innerHTML='<span>'+escH(ch)+'</span>';av.classList.remove("hasPhoto");}
+      };
+      var photo=(typeof __myPhoto!=="undefined"&&__myPhoto&&__myPhoto.uid===u.uid)?__myPhoto.url:"";
+      paint(name,photo);
+      var snap=await database.ref("users/"+u.uid+"/name").once("value");var n2=snap.val();
+      var p2=photo;try{if(typeof __loadMyPhoto==="function")p2=await __loadMyPhoto();}catch(_){}
+      if(auth.currentUser&&auth.currentUser.uid===u.uid)paint(n2||name,p2);
+    }catch(_){}
+  }
+  window.__refreshAccountHeader=refreshAccountHeader;
+  if(typeof showMoreView==="function"){var __oMore=showMoreView;showMoreView=function(){var r=__oMore.apply(this,arguments);refreshAccountHeader();return r;};window.showMoreView=showMoreView;}
+  try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(u)setTimeout(refreshAccountHeader,800);});}catch(_){}
+
+  /* ---------- Weergave: Licht, Donker of Automatisch (zoals je telefoon) ---------- */
+  window.openAppearanceSettings=function(event){
+    if(event){event.preventDefault&&event.preventDefault();event.stopPropagation&&event.stopPropagation();}
+    try{if(typeof closeFamilyMenuForDialog==="function")closeFamilyMenuForDialog();}catch(_){}
+    var cur="light";try{cur=localStorage.getItem("boodschappenTheme")||"light";}catch(_){}
+    var opts=[["light","Licht","fa-sun"],["dark","Donker","fa-moon"],["system","Automatisch","fa-gear"]];
+    var html='<div class="familyDialogText" style="margin:0 6px 8px">Bij <b>Automatisch</b> volgt de app je telefoon: licht overdag, donker als je telefoon op donker staat.</div>'+
+      opts.map(function(o){return '<button type="button" class="mbSelOpt'+(o[0]===cur?' sel':'')+'" data-theme="'+o[0]+'"><i class="fa-solid fa-check" aria-hidden="true"></i><span>'+o[1]+'</span></button>';}).join("");
+    var ov=makePicker("fa-moon","Weergave",html,"");
+    ov.querySelector(".mbPickBody").addEventListener("click",function(e){
+      var b=e.target.closest("[data-theme]");if(!b)return;e.stopPropagation();
+      try{setTheme(b.getAttribute("data-theme"));}catch(_){}
+      closePicker();
+    });
+  };
+  window.__onSystemDarkChanged=function(){try{if((localStorage.getItem("boodschappenTheme")||"light")==="system")applyTheme();}catch(_){}};
+  try{var mq=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)");if(mq&&mq.addEventListener)mq.addEventListener("change",window.__onSystemDarkChanged);}catch(_){}
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)window.__onSystemDarkChanged();});
+
+  /* ---------- Scherm aan laten zolang je lijst open staat ---------- */
+  var wakeLock=null,keepOn=null;
+  function wantAwake(){
+    try{
+      if(localStorage.getItem("boodschappenKeepAwake")==="false")return false;
+      if(document.hidden||!document.body.classList.contains("logged-in"))return false;
+      var app=document.querySelector(".app");if(!app||app.classList.contains("overview-active")||app.classList.contains("more-active"))return false;
+      return Array.isArray(boodschappen)&&boodschappen.some(function(x){return x&&!x.completed;});
+    }catch(_){return false;}
+  }
+  function syncKeepAwake(){
+    var on=wantAwake();if(on===keepOn)return;keepOn=on;
+    try{if(window.AndroidApp&&typeof AndroidApp.setKeepScreenOn==="function"){AndroidApp.setKeepScreenOn(on);return;}}catch(_){}
+    try{
+      if(on&&navigator.wakeLock&&!wakeLock){navigator.wakeLock.request("screen").then(function(l){wakeLock=l;l.addEventListener("release",function(){wakeLock=null;keepOn=null;});}).catch(function(){keepOn=null;});}
+      else if(!on&&wakeLock){wakeLock.release();wakeLock=null;}
+    }catch(_){}
+  }
+  window.__syncKeepAwake=function(){keepOn=null;syncKeepAwake();};
+  document.addEventListener("visibilitychange",function(){keepOn=null;syncKeepAwake();});
+  try{var app0=document.querySelector(".app");if(app0)new MutationObserver(syncKeepAwake).observe(app0,{attributes:true,attributeFilter:["class"]});}catch(_){}
+  if(typeof showList==="function"){var __oShow2=showList;showList=function(){var r=__oShow2.apply(this,arguments);syncKeepAwake();return r;};}
+
+  /* ---------- Korte tik bij afvinken ---------- */
+  if(typeof toggleItem==="function"){
+    var __oToggle=toggleItem;
+    toggleItem=function(index){
+      try{
+        var it=boodschappen[index];
+        if(it&&!it.completed&&localStorage.getItem("boodschappenHaptics")!=="false"){
+          if(window.AndroidApp&&typeof AndroidApp.haptic==="function")AndroidApp.haptic();
+          else if(navigator.vibrate)navigator.vibrate(12);
+        }
+      }catch(_){}
+      return __oToggle.apply(this,arguments);
+    };
+  }
   /* ---------- Terugknop van Android: sluit eerst de bovenste pop-up ---------- */
   function visible(el){return el&&el.isConnected&&!el.hidden&&getComputedStyle(el).display!=="none";}
   window.__appBack=function(){
