@@ -7208,11 +7208,6 @@ html body .familyMenuBack i{font-size:14px!important}
       <span>Help &amp; uitleg</span>
     </button>
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
-    <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" onclick="openAppTourFromHelp(event)">
-      <i class="fa-solid fa-hand-pointer"></i>
-      <span>Rondleiding bekijken</span>
-      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
-    </button>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
       <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op Toevoegen. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
@@ -7254,6 +7249,10 @@ html body .familyMenuBack i{font-size:14px!important}
       <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
       <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je boodschappenlijst open staat en er nog iets af te vinken is. Handig in de winkel. Ga je naar een ander scherm of is alles afgevinkt, dan werkt je telefoon weer zoals normaal.</p>
       <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan en werken in de Android-app.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-triangle-exclamation"></i><span>Geen internet</span></div>
+      <p>Heb je geen bereik, bijvoorbeeld in de supermarkt? Dan zie je bovenaan <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen. Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
@@ -7306,6 +7305,12 @@ html body .familyMenuBack i{font-size:14px!important}
       <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
       <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
     </div>
+    <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" style="margin-top:12px" onclick="openAppTourFromHelp(event)">
+      <i class="fa-solid fa-hand-pointer"></i>
+      <span>Rondleiding bekijken</span>
+      <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
+    </button>
+
   </div>
 </div>
   </div>
@@ -10713,13 +10718,20 @@ async function toggleItem(index) {
 
     // Bewaar de naam van degene die het product afvinkt, ook in een Deellijst.
     if (auth.currentUser) {
-      try {
-        const snap = await database
-          .ref("users/" + auth.currentUser.uid + "/name")
-          .once("value");
-        completedBy = snap.val() || auth.currentUser.email || "Gebruiker";
-      } catch (_) {
-        completedBy = auth.currentUser.email || "Gebruiker";
+      // Eerst de naam van de telefoon zelf; zonder internet nooit blijven wachten.
+      let cached = "";
+      try { const g = JSON.parse(localStorage.getItem("boodschappenGreetingName") || "null"); if (g && g.uid === auth.currentUser.uid && g.name) cached = g.name; } catch (_) {}
+      if (cached) completedBy = cached;
+      else {
+        try {
+          const snap = await Promise.race([
+            database.ref("users/" + auth.currentUser.uid + "/name").once("value"),
+            new Promise(function (r) { setTimeout(function () { r(null); }, 1000); })
+          ]);
+          completedBy = (snap && snap.val()) || auth.currentUser.email || "Gebruiker";
+        } catch (_) {
+          completedBy = auth.currentUser.email || "Gebruiker";
+        }
       }
     }
 
@@ -18163,6 +18175,53 @@ body.dark-theme #mbTour .tDots span.on{background:#9fd3ad}
 body.dark-theme #mbTour .tSkip{color:#a9b6ad}
 body.dark-theme #mbTour .tNext{background:#4c7a5a}
 </style>
+<style id="app-offline-style">
+#mbNet{position:fixed;left:16px;right:16px;margin:0 auto;max-width:440px;bottom:calc(var(--mbNavSpace,0px) + 12px);transform:translateY(16px);opacity:0;z-index:2147482000;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:16px;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s ease,background-color .25s ease;background:#33413a;color:#fff;font-size:14px;line-height:1.3;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.22);pointer-events:none}
+#mbNet.show{transform:translateY(0);opacity:1}
+#mbNet.ok{background:#3c5c46}
+#mbNet i{font-size:16px;flex:0 0 auto}
+#mbNet small{display:block;font-weight:500;font-size:12.5px;opacity:.85}
+body.dark-theme #mbNet{background:#46524b}
+body.dark-theme #mbNet.ok{background:#4c7a5a}
+body:not(.logged-in) #mbNet{display:none}
+</style>
+<script id="app-offline">
+/* Geen internet? Een rustig balkje bovenaan. Wijzigingen blijven bewaard en gaan mee zodra je weer verbinding hebt. */
+(function(){
+  var el=null,timer=null,hideT=null,isOff=false,fbOn=null;
+  function bar(){
+    if(el)return el;
+    el=document.createElement("div");el.id="mbNet";el.setAttribute("role","status");el.setAttribute("aria-live","polite");
+    document.body.appendChild(el);return el;
+  }
+  function showOffline(){
+    var b=bar();clearTimeout(hideT);b.classList.remove("ok");
+    b.innerHTML='<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span>Geen internet<small>Je kunt gewoon verder. Je wijzigingen gaan mee zodra je weer online bent.</small></span>';
+    requestAnimationFrame(function(){b.classList.add("show");});
+  }
+  function showBack(){
+    var b=bar();b.classList.add("ok");
+    b.innerHTML='<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Weer verbonden</span>';
+    b.classList.add("show");clearTimeout(hideT);hideT=setTimeout(function(){b.classList.remove("show");},2200);
+  }
+  function evaluate(){
+    var off=(navigator.onLine===false)||(fbOn===false);
+    clearTimeout(timer);
+    if(off&&!isOff){timer=setTimeout(function(){isOff=true;showOffline();},2500);} /* korte haperingen negeren */
+    else if(!off&&isOff){isOff=false;showBack();}
+  }
+  window.addEventListener("offline",evaluate);
+  window.addEventListener("online",evaluate);
+  try{
+    if(typeof database!=="undefined"&&database&&database.ref){
+      /* Bij het opstarten is Firebase nog even niet verbonden: pas na 4 seconden meetellen. */
+      var ready=false;setTimeout(function(){ready=true;evaluate();},4000);
+      database.ref(".info/connected").on("value",function(snap){fbOn=!!snap.val();if(ready||fbOn)evaluate();});
+    }
+  }catch(_){}
+  window.__mbNetTest=function(off){fbOn=!off;evaluate();};
+})();
+</script>
 <script id="app-tour">
 /* Korte rondleiding voor nieuwe gebruikers: wijst de echte knoppen in de app aan. */
 (function(){
