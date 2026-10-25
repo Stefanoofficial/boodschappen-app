@@ -6449,8 +6449,11 @@ html body #list .item.completed{background:rgba(255,255,255,.55)!important}
 body.dark-theme #list .item.completed{background:rgba(255,255,255,.03)!important}
 body.dark-theme #list .item.completed .productName{color:#7f8b84!important}
 /* 3. Groter afvinkrondje */
-html body #list .itemProductContent{grid-template-columns:26px minmax(0,1fr) 32px 92px !important}
-html body #list .itemProductContent .itemCheck{width:26px!important;height:26px!important;flex-basis:26px!important;border-width:2px!important;border-color:#7a8a80!important;font-size:13px!important}
+html body #list .itemProductContent{grid-template-columns:22px minmax(0,1fr) 32px 92px !important}
+html body #list .itemProductContent .itemCheck{width:22px!important;height:22px!important;flex-basis:22px!important;border-width:2px!important;border-color:#7a8a80!important;font-size:11px!important}
+/* Ook het laatste product een volledige rand (oude regel haalde de onderrand weg) */
+html body #list .item:last-child{border-bottom:1px solid #e1ece4!important}
+body.dark-theme #list .item:last-child{border-bottom-color:#3a473d!important}
 html body #list .itemProductContent .itemCheck.isChecked{background:#3c7a52!important;border-color:#3c7a52!important}
 body.dark-theme #list .itemProductContent .itemCheck{border-color:#9aa39d!important}
 body.dark-theme #list .itemProductContent .itemCheck.isChecked{background:#5f9a70!important;border-color:#5f9a70!important}
