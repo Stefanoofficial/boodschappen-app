@@ -18458,26 +18458,49 @@ body.proPaidMode .onlyFree{display:none!important}
 
   /* ---------- Meer: je foto en naam bovenaan ---------- */
   function escH(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  /* Naam en foto bovenaan Meer: meteen tonen wat we al weten, op de achtergrond bijwerken. */
+  var hdrUid="",hdrName="",hdrPhoto="";
+  function cachedName(uid){
+    if(hdrUid===uid&&hdrName)return hdrName;
+    try{var g=JSON.parse(localStorage.getItem("boodschappenGreetingName")||"null");if(g&&g.uid===uid&&g.name)return g.name;}catch(_){}
+    return "";
+  }
   async function refreshAccountHeader(){
     try{
       var u=(typeof auth!=="undefined"&&auth)?auth.currentUser:null;if(!u)return;
       var nameEl=document.getElementById("moreAccountName"),mailEl=document.getElementById("moreAccountEmail"),av=document.getElementById("moreAccountAvatar");
       if(!nameEl||!av)return;
-      var name="";try{var g=JSON.parse(localStorage.getItem("boodschappenGreetingName")||"null");var cu=(typeof auth!=="undefined"&&auth.currentUser)||null;if(g&&g.name&&(!cu||g.uid===cu.uid))name=g.name;}catch(_){}
-      if(mailEl)mailEl.textContent=u.email||"";
-      var paint=function(n,photo,final){
-        var t=n||u.displayName||(final?"Mijn account":"");
-        /* Nog geen naam bekend: even leeg laten in plaats van eerst "Mijn account" te tonen. */
-        if(t){if(nameEl.textContent!==t){nameEl.textContent=t;nameEl.classList.remove("mbNameIn");void nameEl.offsetWidth;nameEl.classList.add("mbNameIn");}}
-        else nameEl.innerHTML="&nbsp;";
-        if(photo){av.innerHTML='<img src="'+escH(photo)+'" alt="">';av.classList.add("hasPhoto");}
-        else{var ch=(n||u.email||"?").trim().charAt(0).toUpperCase();av.innerHTML='<span>'+escH(ch)+'</span>';av.classList.remove("hasPhoto");}
+      if(hdrUid!==u.uid){hdrUid=u.uid;hdrName="";hdrPhoto="";}
+      if(mailEl&&mailEl.textContent!==(u.email||""))mailEl.textContent=u.email||"";
+      var setName=function(t,animate){
+        if(!t||nameEl.textContent===t)return;
+        nameEl.textContent=t;
+        if(animate){nameEl.classList.remove("mbNameIn");void nameEl.offsetWidth;nameEl.classList.add("mbNameIn");}
       };
+      var setPhoto=function(photo,n){
+        if(photo){
+          if(hdrPhoto===photo&&av.querySelector("img"))return;
+          hdrPhoto=photo;av.innerHTML='<img src="'+escH(photo)+'" alt="">';av.classList.add("hasPhoto");
+        }else if(!av.querySelector("img")){
+          var ch=(n||u.email||"?").trim().charAt(0).toUpperCase();
+          if(av.textContent!==ch){av.innerHTML='<span>'+escH(ch)+'</span>';av.classList.remove("hasPhoto");}
+        }
+      };
+      var known=cachedName(u.uid)||u.displayName||"";
+      if(known){hdrName=known;setName(known,false);}
+      else if(!nameEl.textContent.trim())nameEl.innerHTML="&nbsp;";
       var photo=(typeof __myPhoto!=="undefined"&&__myPhoto&&__myPhoto.uid===u.uid)?__myPhoto.url:"";
-      paint(name,photo);
-      var snap=await database.ref("users/"+u.uid+"/name").once("value");var n2=snap.val();
-      var p2=photo;try{if(typeof __loadMyPhoto==="function")p2=await __loadMyPhoto();}catch(_){}
-      if(auth.currentUser&&auth.currentUser.uid===u.uid)paint(n2||name,p2,true);
+      setPhoto(photo||hdrPhoto,known);
+      // Naam bijwerken zodra hij binnen is (niet wachten op de foto)
+      database.ref("users/"+u.uid+"/name").once("value").then(function(snap){
+        if(!auth.currentUser||auth.currentUser.uid!==u.uid)return;
+        var n2=String(snap.val()||"").trim();
+        if(n2){
+          hdrName=n2;setName(n2,!known);
+          try{localStorage.setItem("boodschappenGreetingName",JSON.stringify({uid:u.uid,name:n2}));}catch(_){}
+        }else if(!known&&!nameEl.textContent.trim())nameEl.textContent="Mijn account";
+      }).catch(function(){if(!nameEl.textContent.trim())nameEl.textContent="Mijn account";});
+      try{if(typeof __loadMyPhoto==="function"){var p2=await __loadMyPhoto();if(auth.currentUser&&auth.currentUser.uid===u.uid)setPhoto(p2,hdrName);}}catch(_){}
     }catch(_){
       try{var ne=document.getElementById("moreAccountName");if(ne&&!ne.textContent.trim())ne.textContent="Mijn account";}catch(__){}
     }
