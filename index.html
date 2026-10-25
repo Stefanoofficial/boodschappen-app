@@ -6435,6 +6435,31 @@ html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogCl
 html body .familyMenuBack span{font-size:17px!important;font-weight:700!important}
 html body .familyMenuBack i{font-size:14px!important}
 </style>
+<style id="list-calm-v2">
+/* 1. Prullenbak rustig: grijsgroen, pas rood bij aantikken */
+html body #list .quantityButton.qtyTrash{background:#eef3ef!important;color:#7d8c82!important}
+html body #list .quantityButton.qtyTrash:active{background:#f9e9e7!important;color:#b85a52!important}
+body.dark-theme #list .quantityButton.qtyTrash{background:#2b332e!important;color:#9aa69e!important}
+body.dark-theme #list .quantityButton.qtyTrash:active{background:#3d2a28!important;color:#f0a49c!important}
+/* 2. Afgevinkt: knoppen weg, regel rustiger */
+html body #list .item.completed .productQuantity,html body #list .item.completed .productQuantity *{visibility:hidden!important;pointer-events:none!important}
+html body #list .item.completed .productIcon{opacity:.45;filter:grayscale(.6)}
+html body #list .item.completed .productName{color:#8a978e!important}
+html body #list .item.completed{background:rgba(255,255,255,.55)!important}
+body.dark-theme #list .item.completed{background:rgba(255,255,255,.03)!important}
+body.dark-theme #list .item.completed .productName{color:#7f8b84!important}
+/* 3. Groter afvinkrondje */
+html body #list .itemProductContent{grid-template-columns:26px minmax(0,1fr) 32px 92px !important}
+html body #list .itemProductContent .itemCheck{width:26px!important;height:26px!important;flex-basis:26px!important;border-width:2px!important;border-color:#7a8a80!important;font-size:13px!important}
+html body #list .itemProductContent .itemCheck.isChecked{background:#3c7a52!important;border-color:#3c7a52!important}
+body.dark-theme #list .itemProductContent .itemCheck{border-color:#9aa39d!important}
+body.dark-theme #list .itemProductContent .itemCheck.isChecked{background:#5f9a70!important;border-color:#5f9a70!important}
+/* 4. Voortgang leesbaar in donker thema */
+body.dark-theme .listProgress{color:#cfe3d5!important}
+body.dark-theme .listProgressText,body.dark-theme .listProgressPercent{color:#cfe3d5!important;opacity:1!important}
+body.dark-theme .listProgressTrack{background:#2c3630!important}
+body.dark-theme .listProgressFill{background:#7fbf91!important}
+</style>
 <style id="focus-style">
 /* Geen standaard (oranje) focusrand van Android: overal dezelfde groene rand als bij het inloggen */
 input:focus,textarea:focus,select:focus,button:focus{outline:none}
