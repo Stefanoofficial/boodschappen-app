@@ -4505,6 +4505,16 @@ body.dark-theme .recipeSheetPanel .rsSteps li::before{background:#4f8a62}
 .recipeSheetPanel .rsTip strong,.recipeSheetPanel .rsTip span{color:var(--rs-tiptext)!important}
 .recipeSheetPanel .rsTip strong{font-size:14px}
 </style>
+<style id="login-logo-style">
+/* Inlogscherm: het mandje (zonder achtergrond) boven de kaart */
+#loginScreen{flex-direction:column}
+#loginScreen > .loginLogo{display:block;width:118px;height:auto;margin:auto auto 6px;flex:0 0 auto;filter:drop-shadow(0 10px 18px rgba(40,80,50,.16));pointer-events:none;-webkit-user-drag:none;user-select:none;animation:loginLogoIn .5s cubic-bezier(.2,.8,.2,1) both}
+#loginScreen > .loginBox{margin:0 auto auto!important}
+@keyframes loginLogoIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+@media (max-height:700px){#loginScreen > .loginLogo{width:84px;margin-bottom:2px}}
+@media (max-height:600px){#loginScreen > .loginLogo{display:none}}
+@media (prefers-reduced-motion:reduce){#loginScreen > .loginLogo{animation:none}}
+</style>
 <style id="boot-logged-in-style">html.boot-logged-in #loginScreen{display:none!important}</style>
 <style id="more-final-layout">
 /* Meer is a real, scrollable screen. The bottom navigation stays fixed. */
@@ -6425,6 +6435,39 @@ html.platform-android .familyDialogOverlay.familyDialogShown:not(.familyDialogCl
 html body .familyMenuBack span{font-size:17px!important;font-weight:700!important}
 html body .familyMenuBack i{font-size:14px!important}
 </style>
+<style id="focus-style">
+/* Geen standaard (oranje) focusrand van Android: overal dezelfde groene rand als bij het inloggen */
+input:focus,textarea:focus,select:focus,button:focus{outline:none}
+.plannerInput:focus,.budgetInput:focus,.feedbackTextarea:focus{border-color:#3c7a52!important;box-shadow:0 0 0 3px rgba(60,122,82,.14)!important;outline:none!important}
+body.dark-theme .plannerInput:focus,body.dark-theme .budgetInput:focus,body.dark-theme .feedbackTextarea:focus{border-color:#9ed5ad!important;box-shadow:0 0 0 3px rgba(158,213,173,.15)!important}
+.pantrySwitch:focus{outline:none}
+.pantrySwitch:focus-visible{box-shadow:0 0 0 3px rgba(60,122,82,.25)}
+</style>
+<style id="login-modern-style">
+/* Inlogscherm "modern": mandje + naam bovenaan, formulier zonder kaart, duidelijke witte invulvakken */
+#loginScreen,.registerModal{background:linear-gradient(180deg,#e3f2e7 0%,#eef7f0 55%,#e6f3e9 100%)!important}
+#loginScreen > .loginLogo{margin:auto auto 10px!important}
+#loginScreen > .loginBrand{flex:0 0 auto;text-align:center;margin:0 auto 18px;padding:0 16px}
+#loginScreen > .loginBrand h1{margin:0;font-size:27px;line-height:1.15;font-weight:800;color:#23573a;letter-spacing:-.01em}
+#loginScreen > .loginBrand p{margin:6px 0 0;font-size:16px;color:#5f6f64}
+#loginScreen > .loginBox > .welcome{display:none!important}
+#loginScreen > .loginBox,.registerModal .registerBox{background:transparent!important;box-shadow:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+#loginScreen > .loginBox{padding-top:0!important}
+#loginScreen .inputBox,.registerModal .registerInputBox{background:#fff!important;border:1.5px solid #cfe0d4!important;box-shadow:0 4px 14px rgba(40,90,55,.08)!important;min-height:54px;border-radius:15px!important;margin-bottom:12px!important;transition:border-color .15s ease,box-shadow .15s ease}
+#loginScreen .inputBox:focus-within,.registerModal .registerInputBox:focus-within{border-color:#3c7a52!important;box-shadow:0 0 0 4px rgba(60,122,82,.14),0 4px 14px rgba(40,90,55,.08)!important}
+#loginScreen .inputBox input,.registerModal .registerInputBox input{background:transparent!important}
+#loginScreen .loginBox > .registerButton,#loginScreen .loginBox > button,.registerModal .registerBox button:not(.registerPasswordToggle){border-radius:15px!important}
+#loginScreen .loginBox > .registerButton,.registerModal .registerBack{background:#fff!important}
+@media (max-height:700px){#loginScreen > .loginBrand{margin-bottom:12px}#loginScreen > .loginBrand h1{font-size:23px}#loginScreen > .loginBrand p{font-size:14px}}
+@media (max-height:600px){#loginScreen > .loginBrand p{display:none}}
+/* Donker thema */
+body.dark-theme #loginScreen,body.dark-theme .registerModal{background:linear-gradient(180deg,#18201b 0%,#141a16 60%,#18201b 100%)!important}
+body.dark-theme #loginScreen > .loginBrand h1{color:#9ed5ad}
+body.dark-theme #loginScreen > .loginBrand p{color:#b8c0ba}
+body.dark-theme #loginScreen .inputBox,body.dark-theme .registerModal .registerInputBox{background:#222b25!important;border-color:#3a4a40!important;box-shadow:none!important}
+body.dark-theme #loginScreen .inputBox:focus-within,body.dark-theme .registerModal .registerInputBox:focus-within{border-color:#9ed5ad!important;box-shadow:0 0 0 4px rgba(158,213,173,.15)!important}
+body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .registerModal .registerBack{background:transparent!important}
+</style>
 </head>
 
 <body>
@@ -6434,6 +6477,8 @@ html body .familyMenuBack i{font-size:14px!important}
 (function(){try{if(localStorage.getItem("boodschappenWasLoggedIn")==="1"){document.documentElement.classList.add("boot-logged-in");document.body.classList.add("logged-in");}}catch(e){}})();
 </script>
 <div id="loginScreen">
+  <img class="loginLogo" alt="" aria-hidden="true" width="132" height="128" src="data:image/webp;base64,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">
+  <div class="loginBrand"><h1>Mijn Boodschappen</h1><p>Jouw lijst, altijd bij de hand</p></div>
   <div class="loginBox">
     <div class="welcome">
   <h2>Welkom bij</h2>
@@ -6626,6 +6671,7 @@ html body .familyMenuBack i{font-size:14px!important}
       <h2>Mijn Boodschappen Pro</h2>
       <span class="proFreeBadge proFreeHero"><i class="fa-solid fa-gift" aria-hidden="true"></i> Tijdelijk gratis</span>
       <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <div id="proSubBox" class="proSubBox" hidden></div>
     </div>
     <div class="proFeatureCard proPlannerLaunch" onclick="toggleSmartPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSmartPlanner(event)}">
       <i class="fa-solid fa-calendar-days"></i><div><strong>Slimme weekplanner</strong><p>Plan maaltijden per dag en verzamel ingrediënten in één lijst.</p><button type="button" class="proPlannerButton" onclick="event.stopPropagation(); toggleSmartPlanner(event)">Open weekplanner <i class="fa-solid fa-chevron-down"></i></button></div>
@@ -6902,6 +6948,20 @@ html body .familyMenuBack i{font-size:14px!important}
         <span>Iemand in mijn familie heeft Pro<small>Test hoe de gedeelde voorraad werkt voor een familielid zonder eigen Pro.</small></span>
         <span class="settingsToggle" id="devFamProToggle" aria-hidden="true"></span>
       </button>
+      <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow devPaidPreviewRow" onclick="togglePaidPreview(event)" role="switch" aria-checked="false">
+        <i class="fa-solid fa-eye"></i>
+        <span>Betaalde Pro testen<small>Alleen jij ziet de app zoals hij wordt als Pro betaald is: prijzen, proefperiode en kopen.</small></span>
+        <span class="settingsToggle" id="devPaidPreviewToggle" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="familyMenuItem settingsMenuItem settingsMenuToggleRow devProToggleRow devPaidLiveRow" onclick="togglePaidLive(event)" role="switch" aria-checked="false">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Pro betaald voor iedereen<small id="devPaidLiveNote">Uit: Pro is gratis voor iedereen. Aan: iedereen moet Pro nemen; huidige gebruikers houden nog 30 dagen gratis.</small></span>
+        <span class="settingsToggle" id="devPaidLiveToggle" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="familyMenuItem settingsMenuItem devHideRow devUidRow" onclick="copyMyUid(event)">
+        <i class="fa-solid fa-key"></i>
+        <span>Mijn gebruikers-ID<small id="devUidText">Tik om te kopiëren. Nodig voor de Firebase-regels.</small></span>
+      </button>
       <button type="button" class="familyMenuItem settingsMenuItem devHideRow" onclick="hideDevSettings(event)">
         <i class="fa-solid fa-rotate-left"></i>
         <span>Testinstellingen terugzetten<small>Pro weer aan en familietest uit. Alleen jij ziet deze instellingen.</small></span>
@@ -7113,7 +7173,8 @@ html body .familyMenuBack i{font-size:14px!important}
       <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner: je weekbudget en uitgaven per winkel bijhouden, en aanbiedingen van je supermarkt op je lijst zetten. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie, met een melding als iets bijna over de datum of bijna op is (Android). <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-gift"></i><span>Alle Pro-onderdelen zijn tijdelijk gratis.</span></div>
+      <div class="aboutInfoLine onlyFree"><i class="fa-solid fa-gift"></i><span>Alle Pro-onderdelen zijn tijdelijk gratis.</span></div>
+      <div class="aboutInfoLine onlyPaid"><i class="fa-solid fa-crown"></i><span>Pro is een abonnement via Google Play: 7 dagen gratis proberen, en één abonnement voor je hele familie.</span></div>
     </div>
     <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
@@ -7146,7 +7207,7 @@ html body .familyMenuBack i{font-size:14px!important}
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 22 oktober 2026</p>
+      <p><strong>Versie:</strong> 25 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
@@ -7157,12 +7218,14 @@ html body .familyMenuBack i{font-size:14px!important}
         <li><strong>Gegevens op je apparaat:</strong> instellingen zoals weergave (licht, donker of automatisch), scherm aan laten, trillen, scanner en meldingen worden alleen op je eigen apparaat bewaard. Zet je voorraadmeldingen aan, dan plant de Android-app die op je telefoon zelf in, met de namen van de producten in de melding; daarvoor wordt niets naar een server gestuurd. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
+        <li><strong>Aankopen:</strong> neem je Pro via Google Play, dan krijgen we van Google alleen de status van je abonnement (zoals actief, proefperiode en einddatum) en een aankoopcode. Die worden bij je account bewaard, zodat Pro op al je apparaten en voor je familie werkt. Je betaalgegevens, zoals je bankrekening of creditcard, zien we nooit; die verwerkt Google.</li>
         <li><strong>Camera:</strong> de camera wordt alleen gebruikt wanneer je de barcodescanner opent. Camerabeelden worden niet als boodschappenlijstgegevens opgeslagen.</li>
       </ul>
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
+      <p><strong>Google Play</strong> regelt het betalen voor Pro. Onze tussenserver bij <strong>Cloudflare</strong> controleert bij Google of een aankoop echt is en zet daarna Pro aan voor je account.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
@@ -7174,7 +7237,7 @@ html body .familyMenuBack i{font-size:14px!important}
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 22 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
     </div>
   </div>
 
@@ -7186,19 +7249,19 @@ html body .familyMenuBack i{font-size:14px!important}
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 22 oktober 2026</p>
+      <p><strong>Versie:</strong> 25 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
       <h4>4. Barcodescanner</h4><p>De scanner is een hulpmiddel om producten sneller te herkennen. Controleer altijd of het juiste product en aantal op je lijst staan.</p>
       <h4>5. Recepten, prijzen en aanbiedingen</h4><p>Aanbiedingen worden geleverd door PrijsProfeet en zijn bedoeld als hulpmiddel. Prijzen en acties kunnen afwijken van die in de winkel. Bekijk bij twijfel altijd de prijs in de winkel. Recepten en hoeveelheden zijn suggesties. Kies je bij een recept een ander aantal porties, dan worden de hoeveelheden automatisch omgerekend en afgerond; controleer ze zelf. Zet je een aanbieding op je lijst, dan past de app het aantal aan op de actie (zoals “2e halve prijs”); de voorwaarden van de winkel blijven leidend. De houdbaarheid die de app bij je voorraad invult, is een schatting op basis van het soort product. De datum op de verpakking is altijd leidend.</p>
-      <h4>6. Pro-functies</h4><p>Sommige functies zijn onderdeel van Mijn Boodschappen Pro, zoals de weekplanner, de budgetplanner, voorraadbeheer en de persoonlijke assistent. Pro is op dit moment tijdelijk gratis; er is geen betaald abonnement nodig. Als Pro later betaald wordt, maken we de prijs en voorwaarden vooraf bekend. Gegevens die je al hebt ingevoerd, blijven bewaard. Heeft iemand in je familie Pro, dan kunnen familieleden de gedeelde voorraad gebruiken.</p>
+      <h4>6. Pro-functies</h4><p>Sommige functies zijn onderdeel van Mijn Boodschappen Pro, zoals de weekplanner, de budgetplanner, voorraadbeheer en de persoonlijke assistent. Zolang Pro tijdelijk gratis is, is er geen betaald abonnement nodig.</p><p>Wordt Pro betaald, dan neem je het als abonnement via Google Play. De prijs en een eventuele gratis proefperiode zie je vóórdat je koopt. Het abonnement wordt automatisch verlengd totdat je het opzegt in Google Play; je houdt Pro dan tot het einde van de lopende periode. Zeg je tijdens de proefperiode op, dan betaal je niets. Terugbetalingen lopen via Google Play, volgens de regels van Google.</p><p>Eén abonnement geldt voor alle leden van je familie in de app. Wie al een account had toen Pro betaald werd, kan Pro daarna nog 30 dagen gratis gebruiken. Gegevens die je al hebt ingevoerd, blijven altijd bewaard. Verwijder je je account, zeg dan ook je abonnement op in Google Play; dat stopt niet vanzelf.</p>
       <h4>7. Tips van de assistent</h4><p>De tips van de persoonlijke assistent zijn suggesties op basis van je eerdere boodschappen. Ze zijn niet altijd juist; jij bepaalt zelf wat je op je lijst zet.</p>
       <h4>8. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
       <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
       <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 22 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
     </div>
   </div>
 
@@ -7291,7 +7354,9 @@ html body .familyMenuBack i{font-size:14px!important}
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-crown"></i><span>Pro en je familie</span></div>
-      <p>Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken. Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken. Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyPaid">Pro is een abonnement via Google Play, per maand of per jaar. Je kunt het eerst <strong>7 dagen gratis proberen</strong>; zeg je op tijd op, dan betaal je niets. Eén abonnement geldt voor je <strong>hele familie</strong>: iedereen in je familie kan dan alle Pro-onderdelen gebruiken. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyPaid">Je abonnement bekijk of stop je via <strong>Meer → Mijn Boodschappen Pro → Abonnement beheren</strong>. Nieuwe telefoon? Tik in het Pro-scherm op <strong>Aankoop herstellen</strong>. Verwijder je je account, zeg dan ook je abonnement op in Google Play; dat stopt niet vanzelf.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
@@ -16608,6 +16673,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     return ownerVal;
   }
   window.__isAppOwner=isOwner;
+  window.__sha256=sha256;
 
   // Pro is tijdelijk gratis voor iedereen. Alleen de eigenaar kan Pro uitzetten om de app zonder Pro te testen.
   // Later vervangen door de echte Pro-status uit Firebase (door de server gezet na een aankoop).
@@ -16643,8 +16709,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
         pmRef.on("value",function(sn){proMembers=sn.val()||{};proNameLookup();apply();try{if(window.__refreshPantryUI)window.__refreshPantryUI();}catch(e){}},function(){proMembers={};});
       }
     }
-    // Eigen Pro-status doorgeven aan de familie
-    if(h&&u&&typeof database!=="undefined"){
+    // Eigen Pro-status doorgeven aan de familie (alleen zolang Pro gratis is; daarna doet de server dit)
+    if(h&&u&&typeof database!=="undefined"&&!(window.__proPaidMode&&window.__proPaidMode())){
       var want=window.isProActive()?"1":"0";
       if(want!==lastPublished){
         lastPublished=want;
@@ -16721,6 +16787,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     if(t)t.classList.toggle("on",!free);
     if(row)row.setAttribute("aria-checked",String(!free));
     try{if(window.__renderExpiryCard)window.__renderExpiryCard();}catch(e){}
+    try{if(window.__afterProApply)window.__afterProApply();}catch(e){}
   }
   window.__applyProState=apply;
 
@@ -16744,7 +16811,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   };
   window.hideDevSettings=function(event){
     if(event)event.stopPropagation();
-    set(DEV_KEY,null);set(MODE_KEY,null);set(FAM_TEST_KEY,null);proNameLookup();showDev();apply();
+    set(DEV_KEY,null);set(MODE_KEY,null);set(FAM_TEST_KEY,null);set("boodschappenPaidPreview",null);try{document.body.classList.toggle("proPaidMode",!!(window.__proPaidMode&&window.__proPaidMode()));}catch(_){}proNameLookup();showDev();apply();
     try{if(window.__refreshPantryUI)window.__refreshPantryUI();}catch(e){}
     note("Teruggezet: Pro staat aan, familietest staat uit.");
   };
@@ -16759,6 +16826,332 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 </script>
+<style id="app-pro-pay-style">
+.proPay .proPayLead{margin:0 2px 10px;color:#5d6b61;font-size:14px;line-height:1.45}
+.proPay ul{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.proPay li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.35;color:#5d6b61}
+.proPay li i{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#e2f3e5;color:#3c5c46;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.proPay li strong{display:block;color:#24352a;font-size:14px}
+.proPayFam{display:flex;gap:9px;align-items:center;margin:0 0 12px;padding:9px 12px;border-radius:14px;background:#fff6dc;color:#7a5200;font-size:13.5px;font-weight:700}
+.proPayFam i{color:#c58a00}
+.proPlans{display:grid;gap:8px;margin-bottom:10px}
+.proPlan{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid #dfe8e1;background:#fff;border-radius:16px;padding:12px 14px;font:inherit;color:#24352a;cursor:pointer}
+.proPlan.sel{border-color:#3c5c46;background:#f3faf4}
+.proPlan .dot{width:20px;height:20px;border-radius:50%;border:2px solid #b9c7bd;flex:0 0 20px;display:inline-flex;align-items:center;justify-content:center}
+.proPlan.sel .dot{border-color:#3c5c46;background:#3c5c46;box-shadow:inset 0 0 0 3px #fff}
+.proPlan .pt{flex:1;min-width:0}
+.proPlan .pt strong{display:block;font-size:15px}
+.proPlan .pt small{display:block;color:#718177;font-size:12.5px;margin-top:1px}
+.proPlan .pp{font-weight:800;font-size:15px;white-space:nowrap}
+.proPlan .save{position:absolute;top:-9px;right:12px;background:#c58a00;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px}
+.proPayTrial{margin:2px 2px 4px;font-size:13px;color:#5d6b61;line-height:1.4}
+.proPaySmall{margin:8px 2px 0;font-size:12px;color:#8a978e;line-height:1.4}
+.proPaySmall button{border:0;background:none;padding:0;color:#3c5c46;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.proPayNote{margin:6px 2px 0;padding:9px 12px;border-radius:12px;background:#f1f4f2;color:#5d6b61;font-size:13px;line-height:1.4}
+.proSubBox{margin:10px auto 0;max-width:360px;display:grid;gap:8px;justify-items:center}
+.proSubBox p{margin:0!important;font-size:13.5px;color:#5d6b61}
+.proSubBox .proSubBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.proSubBox button{border:0;border-radius:14px;padding:10px 16px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:#3c5c46;color:#fff}
+.proSubBox button.sec{background:#e8f1ea;color:#3c5c46}
+body.dark-theme .proPay .proPayLead,body.dark-theme .proPay li,body.dark-theme .proPayTrial,body.dark-theme .proSubBox p{color:#b5c1b8}
+body.dark-theme .proPay li strong{color:#e9eee9}
+body.dark-theme .proPay li i{background:#304b39;color:#dce9df}
+body.dark-theme .proPayFam{background:#3a3120;color:#f3d38a}
+body.dark-theme .proPlan{background:#26302a;border-color:#3a4740;color:#e9eee9}
+body.dark-theme .proPlan.sel{border-color:#9fd3ad;background:#2c3a31}
+body.dark-theme .proPlan.sel .dot{border-color:#9fd3ad;background:#9fd3ad;box-shadow:inset 0 0 0 3px #26302a}
+body.dark-theme .proPlan .pt small{color:#a9b6ad}
+body.dark-theme .proPayNote{background:#2c3530;color:#b5c1b8}
+body.dark-theme .proPaySmall button{color:#9fd3ad}
+body.dark-theme .proSubBox button{background:#4c7a5a}
+body.dark-theme .proSubBox button.sec{background:#304b39;color:#dce9df}
+body:not(.proPaidMode) .onlyPaid{display:none!important}
+body.proPaidMode .onlyFree{display:none!important}
+</style>
+<script id="app-pro-pay">
+/* Betaalde Pro.
+   - Hoofdschakelaar in Firebase: config/proBetaald (alleen de eigenaar mag die omzetten).
+   - Eigenaar kan lokaal "Betaalde Pro testen" aanzetten; alleen hij ziet dan de betaalde versie.
+   - Pro-status per gebruiker staat in users/{uid}/pro en wordt ALLEEN door de server (worker) gezet,
+     nadat die de aankoop bij Google Play heeft gecontroleerd.
+   - Eén abonnement geldt voor het hele huishouden (households/{id}/proMembers, ook door de server gezet).
+   - Wie al een account had toen Pro betaald werd, houdt nog 30 dagen gratis Pro. */
+(function(){
+  var WORKER="https://boodschappen-prijzen.stefanoofficialgraanoogst.workers.dev";
+  var PREVIEW_KEY="boodschappenPaidPreview", PENDING_KEY="boodschappenPendingPurchase";
+  var GRACE_DAYS=30, DAY=86400000;
+  var DEFAULT_PRICES={maand:"€ 1,99",jaar:"€ 14,99"};
+  var cfg={}, pro=null, products=null, cfgRef=null, proRef=null, refUid="";
+  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(_){}return null;}
+  function owner(){try{return !!(window.__isAppOwner&&window.__isAppOwner());}catch(_){return false;}}
+  function user(){try{return auth&&auth.currentUser;}catch(_){return null;}}
+  function android(){try{return !!(window.AndroidApp&&typeof AndroidApp.billingBuy==="function");}catch(_){return false;}}
+  function toast(m){try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(m);}catch(_){}}
+  function fmtDate(t){try{return new Date(t).toLocaleDateString("nl-NL",{day:"numeric",month:"long"});}catch(_){return "";}}
+
+  /* ---------- Status ---------- */
+  function preview(){return owner()&&ls(PREVIEW_KEY)==="1";}
+  function live(){return cfg.proBetaald===true;}
+  window.__proPaidMode=function(){return live()||preview();};
+  function ownActive(){return !!(pro&&pro.active&&pro.until>Date.now());}
+  function graceUntil(){
+    if(!live()||!cfg.proBetaaldSinds)return 0;
+    if(preview()&&!live())return 0;
+    var u=user();if(!u)return 0;
+    var created=0;try{created=Date.parse(u.metadata&&u.metadata.creationTime)||0;}catch(_){}
+    if(!created||created>=cfg.proBetaaldSinds)return 0;     // nieuw account na de overstap: geen gratis maand
+    var end=cfg.proBetaaldSinds+GRACE_DAYS*DAY;
+    return end>Date.now()?end:0;
+  }
+  function viaFamily(){try{return !!(window.familyHasPro&&window.familyHasPro());}catch(_){return false;}}
+  window.__proStatus=function(){
+    if(!window.__proPaidMode())return {mode:"free"};
+    if(ownActive())return {mode:"paid",kind:"own",trial:!!pro.trial,until:pro.until,plan:pro.plan,autoRenewing:pro.autoRenewing};
+    if(viaFamily())return {mode:"paid",kind:"family"};
+    var g=graceUntil();if(g)return {mode:"paid",kind:"grace",until:g};
+    if(pro&&pro.state==="pending")return {mode:"paid",kind:"pending"};
+    return {mode:"paid",kind:"none"};
+  };
+  var baseActive=window.isProActive;
+  window.isProActive=function(){
+    var base=baseActive?baseActive():true;
+    if(!window.__proPaidMode())return base;
+    if(!base)return false;                // eigenaar heeft "Pro actief" uitgezet om te testen
+    var st=window.__proStatus();
+    return st.kind==="own"||st.kind==="family"||st.kind==="grace";
+  };
+
+  /* ---------- Firebase: hoofdschakelaar en eigen Pro-status ---------- */
+  function listen(){
+    var u=user(),uid=u?u.uid:"";
+    if(uid===refUid)return;
+    try{if(cfgRef)cfgRef.off();if(proRef)proRef.off();}catch(_){}
+    cfgRef=proRef=null;pro=null;cfg={};refUid=uid;
+    if(!uid||typeof database==="undefined")return;
+    cfgRef=database.ref("config");
+    cfgRef.on("value",function(sn){cfg=sn.val()||{};refresh();},function(){cfg={};});
+    proRef=database.ref("users/"+uid+"/pro");
+    proRef.on("value",function(sn){pro=sn.val();refresh();},function(){pro=null;});
+    setTimeout(startBilling,1500);
+  }
+  function refresh(){
+    document.body.classList.toggle("proPaidMode",window.__proPaidMode());
+    try{if(window.__applyProState)window.__applyProState();}catch(_){}
+    graceNotice();
+    if(window.__proPaidMode())startBilling();
+  }
+  try{auth.onAuthStateChanged(function(){listen();refresh();});}catch(_){}
+
+  /* ---------- Google Play ---------- */
+  var billingStarted=false;
+  function startBilling(){
+    if(!android()||!window.__proPaidMode())return;
+    if(billingStarted)return;billingStarted=true;
+    try{AndroidApp.billingProducts();AndroidApp.billingPurchases();}catch(_){}
+    var pend=ls(PENDING_KEY);if(pend)verify(pend,true);
+  }
+  window.__onBillingProducts=function(j){try{products=JSON.parse(j);}catch(_){products=null;}renderSheet();};
+  window.__onBillingPurchases=function(j){
+    var d;try{d=JSON.parse(j);}catch(_){return;}
+    (d.purchases||[]).forEach(function(p){
+      if((p.products||[]).indexOf("mijnboodschappen_pro")<0)return;
+      if(p.state==="pending"){if(d.reason==="buy")toast("Je betaling wordt verwerkt. Je krijgt Pro zodra die rond is.");return;}
+      if(p.state!=="purchased")return;
+      verify(p.token,d.reason!=="buy");
+    });
+    if(d.reason==="restoreClick"&&!(d.purchases||[]).length)toast("Geen Pro-abonnement gevonden bij dit Google-account.");
+  };
+  window.__onBillingError=function(j){
+    var e={};try{e=JSON.parse(j);}catch(_){}
+    if(e.code===1)return;                   // zelf geannuleerd
+    if(e.code===7){try{AndroidApp.billingPurchases();}catch(_){}return;}
+    toast(e.message?("Google Play: "+e.message):"Er ging iets mis met Google Play. Probeer het later opnieuw.");
+  };
+  async function verify(token,quiet){
+    var u=user();if(!u||!token)return;
+    ls(PENDING_KEY,token);
+    try{
+      var idToken=await u.getIdToken();
+      var r=await fetch(WORKER+"/pro/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({idToken:idToken,purchaseToken:token})});
+      var d=await r.json().catch(function(){return {};});
+      if(r.ok&&d){
+        ls(PENDING_KEY,null);
+        if(d.active){pro=d;refresh();if(!quiet){closeSheet();toast(d.trial?"Je proefperiode is gestart. Veel plezier met Pro!":"Welkom bij Pro! Dank je wel.");}}
+        return;
+      }
+      if(r.status===409){ls(PENDING_KEY,null);if(!quiet)toast(d.error||"Deze aankoop hoort bij een ander account.");return;}
+      if(!quiet)toast("Je aankoop is ontvangen. De controle lukte nog niet; we proberen het straks opnieuw.");
+    }catch(_){
+      if(!quiet)toast("Je aankoop is ontvangen. Zodra je internet hebt, zetten we Pro aan.");
+    }
+  }
+  window.addEventListener("online",function(){var p=ls(PENDING_KEY);if(p)verify(p,true);});
+
+  /* ---------- Prijzen uit Google Play ---------- */
+  function planInfo(id){
+    var plans=(products&&products.plans)||[],base=null,trial=null;
+    plans.forEach(function(p){if(p.basePlanId!==id)return;if(!p.offerId)base=p;else if((p.phases||[]).some(function(x){return x.micros===0;}))trial=trial||p;});
+    var src=trial||base;
+    var paid=src?(src.phases||[]).filter(function(x){return x.micros>0;}).pop():null;
+    var free=trial?(trial.phases||[]).filter(function(x){return x.micros===0;})[0]:null;
+    return {price:paid?paid.price:DEFAULT_PRICES[id],micros:paid?paid.micros:0,trialDays:free?periodDays(free.period):0,found:!!src};
+  }
+  function periodDays(p){var m=/P(?:(\d+)W)?(?:(\d+)D)?/.exec(p||"");if(!m)return 0;return (+m[1]||0)*7+(+m[2]||0);}
+
+  /* ---------- Het Pro-scherm ---------- */
+  var sheet=null,chosen="jaar";
+  /* Zolang Pro gratis is: de bestaande pop-up met "Pro aanzetten" */
+  var freeShow=window.showProUpsell;
+  function freeUpsell(){if(typeof freeShow==="function")freeShow();}
+  window.showProUpsell=function(){
+    if(typeof familyDialogBase!=="function")return;
+    if(!window.__proPaidMode())return freeUpsell();
+    if(android()&&!products){try{AndroidApp.billingProducts();}catch(_){}}
+    sheet=familyDialogBase("fa-crown","Mijn Boodschappen Pro",'<div class="proPay" id="proPayBody"></div>','<div class="proPayFoot" style="display:flex;gap:8px;justify-content:flex-end;width:100%"></div>');
+    sheet.classList.add("proUpsellDialog");
+    ["click","pointerdown","touchstart"].forEach(function(ev){sheet.addEventListener(ev,function(e){e.stopPropagation();});});
+    sheet.addEventListener("click",function(e){if(e.target===sheet)closeSheet();});
+    renderSheet();
+  };
+  function closeSheet(){if(sheet){try{closeFamilyDialog(sheet);}catch(_){}sheet=null;}}
+  function renderSheet(){
+    if(!sheet)return;
+    var body=sheet.querySelector("#proPayBody"),foot=sheet.querySelector(".proPayFoot");if(!body||!foot)return;
+    var m=planInfo("maand"),y=planInfo("jaar");
+    var save=(m.micros&&y.micros)?Math.round((1-y.micros/(m.micros*12))*100):37;
+    var perMonth=y.micros?("€ "+(y.micros/12e6).toFixed(2).replace(".",",")+" per maand"):"€ 1,25 per maand";
+    var sel=chosen==="jaar"?y:m;
+    var st=window.__proStatus();
+    var canBuy=android()&&products&&products.available&&sel.found;
+    var html='<p class="proPayLead">Haal meer uit je boodschappen.</p><ul>'+
+      '<li><i class="fa-solid fa-calendar-days"></i><span><strong>Slimme weekplanner en 30 recepten</strong>Alle ingrediënten in één keer op je lijst.</span></li>'+
+      '<li><i class="fa-solid fa-wallet"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de acties bij jouw supermarkt.</span></li>'+
+      '<li><i class="fa-solid fa-cube"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en meldingen.</span></li>'+
+      '<li><i class="fa-solid fa-wand-magic-sparkles"></i><span><strong>Persoonlijke assistent</strong>Je vaste boodschappen klaar en tips over wat bijna op is.</span></li>'+
+      '</ul><div class="proPayFam"><i class="fa-solid fa-users"></i><span>Eén abonnement voor je hele familie</span></div>';
+    if(st.kind==="grace")html+='<p class="proPayNote">Je kunt Pro nog gratis gebruiken tot <b>'+fmtDate(st.until)+'</b>. Neem je nu Pro, dan loopt alles daarna gewoon door.</p>';
+    html+='<div class="proPlans">'+
+      '<button type="button" class="proPlan'+(chosen==="jaar"?" sel":"")+'" data-plan="jaar"><span class="dot"></span><span class="pt"><strong>Per jaar</strong><small>'+perMonth+'</small></span><span class="pp">'+y.price+'</span>'+(save>0?'<span class="save">Bespaar '+save+'%</span>':'')+'</button>'+
+      '<button type="button" class="proPlan'+(chosen==="maand"?" sel":"")+'" data-plan="maand"><span class="dot"></span><span class="pt"><strong>Per maand</strong><small>Maandelijks opzegbaar</small></span><span class="pp">'+m.price+'</span></button>'+
+      '</div>';
+    var trialDays=sel.trialDays||(!products?7:0);
+    if(trialDays)html+='<p class="proPayTrial"><b>'+trialDays+' dagen gratis</b>, daarna '+sel.price+' per '+(chosen==="jaar"?"jaar":"maand")+'. Je betaalt niets als je op tijd opzegt.</p>';
+    if(!android())html+='<p class="proPayNote">Pro nemen kan in de Android-app van Mijn Boodschappen. Heb je daar Pro, dan werkt het hier ook.</p>';
+    else if(products&&!products.available)html+='<p class="proPayNote">Pro is nog niet beschikbaar in Google Play. Probeer het later opnieuw.</p>';
+    html+='<p class="proPaySmall">Betalen gaat via Google Play. Opzeggen kan altijd in Google Play.'+(android()?' <button type="button" data-b="restore">Aankoop herstellen</button>':'')+'</p>';
+    body.innerHTML=html;
+    foot.innerHTML='<button type="button" class="familyDialogBtn familyDialogCancel" data-b="later">Niet nu</button>'+
+      (android()?'<button type="button" class="familyDialogBtn familyDialogPrimary" data-b="buy"'+(canBuy?'':' disabled style="opacity:.5"')+'>'+(trialDays?trialDays+' dagen gratis proberen':'Pro nemen')+'</button>':'');
+    body.querySelectorAll("[data-plan]").forEach(function(b){b.onclick=function(e){e.stopPropagation();chosen=b.getAttribute("data-plan");renderSheet();};});
+    var rs=body.querySelector('[data-b="restore"]');if(rs)rs.onclick=function(e){e.stopPropagation();restore();};
+    foot.querySelector('[data-b="later"]').onclick=closeSheet;
+    var bb=foot.querySelector('[data-b="buy"]');if(bb&&canBuy)bb.onclick=function(e){e.stopPropagation();buy();};
+  }
+  function buy(){
+    var u=user();if(!u)return;
+    var acct=window.__sha256?window.__sha256(u.uid):"";
+    try{AndroidApp.billingBuy(chosen,acct);}catch(_){toast("Google Play kon niet worden geopend.");}
+  }
+  function restore(){
+    toast("Je aankopen worden opgezocht…");
+    var orig=window.__onBillingPurchases;
+    window.__onBillingPurchases=function(j){window.__onBillingPurchases=orig;try{var d=JSON.parse(j);d.reason="restoreClick";j=JSON.stringify(d);}catch(_){}orig(j);};
+    try{AndroidApp.billingPurchases();}catch(_){window.__onBillingPurchases=orig;}
+  }
+  window.openProPaywall=function(e){if(e&&e.stopPropagation)e.stopPropagation();window.showProUpsell();};
+
+
+  /* ---------- Kaart in Meer en de Pro-pagina ---------- */
+  window.__afterProApply=function(){
+    var st=window.__proStatus();
+    var card=document.querySelector(".proFreeCard"),hero=document.querySelector(".proFreeHero"),box=document.getElementById("proSubBox");
+    var label="Tijdelijk gratis";
+    if(st.mode==="paid"){
+      if(st.kind==="own")label=st.trial?("Proefperiode tot "+fmtDate(st.until)):"Pro actief";
+      else if(st.kind==="family")label="Via je familie";
+      else if(st.kind==="grace")label="Gratis tot "+fmtDate(st.until);
+      else if(st.kind==="pending")label="Betaling wordt verwerkt";
+      else label="7 dagen gratis proberen";
+    }
+    if(card)card.textContent=label;
+    if(hero)hero.innerHTML='<i class="fa-solid '+(st.mode==="paid"&&st.kind==="own"?"fa-circle-check":"fa-gift")+'" aria-hidden="true"></i> '+label;
+    if(box){
+      if(st.mode!=="paid"){box.hidden=true;box.innerHTML="";return;}
+      var t="",b="";
+      if(st.kind==="own"){
+        t=st.trial?("Je proefperiode loopt tot "+fmtDate(st.until)+"."):(st.autoRenewing===false?("Je Pro stopt op "+fmtDate(st.until)+"."):("Je abonnement wordt verlengd op "+fmtDate(st.until)+"."));
+        b=android()?'<button type="button" class="sec" data-b="manage">Abonnement beheren</button>':'';
+      }else if(st.kind==="family"){t="Je hebt Pro via je familie.";}
+      else if(st.kind==="grace"){t="Je kunt Pro nog gratis gebruiken tot "+fmtDate(st.until)+".";b='<button type="button" data-b="pay">Pro nemen</button>';}
+      else if(st.kind==="pending"){t="Je betaling wordt verwerkt.";}
+      else{t="Probeer Pro 7 dagen gratis. Eén abonnement voor je hele familie.";b='<button type="button" data-b="pay">Bekijk Pro</button>';}
+      box.innerHTML='<p>'+t+'</p>'+(b?'<div class="proSubBtns">'+b+'</div>':'');
+      box.hidden=false;
+      var mb=box.querySelector('[data-b="manage"]');if(mb)mb.onclick=function(e){e.stopPropagation();try{AndroidApp.billingManage();}catch(_){}};
+      var pb=box.querySelector('[data-b="pay"]');if(pb)pb.onclick=function(e){e.stopPropagation();window.showProUpsell();};
+    }
+    // Eigenaar-schakelaars
+    var pv=document.getElementById("devPaidPreviewToggle"),pr=document.querySelector(".devPaidPreviewRow");
+    if(pv)pv.classList.toggle("on",preview());if(pr)pr.setAttribute("aria-checked",String(preview()));
+    var lv=document.getElementById("devPaidLiveToggle"),lr=document.querySelector(".devPaidLiveRow");
+    if(lv)lv.classList.toggle("on",live());if(lr)lr.setAttribute("aria-checked",String(live()));
+    var ut=document.getElementById("devUidText"),u=user();if(ut&&u)ut.textContent=u.uid+" · tik om te kopiëren";
+  };
+
+  /* ---------- Melding voor huidige gebruikers ---------- */
+  function graceNotice(){
+    var u=user();if(!u||!live())return;
+    var g=graceUntil();if(!g)return;
+    var key="boodschappenGraceSeen_"+u.uid;if(ls(key))return;
+    if(document.querySelector(".familyDialogOverlay.familyDialogShown")||document.getElementById("mbTour"))return;
+    ls(key,"1");
+    var ov=familyDialogBase("fa-crown","Pro wordt betaald",
+      '<p class="familyDialogText">Bedankt dat je Mijn Boodschappen gebruikt! Pro wordt vanaf nu een abonnement. Jij kunt Pro nog <b>gratis gebruiken tot '+fmtDate(g)+'</b>.</p>'+
+      '<p class="familyDialogText" style="margin-top:8px">Daarna kun je Pro nemen voor je hele familie. Je gegevens blijven altijd bewaard. De gewone boodschappenlijst blijft gratis.</p>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="ok">Oké</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="see">Bekijk Pro</button>');
+    ov.querySelector('[data-b="ok"]').onclick=function(){closeFamilyDialog(ov);};
+    ov.querySelector('[data-b="see"]').onclick=function(){closeFamilyDialog(ov);setTimeout(window.showProUpsell,320);};
+  }
+
+  /* ---------- Schakelaars van de eigenaar ---------- */
+  window.togglePaidPreview=function(e){
+    if(e)e.stopPropagation();if(!owner())return;
+    var on=!preview();ls(PREVIEW_KEY,on?"1":null);billingStarted=false;
+    refresh();if(on)startBilling();
+    toast(on?"Je ziet nu de betaalde versie. Alleen jij.":"Betaalde versie testen staat uit.");
+  };
+  window.togglePaidLive=function(e){
+    if(e)e.stopPropagation();if(!owner())return;
+    var turnOn=!live();
+    var ov=familyDialogBase("fa-wallet",turnOn?"Pro betaald maken?":"Pro weer gratis maken?",
+      turnOn?'<p class="familyDialogText">Iedereen moet dan Pro nemen om de Pro-onderdelen te gebruiken. Wie nu al een account heeft, houdt nog <b>30 dagen gratis</b> en krijgt daar een melding over.</p><p class="familyDialogText" style="margin-top:8px">Doe dit pas als het abonnement in Play Console klaarstaat en de servercontrole werkt.</p>'
+            :'<p class="familyDialogText">Pro wordt weer gratis voor iedereen. Lopende abonnementen in Google Play blijven bestaan; zeg die zo nodig zelf op in Play Console.</p>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="no">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="yes">'+(turnOn?"Ja, Pro betaald maken":"Ja, weer gratis")+'</button>');
+    ov.querySelector('[data-b="no"]').onclick=function(){closeFamilyDialog(ov);};
+    ov.querySelector('[data-b="yes"]').onclick=function(){
+      closeFamilyDialog(ov);
+      var upd=turnOn?{proBetaald:true,proBetaaldSinds:Date.now()}:{proBetaald:false};
+      database.ref("config").update(upd).then(function(){toast(turnOn?"Pro is nu betaald voor iedereen.":"Pro is weer gratis voor iedereen.");})
+      .catch(function(){
+        var u=user();
+        var o2=familyDialogBase("fa-key","Nog niet toegestaan",'<p class="familyDialogText">Firebase staat dit nog niet toe. Zet je gebruikers-ID in de Firebase-regels op de plek van <b>VUL_HIER_JE_UID_IN</b>:</p><p class="familyDialogText" style="margin-top:8px;word-break:break-all;font-family:monospace;font-size:13px">'+(u?u.uid:"")+'</p>',
+          '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="c">Sluiten</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="k">Kopiëren</button>');
+        o2.querySelector('[data-b="c"]').onclick=function(){closeFamilyDialog(o2);};
+        o2.querySelector('[data-b="k"]').onclick=function(){window.copyMyUid();closeFamilyDialog(o2);};
+      });
+    };
+  };
+  window.copyMyUid=function(e){
+    if(e)e.stopPropagation();var u=user();if(!u)return;
+    var done=function(){toast("Gebruikers-ID gekopieerd.");};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u.uid).then(done,function(){fallback();});return;}}catch(_){}
+    fallback();
+    function fallback(){try{var t=document.createElement("textarea");t.value=u.uid;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();done();}catch(_){}}
+  };
+  setInterval(function(){try{listen();}catch(_){}},4000);
+})();
+</script>
+
 <script id="list-calm-logic">
 (function(){
   /* Waarschuwingen in de statusregel oranje kleuren */
