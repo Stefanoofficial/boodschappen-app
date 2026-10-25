@@ -18643,6 +18643,29 @@ body:not(.logged-in) #mbNet{display:none}
   window.__mbNetTest=function(off){fbOn=!off;evaluate();};
 })();
 </script>
+<script id="reliable-tap">
+/* Tik na het scrollen: soms gebruikt de telefoon die tik alleen om het doorglijden te stoppen.
+   Je ziet de knop dan oplichten, maar er gebeurt niets. Kwam er geen klik, dan doen we hem zelf. */
+(function(){
+  var SEL="#familyMenu button, #moreView button, .moreMenuLogout";
+  var down=null,pending=null,clicked=false;
+  function start(x,y,t){var b=t&&t.closest&&t.closest(SEL);down=b?{b:b,x:x,y:y,t:Date.now()}:null;}
+  function end(x,y,t){
+    if(!down)return;var d=down;down=null;
+    var b=t&&t.closest&&t.closest(SEL);
+    if(b!==d.b||Math.abs(x-d.x)>10||Math.abs(y-d.y)>10||Date.now()-d.t>700)return;
+    pending=b;clicked=false;
+    setTimeout(function(){
+      if(pending===b&&!clicked&&b.isConnected&&!b.disabled&&!document.querySelector(".familyDialogOverlay.familyDialogShown")){pending=null;b.click();}
+      else if(pending===b)pending=null;
+    },380);
+  }
+  document.addEventListener("touchstart",function(e){var p=e.touches[0];if(p)start(p.clientX,p.clientY,e.target);},{capture:true,passive:true});
+  document.addEventListener("touchend",function(e){var p=e.changedTouches[0];if(p)end(p.clientX,p.clientY,document.elementFromPoint(p.clientX,p.clientY)||e.target);},{capture:true,passive:true});
+  document.addEventListener("touchcancel",function(){down=null;},{capture:true,passive:true});
+  document.addEventListener("click",function(e){if(pending&&e.target&&e.target.closest&&e.target.closest(SEL)===pending)clicked=true;},true);
+})();
+</script>
 <script id="app-tour">
 /* Korte rondleiding voor nieuwe gebruikers: wijst de echte knoppen in de app aan. */
 (function(){
@@ -18735,6 +18758,8 @@ body:not(.logged-in) #mbNet{display:none}
       if(!document.body.classList.contains("logged-in")||window.__listLoading)return;
       var app=document.querySelector(".app");if(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")))return;
       if(document.querySelector(".familyDialogOverlay.familyDialogShown"))return;
+      /* Alleen voor echt nieuwe accounts (aangemaakt in de afgelopen 2 dagen) */
+      try{var cu=auth.currentUser,ct=Date.parse(cu&&cu.metadata&&cu.metadata.creationTime)||0;if(ct&&Date.now()-ct>2*86400000){markDone();return;}}catch(_){}
       var hc=localStorage.getItem("boodschappenHistCount");
       if((Array.isArray(boodschappen)&&boodschappen.length)||(hc&&hc!=="0")){markDone();return;}
       window.startAppTour();
