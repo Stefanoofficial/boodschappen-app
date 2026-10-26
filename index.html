@@ -7164,16 +7164,15 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="feedbackIntro">
       <div class="feedbackIcon"><i class="fa-solid fa-comment-dots"></i></div>
       <h3>Jouw mening telt!</h3>
-      <p>Heb je een idee, suggestie, vraag of iets gevonden dat niet goed werkt? Laat het weten.</p>
+      <p>Heb je een idee, een vraag of iets gevonden dat niet goed werkt? Laat het weten, elk bericht wordt gelezen.</p>
     </div>
-    <div class="feedbackPrompt">Vertel ons wat je vindt</div>
-    <label class="feedbackLabel" for="feedbackText">Je feedback</label>
-    <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Schrijf hier je feedback…"></textarea>
+    <label class="feedbackLabel" for="feedbackText">Je bericht</label>
+    <textarea id="feedbackText" class="feedbackTextarea" maxlength="1000" placeholder="Bijv. wat je handig vindt, wat beter kan of waar het misging…"></textarea>
     <button type="button" class="familyMenuItem feedbackSendBtn" onclick="shareFeedback(event)">
       <i class="fa-solid fa-paper-plane"></i>
       <span>Feedback delen</span>
     </button>
-    <div class="settingsMenuHint">Je feedback wordt rechtstreeks naar de ontwikkelaar gestuurd. Je hoeft geen e-mailapp te openen.</div>
+    <div class="settingsMenuHint">Je bericht gaat rechtstreeks naar de maker van de app, samen met je naam en e-mailadres, zodat we je kunnen antwoorden. Je hoeft geen e-mailapp te openen.</div>
   </div>
 
   <div id="appInfoMenuSub" class="familyMenuPage aboutMenuPage" style="display:none;">
@@ -7255,6 +7254,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>Google Play</strong> regelt het betalen voor Pro. Onze tussenserver bij <strong>Cloudflare</strong> controleert bij Google of een aankoop echt is en zet daarna Pro aan voor je account.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
+      <p><strong>FormSubmit</strong> wordt gebruikt om je bericht te versturen als je via <strong>Meer → Feedback</strong> feedback geeft. Daarbij worden je bericht, je naam, je e-mailadres en het soort apparaat naar ons gestuurd, zodat we je kunnen antwoorden.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
       <h4>Delen met anderen</h4>
@@ -7264,7 +7264,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>Jouw rechten</h4>
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
-      <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
+      <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
       <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
     </div>
   </div>
@@ -7288,7 +7288,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>8. Beschikbaarheid</h4><p>We streven ernaar dat de app goed werkt, maar kunnen geen permanente beschikbaarheid of foutloze werking van online diensten garanderen.</p>
       <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
-      <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:info.stefanograanoogst@gmail.com">info.stefanograanoogst@gmail.com</a></dd></dl>
+      <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
       <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
     </div>
   </div>
@@ -8333,18 +8333,31 @@ async function shareFeedback(event) {
   try {
     // Feedback wordt rechtstreeks naar de eigenaar van de app gestuurd via FormSubmit.
     // De eerste verzending activeert een eenmalige bevestigingsmail voor het ingestelde adres.
-    const response = await fetch('https://formsubmit.co/ajax/info.stefanograanoogst@gmail.com', {
+    const response = await fetch('https://formsubmit.co/ajax/support.mijnboodschappen@gmail.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        _subject: 'Nieuwe feedback — Mijn Boodschappen',
-        message: text,
-        app: 'Mijn Boodschappen',
-        version: '1.0'
-      })
+      body: JSON.stringify((function () {
+        const u = (typeof auth !== "undefined" && auth.currentUser) || null;
+        let naam = "";
+        try { const g = JSON.parse(localStorage.getItem("boodschappenGreetingName") || "null"); if (g && u && g.uid === u.uid) naam = g.name || ""; } catch (_) {}
+        const platform = document.documentElement.classList.contains("platform-android") || (window.AndroidApp ? true : false) ? "Android-app"
+          : (/iPhone|iPad/.test(navigator.userAgent) ? "iPhone" : "Website");
+        const body = {
+          _subject: "Feedback Mijn Boodschappen" + (naam ? " van " + naam : ""),
+          _template: "table",
+          _captcha: "false",
+          Bericht: text,
+          Naam: naam || "(onbekend)",
+          "E-mail": (u && u.email) || "(niet ingelogd)",
+          Apparaat: platform,
+          Versie: "1.0.0"
+        };
+        if (u && u.email) body._replyto = u.email;
+        return body;
+      })())
     });
 
     const result = await response.json().catch(() => ({}));
