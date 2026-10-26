@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import androidx.core.splashscreen.SplashScreen;
 public class MainActivity extends Activity {
     private WebView webView;
+    private BillingBridge billing;
     private FrameLayout root;
     private FrameLayout splash;
     private ImageView splashIcon;
@@ -126,6 +127,7 @@ public class MainActivity extends Activity {
                 });
             }
         });
+        billing = new BillingBridge(this, webView);
         webView.addJavascriptInterface(new AppBridge(), "AndroidApp");
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -524,6 +526,22 @@ public class MainActivity extends Activity {
     }
 
     private class AppBridge {
+        // ---------- Betalen voor Pro (Google Play) ----------
+        @JavascriptInterface
+        public boolean billingAvailable() { return billing != null; }
+
+        @JavascriptInterface
+        public void billingProducts() { if (billing != null) billing.queryProducts(); }
+
+        @JavascriptInterface
+        public void billingPurchases() { if (billing != null) billing.queryPurchases(); }
+
+        @JavascriptInterface
+        public void billingBuy(String basePlanId, String accountId) { if (billing != null) billing.buy(basePlanId, accountId); }
+
+        @JavascriptInterface
+        public void billingManage() { if (billing != null) billing.manage(); }
+
         @JavascriptInterface
         public void testShoppingReminder() {
             runOnUiThread(() -> {
@@ -627,15 +645,29 @@ public class MainActivity extends Activity {
             });
         }
 
-        /** Korte tik als bevestiging (volgt de trilinstelling van je telefoon). */
+        /** Korte, duidelijke tik als bevestiging bij afvinken (de gebruiker zet dit aan/uit in Lijstopties). */
         @JavascriptInterface
         public void haptic() {
             runOnUiThread(() -> {
-                if (webView == null) return;
-                int type = Build.VERSION.SDK_INT >= 30
-                        ? android.view.HapticFeedbackConstants.CONFIRM
-                        : android.view.HapticFeedbackConstants.KEYBOARD_TAP;
-                webView.performHapticFeedback(type);
+                try {
+                    android.os.Vibrator v;
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        android.os.VibratorManager vm = (android.os.VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                        v = vm != null ? vm.getDefaultVibrator() : null;
+                    } else {
+                        v = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    }
+                    if (v == null || !v.hasVibrator()) return;
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        v.vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_CLICK));
+                    } else if (Build.VERSION.SDK_INT >= 26) {
+                        v.vibrate(android.os.VibrationEffect.createOneShot(25, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        v.vibrate(25);
+                    }
+                } catch (Exception e) {
+                    if (webView != null) webView.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
+                }
             });
         }
 
@@ -756,6 +788,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         stopSplashRing();
+        if (billing != null) { billing.destroy(); billing = null; }
         if (webView != null) {
             webView.destroy();
             webView = null;
