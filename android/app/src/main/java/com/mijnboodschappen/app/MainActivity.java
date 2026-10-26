@@ -658,12 +658,12 @@ public class MainActivity extends Activity {
                         v = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     }
                     if (v == null || !v.hasVibrator()) return;
-                    if (Build.VERSION.SDK_INT >= 29) {
-                        v.vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_CLICK));
-                    } else if (Build.VERSION.SDK_INT >= 26) {
-                        v.vibrate(android.os.VibrationEffect.createOneShot(25, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+                    // Een korte maar duidelijk voelbare tik (40 ms, volle kracht als de telefoon dat ondersteunt)
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        int amp = v.hasAmplitudeControl() ? 255 : android.os.VibrationEffect.DEFAULT_AMPLITUDE;
+                        v.vibrate(android.os.VibrationEffect.createOneShot(40, amp));
                     } else {
-                        v.vibrate(25);
+                        v.vibrate(40);
                     }
                 } catch (Exception e) {
                     if (webView != null) webView.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
