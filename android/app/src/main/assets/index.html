@@ -11016,6 +11016,8 @@ if (document.readyState === "loading") {
   // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+// E-mails van Firebase (wachtwoord vergeten e.d.) in het Nederlands
+try { auth.languageCode = "nl"; } catch (_) {}
 const database = firebase.database();
 // Bewaar de Firebase-inlogsessie lokaal totdat de gebruiker zelf uitlogt.
 const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
@@ -12570,20 +12572,20 @@ function togglePassword() {
   const email = document.getElementById("loginEmail").value;
 
   if (!email) {
-    alert("Vul eerst je e-mailadres in.");
+    familyAlert("Wachtwoord vergeten", "Vul eerst je e-mailadres in. Daarna sturen we je een link om een nieuw wachtwoord te kiezen.", "fa-envelope");
     return;
   }
 
   try {
     await auth.sendPasswordResetEmail(email);
-    alert("Er is een e-mail gestuurd om je wachtwoord opnieuw in te stellen.");
+    familyAlert("Kijk in je e-mail", "We hebben je een e-mail gestuurd met een link om een nieuw wachtwoord te kiezen. Zie je niets? Kijk dan ook even bij je spam of ongewenste e-mail.", "fa-envelope");
   } catch (error) {
     let msg = "Het lukte niet om de e-mail te versturen. Probeer het later opnieuw.";
     if (error && error.code === "auth/invalid-email") msg = "Dit e-mailadres is niet geldig.";
     else if (error && error.code === "auth/user-not-found") msg = "Er bestaat geen account met dit e-mailadres.";
     else if (error && error.code === "auth/network-request-failed") msg = "Geen internetverbinding. Controleer je verbinding en probeer het opnieuw.";
     else if (error && error.code === "auth/too-many-requests") msg = "Te veel pogingen. Probeer het later opnieuw.";
-    alert(msg);
+    familyAlert("Wachtwoord vergeten", msg, "fa-triangle-exclamation");
   }
 }
 async function login(){
@@ -12883,15 +12885,15 @@ async function register() {
   const confirmPassword = document.getElementById("registerPasswordConfirm").value || "";
 
   if (!name || !email || !password || !confirmPassword) {
-    alert("Vul alle velden in.");
+    familyAlert("Account aanmaken", "Vul alle velden in.", "fa-circle-info");
     return;
   }
   if (password !== confirmPassword) {
-    alert("De wachtwoorden komen niet overeen.");
+    familyAlert("Account aanmaken", "De wachtwoorden komen niet overeen.", "fa-lock");
     return;
   }
   if (password.length < 6) {
-    alert("Het wachtwoord moet minimaal 6 tekens bevatten.");
+    familyAlert("Account aanmaken", "Het wachtwoord moet minimaal 6 tekens bevatten.", "fa-lock");
     return;
   }
 
@@ -12916,7 +12918,7 @@ async function register() {
 
     closeRegister();
     document.getElementById("loginScreen").style.display = "flex";
-    alert("Account aangemaakt. Je kunt nu inloggen.");
+    familyAlert("Account aangemaakt", "Welkom! Je kunt nu inloggen met je e-mailadres en wachtwoord.", "fa-circle-check");
   } catch (error) {
     registrationInProgress = false;
     console.error("Registratie fout:", error);
@@ -12949,7 +12951,7 @@ async function register() {
       message = "Account aanmaken is niet gelukt. Probeer het later opnieuw.";
     }
 
-    alert(message);
+    familyAlert("Account aanmaken", message, "fa-triangle-exclamation");
   }
 }
 
