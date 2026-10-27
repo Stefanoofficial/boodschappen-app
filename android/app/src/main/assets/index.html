@@ -8765,7 +8765,7 @@ async function deleteAccountFromMenu() {
       return;
     }
 
-    if (error && error.code === "auth/wrong-password") {
+    if (error && (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential")) {
       await familyAlert("Verkeerd wachtwoord", "Het ingevoerde wachtwoord klopt niet.", "fa-triangle-exclamation");
       return;
     }
@@ -12591,7 +12591,7 @@ function togglePassword() {
 
   try {
     await auth.sendPasswordResetEmail(email);
-    familyAlert("Kijk in je e-mail", "We hebben je een e-mail gestuurd met een link om een nieuw wachtwoord te kiezen. Zie je niets? Kijk dan ook even bij je spam of ongewenste e-mail.", "fa-envelope");
+    familyAlert("Kijk in je e-mail", "Heb je een account met dit e-mailadres? Dan krijg je zo een e-mail met een link om een nieuw wachtwoord te kiezen. Zie je niets? Kijk dan ook even bij je spam of ongewenste e-mail, en controleer of je het juiste adres hebt ingevuld.", "fa-envelope");
   } catch (error) {
     let msg = "Het lukte niet om de e-mail te versturen. Probeer het later opnieuw.";
     if (error && error.code === "auth/invalid-email") msg = "Dit e-mailadres is niet geldig.";
