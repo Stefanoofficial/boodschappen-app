@@ -6772,6 +6772,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <div class="proTabPane" data-pane="deals" hidden>
       <label for="budgetSupermarket">Mijn vaste supermarkt</label>
       <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
+        <optgroup label="Nederland">
         <option value="ah">Albert Heijn</option>
         <option value="aldi">Aldi</option>
         <option value="boni">Boni</option>
@@ -6791,7 +6792,19 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <option value="poiesz">Poiesz</option>
         <option value="spar">SPAR</option>
         <option value="vomar">Vomar</option>
+        </optgroup>
+        <optgroup label="België">
+        <option value="ah_be">Albert Heijn België</option>
+        <option value="aldi_be">Aldi België</option>
+        <option value="carrefour">Carrefour</option>
+        <option value="colruyt">Colruyt</option>
+        <option value="delhaize">Delhaize</option>
+        <option value="jumbo_be">Jumbo België</option>
+        <option value="lidl_be">Lidl België</option>
+        </optgroup>
+        <optgroup label="Overig">
         <option value="other">Andere supermarkt (zonder aanbiedingen)</option>
+        </optgroup>
       </select>
       <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard en gebruikt om aanbiedingen te zoeken.</p>
       <p id="budgetNoDealsNote" class="budgetNoDeals" hidden><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Voor jouw supermarkt hebben we nog geen aanbiedingen. Je budget en uitgaven bijhouden werkt gewoon.</span></p>
@@ -6805,7 +6818,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <div id="budgetLivePriceResults" aria-live="polite"></div>
         <button type="button" class="budgetActionButton budgetWeekButton" onclick="searchWeekplanDeals()">Zoek aanbiedingen voor mijn week</button>
         <div id="weekplanDealsResults" aria-live="polite"></div>
-        <p class="budgetStatus budgetSource">Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
+        <p class="budgetStatus budgetSource">Aanbiedingen via <a id="ppSourceLink" href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a>. Prijzen kunnen afwijken; controleer bij de winkel.</p>
       </div>
       </div>
     </section>
@@ -7197,13 +7210,13 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <div class="aboutInfoLine"><i class="fa-solid fa-bolt"></i><span>Producten die je vaak koopt snel opnieuw toevoegen.</span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-utensils"></i><span>30 recepten (van stamppot tot curry) met ingrediënten, bereidingswijze en tips, voor het aantal porties dat jij kiest. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-calendar-week"></i><span>Je maaltijden voor de week plannen en alle ingrediënten in één keer op je lijst zetten. <b class="aboutProBadge">PRO</b></span></div>
-      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner: je weekbudget en uitgaven per winkel bijhouden, en aanbiedingen van je supermarkt op je lijst zetten. <b class="aboutProBadge">PRO</b></span></div>
+      <div class="aboutInfoLine"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner: je weekbudget en uitgaven per winkel bijhouden, en aanbiedingen van je supermarkt (in Nederland of België) op je lijst zetten. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-cube"></i><span>Je voorraad bijhouden en delen met je familie, met een melding als iets bijna over de datum of bijna op is (Android). <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips van je persoonlijke assistent. <b class="aboutProBadge">PRO</b></span></div>
       <div class="aboutInfoLine onlyFree"><i class="fa-solid fa-gift"></i><span>Alle Pro-onderdelen zijn tijdelijk gratis.</span></div>
       <div class="aboutInfoLine onlyPaid"><i class="fa-solid fa-crown"></i><span>Pro is een abonnement via Google Play: 7 dagen gratis proberen, en één abonnement voor je hele familie.</span></div>
     </div>
-    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet</a></span></div>
+    <div class="aboutMenuHint aboutSources"><span>Productinformatie en foto’s: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open&nbsp;Food&nbsp;Facts</a> <span class="nowrap">(CC&nbsp;BY‑SA)</span></span><span>Aanbiedingen via <a href="https://www.prijsprofeet.nl" target="_blank" rel="noopener">PrijsProfeet.nl</a> en <a href="https://www.prijsprofeet.be" target="_blank" rel="noopener">PrijsProfeet.be</a></span></div>
     <div class="aboutMenuHint">© 2026 Mijn Boodschappen</div>
   </div>
 
@@ -7234,7 +7247,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 25 oktober 2026</p>
+      <p><strong>Versie:</strong> 28 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
@@ -7253,7 +7266,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>Google Play</strong> regelt het betalen voor Pro. Onze tussenserver bij <strong>Cloudflare</strong> controleert bij Google of een aankoop echt is en zet daarna Pro aan voor je account.</p>
-      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
+      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten in Nederland en België. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>FormSubmit</strong> wordt gebruikt om je bericht te versturen als je via <strong>Meer → Feedback</strong> feedback geeft. Daarbij worden je bericht, je naam, je e-mailadres en het soort apparaat naar ons gestuurd, zodat we je kunnen antwoorden.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
@@ -7265,7 +7278,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 28 oktober 2026.</p>
     </div>
   </div>
 
@@ -7277,7 +7290,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 25 oktober 2026</p>
+      <p><strong>Versie:</strong> 28 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
@@ -7289,7 +7302,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
       <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 25 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 28 oktober 2026.</p>
     </div>
   </div>
 
@@ -7374,7 +7387,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Bij <strong>Mijn budget</strong> vul je bij <strong>Budget per week</strong> een bedrag in en tik je op <strong>Budget opslaan</strong>. Daarna zie je steeds hoeveel je hebt uitgegeven en wat er nog beschikbaar is.</p>
       <p>Na het boodschappen doen vul je bij <strong>Uitgave toevoegen</strong> een omschrijving, het bedrag en de winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf; met <strong>Wis uitgaven</strong> begin je opnieuw.</p>
-      <p>Bij <strong>Aanbiedingen</strong> kies je eerst je <strong>vaste supermarkt</strong>. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
+      <p>Bij <strong>Aanbiedingen</strong> kies je eerst je <strong>vaste supermarkt</strong>. Je kunt kiezen uit supermarkten in Nederland en België. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -15423,9 +15436,11 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     window.__updateDealsAvail();
     if(window.__fillExpenseStores)window.__fillExpenseStores();
   };
+  const BE_KEYS=["ah_be","aldi_be","carrefour","colruyt","delhaize","jumbo_be","lidl_be"];
   window.__updateDealsAvail=function(){
     const sel=document.getElementById("budgetSupermarket");if(!sel)return;
     const ok=sel.value!=="other";
+    const src=document.getElementById("ppSourceLink");if(src)src.href=BE_KEYS.indexOf(sel.value)>=0?"https://www.prijsprofeet.be":"https://www.prijsprofeet.nl";
     const card=document.querySelector("#budgetPlannerPanel .budgetDealsCard"),msg=document.getElementById("budgetNoDealsNote");
     if(card)card.hidden=!ok;if(msg)msg.hidden=ok;
   };
@@ -15469,7 +15484,9 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 
   // Adres van je eigen tussenstap (Cloudflare Worker). Vervang JOUW-NAAM door jouw workers.dev-adres.
   const PRIJZEN_PROXY="https://boodschappen-prijzen.stefanoofficialgraanoogst.workers.dev";
-  const budgetRetailerSlugs={ah:"albert_heijn",aldi:"aldi",boni:"boni",boons:"boons_markt",coop:"coop",dagwinkel:"dagwinkel",dekamarkt:"dekamarkt",dirk:"dirk",ekoplaza:"ekoplaza",gewooncoop:"gewoon_coop",hoogvliet:"hoogvliet",jumbo:"jumbo",lidl:"lidl",mcd:"mcd",nettorama:"nettorama",plus:"plus",poiesz:"poiesz",spar:"spar",vomar:"vomar"};
+  const budgetRetailerSlugs={ah:"albert_heijn",aldi:"aldi",boni:"boni",boons:"boons_markt",coop:"coop",dagwinkel:"dagwinkel",dekamarkt:"dekamarkt",dirk:"dirk",ekoplaza:"ekoplaza",gewooncoop:"gewoon_coop",hoogvliet:"hoogvliet",jumbo:"jumbo",lidl:"lidl",mcd:"mcd",nettorama:"nettorama",plus:"plus",poiesz:"poiesz",spar:"spar",vomar:"vomar",ah_be:"albert_heijn_be",aldi_be:"aldi_be",carrefour:"carrefour",colruyt:"colruyt",delhaize:"delhaize",jumbo_be:"jumbo_be",lidl_be:"lidl_be"};
+  // Belgische ketens staan bij PrijsProfeet op prijsprofeet.be (zelfde API en sleutel).
+  const BE_RETAILERS=["albert_heijn_be","aldi_be","carrefour","colruyt","delhaize","jumbo_be","lidl_be"];
   const retailerName=()=>{const s=document.getElementById("budgetSupermarket");return s&&s.selectedOptions[0]?s.selectedOptions[0].text:"je supermarkt"};
   const money=n=>"€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
   const shortDate=iso=>{if(!iso)return"";const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"-"+m[2]:""};
@@ -15479,7 +15496,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     try{return await fetchBudgetDealsFor(term,slug);}
     catch(err){
       // Sommige ketens hebben een naam met streepje (boons-markt); probeer die als de eerste vorm niet bekend is.
-      if(slug.indexOf("_")>=0&&err&&err.status>=400&&err.status<500)return await fetchBudgetDealsFor(term,slug.replace(/_/g,"-"));
+      if(BE_RETAILERS.indexOf(slug)<0&&slug.indexOf("_")>=0&&err&&err.status>=400&&err.status<500)return await fetchBudgetDealsFor(term,slug.replace(/_/g,"-"));
       throw err;
     }
   }
@@ -15487,7 +15504,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const query="q="+encodeURIComponent(term)+"&retailer="+retailer+"&promotion_status=active&page_size=30";
     const bases=[];
     if(PRIJZEN_PROXY&&!/JOUW-NAAM/.test(PRIJZEN_PROXY))bases.push(PRIJZEN_PROXY.replace(/\/+$/,"")+"/search?");
-    bases.push("https://www.prijsprofeet.nl/api/v1/search?");
+    bases.push((BE_RETAILERS.indexOf(retailer)>=0?"https://www.prijsprofeet.be":"https://www.prijsprofeet.nl")+"/api/v1/search?");
     let lastErr=null;
     for(const base of bases){
       let response;
@@ -15565,7 +15582,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   };
   window.__assistantSupermarket=function(){
     const sel=read().supermarket||"ah";
-    const names={ah:"Albert Heijn",aldi:"Aldi",boni:"Boni",boons:"Boon's Markt",coop:"Coop",dagwinkel:"Dagwinkel",dekamarkt:"DekaMarkt",dirk:"Dirk",ekoplaza:"Ekoplaza",gewooncoop:"Gewoon Coop",hoogvliet:"Hoogvliet",jumbo:"Jumbo",lidl:"Lidl",mcd:"MCD",nettorama:"Nettorama",plus:"PLUS",poiesz:"Poiesz",spar:"SPAR",vomar:"Vomar",other:""};
+    const names={ah:"Albert Heijn",aldi:"Aldi",boni:"Boni",boons:"Boon's Markt",coop:"Coop",dagwinkel:"Dagwinkel",dekamarkt:"DekaMarkt",dirk:"Dirk",ekoplaza:"Ekoplaza",gewooncoop:"Gewoon Coop",hoogvliet:"Hoogvliet",jumbo:"Jumbo",lidl:"Lidl",mcd:"MCD",nettorama:"Nettorama",plus:"PLUS",poiesz:"Poiesz",spar:"SPAR",vomar:"Vomar",ah_be:"Albert Heijn België",aldi_be:"Aldi België",carrefour:"Carrefour",colruyt:"Colruyt",delhaize:"Delhaize",jumbo_be:"Jumbo België",lidl_be:"Lidl België",other:""};
     return {key:sel,name:names[sel]||"",supported:!!budgetRetailerSlugs[sel]};
   };
   const LONG_DAYS=["zo","ma","di","wo","do","vr","za"],MONTHS=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
