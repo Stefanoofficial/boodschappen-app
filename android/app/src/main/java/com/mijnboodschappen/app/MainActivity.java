@@ -73,12 +73,25 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         splashStartTime = android.os.SystemClock.uptimeMillis();
         Window window = getWindow();
-        window.setStatusBarColor(BACKGROUND_COLOR);
-        window.setNavigationBarColor(BACKGROUND_COLOR);
-        window.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                        | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        );
+        // Vanaf Android 15 tekent de app zelf de kleur achter de balken (zie setupEdgeToEdge).
+        // De oude kleur-instellingen gebruiken we alleen nog op oudere Android-versies.
+        if (Build.VERSION.SDK_INT < 35) {
+            window.setStatusBarColor(BACKGROUND_COLOR);
+            window.setNavigationBarColor(BACKGROUND_COLOR);
+        }
+        if (Build.VERSION.SDK_INT >= 30) {
+            android.view.WindowInsetsController bars = window.getInsetsController();
+            if (bars != null) {
+                int light = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                bars.setSystemBarsAppearance(light, light);
+            }
+        } else {
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                            | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            );
+        }
         root = new FrameLayout(this);
         webView = new WebView(this);
         WebSettings settings = webView.getSettings();
@@ -287,7 +300,7 @@ public class MainActivity extends Activity {
     private void applyNavBarColor() {
         if (!navBarColorSet) return;
         Window window = getWindow();
-        window.setNavigationBarColor(navBarColor);
+        if (Build.VERSION.SDK_INT < 35) window.setNavigationBarColor(navBarColor);
         if (bottomScrim != null) bottomScrim.setBackgroundColor(navBarColor);
         if (Build.VERSION.SDK_INT >= 30) {
             try {
@@ -676,7 +689,7 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 Window window = getWindow();
                 statusBarScrimColor = dimmed ? Color.rgb(200, 211, 204) : BACKGROUND_COLOR;
-                window.setStatusBarColor(statusBarScrimColor);
+                if (Build.VERSION.SDK_INT < 35) window.setStatusBarColor(statusBarScrimColor);
                 if (topScrim != null) topScrim.setBackgroundColor(statusBarScrimColor);
             });
         }
