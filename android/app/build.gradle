@@ -54,4 +54,6 @@ dependencies {
     implementation 'androidx.core:core-splashscreen:1.0.1'
     // Betalen voor Pro via Google Play
     implementation 'com.android.billingclient:billing:8.0.0'
+    // De betaalbibliotheek neemt een oude versie (1.1.0) mee; Google raadt een nieuwere aan.
+    implementation 'androidx.fragment:fragment:1.8.5'
 }
