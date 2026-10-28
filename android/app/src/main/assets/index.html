@@ -15525,6 +15525,10 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       const store=String(p.retailer||"").toLowerCase().replace(/[^a-z0-9]/g,"");
       const start=p.valid_from||"",end=p.valid_until||"";
       return store===retailer.replace(/[^a-z0-9]/g,"")&&Number.isFinite(Number(p.price))&&(!start||start<=today)&&(!end||end>=today);
+    }).map(p=>{
+      // Belgische ketens schrijven "Merk | Product | Smaak"; toon dat als gewone tekst.
+      ["name","product_name","title"].forEach(k=>{if(typeof p[k]==="string"&&p[k].indexOf("|")>=0)p[k]=p[k].split("|").map(x=>x.trim()).filter(Boolean).join(" ");});
+      return p;
     });
   }
   function dealError(err){
@@ -15535,13 +15539,19 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     return"Geen verbinding met PrijsProfeet. Controleer je internetverbinding en probeer het opnieuw.";
   }
   // Relevantie: laat producten weg die het zoekwoord alleen als smaak of bijzaak in de naam hebben (kaaschips, chocoladevlokken melk).
-  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker","hagelslag","muisjes","gevuld","pinda","kokos","chocomel","limonade","siroop"];
+  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker","hagelslag","muisjes","gevuld","pinda","kokos","chocomel","limonade","siroop","matinettes","gecondenseerd","koffiemelk","koffiecreamer","choco"];
+  // Smaken: die maken van "melk" iets anders (hazelnootvlokken, karamelmelk). Zoete smaken wegen zwaarder dan fruit.
+  const DEAL_FLAVORS_STRONG=["hazelnoot","caramel","karamel","mokka","cacao","speculoos","praline"];
+  const DEAL_FLAVORS_LIGHT=["aardbei","vanille","framboos","perzik","banaan","bosvruchten","mango","citroen"];
   const CAT_HINTS=[[/^(melk|halfvolle melk|volle melk|yoghurt|boter|eieren|kwark|slagroom|room)$/,/zuivel/],[/\b(kipfilet|gehakt|rookworst|ham|spek|zalm|zalmfilet|vis|vlees)\b/,/vlees|vis|kip/],[/(ui|uien|paprika|wortel|broccoli|spinazie|courgette|sla|witlof|boerenkool|champignons|aardappelen|citroen|tomaten|knoflook|bosui)$/,/groente|aardappel|fruit/]];
   const NON_FOOD=/drogist|verzorg|huishoud|schoonmaak|baby|dier|cosmetic|was-|wasmiddel|gezondheid/;
   const SNACK_TERMS=/chips|koek|snoep|chocola|drop|snack/;
   const escRe=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
   function dealScore(p,term){
-    const name=String(p.name||p.product_name||p.title||"").toLowerCase();
+    const rawName=String(p.name||p.product_name||p.title||"").toLowerCase();
+    // Belgische ketens (o.a. Delhaize) schrijven "Merk | Product | Smaak". Maak er gewone tekst van.
+    const parts=rawName.split("|").map(x=>x.trim()).filter(Boolean);
+    const name=parts.join(" ");
     const cat=String(p.unified_category||"").toLowerCase();
     const t=String(term).toLowerCase().trim();
     if(cat==="snoep-koek-chips"&&!SNACK_TERMS.test(t))return -1;
@@ -15559,10 +15569,12 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     if(cat&&words.some(w=>cat.includes(w)))score+=3;
     CAT_HINTS.forEach(([re,catRe])=>{if(re.test(t)&&catRe.test(cat))score+=2;});
     // "Roomboter met olie", "Salade met mosterd": het zoekwoord staat pas na met/in/op, dus het is bijzaak.
-    const mainPart=name.split(/\s(?:met|in|op)\s/)[0];
     const headWord=words[words.length-1];
+    const mainPart=name.split(/\s(?:met|in|op)\s/)[0];
     if(mainPart!==name&&!mainPart.includes(headWord.length>3?headWord.slice(0,-1):headWord))score-=4;
     DEAL_SIDE_WORDS.forEach(sw=>{if(name.includes(sw)&&!t.includes(sw))score-=4;});
+    DEAL_FLAVORS_STRONG.forEach(f=>{if(name.includes(f)&&!t.includes(f))score-=4;});
+    DEAL_FLAVORS_LIGHT.forEach(f=>{if(name.includes(f)&&!t.includes(f))score-=1.5;});
     score-=name.split(/\s+/).length*0.05; // kortere, eenvoudigere productnamen iets voorrang
     return score;
   }
@@ -18255,7 +18267,10 @@ body.proPaidMode .onlyFree{display:none!important}
     if(!open)return false;var o=open;open=null;
     o.pop.classList.remove("show");
     setTimeout(function(){if(o.bd.isConnected)o.bd.remove();},150);
-    try{o.sel.focus({preventScroll:true});}catch(_){}
+    // Op een telefoon niet terugspringen naar het echte keuzeveld: iOS opent dan zijn eigen lijst nog een keer.
+    var touch=false;try{touch=window.matchMedia("(pointer:coarse)").matches||("ontouchstart" in window);}catch(_){}
+    if(!touch){try{o.sel.focus({preventScroll:true});}catch(_){}}
+    else{try{o.sel.blur();}catch(_){}}
     return true;
   }
   function choose(sel,value){
