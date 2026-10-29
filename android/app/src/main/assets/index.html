@@ -6771,7 +6771,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
       </div>
       <div class="budgetAutoCard">
-        <div class="budgetAutoHead"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><div><strong>Automatisch bijhouden</strong><small>Vink je op je persoonlijke lijst een product af dat je via Aanbiedingen hebt toegevoegd, dan komt de prijs vanzelf bij je uitgaven. Vink je het weer uit, dan gaat het er weer af.</small></div></div>
+        <div class="budgetAutoHead"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><div><strong>Automatisch bijhouden</strong><small>Vink je op je persoonlijke lijst een product af dat je via Aanbiedingen hebt toegevoegd, dan komt de prijs vanzelf bij je uitgaven, per winkel samengevoegd. Vink je het weer uit, dan gaat het er weer af.</small></div></div>
         <div class="budgetAutoRow"><span>Vraag prijs bij producten zonder prijs<small>Bij afvinken vraagt de app wat het kostte (je kunt altijd overslaan).</small></span><button type="button" id="budgetAskPriceToggle" class="settingsToggle" role="switch" aria-checked="false" aria-label="Vraag prijs bij producten zonder prijs"></button></div>
       </div>
       <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
@@ -15961,9 +15961,21 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const storeOf=x=>x.store||"Zonder winkel";
     const totals={};d.expenses.forEach(x=>{const cat=storeOf(x);totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
     const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Zodra je uitgaven toevoegt, zie je hier per winkel wat je uitgeeft.</p>';}
-    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))}${x.auto?" · van je lijst":""} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
+    const list=document.getElementById("budgetExpenseList");if(list){
+      // Automatische uitgaven (van je lijst) per winkel per dag samenvoegen; openklappen voor de producten.
+      const day=x=>new Date(x.date||Date.now()).toLocaleDateString("nl-NL");
+      const one=x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))}${x.auto?" · van je lijst":""} · ${esc(day(x))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`;
+      const rows=[],groups={};
+      d.expenses.forEach(x=>{if(x.auto){const k=storeOf(x)+"|"+day(x);if(!groups[k]){groups[k]={k:k,store:storeOf(x),day:day(x),items:[]};rows.push({g:groups[k]});}groups[k].items.push(x);}else rows.push({x:x});});
+      const openG=window.__budgetOpenGroups||(window.__budgetOpenGroups={});
+      const LIMIT=6,all=!!window.__budgetShowAll;
+      const group=g=>{const tot=g.items.reduce((s2,x)=>s2+(Number(x.amount)||0),0),k=encodeURIComponent(g.k),op=!!openG[g.k];
+        return `<div class="budgetExpenseGroup${op?" open":""}"><button type="button" class="budgetGroupHead" onclick="__budgetToggleGroup('${k}')" aria-expanded="${op}"><span class="budgetExpenseDetails"><strong>Boodschappen ${esc(g.store)}</strong><small>${g.items.length} producten · van je lijst · ${esc(g.day)}</small></span><span class="budgetExpenseAmount">${euro(tot)}</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button><div class="budgetGroupItems">${g.items.map(x=>`<div class="budgetGroupItem"><span>${esc(x.name)}</span><b>${euro(x.amount)}</b><button type="button" class="budgetExpenseDelete" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')" aria-label="Verwijderen">Verwijderen</button></div>`).join("")}</div></div>`;};
+      list.innerHTML=rows.length?rows.slice(0,all?rows.length:LIMIT).map(r=>r.x?one(r.x):(r.g.items.length===1?one(r.g.items[0]):group(r.g))).join("")+(rows.length>LIMIT&&!all?`<button type="button" class="budgetShowAll" onclick="__budgetShowAllExp()">Toon alle uitgaven (${rows.length})</button>`:""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
   // Automatisch bijhouden: afgevinkte producten met een prijs komen bij je uitgaven.
+  window.__budgetToggleGroup=function(k){k=decodeURIComponent(k);const o=window.__budgetOpenGroups||(window.__budgetOpenGroups={});o[k]=!o[k];renderBudget();};
+  window.__budgetShowAllExp=function(){window.__budgetShowAll=true;renderBudget();};
   window.__budgetAuto={
     read:read,
     add:function(name,amount,store,key){const d=read();const a=Math.round(Number(amount)*100)/100;if(!(a>0))return null;d.expenses.unshift({id:Date.now()+Math.random(),name:String(name).slice(0,80),amount:a,store:store||"Andere winkel",date:new Date().toISOString(),auto:true,listKey:key});write(d);renderBudget();return {amount:a,remaining:d.budget>0?d.budget-d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0):null};},
@@ -19582,6 +19594,23 @@ body.dark-theme .budgetAutoHead strong,body.dark-theme .budgetAutoRow>span{color
 body.dark-theme .budgetAutoHead small,body.dark-theme .budgetAutoRow>span small{color:#b8c6bc}
 body.dark-theme .budgetAutoRow{border-color:#3a4a3f}
 .mbPriceInput{display:flex;align-items:center;gap:8px;margin-top:12px}
+.budgetExpenseGroup{border-bottom:1px solid #e1ece4}
+.budgetGroupHead{display:flex;align-items:center;gap:10px;width:100%;padding:12px 0;border:0;background:transparent;font:inherit;text-align:left;cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
+.budgetGroupHead .budgetExpenseDetails{flex:1 1 auto;min-width:0}
+.budgetGroupHead .budgetExpenseDetails strong,.budgetGroupHead .budgetExpenseDetails small{display:block}
+.budgetGroupHead i{flex:0 0 auto;font-size:13px;color:#718177;transition:transform .2s}
+.budgetExpenseGroup.open .budgetGroupHead i{transform:rotate(180deg)}
+.budgetGroupItems{display:none;padding:0 0 10px 12px;border-left:3px solid #e1ece4;margin:0 0 4px 2px}
+.budgetExpenseGroup.open .budgetGroupItems{display:block}
+.budgetGroupItem{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;color:#2f4a38}
+.budgetGroupItem span{flex:1 1 auto;min-width:0}
+.budgetGroupItem b{flex:0 0 auto;font-weight:700}
+.budgetGroupItem .budgetExpenseDelete{flex:0 0 auto;margin:0;font-size:12px}
+.budgetShowAll{display:block;width:100%;margin-top:10px;min-height:42px;border:0;border-radius:12px;background:#e4efe7;color:#2f4a38;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+body.dark-theme .budgetExpenseGroup{border-color:#3a4a3f}
+body.dark-theme .budgetGroupItems{border-color:#3a4a3f}
+body.dark-theme .budgetGroupItem{color:#e4eee7}
+body.dark-theme .budgetShowAll{background:#34443a;color:#e4eee7}
 .mbPriceInput b{font-size:20px;color:#2f4a38}
 body.dark-theme .mbPriceInput b{color:#edf5ef}
 </style>
@@ -19640,7 +19669,7 @@ body.dark-theme .mbPriceInput b{color:#edf5ef}
       var p=priceOf(it);
       if(p==null&&A.askPrice()){p=await askPrice(it);}
       if(p==null)return;
-      added(it,A.add(it.text,p,storeOf(it),key(it)));
+      A.add(it.text,p,storeOf(it),key(it)); /* stil: geen melding bij afvinken */
     }else if(wasDone&&!it.completed){
       var x=A.remove(key(it));
       if(x)toast(A.money(x.amount)+" van <b>"+esc(it.text)+"</b> is weer van je uitgaven af.");
@@ -19678,6 +19707,8 @@ html body #list .item .itemProductContent .productBrand{white-space:nowrap!impor
 /* Lange naam: het plaatje maakt plaats, de tekst iets kleiner en tot drie regels */
 html body #list .item.longName .itemProductContent{grid-template-columns:22px minmax(0,1fr) 0 92px!important}
 html body #list .item.longName .itemProductContent .productIcon{display:none!important}
+/* Ruimte tussen productnaam en de rode aanbiedingsregel */
+html body #list .item .productDeal{margin-top:7px!important;margin-bottom:3px!important}
 html body #list .item.longName .itemProductContent .productName{font-size:16px!important;-webkit-line-clamp:3!important;line-clamp:3}
 </style>
 <script id="name-wrap">
