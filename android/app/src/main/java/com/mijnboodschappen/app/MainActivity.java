@@ -539,6 +539,16 @@ public class MainActivity extends Activity {
     }
 
     private class AppBridge {
+        /** Versienaam uit build.gradle (dezelfde als in Google Play), voor "Over de app" en feedback. */
+        @JavascriptInterface
+        public String appVersion() {
+            try {
+                return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
         // ---------- Betalen voor Pro (Google Play) ----------
         @JavascriptInterface
         public boolean billingAvailable() { return billing != null; }
