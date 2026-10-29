@@ -6770,6 +6770,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <div class="budgetProgressTrack"><div id="budgetProgress" class="budgetProgress"></div></div>
         <p id="budgetStatus" class="budgetStatus" aria-live="polite">Stel je weekbudget in en voeg je uitgaven toe.</p>
       </div>
+      <div class="budgetAutoCard">
+        <div class="budgetAutoHead"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><div><strong>Automatisch bijhouden</strong><small>Vink je op je persoonlijke lijst een product af dat je via Aanbiedingen hebt toegevoegd, dan komt de prijs vanzelf bij je uitgaven. Vink je het weer uit, dan gaat het er weer af.</small></div></div>
+        <div class="budgetAutoRow"><span>Vraag prijs bij producten zonder prijs<small>Bij afvinken vraagt de app wat het kostte (je kunt altijd overslaan).</small></span><button type="button" id="budgetAskPriceToggle" class="settingsToggle" role="switch" aria-checked="false" aria-label="Vraag prijs bij producten zonder prijs"></button></div>
+      </div>
       <h3 class="budgetSectionTitle">Uitgave toevoegen</h3>
       <label for="budgetExpenseName">Product of omschrijving</label>
       <input id="budgetExpenseName" class="budgetInput budgetFullInput" type="text" placeholder="Bijv. weekboodschappen">
@@ -7376,7 +7380,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-triangle-exclamation"></i><span>Geen internet</span></div>
-      <p>Heb je geen bereik, bijvoorbeeld in de supermarkt? Dan zie je bovenaan <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen. Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
+      <p>Heb je geen bereik, bijvoorbeeld in de supermarkt? Dan zie je onderin een melding <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen. Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
@@ -7405,7 +7409,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Bij <strong>Mijn budget</strong> vul je bij <strong>Budget per week</strong> een bedrag in en tik je op <strong>Budget opslaan</strong>. Daarna zie je steeds hoeveel je hebt uitgegeven en wat er nog beschikbaar is.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Bij <strong>Mijn budget</strong> vul je bij <strong>Budget per week</strong> een bedrag in en tik je op <strong>Budget opslaan</strong>. Daarna zie je steeds hoeveel je hebt uitgegeven en wat er nog beschikbaar is. Zet je via <strong>Aanbiedingen</strong> een product op je persoonlijke lijst, dan komt de prijs vanzelf bij je uitgaven zodra je het afvinkt (weer uitvinken haalt het er weer af). Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan: de app vraagt dan bij afvinken wat het kostte.</p>
       <p>Na het boodschappen doen vul je bij <strong>Uitgave toevoegen</strong> een omschrijving, het bedrag en de winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf; met <strong>Wis uitgaven</strong> begin je opnieuw.</p>
       <p>Bij <strong>Aanbiedingen</strong> kies je eerst je winkels: tik bij <strong>Mijn winkels</strong> op <strong>Wijzigen</strong>. Je kunt tot 3 winkels kiezen, in Nederland en België; de app zoekt dan bij al je winkels tegelijk. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
     </div>
@@ -15605,7 +15609,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 (function(){
   const KEY="boodschappen_budgetplanner_v1";
   const euro=n=>new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"}).format(Number(n)||0);
-  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[],supermarket:typeof d.supermarket==="string"?d.supermarket:"ah",favorites:Array.isArray(d.favorites)?d.favorites:undefined}}catch(e){return {budget:0,expenses:[],supermarket:"ah"}}};
+  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[],supermarket:typeof d.supermarket==="string"?d.supermarket:"ah",favorites:Array.isArray(d.favorites)?d.favorites:undefined,askPrice:d.askPrice===true?true:undefined}}catch(e){return {budget:0,expenses:[],supermarket:"ah"}}};
   const write=d=>localStorage.setItem(KEY,JSON.stringify(d));
   window.saveBudgetSupermarket=function(){
     const select=document.getElementById("budgetSupermarket");
@@ -15729,7 +15733,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     return"Geen verbinding met PrijsProfeet. Controleer je internetverbinding en probeer het opnieuw.";
   }
   // Relevantie: laat producten weg die het zoekwoord alleen als smaak of bijzaak in de naam hebben (kaaschips, chocoladevlokken melk).
-  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker","hagelslag","muisjes","gevuld","pinda","kokos","chocomel","limonade","siroop","matinettes","gecondenseerd","koffiemelk","koffiecreamer","choco"];
+  const DEAL_SIDE_WORDS=["chips","snack","wafel","cracker","koek","biscuit","vlokken","spread","smeersel","dip","salade","saus","dressing","marinade","smaak","chocola","drink","drank","shake","pesto","worst","salami","rolletje","olijven","vleesvervanger","pasta","soep","snoep","taart","cake","bonbon","toffee","drop","shuttel","stengel","tapenade","hummus","pizza","quiche","burger","nugget","kroket","bitterbal","tosti","toastje","borrel","toetje","pudding","maaltijd","ovenschotel","mix","tand","katten","honden","dieren","baby","shampoo","zeep","douche","parfum","geur","kaars","carbonara","bolognese","lasagne","kant-en-klaar","vegan","vegetarisch","haar","huid","conditioner","masker","hagelslag","muisjes","gevuld","pinda","kokos","chocomel","limonade","siroop","matinettes","gecondenseerd","koffiemelk","koffiecreamer","choco","suisse","croissant","scholier","gebak","muffin","donut","bonbon","pastei","saucijs","broodje","bolletje","stengel","soesje","tompouce","koffiekoek","lolly"];
   // Smaken: die maken van "melk" iets anders (hazelnootvlokken, karamelmelk). Zoete smaken wegen zwaarder dan fruit.
   const DEAL_FLAVORS_STRONG=["hazelnoot","caramel","karamel","mokka","cacao","speculoos","praline"];
   const DEAL_FLAVORS_LIGHT=["aardbei","vanille","framboos","perzik","banaan","bosvruchten","mango","citroen"];
@@ -15768,8 +15772,31 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     score-=name.split(/\s+/).length*0.05; // kortere, eenvoudigere productnamen iets voorrang
     return score;
   }
+  // Categorie-check voor alle producten: de categorie waar de meeste goede treffers in zitten
+  // (bijv. zuivel bij "melk", kaas bij "kaas") bepaalt wat erbij hoort. Producten uit een heel
+  // andere categorie (koek, bakkerij, snoep) vallen weg. Zonder categorie blijft een product staan.
+  function catOf(p){return String(p.unified_category||"").toLowerCase().trim();}
+  function categoryFilter(scored){
+    const votes={};let voters=0;
+    scored.forEach(x=>{const c=catOf(x.p);if(!c||x.s<2.5)return;votes[c]=(votes[c]||0)+x.s;voters++;});
+    const cats=Object.keys(votes);
+    if(voters<2||!cats.length)return scored;
+    const top=Math.max(...cats.map(c=>votes[c]));
+    const allowed=new Set(cats.filter(c=>votes[c]>=top*0.45));
+    return scored.filter(x=>{const c=catOf(x.p);return !c||allowed.has(c);});
+  }
+  // Heet de categorie zelf zoals je zoekt (bijv. "kaas"), dan hoort een product erbij, ook als
+  // het woord niet in de naam staat ("Old Amsterdam stuk"), zolang het geen snack of bijzaak is.
+  function catNamed(p,term){
+    const t=String(term||"").toLowerCase().trim();if(t.length<4||/\s/.test(t))return false;
+    const c=catOf(p);if(!c||NON_FOOD.test(c))return false;
+    const stem=t.replace(/(en|s)$/,"");
+    if(!c.split(/[^a-z]+/).some(w=>w===t||w===stem||w===stem+"en"||w===stem+"s"))return false;
+    const n=String(p.name||p.product_name||p.title||"").toLowerCase();
+    return !DEAL_SIDE_WORDS.some(sw=>n.includes(sw)&&!t.includes(sw));
+  }
   function rankDeals(rows,term){
-    return rows.map(p=>({p:p,s:dealScore(p,term)})).filter(x=>x.s>0)
+    return categoryFilter(rows.map(p=>{let sc=dealScore(p,term);if(sc<=0&&catNamed(p,term))sc=0.6;return {p:p,s:sc};}).filter(x=>x.s>0))
       .sort((a,b)=>b.s-a.s||(Number(b.p.savings_percentage)||0)-(Number(a.p.savings_percentage)||0)||Number(a.p.price)-Number(b.p.price))
       .map(x=>x.p);
   }
@@ -15835,8 +15862,11 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const settled=await Promise.all(shops.map(k=>fetchBudgetDeals(term,k).then(rows=>({k:k,rows:rows||[]}),err=>({k:k,err:err}))));
     const ok=settled.filter(x=>!x.err),failed=settled.filter(x=>x.err);
     if(!ok.length){results.textContent=dealError(failed[0].err);return;}
-    let raw=0;const all=[],count={};
-    ok.forEach(x=>{raw+=x.rows.length;const r=rankDeals(x.rows,term);count[x.k]=r.length;r.forEach((p,i)=>{p.__shop=x.k;p.__rank=i;all.push(p);});});
+    let raw=0;const combined=[],count={},pos={};
+    ok.forEach(x=>{raw+=x.rows.length;x.rows.forEach(p=>{p.__shop=x.k;combined.push(p);});});
+    // Samen beoordelen, zodat de categorie-check alle winkels meeneemt.
+    const all=rankDeals(combined,term);
+    all.forEach(p=>{pos[p.__shop]=(pos[p.__shop]||0);p.__rank=pos[p.__shop]++;count[p.__shop]=(count[p.__shop]||0)+1;});
     // Om en om per winkel, zodat je van elke winkel eerst de beste ziet.
     all.sort((a,b)=>a.__rank-b.__rank||shops.indexOf(a.__shop)-shops.indexOf(b.__shop));
     const where=joinNames(ok.map(x=>x.k));
@@ -15898,8 +15928,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       const got=await Promise.all(shops.map(k=>fetchBudgetDeals(term,k).then(rows=>({k:k,rows:rows||[]}),err=>({k:k,err:err}))));
       const okRows=got.filter(x=>!x.err);
       if(!okRows.length){failed=got[0].err;break;}
-      let best=null,bestScore=-1e9;
-      okRows.forEach(x=>{const b=bestDeal(x.rows,term);if(!b)return;const sc=dealScore(b,term)+(Number(b.savings_percentage)||0)/1000;if(sc>bestScore){bestScore=sc;best=b;best.__shop=x.k;}});
+      const combined=[];okRows.forEach(x=>x.rows.forEach(p=>{p.__shop=x.k;combined.push(p);}));
+      const best=bestDeal(combined,term);
       if(best)found.push({term:term,deal:best});else missing.push(term);
       await new Promise(r=>setTimeout(r,200));
     }
@@ -15931,8 +15961,17 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const storeOf=x=>x.store||"Zonder winkel";
     const totals={};d.expenses.forEach(x=>{const cat=storeOf(x);totals[cat]=(totals[cat]||0)+(Number(x.amount)||0);});
     const cats=document.getElementById("budgetCategories");if(cats){const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);cats.innerHTML=entries.length?entries.map(([name,amount])=>`<div class="budgetCategoryRow"><div class="budgetCategoryTop"><span>${esc(name)}</span><strong>${euro(amount)}</strong></div><div class="budgetCategoryTrack"><div class="budgetCategoryFill" style="width:${spent?Math.max(2,amount/spent*100):0}%"></div></div></div>`).join(""):'<p class="budgetEmpty">Zodra je uitgaven toevoegt, zie je hier per winkel wat je uitgeeft.</p>';}
-    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
+    const list=document.getElementById("budgetExpenseList");if(list){list.innerHTML=d.expenses.length?d.expenses.map(x=>`<div class="budgetExpenseRow"><div class="budgetExpenseDetails"><strong>${esc(x.name)}</strong><small>${esc(storeOf(x))}${x.auto?" · van je lijst":""} · ${esc(new Date(x.date||Date.now()).toLocaleDateString("nl-NL"))}</small><button class="budgetExpenseDelete" type="button" onclick="removeBudgetExpense('${String(x.id).replace(/'/g,"")}')">Verwijderen</button></div><span class="budgetExpenseAmount">${euro(x.amount)}</span></div>`).join(""):'<p class="budgetEmpty">Nog geen uitgaven toegevoegd.</p>';}
   }
+  // Automatisch bijhouden: afgevinkte producten met een prijs komen bij je uitgaven.
+  window.__budgetAuto={
+    read:read,
+    add:function(name,amount,store,key){const d=read();const a=Math.round(Number(amount)*100)/100;if(!(a>0))return null;d.expenses.unshift({id:Date.now()+Math.random(),name:String(name).slice(0,80),amount:a,store:store||"Andere winkel",date:new Date().toISOString(),auto:true,listKey:key});write(d);renderBudget();return {amount:a,remaining:d.budget>0?d.budget-d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0):null};},
+    remove:function(key){const d=read();const i=d.expenses.findIndex(x=>x.auto&&x.listKey===key);if(i<0)return null;const x=d.expenses.splice(i,1)[0];write(d);renderBudget();return x;},
+    askPrice:function(){return read().askPrice===true;},
+    setAskPrice:function(on){const d=read();if(on)d.askPrice=true;else delete d.askPrice;write(d);},
+    money:euro
+  };
   window.__refreshBudgetUI=function(){try{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();}catch(e){console.warn(e);}};
   document.addEventListener("DOMContentLoaded",()=>{const d=read();const input=document.getElementById("budgetAmount");if(input)input.value=d.budget||"";const supermarket=document.getElementById("budgetSupermarket");if(supermarket)supermarket.value=d.supermarket||"ah";if(window.__updateDealsAvail)window.__updateDealsAvail();renderBudget();});
 })();
@@ -19521,6 +19560,108 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
   if(typeof window.clearSearch==="function"||typeof clearSearch==="function"){try{var oCS=clearSearch;clearSearch=function(){var r=oCS.apply(this,arguments);apply();return r;};window.clearSearch=clearSearch;}catch(e){}}
   if(typeof window.__refreshBudgetUI==="function"){var oRB=window.__refreshBudgetUI;window.__refreshBudgetUI=function(){var r=oRB.apply(this,arguments);try{renderDealShops();apply();}catch(e){}return r;};}
   function init(){renderDealShops();apply();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<style id="app-budget-auto-style">
+.budgetAutoCard{margin:14px 0 6px;padding:14px;border-radius:16px;background:#f2f8f3;border:1px solid #e1ece4}
+.budgetAutoHead{display:flex;gap:10px;align-items:flex-start}
+.budgetAutoHead i{flex:0 0 auto;margin-top:3px;color:#3e7650}
+.budgetAutoHead strong{display:block;font-size:15px;color:#2f4a38}
+.budgetAutoHead small{display:block;margin-top:3px;font-size:13px;line-height:1.4;color:#66776d}
+.budgetAutoRow{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid #e1ece4}
+.budgetAutoRow>span{flex:1 1 auto;font-size:14px;font-weight:700;color:#2f4a38}
+.budgetAutoRow>span small{display:block;font-weight:500;font-size:12.5px;color:#718177;margin-top:2px;line-height:1.35}
+.budgetAutoRow .settingsToggle{flex:0 0 auto;border:0;cursor:pointer}
+body.dark-theme .budgetAutoCard{background:#26302a;border-color:#3a4a3f}
+body.dark-theme .budgetAutoHead strong,body.dark-theme .budgetAutoRow>span{color:#edf5ef}
+body.dark-theme .budgetAutoHead small,body.dark-theme .budgetAutoRow>span small{color:#b8c6bc}
+body.dark-theme .budgetAutoRow{border-color:#3a4a3f}
+.mbPriceInput{display:flex;align-items:center;gap:8px;margin-top:12px}
+.mbPriceInput b{font-size:20px;color:#2f4a38}
+body.dark-theme .mbPriceInput b{color:#edf5ef}
+</style>
+<script id="app-budget-auto">
+/* Pro: afgevinkte producten op je persoonlijke lijst komen vanzelf bij je budget.
+   Alleen producten met een bekende prijs (uit Aanbiedingen), of – als je dat aanzet – met een prijs die je zelf invult.
+   Weer uitvinken haalt de uitgave weer weg. Niet op de familielijst of gedeelde lijsten. */
+(function(){
+  function api(){return window.__budgetAuto||null;}
+  function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function pro(){try{return window.isProActive?window.isProActive():true;}catch(e){return false;}}
+  /* Persoonlijke lijst: niet in een gedeelde lijst en niet in een familie (zonder familie is je lijst persoonlijk). */
+  function personal(){try{if(activeListType==="shared")return false;if(activeListType==="private")return true;return !currentHouseholdId;}catch(e){return false;}}
+  function key(it){return "L:"+String(it.text||"").trim().toLowerCase();}
+  function todayIso(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  function priceOf(it){
+    var d=it&&it.deal;if(!d||!Number.isFinite(Number(d.price)))return null;
+    if(d.until&&String(d.until).slice(0,10)<todayIso())return null; /* verlopen aanbieding: prijs klopt niet meer */
+    return Number(d.price)*Math.max(1,Number(it.quantity)||1);
+  }
+  function storeOf(it){
+    try{if(it.deal&&it.deal.store)return it.deal.store;}catch(e){}
+    try{if(it.shop&&window.__shopName)return window.__shopName(it.shop);}catch(e){}
+    try{var s=document.getElementById("budgetSupermarket");if(s&&s.selectedOptions[0]&&s.value!=="other")return s.selectedOptions[0].text;}catch(e){}
+    return "Andere winkel";
+  }
+  function toast(m){try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(m);}catch(e){}}
+  function added(it,res){
+    var A=api();if(!res)return;
+    var m="<b>"+esc(it.text)+"</b> ("+A.money(res.amount)+") staat bij je uitgaven.";
+    if(res.remaining!=null)m+=res.remaining>=0?" Nog "+A.money(res.remaining)+" over.":" Je zit "+A.money(-res.remaining)+" boven je budget.";
+    toast(m);
+  }
+  function parseEuro(v){v=String(v||"").trim().replace(/[€\s]/g,"").replace(",",".");var n=Number(v);return Number.isFinite(n)&&n>0&&n<10000?Math.round(n*100)/100:null;}
+  function askPrice(it){
+    return new Promise(function(resolve){
+      var overlay=familyDialogBase("fa-wallet","Wat kostte "+esc(it.text)+"?",
+        '<div class="familyDialogText">Dan komt het bij je uitgaven'+(Number(it.quantity)>1?" (totaal voor "+Math.round(Number(it.quantity))+" stuks)":"")+'.</div><div class="mbPriceInput"><b>€</b><input class="familyDialogInput" type="text" inputmode="decimal" placeholder="0,00" aria-label="Prijs"></div><div class="mbPriceErr familyDialogText" style="display:none;color:#b3412e;margin-top:6px">Vul een bedrag in, bijv. 2,19.</div>',
+        '<button type="button" class="familyDialogBtn familyDialogCancel">Overslaan</button><button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>');
+      var input=overlay.querySelector("input"),err=overlay.querySelector(".mbPriceErr");
+      var done=function(v){closeFamilyDialog(overlay,function(){resolve(v);});};
+      overlay.querySelector(".familyDialogCancel").addEventListener("click",function(e){e.stopPropagation();done(null);});
+      var save=function(){var n=parseEuro(input.value);if(!n){err.style.display="block";input.focus();return;}done(n);};
+      overlay.querySelector(".familyDialogPrimary").addEventListener("click",function(e){e.stopPropagation();save();});
+      input.addEventListener("keydown",function(e){if(e.key==="Enter")save();});
+      input.addEventListener("input",function(){err.style.display="none";});
+      overlay.addEventListener("click",function(e){if(e.target===overlay)done(null);});
+      setTimeout(function(){try{input.focus();}catch(_){}},60);
+    });
+  }
+  async function after(index,text,wasDone){
+    var A=api();if(!A||!pro()||!personal())return;
+    var it=(Array.isArray(boodschappen)?boodschappen:[])[index];
+    if(!it||String(it.text)!==text)return;
+    if(!wasDone&&it.completed){
+      var p=priceOf(it);
+      if(p==null&&A.askPrice()){p=await askPrice(it);}
+      if(p==null)return;
+      added(it,A.add(it.text,p,storeOf(it),key(it)));
+    }else if(wasDone&&!it.completed){
+      var x=A.remove(key(it));
+      if(x)toast(A.money(x.amount)+" van <b>"+esc(it.text)+"</b> is weer van je uitgaven af.");
+    }
+  }
+  if(typeof toggleItem==="function"){
+    var oToggle=toggleItem;
+    toggleItem=async function(index){
+      var it=(Array.isArray(boodschappen)?boodschappen:[])[index];
+      var text=it?String(it.text):"",wasDone=!!(it&&it.completed);
+      var r=await oToggle.apply(this,arguments);
+      try{await after(index,text,wasDone);}catch(e){console.warn("Budget bijhouden:",e);}
+      return r;
+    };
+  }
+  /* Schakelaar "Vraag prijs bij producten zonder prijs" */
+  function paint(){var t=document.getElementById("budgetAskPriceToggle"),A=api();if(!t||!A)return;var on=A.askPrice();t.classList.toggle("on",on);t.setAttribute("aria-checked",String(on));}
+  function init(){
+    var t=document.getElementById("budgetAskPriceToggle");
+    if(t&&!t.__wired){t.__wired=true;t.addEventListener("click",function(e){e.stopPropagation();var A=api();if(!A)return;A.setAskPrice(!A.askPrice());paint();});}
+    paint();
+  }
+  if(typeof window.__refreshBudgetUI==="function"){var oR=window.__refreshBudgetUI;window.__refreshBudgetUI=function(){var r=oR.apply(this,arguments);try{paint();}catch(e){}return r;};}
+  ["toggleBudgetPlanner","__proSetTab"].forEach(function(fn){if(typeof window[fn]==="function"){var o=window[fn];window[fn]=function(){var r=o.apply(this,arguments);try{init();}catch(e){}return r;};}});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 </script>
