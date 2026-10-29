@@ -548,6 +548,36 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void googleSignIn(String webClientId) { if (googleSignIn != null) googleSignIn.signIn(webClientId); }
 
+        /** Interne versiecode (stijgt bij elke upload), om te zien of er een update is. */
+        @JavascriptInterface
+        public long appVersionCode() {
+            try {
+                android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        /** Opent de Play Store op deze app (om bij te werken). */
+        @JavascriptInterface
+        public void openPlayStore() {
+            runOnUiThread(() -> {
+                String pkg = getPackageName();
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg));
+                    i.setPackage("com.android.vending");
+                    startActivity(i);
+                } catch (Exception e) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
+                    } catch (Exception ignored) {
+                    }
+                }
+            });
+        }
+
         /** Versienaam uit build.gradle (dezelfde als in Google Play), voor "Over de app" en feedback. */
         @JavascriptInterface
         public String appVersion() {
