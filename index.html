@@ -5545,6 +5545,12 @@ html body .aboutInfoLine > i{flex:0 0 24px!important;width:24px!important;min-wi
 body.dark-theme .productDeal{color:#f2a3a3}
 .dealAddBtn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:38px;padding:0 14px;border:0;border-radius:11px;background:#3F5B45;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .dealAddBtn .plus{font-weight:800}
+.dealItem.hasThumb{display:flex;align-items:flex-start;gap:12px}
+.dealItem.hasThumb .dealBody{flex:1 1 auto;min-width:0}
+.dealThumb{flex:0 0 72px;width:72px;height:72px;border-radius:12px;background:#fff;border:1px solid #e1ece4;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.dealThumb img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box;opacity:0;transition:opacity .2s}
+.dealThumb.loaded img{opacity:1}
+body.dark-theme .dealThumb{border-color:#3a4a3f}
 .dealAddBtn.done{background:#e3f4e7;color:#2f6b45;cursor:default}
 body.dark-theme .dealAddBtn.done{background:#2c3d31;color:#9fd3ac}
 html body #list .itemProductContent{grid-template-columns:19px minmax(0,1fr) 32px 92px !important}
@@ -6779,8 +6785,9 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p class="budgetPrivacyNote">Je budget en uitgaven worden aan je account gekoppeld. Je ziet ze dus ook op een andere telefoon als je daar inlogt.</p>
       </div>
       <div class="proTabPane" data-pane="deals" hidden>
-      <label for="budgetSupermarket">Mijn vaste supermarkt</label>
-      <select id="budgetSupermarket" class="budgetInput" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
+      <label for="budgetSupermarket" class="legacyStorePick">Mijn vaste supermarkt</label>
+      <div id="dealShopsRow" class="dealShopsRow"></div>
+      <select id="budgetSupermarket" class="budgetInput legacyStorePick" aria-describedby="budgetSupermarketNote" onchange="saveBudgetSupermarket()">
         <optgroup label="Nederland">
         <option value="ah">Albert Heijn</option>
         <option value="aldi">Aldi</option>
@@ -6815,8 +6822,8 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <option value="other">Andere supermarkt (zonder aanbiedingen)</option>
         </optgroup>
       </select>
-      <p id="budgetSupermarketNote" class="budgetStatus">Je keuze wordt bewaard en gebruikt om aanbiedingen te zoeken.</p>
-      <p id="budgetNoDealsNote" class="budgetNoDeals" hidden><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Voor jouw supermarkt hebben we nog geen aanbiedingen. Je budget en uitgaven bijhouden werkt gewoon.</span></p>
+      <p id="budgetSupermarketNote" class="budgetStatus">Aanbiedingen worden opgezocht bij je winkels.</p>
+      <p id="budgetNoDealsNote" class="budgetNoDeals" hidden><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Voor jouw winkels hebben we nog geen aanbiedingen. Je budget en uitgaven bijhouden werkt gewoon.</span></p>
       <div class="budgetDealsCard">
         <h4>Aanbiedingen bij je supermarkt</h4>
         <p class="budgetStatus">Zoek een product, of bekijk welke producten uit je weekplanning nu in de aanbieding zijn.</p>
@@ -7263,7 +7270,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID. Log je in met Google, dan krijgen we van Google alleen je naam, e-mailadres en een account-ID. Je Google-wachtwoord zien we nooit. Stel je een profielfoto in, dan wordt een verkleinde versie daarvan bij je account bewaard. Je kunt die foto altijd weer verwijderen.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen. Zet je een aanbieding op je lijst, dan worden de prijs, de actie en de einddatum bij dat product bewaard.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
-        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen supermarkt en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
+        <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen winkels en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
         <li><strong>Gegevens op je apparaat:</strong> instellingen zoals weergave (licht, donker of automatisch), scherm aan laten, trillen, scanner en meldingen worden alleen op je eigen apparaat bewaard. Zet je voorraadmeldingen aan, dan plant de Android-app die op je telefoon zelf in, met de namen van de producten in de melding; daarvoor wordt niets naar een server gestuurd. Ook een kopie van je laatste boodschappenlijst, de voorstellen bij “Snel opnieuw toevoegen” en het aantal eerdere lijsten worden op je apparaat bewaard, zodat de app direct opent. Bij uitloggen wordt dit gewist.</li>
         <li><strong>Productsuggesties en scannen:</strong> als je een product typt of een barcode scant, worden de zoekterm of de barcode naar Open Food Facts gestuurd om productnamen en foto’s op te halen. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
         <li><strong>Zoekopdrachten voor aanbiedingen:</strong> als je aanbiedingen zoekt, worden alleen het zoekwoord (bijvoorbeeld “melk”) en de gekozen supermarkt verstuurd. Er worden geen naam, e-mailadres of andere persoonsgegevens meegestuurd.</li>
@@ -7275,7 +7282,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>Externe dienstverleners</h4>
       <p><strong>Google Firebase</strong> wordt gebruikt voor je account (ook voor inloggen met Google) en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>Google Play</strong> regelt het betalen voor Pro. Onze tussenserver bij <strong>Cloudflare</strong> controleert bij Google of een aankoop echt is en zet daarna Pro aan voor je account.</p>
-      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten in Nederland en België. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
+      <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten in Nederland en België. De productfoto&#39;s bij aanbiedingen worden rechtstreeks van de website van de supermarkt geladen; daarbij ziet die website, zoals bij elke afbeelding op internet, je IP-adres. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>FormSubmit</strong> wordt gebruikt om je bericht te versturen als je via <strong>Meer → Feedback</strong> feedback geeft. Daarbij worden je bericht, je naam, je e-mailadres en het soort apparaat naar ons gestuurd, zodat we je kunnen antwoorden.</p>
       <p><strong>Open Food Facts</strong> (en de verwante databanken Open Beauty Facts en Open Products Facts) levert productnamen en merken bij suggesties, en productfoto’s bij scannen of als je “Productfoto’s tonen” aanzet.</p>
       <p>De iconen zitten in de app zelf. Daarvoor wordt geen verbinding met een andere dienst gemaakt.</p>
@@ -7355,6 +7362,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld. Onder je lijst tik je op <strong>Meer</strong> om alle producten te zien. In een gedeelde lijst (zoals een BBQ-lijst) staat het niet onder de lijst.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-cart-shopping"></i><span>Meerdere winkels</span></div>
+      <p>Doe je boodschappen bij meer dan één winkel? Tik op de lijst op <strong>⋮ → Mijn winkels</strong> (of ga naar <strong>Meer → Instellingen → Lijstopties</strong>) en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad boven je lijst; wat je toevoegt komt bij de winkel die openstaat. <strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen. Heb je in de ene winkel al iets afgevinkt, dan zie je onderaan ook <strong>Niet gevonden?</strong>: daarmee zet je alles wat over is in één keer op de lijst van een andere winkel. Met Pro zoek je bij <strong>Aanbiedingen</strong> bij al je winkels tegelijk, en kies je bij <strong>+ Op lijst</strong> op welke lijst het product komt.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
       <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
     </div>
@@ -7396,7 +7407,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
       <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Bij <strong>Mijn budget</strong> vul je bij <strong>Budget per week</strong> een bedrag in en tik je op <strong>Budget opslaan</strong>. Daarna zie je steeds hoeveel je hebt uitgegeven en wat er nog beschikbaar is.</p>
       <p>Na het boodschappen doen vul je bij <strong>Uitgave toevoegen</strong> een omschrijving, het bedrag en de winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf; met <strong>Wis uitgaven</strong> begin je opnieuw.</p>
-      <p>Bij <strong>Aanbiedingen</strong> kies je eerst je <strong>vaste supermarkt</strong>. Je kunt kiezen uit supermarkten in Nederland en België. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
+      <p>Bij <strong>Aanbiedingen</strong> kies je eerst je winkels: tik bij <strong>Mijn winkels</strong> op <strong>Wijzigen</strong>. Je kunt tot 3 winkels kiezen, in Nederland en België; de app zoekt dan bij al je winkels tegelijk. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
@@ -7543,6 +7554,9 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <button type="button" class="listOptionItem" onclick="sortCurrentList('alpha')"><i class="fa-solid fa-arrow-down-a-z"></i><span>Alfabetisch</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('category')"><i class="fa-solid fa-layer-group"></i><span>Per categorie</span></button>
       <button type="button" class="listOptionItem" onclick="sortCurrentList('newest')"><i class="fa-solid fa-clock"></i><span>Nieuwste eerst</span></button>
+      <div class="listOptionDivider" aria-hidden="true"></div>
+      <div class="listOptionTitle">Winkels</div>
+      <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openShopPicker)openShopPicker();},220)"><i class="fa-solid fa-cart-shopping"></i><span>Mijn winkels</span></button>
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Bewaren</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
@@ -9218,6 +9232,21 @@ function openListOptionsSettings() {
     try { localStorage.setItem(t.getAttribute("data-pref"), next ? "true" : "false"); } catch (_) {}
     try { if (window.__syncKeepAwake) window.__syncKeepAwake(); } catch (_) {}
   }));
+  // Mijn winkels: elke favoriete winkel een eigen tabblad op je lijst.
+  try {
+    const body = overlay.querySelector(".familyDialogBody");
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "familyMenuItem settingsMenuToggleRow shopOptionRow";
+    row.style.cssText = "margin-top:8px;background:rgba(255,255,255,.42);width:100%;text-align:left";
+    const favs = window.__favShops ? window.__favShops() : [];
+    const sum = favs.length ? favs.map(k => window.__shopName(k)).join(", ") : "Nog geen winkels gekozen";
+    row.innerHTML = '<span>Mijn winkels<small class="settingsToggleHint"></small></span><i class="fa-solid fa-chevron-right familyMenuArrow" aria-hidden="true"></i>';
+    row.querySelector("small").textContent = sum + ". Kies er twee of drie, dan krijgt elke winkel een eigen lijst.";
+    row.addEventListener("click", e => { e.stopPropagation(); closeFamilyDialog(overlay); setTimeout(() => { if (window.openShopPicker) window.openShopPicker(); }, 300); });
+    const firstRow = body.querySelector(".settingsMenuToggleRow");
+    body.insertBefore(row, firstRow);
+  } catch (_) {}
   overlay.querySelector(".familyDialogPrimary").addEventListener("click", () => closeFamilyDialog(overlay));
 }
 
@@ -9428,6 +9457,7 @@ function normalizeBoodschappen(data) {
         imageUrl: item.imageUrl ? String(item.imageUrl) : "",
         brand: item.brand ? String(item.brand) : "",
         quantity: Math.max(1, Number(item.quantity) || 1),
+        ...(item.shop ? { shop: String(item.shop).slice(0, 30) } : {}),
         ...(item.deal && typeof item.deal === "object" && Number.isFinite(Number(item.deal.price)) ? { deal: {
           price: Number(item.deal.price),
           promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
@@ -10921,7 +10951,8 @@ async function addProduct() {
     createdAt: Date.now(),
     barcode: selected && selected.barcode ? selected.barcode : "",
     imageUrl: selected && selected.imageUrl ? selected.imageUrl : "",
-    brand: selected && selected.brand ? selected.brand : ""
+    brand: selected && selected.brand ? selected.brand : "",
+    ...((typeof window!=="undefined"&&window.__shopForNew&&window.__shopForNew())?{shop:window.__shopForNew()}:{})
   });
   input.value = "";
   selectedProductSuggestion = null;
@@ -13703,7 +13734,7 @@ function __overviewAddProduct(product){
   if(!text) return;
   var exists=boodschappen.some(function(x){return String(x.text||"").trim().toLowerCase()===text.toLowerCase() && !x.completed;});
   if(!exists){
-    boodschappen.push({text:text,completed:false,completedBy:"",completedByUid:"",completedAt:null});
+    boodschappen.push({text:text,completed:false,completedBy:"",completedByUid:"",completedAt:null,...((typeof window!=="undefined"&&window.__shopForNew&&window.__shopForNew())?{shop:window.__shopForNew()}:{})});
     showList();
     saveList();
   }
@@ -14935,7 +14966,8 @@ async function addScannedProduct(product){
     barcode:product.barcode || '',
     imageUrl:product.imageUrl || '',
     brand:product.brand || '',
-    quantity:1
+    quantity:1,
+    ...((typeof window!=="undefined"&&window.__shopForNew&&window.__shopForNew())?{shop:window.__shopForNew()}:{})
   });
   showList();
   await saveList();
@@ -15573,7 +15605,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
 (function(){
   const KEY="boodschappen_budgetplanner_v1";
   const euro=n=>new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"}).format(Number(n)||0);
-  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[],supermarket:typeof d.supermarket==="string"?d.supermarket:"ah"}}catch(e){return {budget:0,expenses:[],supermarket:"ah"}}};
+  const read=()=>{try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");return {budget:Number(d.budget)||0,expenses:Array.isArray(d.expenses)?d.expenses:[],supermarket:typeof d.supermarket==="string"?d.supermarket:"ah",favorites:Array.isArray(d.favorites)?d.favorites:undefined}}catch(e){return {budget:0,expenses:[],supermarket:"ah"}}};
   const write=d=>localStorage.setItem(KEY,JSON.stringify(d));
   window.saveBudgetSupermarket=function(){
     const select=document.getElementById("budgetSupermarket");
@@ -15587,7 +15619,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   const BE_KEYS=["ah_be","aldi_be","carrefour","colruyt","delhaize","jumbo_be","lidl_be"];
   window.__updateDealsAvail=function(){
     const sel=document.getElementById("budgetSupermarket");if(!sel)return;
-    const ok=sel.value!=="other";
+    let ok=sel.value!=="other";
+    try{if(window.__favShops&&window.__favShops().length)ok=window.__favShops().some(k=>!!(window.__budgetRetailerSlugs||{})[k]);}catch(e){}
     const src=document.getElementById("ppSourceLink");if(src)src.href=BE_KEYS.indexOf(sel.value)>=0?"https://www.prijsprofeet.be":"https://www.prijsprofeet.nl";
     const card=document.querySelector("#budgetPlannerPanel .budgetDealsCard"),msg=document.getElementById("budgetNoDealsNote");
     if(card)card.hidden=!ok;if(msg)msg.hidden=ok;
@@ -15635,6 +15668,15 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   const budgetRetailerSlugs={ah:"albert_heijn",aldi:"aldi",boni:"boni",boons:"boons_markt",coop:"coop",dagwinkel:"dagwinkel",dekamarkt:"dekamarkt",dirk:"dirk",ekoplaza:"ekoplaza",gewooncoop:"gewoon_coop",hoogvliet:"hoogvliet",jumbo:"jumbo",lidl:"lidl",mcd:"mcd",nettorama:"nettorama",plus:"plus",poiesz:"poiesz",spar:"spar",vomar:"vomar",ah_be:"albert_heijn_be",aldi_be:"aldi_be",carrefour:"carrefour",colruyt:"colruyt",delhaize:"delhaize",jumbo_be:"jumbo_be",lidl_be:"lidl_be"};
   // Belgische ketens staan bij PrijsProfeet op prijsprofeet.be (zelfde API en sleutel).
   const BE_RETAILERS=["albert_heijn_be","aldi_be","carrefour","colruyt","delhaize","jumbo_be","lidl_be"];
+  window.__budgetRetailerSlugs=budgetRetailerSlugs;
+  // Winkels waar we aanbiedingen zoeken: je favoriete winkels (met aanbiedingen), anders je vaste supermarkt.
+  function dealShops(){
+    let f=[];try{f=window.__favShops?window.__favShops():[];}catch(e){}
+    if(!f.length)f=[(document.getElementById("budgetSupermarket")||{}).value||"ah"];
+    return f.filter(k=>budgetRetailerSlugs[k]);
+  }
+  const shopName=k=>{try{if(window.__shopName)return window.__shopName(k);}catch(e){}return retailerName();};
+  const joinNames=keys=>{const n=keys.map(shopName);return n.length<2?(n[0]||"je supermarkt"):n.slice(0,-1).join(", ")+" en "+n[n.length-1];};
   const retailerName=()=>{const s=document.getElementById("budgetSupermarket");return s&&s.selectedOptions[0]?s.selectedOptions[0].text:"je supermarkt"};
   const money=n=>"€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
   const shortDate=iso=>{if(!iso)return"";const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"-"+m[2]:""};
@@ -15750,6 +15792,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
   function dealCard(p,label,searchTerm){
     const card=document.createElement("div");card.className="dealItem";
     if(label){const l=document.createElement("span");l.className="dealLabel";l.textContent=label;card.appendChild(l);}
+    if(p.__shop&&dealShops().length>1){const t=document.createElement("span");t.className="dealStore";t.textContent=shopName(p.__shop);card.appendChild(t);}
     const name=document.createElement("div");name.className="dealName";name.textContent=p.name||p.product_name||p.title||"Product";card.appendChild(name);
     const priceRow=document.createElement("div");priceRow.className="dealPriceRow";
     const amount=Number(p.price),orig=Number(p.original_price);
@@ -15766,7 +15809,19 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const meta=document.createElement("div");meta.className="dealMeta";
     meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
-    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:retailerName()}));
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:p.__shop?shopName(p.__shop):retailerName(),shop:p.__shop||""}));
+    // Productfoto van PrijsProfeet (van de site van de supermarkt). Lukt laden niet, dan zonder foto.
+    const img=String(p.image_url||"").trim();
+    if(/^https:\/\//i.test(img)){
+      const body=document.createElement("div");body.className="dealBody";
+      while(card.firstChild)body.appendChild(card.firstChild);
+      const th=document.createElement("div");th.className="dealThumb";
+      const im=document.createElement("img");im.alt="";im.loading="lazy";im.decoding="async";im.referrerPolicy="no-referrer";
+      im.addEventListener("error",()=>{th.remove();card.classList.remove("hasThumb");});
+      im.addEventListener("load",()=>th.classList.add("loaded"));
+      im.src=img;th.appendChild(im);
+      card.classList.add("hasThumb");card.appendChild(th);card.appendChild(body);
+    }
     return card;
   }
   window.searchBudgetLivePrices=async function(){
@@ -15774,26 +15829,45 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const term=(input&&input.value||"").trim();
     if(!results)return;
     if(term.length<2){results.textContent="Vul minimaal twee letters in.";return;}
-    const selected=(document.getElementById("budgetSupermarket")||{}).value||"ah";
-    if(!budgetRetailerSlugs[selected]){results.textContent="Voor deze supermarkt hebben we nog geen aanbiedingen.";return;}
+    const shops=dealShops();
+    if(!shops.length){results.textContent="Voor jouw winkels hebben we nog geen aanbiedingen.";return;}
     results.textContent="Aanbiedingen ophalen…";
-    try{
-      const all=await fetchBudgetDeals(term,selected);
-      const rows=rankDeals(all,term);
-      if(!rows.length&&all.length){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Er zijn wel aanbiedingen voor producten met “"+term+"” als smaak of ingrediënt, zoals snacks. Die laten we weg.";return;}
-      if(!rows.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+retailerName()+". Het product is waarschijnlijk gewoon te koop, alleen nu niet in de aanbieding.";return;}
-      results.replaceChildren();
-      const list=document.createElement("div");list.className="dealList";results.appendChild(list);
-      const FIRST=4;
+    const settled=await Promise.all(shops.map(k=>fetchBudgetDeals(term,k).then(rows=>({k:k,rows:rows||[]}),err=>({k:k,err:err}))));
+    const ok=settled.filter(x=>!x.err),failed=settled.filter(x=>x.err);
+    if(!ok.length){results.textContent=dealError(failed[0].err);return;}
+    let raw=0;const all=[],count={};
+    ok.forEach(x=>{raw+=x.rows.length;const r=rankDeals(x.rows,term);count[x.k]=r.length;r.forEach((p,i)=>{p.__shop=x.k;p.__rank=i;all.push(p);});});
+    // Om en om per winkel, zodat je van elke winkel eerst de beste ziet.
+    all.sort((a,b)=>a.__rank-b.__rank||shops.indexOf(a.__shop)-shops.indexOf(b.__shop));
+    const where=joinNames(ok.map(x=>x.k));
+    if(!all.length&&raw){results.textContent="Geen passende aanbieding gevonden voor “"+term+"” bij "+where+". Er zijn wel aanbiedingen voor producten met “"+term+"” als smaak of ingrediënt, zoals snacks. Die laten we weg.";return;}
+    if(!all.length){results.textContent="Geen actuele aanbieding gevonden voor “"+term+"” bij "+where+". Het product is waarschijnlijk gewoon te koop, alleen nu niet in de aanbieding.";return;}
+    results.replaceChildren();
+    let filter="";
+    const chips=document.createElement("div");chips.className="dealShopFilter";
+    const list=document.createElement("div");list.className="dealList";
+    const FIRST=4;
+    function draw(){
+      list.replaceChildren();const old=results.querySelector(".dealMore");if(old)old.remove();
+      const rows=filter?all.filter(p=>p.__shop===filter):all;
       rows.slice(0,FIRST).forEach(p=>list.appendChild(dealCard(p,null,term)));
       if(rows.length>FIRST){
         const more=document.createElement("button");more.type="button";more.className="dealMore";
         const rest=Math.min(rows.length,12)-FIRST;
         more.textContent="Toon "+rest+" meer";
         more.addEventListener("click",e=>{e.stopPropagation();rows.slice(FIRST,12).forEach(p=>list.appendChild(dealCard(p,null,term)));more.remove();});
-        results.appendChild(more);
+        results.insertBefore(more,list.nextSibling);
       }
-    }catch(err){results.textContent=dealError(err);}
+      chips.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.k===filter));
+    }
+    if(ok.length>1){
+      const mk=(k,label,n)=>{const b=document.createElement("button");b.type="button";b.className="dealShopChip";b.dataset.k=k;b.innerHTML="";b.append(label);const c=document.createElement("span");c.textContent=n;b.appendChild(c);b.addEventListener("click",e=>{e.stopPropagation();filter=k;draw();});chips.appendChild(b);};
+      mk("","Alle",all.length);ok.forEach(x=>mk(x.k,shopName(x.k),count[x.k]||0));
+      results.appendChild(chips);
+    }
+    results.appendChild(list);
+    draw();
+    if(failed.length){const f=document.createElement("p");f.className="dealFootnote";f.textContent="Aanbiedingen van "+joinNames(failed.map(x=>x.k))+" konden nu niet worden opgehaald.";results.appendChild(f);}
   };
   const STAPLES=/\b(zout|peper|water|nootmuskaat|optioneel)\b/i;
   const TERM_ALIASES={ei:"eieren",ui:"uien","paprika's":"paprika",wortels:"wortel",zalmfilets:"zalmfilet",champignon:"champignons"};
@@ -15808,8 +15882,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const out=document.getElementById("weekplanDealsResults");if(!out)return;
     let meals=[];try{meals=JSON.parse(localStorage.getItem("boodschappen_pro_smart_weekplanner_v1")||"[]")}catch(e){}
     if(!Array.isArray(meals)||!meals.length){out.textContent="Je hebt nog geen maaltijden gepland. Plan eerst maaltijden in de slimme weekplanner.";return;}
-    const selected=(document.getElementById("budgetSupermarket")||{}).value||"ah";
-    if(!budgetRetailerSlugs[selected]){out.textContent="Voor deze supermarkt hebben we nog geen aanbiedingen.";return;}
+    const shops=dealShops();
+    if(!shops.length){out.textContent="Voor jouw winkels hebben we nog geen aanbiedingen.";return;}
     let lines=[];
     if(typeof window.mergePlannerIngredients==="function"){lines=window.mergePlannerIngredients(meals).items.map(i=>i.text)}
     else{meals.forEach(m=>(Array.isArray(m.ingredients)?m.ingredients:String(m.ingredients||"").split("\n")).forEach(x=>lines.push(x)))}
@@ -15820,11 +15894,13 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     out.textContent="Aanbiedingen zoeken voor "+list.length+" producten…";
     const found=[],missing=[];let failed=null;
     for(const term of list){
-      try{
-        const rows=await fetchBudgetDeals(term,selected);
-        const best=bestDeal(rows,term);
-        if(best)found.push({term:term,deal:best});else missing.push(term);
-      }catch(err){failed=err;break;}
+      // Bij al je winkels tegelijk zoeken; de best passende aanbieding wint (bij gelijkspel de grootste korting).
+      const got=await Promise.all(shops.map(k=>fetchBudgetDeals(term,k).then(rows=>({k:k,rows:rows||[]}),err=>({k:k,err:err}))));
+      const okRows=got.filter(x=>!x.err);
+      if(!okRows.length){failed=got[0].err;break;}
+      let best=null,bestScore=-1e9;
+      okRows.forEach(x=>{const b=bestDeal(x.rows,term);if(!b)return;const sc=dealScore(b,term)+(Number(b.savings_percentage)||0)/1000;if(sc>bestScore){bestScore=sc;best=b;best.__shop=x.k;}});
+      if(best)found.push({term:term,deal:best});else missing.push(term);
       await new Promise(r=>setTimeout(r,200));
     }
     if(failed){out.textContent=dealError(failed);return;}
@@ -15833,7 +15909,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     found.forEach(f=>{const a=Number(f.deal.price),o=Number(f.deal.original_price);if(o>a)saving+=o-a;});
     const sum=document.createElement("div");sum.className="dealSummary";
     const st=document.createElement("strong");st.textContent=found.length?found.length+" van "+list.length+" producten in de aanbieding":"Geen van je "+list.length+" producten is nu in de aanbieding";
-    const ss=document.createElement("span");ss.textContent=found.length?(saving>0?"Je bespaart ongeveer "+money(saving)+" bij "+retailerName():"bij "+retailerName()):"bij "+retailerName()+". Probeer het later deze week nog eens.";
+    const where=joinNames(shops);
+    const ss=document.createElement("span");ss.textContent=found.length?(saving>0?"Je bespaart ongeveer "+money(saving)+" bij "+where:"bij "+where):"bij "+where+". Probeer het later deze week nog eens.";
     sum.append(st,ss);out.appendChild(sum);
     if(found.length){const listEl=document.createElement("div");listEl.className="dealList";found.forEach(f=>listEl.appendChild(dealCard(f.deal,f.term)));out.appendChild(listEl);}
     if(missing.length){const ms=document.createElement("p");ms.className="dealFootnote";ms.textContent="Geen aanbieding voor: "+missing.join(", ")+".";out.appendChild(ms);}
@@ -16084,8 +16161,9 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     }catch(e){}
     entries.forEach(function(e){
       if(onShoppingList(e.name))return;
-      boodschappen.push({text:e.name,completed:false,completedBy:"",completedAt:null,quantity:1,createdAt:Date.now(),
-        barcode:e.barcode||"",imageUrl:e.imageUrl||"",brand:e.brand||""});
+      var sh=e.shop||(window.__shopForNew?window.__shopForNew():"");
+      boodschappen.push(Object.assign({text:e.name,completed:false,completedBy:"",completedAt:null,quantity:1,createdAt:Date.now(),
+        barcode:e.barcode||"",imageUrl:e.imageUrl||"",brand:e.brand||""},sh?{shop:sh}:{}));
       added++;
     });
     if(added){try{showList();}catch(e){} try{await saveList();}catch(e){console.warn(e);} }
@@ -18011,6 +18089,7 @@ body.proPaidMode .onlyFree{display:none!important}
     var d=item.deal,el=document.createElement("span");el.className="productDeal";
     var parts=[money(d.price)];var pr=tidyPromo(d.promo);if(pr)parts.push(pr);
     var fav="";try{var fs=document.getElementById("budgetSupermarket");fav=fs&&fs.selectedOptions[0]?fs.selectedOptions[0].text:"";}catch(e){}
+    try{if(item.shop&&window.__shopName)fav=window.__shopName(item.shop);}catch(e){}
     if(d.store&&d.store!==fav)parts.push("bij "+d.store);var u=untilTxt(d.until);if(u)parts.push(u);
     var pct=Number(d.was)>Number(d.price)?Math.round((1-Number(d.price)/Number(d.was))*100):0;
     el.innerHTML=(pct>0?'<span class="productDealBadge">-'+pct+'%</span>':'<i class="fa-solid fa-tag" aria-hidden="true"></i>')+esc(parts.join(" · "));
@@ -18029,15 +18108,17 @@ body.proPaidMode .onlyFree{display:none!important}
     if(Number(d.was)>Number(d.price))deal.was=Number(d.was);
     var it=findOnList([d.name,d.term]),added=false;
     if(!it){
-      try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([{name:d.name}]);}catch(e){}
+      try{if(window.__pantryApi&&window.__pantryApi.addNamesToShoppingList)await window.__pantryApi.addNamesToShoppingList([d.shop?{name:d.name,shop:d.shop}:{name:d.name}]);}catch(e){}
       it=findOnList([d.name]);added=true;
     }
     if(!it)return false;
     it.deal=deal;
+    // Gekozen lijst (winkel): het product komt (of verhuist) naar die lijst.
+    var toShop="";try{if(d.shop&&window.__shopsOn&&window.__shopsOn()){it.shop=d.shop;toShop=window.__shopName(d.shop);}}catch(e){}
     var need=qtyForPromo(deal.promo);if(need>(Number(it.quantity)||1))it.quantity=need;
     try{showList();}catch(e){}
     try{await saveList();}catch(e){console.warn(e);}
-    var msg=added?esc(it.text)+" staat op je boodschappenlijst":"De aanbieding staat nu bij "+esc(it.text);
+    var msg=added?esc(it.text)+(toShop?" staat op je lijst van "+esc(toShop):" staat op je boodschappenlijst"):"De aanbieding staat nu bij "+esc(it.text)+(toShop?" (lijst van "+esc(toShop)+")":"");
     if(need>1)msg+=" ("+need+" stuks voor de actie)";
     try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(msg+".");}catch(e){}
     return true;
@@ -18048,7 +18129,10 @@ body.proPaidMode .onlyFree{display:none!important}
     var b=document.createElement("button");b.type="button";b.className="dealAddBtn";
     function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i> Op je lijst';}
     if(window.__dealOnList(d))done();else b.innerHTML='<span class="plus">+</span> Op lijst';
-    b.addEventListener("click",async function(e){e.preventDefault();e.stopPropagation();if(b.disabled)return;b.disabled=true;var ok=await window.__addDealToList(d);if(ok)done();else b.disabled=false;});
+    b.addEventListener("click",async function(e){e.preventDefault();e.stopPropagation();if(b.disabled)return;b.disabled=true;
+      // Meerdere winkels? Dan kies je naar welke lijst het gaat (de winkel van de aanbieding staat voorgeselecteerd).
+      var dd=d;try{if(window.__chooseShopList){var target=await window.__chooseShopList(d.shop||"",d.name);if(target===null){b.disabled=false;return;}if(target)dd=Object.assign({},d,{shop:target});}}catch(err){}
+      var ok=await window.__addDealToList(dd);if(ok)done();else b.disabled=false;});
     return b;
   };
 })();
@@ -19064,6 +19148,383 @@ body:not(.logged-in) #mbNet{display:none}
   window.__recipePreload=preload;
 })();
 </script>
+<style id="app-shops-style">
+/* Favoriete winkels: tabbladen boven de lijst */
+.shopTabs{display:flex;gap:4px;margin:12px 0 12px;padding:4px;background:#e2ebe4;border-radius:16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.shopTabs::-webkit-scrollbar{display:none}
+.shopTabs[hidden]{display:none!important}
+.shopTab{flex:1 0 auto;min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:#3f5b45;font:inherit;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,box-shadow .15s}
+.shopTab .nm{overflow:hidden;text-overflow:ellipsis}
+.shopTab .n{flex:0 0 auto;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(63,91,69,.13);color:#3f5b45;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+.shopTab.active{background:#fff;color:#2f4a38;box-shadow:0 1px 4px rgba(47,90,61,.16)}
+.shopTab.active .n{background:#3F5B45;color:#fff}
+.shopTab.edit{flex:0 0 42px;padding:0;color:#5d7464;font-size:16px}
+.shopTabs.many .shopTab{font-size:14px;padding:0 7px;gap:5px}
+.shopTabs.many .shopTab .n{min-width:20px;height:20px;font-size:11px;padding:0 5px}
+.shopTabs.many .shopTab.edit{flex-basis:32px;font-size:15px}
+body.dark-theme .shopTabs{background:#26302a}
+body.dark-theme .shopTab{color:#cfe6d5}
+body.dark-theme .shopTab .n{background:rgba(207,230,213,.14);color:#cfe6d5}
+body.dark-theme .shopTab.active{background:#3a4a3f;color:#fff;box-shadow:none}
+body.dark-theme .shopTab.active .n{background:#9fd3ac;color:#1d241f}
+.app.overview-active #shopTabs,.app.more-active #shopTabs{display:none!important}
+#list .item.shopHidden{display:none!important}
+html.shops-on #list .item{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#list .item.shopPressed{transform:scale(.985);transition:transform .12s}
+.shopEmptyHint{margin:6px 4px 10px;padding:18px 14px;border:1.5px dashed #cfe0d4;border-radius:16px;text-align:center;color:#5d7464;font-size:14px;line-height:1.45}
+.shopEmptyHint strong{display:block;color:#2f4a38;font-size:15px;margin-bottom:3px}
+body.dark-theme .shopEmptyHint{border-color:#3a4a3f;color:#b8c6bc}
+body.dark-theme .shopEmptyHint strong{color:#edf5ef}
+.shopMoveRest{display:flex;align-items:center;gap:10px;margin:10px 4px 4px;padding:12px 14px;border-radius:16px;background:#fdf6e3;color:#6d5513;font-size:14px;line-height:1.35}
+.shopMoveRest span{flex:1 1 auto}
+.shopMoveRest button{flex:0 0 auto;border:0;border-radius:11px;min-height:38px;padding:0 13px;background:#3F5B45;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+body.dark-theme .shopMoveRest{background:#3a3424;color:#f1dfa6}
+/* Kiezen van winkels */
+.shopPickList{max-height:46vh;overflow-y:auto;margin:10px -4px 0;padding:0 4px;-webkit-overflow-scrolling:touch}
+.shopPickGroup{margin:12px 2px 6px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#718177}
+.shopPickRow{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;margin:0 0 6px;padding:0 12px;border:1.5px solid #e1ece4;border-radius:14px;background:#fff;color:#2f4a38;font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.shopPickRow .num{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #b8c6bc;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-sizing:border-box;color:transparent}
+.shopPickRow .nm{flex:1 1 auto}
+.shopPickRow .tag{font-size:12px;font-weight:600;color:#8a998f}
+.shopPickRow.on{border-color:#3F5B45;background:#f2f8f3}
+.shopPickRow.on .num{background:#3F5B45;border-color:#3F5B45;color:#fff}
+body.dark-theme .shopPickRow{background:#29352d;border-color:#3a4a3f;color:#e4eee7}
+body.dark-theme .shopPickRow.on{border-color:#9fd3ac;background:#2f3d33}
+body.dark-theme .shopPickRow.on .num{background:#9fd3ac;border-color:#9fd3ac;color:#1d241f}
+.shopPickMsg{min-height:20px;margin-top:8px;font-size:13px;color:#b3412e}
+.shopDialog .familyDialogActions{flex-direction:column;align-items:stretch;gap:8px}
+.shopDialog .familyDialogActions .familyDialogBtn{width:100%;margin:0}
+.shopDialog .familyDialogBtn.shopAlt{background:#e4efe7;color:#2f4a38}
+body.dark-theme .shopDialog .familyDialogBtn.shopAlt{background:#34443a;color:#e4eee7}
+/* Aanbiedingen: winkels */
+.legacyStorePick{display:none!important}
+.dealShopsRow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:2px 0 6px}
+.dealShopsRow .lbl{width:100%;font-size:14px;font-weight:700;color:#2f4a38;margin-bottom:2px}
+.dealShopsRow .chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:999px;background:#e4efe7;color:#2f4a38;font-size:14px;font-weight:700}
+.dealShopsRow .chip i{font-size:11px;opacity:.6}
+.dealShopsRow .edit{min-height:34px;padding:0 12px;border:1.5px solid #cfe0d4;border-radius:999px;background:#fff;color:#3F5B45;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+body.dark-theme .dealShopsRow .lbl{color:#edf5ef}
+body.dark-theme .dealShopsRow .chip{background:#34443a;color:#cfe6d5}
+body.dark-theme .dealShopsRow .edit{background:transparent;border-color:#4a5d50;color:#9fd3ac}
+.dealStore{display:inline-block;margin:0 0 4px;padding:2px 8px;border-radius:999px;background:#eef3ef;color:#3f5b45;font-size:11px!important;font-weight:800;letter-spacing:.02em}
+body.dark-theme .dealStore{background:#34443a;color:#cfe6d5}
+.dealShopFilter{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding:2px 0;scrollbar-width:none}
+.dealShopFilter::-webkit-scrollbar{display:none}
+.dealShopChip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border:0;border-radius:999px;background:#e4ece6;color:#2f4a38;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.dealShopChip span{opacity:.7;font-weight:600}
+.dealShopChip.active{background:#2f5a3d;color:#fff}
+body.dark-theme .dealShopChip{background:#34443a;color:#e4eee7}
+body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
+</style>
+<script id="app-shops">
+/* Favoriete winkels (maximaal 3). Elke winkel krijgt een eigen tabblad op de boodschappenlijst;
+   producten kun je verplaatsen (ingedrukt houden, of "niet gevonden? verplaats"). De keuze wordt
+   bewaard bij je budgetgegevens (en dus aan je account gekoppeld). Producten krijgen een veld "shop". */
+(function(){
+  var KEY="boodschappen_budgetplanner_v1",ACTIVE="boodschappenActiveShop",TIP="boodschappenShopTipShown",MAX=3;
+  function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function readB(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
+  function writeB(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+  function items(){try{return Array.isArray(boodschappen)?boodschappen:[];}catch(e){return [];}}
+  /* Alle winkels uit de bestaande keuzelijst (Nederland, België, Overig) */
+  var optCache=null;
+  function options(){
+    if(optCache&&optCache.length)return optCache;
+    var sel=document.getElementById("budgetSupermarket"),out=[];
+    if(sel)[].forEach.call(sel.querySelectorAll("option"),function(o){
+      var g=o.parentNode&&o.parentNode.tagName==="OPTGROUP"?o.parentNode.label:"";
+      out.push({key:o.value,name:o.value==="other"?"Andere winkel":o.textContent.trim(),group:g});
+    });
+    optCache=out;return out;
+  }
+  function known(k){return options().some(function(o){return o.key===k;});}
+  /* Korte naam voor op een tabblad (zodat drie winkels naast elkaar passen) */
+  var SHORT={ah_be:"AH België",aldi_be:"Aldi BE",jumbo_be:"Jumbo BE",lidl_be:"Lidl BE",other:"Andere"};
+  function tabName(k,count){if(k==="ah"&&count>=3)return "AH";return SHORT[k]||nameOf(k);}
+  function nameOf(k){var o=options().filter(function(x){return x.key===k;})[0];return o?o.name:String(k||"");}
+  function favorites(){
+    var d=readB(),f;
+    if(Array.isArray(d.favorites))f=d.favorites.filter(function(k,i,a){return known(k)&&a.indexOf(k)===i;});
+    else f=(typeof d.supermarket==="string"&&known(d.supermarket))?[d.supermarket]:[];
+    return f.slice(0,MAX);
+  }
+  /* Tabbladen: je favorieten, plus winkels die familieleden al aan producten hebben gegeven. */
+  function tabKeys(){
+    var keys=favorites().slice();
+    items().forEach(function(it){var k=it&&it.shop;if(k&&keys.indexOf(k)<0&&known(k))keys.push(k);});
+    return keys;
+  }
+  function on(){return tabKeys().length>=2;}
+  function shopOf(it,keys){keys=keys||tabKeys();return (it&&it.shop&&keys.indexOf(it.shop)>=0)?it.shop:keys[0];}
+  function active(keys){keys=keys||tabKeys();var a="";try{a=localStorage.getItem(ACTIVE)||"";}catch(e){}return keys.indexOf(a)>=0?a:keys[0];}
+  function setActive(k){try{localStorage.setItem(ACTIVE,k);}catch(e){}apply();try{var l=document.getElementById("shopTabs");if(l)l.scrollIntoView({block:"nearest"});}catch(e){}}
+  window.__favShops=favorites;
+  window.__shopName=nameOf;
+  window.__shopsOn=on;
+  window.__shopForNew=function(){var keys=tabKeys();return keys.length>=2?active(keys):"";};
+
+  function bar(){
+    var b=document.getElementById("shopTabs");
+    if(!b){
+      var list=document.getElementById("list");if(!list)return null;
+      b=document.createElement("div");b.id="shopTabs";b.className="shopTabs";b.setAttribute("role","tablist");b.setAttribute("aria-label","Winkels");b.hidden=true;
+      list.parentNode.insertBefore(b,list);
+      b.addEventListener("click",function(e){
+        var t=e.target.closest("button");if(!t)return;e.stopPropagation();
+        if(t.classList.contains("edit")){window.openShopPicker();return;}
+        if(t.dataset.k)setActive(t.dataset.k);
+      });
+    }
+    return b;
+  }
+  function haptic(){try{if(window.AndroidApp&&typeof AndroidApp.haptic==="function")AndroidApp.haptic();else if(navigator.vibrate)navigator.vibrate(12);}catch(e){}}
+  function toast(m,a,f){try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(m,a,f);}catch(e){}}
+
+  /* Na elke keer tekenen van de lijst: tabbladen bijwerken en alleen de producten van de gekozen winkel tonen. */
+  function apply(){
+    var b=bar(),list=document.getElementById("list");if(!b||!list)return;
+    list.querySelectorAll(".shopEmptyHint,.shopMoveRest").forEach(function(n){n.remove();});
+    var keys=tabKeys(),isOn=keys.length>=2;
+    document.documentElement.classList.toggle("shops-on",isOn);
+    if(!isOn){b.hidden=true;b.innerHTML="";list.querySelectorAll(".item.shopHidden").forEach(function(n){n.classList.remove("shopHidden");});progress();return;}
+    var act=active(keys),si=document.getElementById("searchInput"),searching=!!(si&&si.value.trim());
+    var open={};keys.forEach(function(k){open[k]=0;});
+    var L=items();L.forEach(function(it){if(it&&!it.completed)open[shopOf(it,keys)]++;});
+    var html=keys.map(function(k){
+      return '<button type="button" role="tab" class="shopTab'+(k===act?" active":"")+'" data-k="'+esc(k)+'" aria-selected="'+(k===act)+'"><span class="nm">'+esc(tabName(k,keys.length))+'</span><span class="n">'+open[k]+'</span></button>';
+    }).join("")+'<button type="button" class="shopTab edit" aria-label="Mijn winkels kiezen" title="Mijn winkels"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>';
+    if(b.innerHTML!==html)b.innerHTML=html;
+    b.classList.toggle("many",keys.length>=3);
+    b.hidden=false;
+    list.querySelectorAll(".item").forEach(function(el){
+      var it=L[Number(el.dataset.index)];
+      el.classList.toggle("shopHidden",!searching&&!!it&&shopOf(it,keys)!==act);
+    });
+    if(!searching&&L.length){
+      var mine=L.filter(function(it){return it&&shopOf(it,keys)===act;});
+      if(!mine.length){
+        var h=document.createElement("div");h.className="shopEmptyHint";
+        h.innerHTML='<strong>Nog niets voor '+esc(nameOf(act))+'</strong>Typ hierboven wat je bij '+esc(nameOf(act))+' nodig hebt. Het komt dan op deze lijst.';
+        list.appendChild(h);
+      }else{
+        var rest=mine.filter(function(it){return !it.completed;}),done=mine.length-rest.length,others=keys.filter(function(k){return k!==act;});
+        if(rest.length&&done){
+          var m=document.createElement("div");m.className="shopMoveRest";
+          m.innerHTML='<span>'+(rest.length===1?'1 product':rest.length+' producten')+' niet gevonden?</span><button type="button">'+(others.length===1?'Naar '+esc(nameOf(others[0])):'Verplaatsen')+'</button>';
+          ["click","pointerdown","touchstart"].forEach(function(ev){m.addEventListener(ev,function(e){e.stopPropagation();});});
+          m.querySelector("button").addEventListener("click",async function(){
+            var idx=[];L.forEach(function(it,i){if(it&&!it.completed&&shopOf(it,keys)===act)idx.push(i);});
+            var target=others.length===1?others[0]:await chooseShop("Waar wil je de rest halen?",(idx.length===1?"1 product":idx.length+" producten")+" van "+nameOf(act)+" verplaatsen naar:",others,others[0]);
+            if(target)moveItems(idx,target);
+          });
+          list.appendChild(m);
+        }
+      }
+    }
+    progress();
+    maybeTip();
+  }
+  /* Voortgang bovenaan: alleen van de gekozen winkel */
+  function progress(){
+    try{
+      var p=document.getElementById("listProgress");if(!p||!on())return;
+      var keys=tabKeys(),act=active(keys),mine=items().filter(function(it){return it&&shopOf(it,keys)===act;});
+      if(!items().length)return;
+      var total=mine.length,done=mine.filter(function(it){return it.completed;}).length,pct=total?Math.round(done/total*100):0;
+      p.innerHTML='<span class="listProgressText"><i class="fa-solid fa-basket-shopping"></i> '+(total?done+' van '+total+' klaar':'0 boodschappen')+'</span>'+
+        (total?'<span class="listProgressPercent">'+pct+'%</span><span class="listProgressTrack"><span class="listProgressFill"></span></span>':'');
+      p.style.setProperty("--progress",pct+"%");
+    }catch(e){}
+  }
+  function maybeTip(){
+    try{
+      if(localStorage.getItem(TIP)==="1")return;
+      if(!document.body.classList.contains("logged-in"))return;
+      var app=document.querySelector(".app");if(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")))return;
+      if(!items().some(function(it){return it&&!it.completed;}))return;
+      localStorage.setItem(TIP,"1");
+      setTimeout(function(){toast("Tip: houd een product ingedrukt om het naar een andere winkel te verplaatsen.");},900);
+    }catch(e){}
+  }
+  async function moveItems(indices,target){
+    var L=items(),names=[];
+    indices.forEach(function(i){if(L[i]){L[i].shop=target;names.push(L[i].text);}});
+    if(!names.length)return;
+    try{showList();}catch(e){}
+    try{await saveList();}catch(e){console.warn(e);}
+    var what=names.length===1?"<b>"+esc(names[0])+"</b> staat":names.length+" producten staan";
+    toast(what+" nu op de lijst van "+esc(nameOf(target))+".","Bekijken",function(){setActive(target);});
+  }
+  window.__moveItemsToShop=moveItems;
+
+  /* Kies een winkel uit een paar knoppen. Geeft de sleutel terug, of null bij Annuleren. */
+  function chooseShop(title,text,keys,preferred){
+    return new Promise(function(resolve){
+      var order=keys.slice();if(preferred&&order.indexOf(preferred)>0){order.splice(order.indexOf(preferred),1);order.unshift(preferred);}
+      var overlay=familyDialogBase("fa-cart-shopping",esc(title),'<div class="familyDialogText"></div>',
+        order.map(function(k,i){return '<button type="button" class="familyDialogBtn '+(i===0?"familyDialogPrimary":"shopAlt")+'" data-k="'+esc(k)+'">'+esc(nameOf(k))+'</button>';}).join("")+
+        '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>');
+      overlay.classList.add("shopDialog");
+      overlay.querySelector(".familyDialogText").textContent=text;
+      var finish=function(v){closeFamilyDialog(overlay,function(){resolve(v);});};
+      overlay.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();finish(b.dataset.k);});});
+      overlay.querySelector(".familyDialogCancel").addEventListener("click",function(e){e.stopPropagation();finish(null);});
+      overlay.addEventListener("click",function(e){if(e.target===overlay)finish(null);});
+    });
+  }
+  /* "+ Op lijst" bij een aanbieding: naar welke lijst? (alleen als je meerdere winkels hebt) */
+  window.__chooseShopList=function(preferred,name){
+    var keys=tabKeys();
+    if(keys.length<2)return Promise.resolve("");
+    if(keys.indexOf(preferred)<0)preferred=active(keys);
+    return chooseShop("Op welke lijst?",String(name||"Dit product")+" zetten op de lijst van:",keys,preferred);
+  };
+
+  /* Product ingedrukt houden: verplaatsen naar een andere winkel */
+  var lp=null,fired=false,swallowUntil=0;
+  function cancelLp(){if(lp){clearTimeout(lp.t);lp=null;}}
+  document.addEventListener("pointerdown",function(e){
+    fired=false;
+    if(!document.documentElement.classList.contains("shops-on"))return;
+    var it=e.target.closest&&e.target.closest("#list .item");
+    if(!it||e.target.closest("button"))return;
+    cancelLp();
+    var idx=Number(it.dataset.index);
+    lp={x:e.clientX,y:e.clientY,t:setTimeout(function(){
+      lp=null;fired=true;haptic();
+      it.classList.add("shopPressed");setTimeout(function(){it.classList.remove("shopPressed");},250);
+      openMove(idx);
+    },520)};
+  },true);
+  document.addEventListener("pointermove",function(e){if(lp&&(Math.abs(e.clientX-lp.x)>10||Math.abs(e.clientY-lp.y)>10))cancelLp();},true);
+  document.addEventListener("pointerup",function(){cancelLp();if(fired){fired=false;swallowUntil=Date.now()+450;}},true);
+  document.addEventListener("pointercancel",function(){cancelLp();if(fired){fired=false;swallowUntil=Date.now()+450;}},true);
+  window.addEventListener("scroll",cancelLp,true);
+  /* De tik die bij het loslaten volgt mag het product niet afvinken en de keuze niet meteen sluiten. */
+  document.addEventListener("click",function(e){if(Date.now()<swallowUntil){swallowUntil=0;e.preventDefault();e.stopImmediatePropagation();}},true);
+  document.addEventListener("contextmenu",function(e){if(document.documentElement.classList.contains("shops-on")&&e.target.closest&&e.target.closest("#list .item"))e.preventDefault();},true);
+  async function openMove(idx){
+    var keys=tabKeys(),it=items()[idx];if(!it||keys.length<2)return;
+    var cur=shopOf(it,keys),others=keys.filter(function(k){return k!==cur;});
+    var target=await chooseShop("Verplaatsen",String(it.text)+" staat nu op de lijst van "+nameOf(cur)+". Naar welke winkel?",others,others[0]);
+    if(target){var i=items().indexOf(it);if(i>=0)moveItems([i],target);}
+  }
+
+  /* Mijn winkels kiezen (maximaal 3) */
+  window.openShopPicker=function(e){
+    if(e&&e.preventDefault){e.preventDefault();e.stopPropagation();}
+    try{closeFamilyMenuForDialog();}catch(_){}
+    var opts=options(),sel=favorites().slice(),before=sel.slice();
+    var groups=[],by={};
+    opts.forEach(function(o){var g=o.group||"Overig";if(!by[g]){by[g]=[];groups.push(g);}by[g].push(o);});
+    var slugs=window.__budgetRetailerSlugs||{};
+    var html='<div class="familyDialogText">Kies maximaal 3 winkels waar je boodschappen doet. Kies je er twee of drie, dan krijgt elke winkel een eigen lijst. De eerste is je vaste winkel.</div><div class="shopPickList">'+
+      groups.map(function(g){return '<div class="shopPickGroup">'+esc(g)+'</div>'+by[g].map(function(o){
+        return '<button type="button" class="shopPickRow" data-k="'+esc(o.key)+'"><span class="num"></span><span class="nm">'+esc(o.name)+'</span>'+(slugs[o.key]?'':'<span class="tag">geen aanbiedingen</span>')+'</button>';
+      }).join("");}).join("")+'</div><div class="shopPickMsg" aria-live="polite"></div>';
+    var overlay=familyDialogBase("fa-cart-shopping","Mijn winkels",html,
+      '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>');
+    var msg=overlay.querySelector(".shopPickMsg");
+    function paint(){
+      overlay.querySelectorAll(".shopPickRow").forEach(function(r){
+        var i=sel.indexOf(r.dataset.k);r.classList.toggle("on",i>=0);r.setAttribute("aria-pressed",String(i>=0));
+        r.querySelector(".num").textContent=i>=0?String(i+1):"";
+      });
+    }
+    paint();
+    overlay.querySelectorAll(".shopPickRow").forEach(function(r){r.addEventListener("click",function(ev){
+      ev.stopPropagation();var k=r.dataset.k,i=sel.indexOf(k);msg.textContent="";
+      if(i>=0)sel.splice(i,1);
+      else if(sel.length>=MAX){msg.textContent="Je kunt maximaal 3 winkels kiezen. Tik eerst op een gekozen winkel om hem weg te halen.";return;}
+      else sel.push(k);
+      paint();
+    });});
+    var first=overlay.querySelector(".shopPickRow.on");if(first)setTimeout(function(){try{first.scrollIntoView({block:"center"});}catch(_){}},60);
+    overlay.querySelector(".familyDialogCancel").addEventListener("click",function(ev){ev.stopPropagation();closeFamilyDialog(overlay);});
+    overlay.querySelector(".familyDialogPrimary").addEventListener("click",async function(ev){
+      ev.stopPropagation();
+      closeFamilyDialog(overlay);
+      await saveFavorites(sel,before);
+    });
+  };
+  async function saveFavorites(sel,before){
+    var d=readB();d.favorites=sel.slice(0,MAX);if(sel[0])d.supermarket=sel[0];
+    writeB(d);
+    try{var s=document.getElementById("budgetSupermarket");if(s&&sel[0])s.value=sel[0];}catch(e){}
+    /* Winkels die je weghaalt: hun producten gaan naar je eerste winkel (of terug naar één lijst). */
+    var L=items(),changed=false;
+    L.forEach(function(it){
+      if(!it||!it.shop||sel.indexOf(it.shop)>=0)return;
+      if(before.indexOf(it.shop)<0)return; /* winkel van een familielid: laten staan */
+      if(sel.length>=2)it.shop=sel[0];else delete it.shop;
+      changed=true;
+    });
+    if(sel.length>=2&&before.indexOf(active())<0){try{localStorage.setItem(ACTIVE,sel[0]);}catch(e){}}
+    try{showList();}catch(e){}
+    if(changed){try{await saveList();}catch(e){}}
+    try{if(window.__refreshBudgetUI)window.__refreshBudgetUI();}catch(e){}
+    renderDealShops();
+    var m=sel.length>=2?"Je winkels zijn opgeslagen. Elke winkel heeft nu een eigen lijst.":(sel.length?"Je winkel is opgeslagen.":"Je hebt geen winkels meer gekozen.");
+    toast(m);
+  }
+
+  /* Aanbiedingen: welke winkels, met een knop om te wijzigen */
+  function renderDealShops(){
+    var row=document.getElementById("dealShopsRow");if(!row)return;
+    var f=favorites();if(!f.length){var s=document.getElementById("budgetSupermarket");if(s&&s.value)f=[s.value];}
+    var slugs=window.__budgetRetailerSlugs||{};
+    row.innerHTML='<div class="lbl">'+(f.length>1?"Mijn winkels":"Mijn winkel")+'</div>'+
+      f.map(function(k){return '<span class="chip">'+esc(nameOf(k))+(slugs[k]?'':' <i>(geen aanbiedingen)</i>')+'</span>';}).join("")+
+      '<button type="button" class="edit">Wijzigen</button>';
+    row.querySelector(".edit").addEventListener("click",function(e){e.stopPropagation();window.openShopPicker();});
+    try{var h=document.querySelector("#budgetPlannerPanel .budgetDealsCard h4");if(h){if(!h.dataset.orig)h.dataset.orig=h.textContent;h.textContent=f.length>1?"Aanbiedingen bij je winkels":h.dataset.orig;}}catch(e){}
+    try{if(window.__updateDealsAvail)window.__updateDealsAvail();}catch(e){}
+  }
+
+  /* Alleen deze winkel wissen (naast "alles wissen") */
+  if(typeof window.openClearListConfirm==="function"){
+    var oOpen=window.openClearListConfirm;
+    window.openClearListConfirm=function(e){
+      var r=oOpen.apply(this,arguments);
+      try{
+        var sheet=document.getElementById("clearListSheet"),desc=document.getElementById("clearListDescription");
+        var x=document.getElementById("clearListOnlyShop");
+        if(!desc.dataset.orig)desc.dataset.orig=desc.textContent;
+        if(!on()){if(x)x.remove();desc.textContent=desc.dataset.orig;return r;}
+        var keys=tabKeys(),act=active(keys);
+        desc.textContent="Je wist de lijsten van al je winkels ("+keys.map(nameOf).join(", ")+"). Of wis alleen de lijst van "+nameOf(act)+".";
+        if(!x){x=document.createElement("button");x.type="button";x.id="clearListOnlyShop";x.className="clearListCancel clearListOnlyShop";
+          var acts=sheet.querySelector(".clearListActions");acts.parentNode.insertBefore(x,acts);
+          x.addEventListener("click",async function(ev){
+            ev.preventDefault();ev.stopPropagation();
+            try{closeClearListConfirm();}catch(_){}
+            var k=x.dataset.k,keys2=tabKeys(),L=items();
+            var gone=L.filter(function(it){return it&&shopOf(it,keys2)===k;});
+            try{if(gone.length&&typeof recordShoppingHistory==="function")recordShoppingHistory(gone);}catch(_){}
+            boodschappen=L.filter(function(it){return !(it&&shopOf(it,keys2)===k);});
+            selectedIndex=-1;
+            try{showList();}catch(_){}
+            try{await saveList();}catch(_){}
+            toast("De lijst van "+esc(nameOf(k))+" is gewist.");
+          });
+        }
+        x.dataset.k=act;x.innerHTML='<i class="fa-solid fa-trash-can"></i> Alleen '+esc(nameOf(act))+' wissen';
+      }catch(_){}
+      return r;
+    };
+  }
+
+  /* Inhaken op het tekenen van de lijst en op het zoeken */
+  if(typeof showList==="function"){var oShow=showList;showList=function(){var r=oShow.apply(this,arguments);try{apply();}catch(e){console.warn("Winkels:",e);}return r;};}
+  if(typeof updateListProgress==="function"){var oProg=updateListProgress;updateListProgress=function(){var r=oProg.apply(this,arguments);progress();return r;};}
+  try{var si=document.getElementById("searchInput");if(si)si.addEventListener("input",function(){setTimeout(apply,0);});}catch(e){}
+  if(typeof window.clearSearch==="function"||typeof clearSearch==="function"){try{var oCS=clearSearch;clearSearch=function(){var r=oCS.apply(this,arguments);apply();return r;};window.clearSearch=clearSearch;}catch(e){}}
+  if(typeof window.__refreshBudgetUI==="function"){var oRB=window.__refreshBudgetUI;window.__refreshBudgetUI=function(){var r=oRB.apply(this,arguments);try{renderDealShops();apply();}catch(e){}return r;};}
+  function init(){renderDealShops();apply();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
 </body>
 
 
