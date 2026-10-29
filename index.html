@@ -7196,7 +7196,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">APP-INFORMATIE</div>
     <div class="aboutInfoCard">
       <div class="aboutInfoTitle"><i class="fa-solid fa-cart-shopping"></i> Mijn Boodschappen</div>
-      <div class="aboutInfoVersion">Versie 1.0.0</div>
+      <div class="aboutInfoVersion" id="aboutAppVersion">Versie 1.0.0</div>
       <p>Mijn Boodschappen is gemaakt om je dagelijkse boodschappen eenvoudig te plannen en overzichtelijk te houden. Voeg producten toe, pas aantallen aan, vink af wat je in je mandje legt en gebruik de scanner als je sneller een product wilt toevoegen.</p>
     </div>
     <div class="aboutInfoSection">
@@ -8366,7 +8366,7 @@ async function shareFeedback(event) {
           Naam: naam || "(onbekend)",
           "E-mail": (u && u.email) || "(niet ingelogd)",
           Apparaat: platform,
-          Versie: "1.0.0"
+          Versie: window.__appVersion ? window.__appVersion() : "1.0.0"
         };
         if (u && u.email) body._replyto = u.email;
         return body;
@@ -18695,12 +18695,35 @@ body:not(.logged-in) #mbNet{display:none}
     b.innerHTML='<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Weer verbonden</span>';
     b.classList.add("show");clearTimeout(hideT);hideT=setTimeout(function(){b.classList.remove("show");},2200);
   }
+  /* Na een tijd op de achtergrond is de verbinding met Firebase even weg; die komt binnen een paar
+     seconden vanzelf terug. Daarom tellen we na het terugkomen de Firebase-status pas na 8 seconden mee. */
+  var graceUntil=0;
+  function inGrace(){return Date.now()<graceUntil;}
   function evaluate(){
-    var off=(navigator.onLine===false)||(fbOn===false);
+    var off=(navigator.onLine===false)||(fbOn===false&&!inGrace());
     clearTimeout(timer);
-    if(off&&!isOff){timer=setTimeout(function(){isOff=true;showOffline();},2500);} /* korte haperingen negeren */
+    if(off&&!isOff){
+      var planned=Date.now();
+      timer=setTimeout(function(){
+        /* Liep deze wekker veel te laat af, dan stond de app op de achtergrond: eerst opnieuw kijken. */
+        if(Date.now()-planned>6000||document.visibilityState==="hidden"){resume();return;}
+        isOff=true;showOffline();
+      },2500); /* korte haperingen negeren */
+    }
     else if(!off&&isOff){isOff=false;showBack();}
   }
+  function resume(){
+    graceUntil=Date.now()+8000;clearTimeout(timer);
+    setTimeout(evaluate,8100);evaluate();
+  }
+  document.addEventListener("visibilitychange",function(){
+    if(document.visibilityState==="hidden"){clearTimeout(timer);}
+    else resume();
+  });
+  window.addEventListener("pageshow",function(e){if(e.persisted)resume();});
+  /* Niet elke telefoon meldt het terugkomen netjes; een grote sprong in de tijd verraadt het ook. */
+  var lastTick=Date.now();
+  setInterval(function(){var now=Date.now();if(now-lastTick>5000)resume();lastTick=now;},1000);
   window.addEventListener("offline",evaluate);
   window.addEventListener("online",evaluate);
   try{
@@ -18711,6 +18734,19 @@ body:not(.logged-in) #mbNet{display:none}
     }
   }catch(_){}
   window.__mbNetTest=function(off){fbOn=!off;evaluate();};
+})();
+</script>
+<script id="app-version">
+/* Versienummer van de app. In de Android-app komt het uit Google Play (build.gradle);
+   op de website (iPhone) staat het hieronder. Bij een nieuwe versie alleen deze regel en build.gradle aanpassen. */
+(function(){
+  var WEB_VERSION="1.0.0";
+  window.__appVersion=function(){
+    try{if(window.AndroidApp&&typeof window.AndroidApp.appVersion==="function"){var v=String(window.AndroidApp.appVersion()||"").trim();if(v)return v;}}catch(_){}
+    return WEB_VERSION;
+  };
+  function fill(){var el=document.getElementById("aboutAppVersion");if(el)el.textContent="Versie "+window.__appVersion();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fill);else fill();
 })();
 </script>
 <script id="reliable-tap">
