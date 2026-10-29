@@ -35,6 +35,7 @@ import androidx.core.splashscreen.SplashScreen;
 public class MainActivity extends Activity {
     private WebView webView;
     private BillingBridge billing;
+    private GoogleSignInBridge googleSignIn;
     private FrameLayout root;
     private FrameLayout splash;
     private ImageView splashIcon;
@@ -141,6 +142,7 @@ public class MainActivity extends Activity {
             }
         });
         billing = new BillingBridge(this, webView);
+        googleSignIn = new GoogleSignInBridge(this, webView);
         webView.addJavascriptInterface(new AppBridge(), "AndroidApp");
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -539,6 +541,13 @@ public class MainActivity extends Activity {
     }
 
     private class AppBridge {
+        // ---------- Inloggen met Google ----------
+        @JavascriptInterface
+        public boolean googleSignInAvailable() { return googleSignIn != null; }
+
+        @JavascriptInterface
+        public void googleSignIn(String webClientId) { if (googleSignIn != null) googleSignIn.signIn(webClientId); }
+
         /** Versienaam uit build.gradle (dezelfde als in Google Play), voor "Over de app" en feedback. */
         @JavascriptInterface
         public String appVersion() {
