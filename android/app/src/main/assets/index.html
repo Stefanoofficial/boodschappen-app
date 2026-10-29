@@ -7019,6 +7019,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
         <span>Pro betaald voor iedereen<small id="devPaidLiveNote">Uit: Pro is gratis voor iedereen. Aan: iedereen moet Pro nemen; huidige gebruikers houden nog 30 dagen gratis.</small></span>
         <span class="settingsToggle" id="devPaidLiveToggle" aria-hidden="true"></span>
       </button>
+      <button type="button" class="familyMenuItem settingsMenuItem devHideRow devUpdateRow" onclick="announceAppUpdate(event)">
+        <i class="fa-solid fa-gift"></i>
+        <span>Update melden<small id="devUpdateNote">Tik als de nieuwe versie in de Play Store staat. Wie een oudere Android-versie heeft, krijgt dan een melding om bij te werken.</small></span>
+      </button>
       <button type="button" class="familyMenuItem settingsMenuItem devHideRow devUidRow" onclick="copyMyUid(event)">
         <i class="fa-solid fa-key"></i>
         <span>Mijn gebruikers-ID<small id="devUidText">Tik om te kopiëren. Nodig voor de Firebase-regels.</small></span>
@@ -7426,6 +7430,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Inloggen met Google</span></div>
       <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Je hoeft dan geen wachtwoord te onthouden. De eerste keer vraagt de app hoe we je mogen noemen; die naam pas je later aan bij <strong>Meer → Mijn account → Mijn naam</strong>. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-gift"></i><span>Updates</span></div>
+      <p>Op Android krijg je een melding als er een nieuwe versie van de app is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer. Op de iPhone gebruik je altijd vanzelf de nieuwste versie.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
@@ -19720,6 +19728,73 @@ html body #list .item.longName .itemProductContent .productName{font-size:16px!i
   function relayout(){var b=document.getElementById("shopTabs"),on=!!(b&&!b.hidden);if(on!==wasOn){wasOn=on;requestAnimationFrame(function(){try{window.dispatchEvent(new Event("resize"));}catch(e){}});}}
   if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);mark();relayout();return r;};}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){mark();relayout();});else{mark();relayout();}
+})();
+</script>
+<script id="app-update-check">
+/* Android: melding als er een nieuwere versie in de Play Store staat.
+   De eigenaar zet in Firebase config/latestVersion = {code, required} via Testinstellingen → Update melden.
+   Gewone update: "Later" mag (komt na een dag terug). Verplicht: alleen "Nu bijwerken". */
+(function(){
+  var SNOOZE="boodschappenUpdateLater";
+  function myCode(){try{if(window.AndroidApp&&typeof AndroidApp.appVersionCode==="function")return Number(AndroidApp.appVersionCode())||0;}catch(e){}return 0;}
+  function openStore(){try{if(window.AndroidApp&&typeof AndroidApp.openPlayStore==="function"){AndroidApp.openPlayStore();return;}}catch(e){}window.open("https://play.google.com/store/apps/details?id=com.mijnboodschappen.app","_blank");}
+  var latest=null,shown=false;
+  function maybeShow(){
+    try{
+      if(shown||!latest)return;
+      var mine=myCode();if(!mine||!(Number(latest.code)>mine))return;
+      if(!document.body.classList.contains("logged-in"))return;
+      if(document.querySelector(".familyDialogOverlay.familyDialogShown:not(.familyDialogClosing)")){setTimeout(maybeShow,3000);return;}
+      var req=latest.required===true;
+      if(!req){var t=0;try{t=Number(localStorage.getItem(SNOOZE))||0;}catch(e){}if(Date.now()-t<20*3600*1000)return;}
+      shown=true;
+      var ov=familyDialogBase("fa-gift",req?"Update nodig":"Nieuwe versie 🎉",
+        '<div class="familyDialogText">'+(req?"Deze versie van de app werkt niet meer goed. Werk de app bij om verder te gaan. Je lijstjes blijven gewoon bewaard.":"Er staat een nieuwe versie van Mijn Boodschappen voor je klaar, met verbeteringen en nieuwe functies. Werk de app bij via de Play Store.")+'</div>',
+        (req?'':'<button type="button" class="familyDialogBtn familyDialogCancel">Later</button>')+'<button type="button" class="familyDialogBtn familyDialogPrimary"'+(req?' style="width:100%"':'')+'>Nu bijwerken</button>');
+      ov.id="mbUpdateAsk";
+      ov.querySelector(".familyDialogPrimary").addEventListener("click",function(e){e.stopPropagation();openStore();if(!req){closeFamilyDialog(ov);shown=false;try{localStorage.setItem(SNOOZE,String(Date.now()));}catch(_){}}});
+      var later=ov.querySelector(".familyDialogCancel");
+      if(later)later.addEventListener("click",function(e){e.stopPropagation();try{localStorage.setItem(SNOOZE,String(Date.now()));}catch(_){}closeFamilyDialog(ov);});
+      if(req){
+        /* Verplicht: niet wegtikken en de terugknop doet niets */
+        var pb=window.__appBack;window.__appBack=function(){if(document.getElementById("mbUpdateAsk"))return true;return pb?pb():false;};
+      }
+    }catch(e){console.warn("Update-check:",e);}
+  }
+  function listen(){
+    try{
+      if(!myCode())return; /* alleen in de Android-app */
+      database.ref("config/latestVersion").on("value",function(s){latest=s.val();setTimeout(maybeShow,2500);},function(){});
+    }catch(e){}
+  }
+  /* Na terugkomen in de app opnieuw kijken (bijv. na de Play Store) */
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){var a=document.getElementById("mbUpdateAsk");if(a&&latest&&!(Number(latest.code)>myCode())){closeFamilyDialog(a);shown=false;}else setTimeout(maybeShow,1500);}});
+  try{auth.onAuthStateChanged(function(u){if(u)listen();});}catch(e){}
+
+  /* Eigenaar: Update melden */
+  window.announceAppUpdate=function(e){
+    if(e)e.stopPropagation();
+    try{if(window.__isAppOwner&&!window.__isAppOwner())return;}catch(_){}
+    var mine=myCode();
+    var ov=familyDialogBase("fa-gift","Update melden",
+      '<div class="familyDialogText">'+(mine?"Je hebt nu versie <b>"+mine+"</b>. Iedereen met een lagere versie krijgt een melding om bij te werken. Doe dit pas als deze versie in de Play Store staat (goedgekeurd).":"Vul de versiecode in van de nieuwe versie (het getal uit Play Console, bijv. 17). Iedereen met een lagere versie krijgt een melding.")+'</div>'+
+      (mine?'':'<input class="familyDialogInput" id="mbUpdCode" type="number" inputmode="numeric" placeholder="Bijv. 17" style="margin-top:10px">')+
+      '<label class="familyMenuItem settingsMenuToggleRow" style="margin-top:10px;background:rgba(255,255,255,.42);cursor:pointer"><span>Verplicht bijwerken<small class="settingsToggleHint">Alleen bij een belangrijke fout. Er is dan geen "Later".</small></span><input type="checkbox" id="mbUpdReq" style="width:22px;height:22px;accent-color:#3F5B45"></label>',
+      '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Melden</button>');
+    ov.querySelector(".familyDialogCancel").addEventListener("click",function(ev){ev.stopPropagation();closeFamilyDialog(ov);});
+    ov.querySelector(".familyDialogPrimary").addEventListener("click",function(ev){
+      ev.stopPropagation();
+      var code=mine||Number((ov.querySelector("#mbUpdCode")||{}).value)||0;
+      if(!(code>0)){var i=ov.querySelector("#mbUpdCode");if(i)i.focus();return;}
+      var req=!!ov.querySelector("#mbUpdReq").checked;
+      closeFamilyDialog(ov);
+      database.ref("config/latestVersion").set({code:code,required:req,at:Date.now()}).then(function(){
+        try{window.__pantryApi.toast("Gemeld: wie een versie lager dan "+code+" heeft, krijgt een melding"+(req?" (verplicht)":"")+".");}catch(_){}
+      }).catch(function(){
+        familyAlert("Nog niet toegestaan","Firebase staat dit nog niet toe. Zet je gebruikers-ID in de Firebase-regels op de plek van <b>VUL_HIER_JE_UID_IN</b> (zie Mijn gebruikers-ID hieronder) en publiceer de regels.","fa-key");
+      });
+    });
+  };
 })();
 </script>
 </body>
