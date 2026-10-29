@@ -18126,7 +18126,10 @@ body.proPaidMode .onlyFree{display:none!important}
   window.__dealLineFor=function(item){
     if(!item||item.completed||!active(item.deal))return null;
     var d=item.deal,el=document.createElement("span");el.className="productDeal";
-    var parts=[money(d.price)];var pr=tidyPromo(d.promo);if(pr)parts.push(pr);
+    var parts=[money(d.price)];var pr=tidyPromo(d.promo);
+    // Staat de korting al in het rode labeltje (-10%), dan geen dubbele tekst als "10% volume voordeel".
+    if(pr&&Number(d.was)>Number(d.price)&&/%|voordeel|korting|actie|aanbieding/i.test(pr))pr="";
+    if(pr)parts.push(pr);
     var fav="";try{var fs=document.getElementById("budgetSupermarket");fav=fs&&fs.selectedOptions[0]?fs.selectedOptions[0].text:"";}catch(e){}
     try{if(item.shop&&window.__shopName)fav=window.__shopName(item.shop);}catch(e){}
     if(d.store&&d.store!==fav)parts.push("bij "+d.store);var u=untilTxt(d.until);if(u)parts.push(u);
@@ -19349,7 +19352,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
         var rest=mine.filter(function(it){return !it.completed;}),done=mine.length-rest.length,others=keys.filter(function(k){return k!==act;});
         if(rest.length&&done){
           var m=document.createElement("div");m.className="shopMoveRest";
-          m.innerHTML='<span>'+(rest.length===1?'1 product':rest.length+' producten')+' niet gevonden?</span><button type="button">'+(others.length===1?'Naar '+esc(nameOf(others[0])):'Verplaatsen')+'</button>';
+          m.innerHTML='<span>'+rest.length+' niet gevonden?</span><button type="button">'+(others.length===1?'Naar '+esc(nameOf(others[0])):'Verplaatsen')+'</button>';
           ["click","pointerdown","touchstart"].forEach(function(ev){m.addEventListener(ev,function(e){e.stopPropagation();});});
           m.querySelector("button").addEventListener("click",async function(){
             var idx=[];L.forEach(function(it,i){if(it&&!it.completed&&shopOf(it,keys)===act)idx.push(i);});
@@ -19666,6 +19669,28 @@ body.dark-theme .mbPriceInput b{color:#edf5ef}
 })();
 </script>
 
+
+<style id="name-wrap-style">
+/* Lange productnamen: niet meer schuiven, maar netjes over (maximaal) twee regels. */
+html body #list .item .itemProductContent .productInfo{overflow:hidden!important;touch-action:manipulation!important;-webkit-mask-image:none!important;mask-image:none!important}
+html body #list .item .itemProductContent .productName{width:auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-clamp:2;overflow-wrap:anywhere;line-height:1.22!important;-webkit-user-select:none;user-select:none}
+html body #list .item .itemProductContent .productBrand{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+/* Lange naam: het plaatje maakt plaats, de tekst iets kleiner en tot drie regels */
+html body #list .item.longName .itemProductContent{grid-template-columns:22px minmax(0,1fr) 0 92px!important}
+html body #list .item.longName .itemProductContent .productIcon{display:none!important}
+html body #list .item.longName .itemProductContent .productName{font-size:16px!important;-webkit-line-clamp:3!important;line-clamp:3}
+</style>
+<script id="name-wrap">
+(function(){
+  function mark(){
+    try{document.querySelectorAll("#list .item").forEach(function(el){var n=el.querySelector(".productName");if(n)el.classList.toggle("longName",String(n.textContent||"").trim().length>16);});}catch(e){}
+  }
+  var wasOn=null;
+  function relayout(){var b=document.getElementById("shopTabs"),on=!!(b&&!b.hidden);if(on!==wasOn){wasOn=on;requestAnimationFrame(function(){try{window.dispatchEvent(new Event("resize"));}catch(e){}});}}
+  if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);mark();relayout();return r;};}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){mark();relayout();});else{mark();relayout();}
+})();
+</script>
 </body>
 
 
