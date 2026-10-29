@@ -5977,6 +5977,11 @@ body.dark-theme #loginScreen .loginBox > .registerButton {
 body.dark-theme #loginScreen .loginBox > .registerButton i {
   color: #9ED5AD !important;
 }
+/* Doorgaan met Google: neutraal (huisstijl van Google), boven "Account aanmaken" */
+#loginScreen .loginBox > .googleLoginButton{border-color:#c9d3cc!important;color:#1f1f1f!important;margin-bottom:12px!important;font-weight:600!important}
+#loginScreen .loginBox > .googleLoginButton .gIcon{width:20px;height:20px;flex:0 0 auto}
+#loginScreen .loginBox > .googleLoginButton:disabled{opacity:.6}
+body.dark-theme #loginScreen .loginBox > .googleLoginButton{color:#e8eee9!important;border-color:#56645a!important}
 </style>
 <style id="meer-menu-no-fade-final">
 /* Meer-menu: direct openen/sluiten zonder fade of schermanimatie. */
@@ -6528,6 +6533,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="forgotPassword" onclick="resetPassword()">Wachtwoord vergeten?</div>
     <button onclick="login()">Inloggen</button>
     <div class="loginOr"><span></span><b>Of</b><span></span></div>
+    <button type="button" id="googleLoginBtn" class="registerButton googleLoginButton" onclick="googleLogin()">
+      <svg class="gIcon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <span>Doorgaan met Google</span>
+    </button>
     <button type="button" class="registerButton" onclick="openRegister()">
       <i class="fa-solid fa-user-plus"></i>
       <span>Account aanmaken</span>
@@ -7247,11 +7256,11 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">PRIVACYBELEID</div>
     <div class="legalCard">
       <h3>Privacybeleid – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 28 oktober 2026</p>
+      <p><strong>Versie:</strong> 29 oktober 2026</p>
       <p>Mijn Boodschappen verwerkt alleen gegevens die nodig zijn om de app en de bijbehorende functies te laten werken.</p>
       <h4>Welke gegevens verwerken we?</h4>
       <ul>
-        <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID. Stel je een profielfoto in, dan wordt een verkleinde versie daarvan bij je account bewaard. Je kunt die foto altijd weer verwijderen.</li>
+        <li><strong>Accountgegevens:</strong> naam, e-mailadres en een technisch account-ID. Log je in met Google, dan krijgen we van Google alleen je naam, e-mailadres en een account-ID. Je Google-wachtwoord zien we nooit. Stel je een profielfoto in, dan wordt een verkleinde versie daarvan bij je account bewaard. Je kunt die foto altijd weer verwijderen.</li>
         <li><strong>Boodschappen en lijsten:</strong> producten, aantallen, status, opgeslagen lijsten en gedeelde lijsten die je zelf aanmaakt. Ook je eerdere boodschappenrondes (geschiedenis) worden bewaard; de persoonlijke assistent gebruikt die om tips op je telefoon te berekenen. Zet je een aanbieding op je lijst, dan worden de prijs, de actie en de einddatum bij dat product bewaard.</li>
         <li><strong>Familiegegevens:</strong> familiecodes, deelcodes en namen die je binnen een gedeelde lijst gebruikt. Binnen een familie wordt ook opgeslagen wie Pro heeft.</li>
         <li><strong>Planning, voorraad en budget:</strong> je persoonlijke boodschappenlijst, je weekplanning, je voorraad (met hoe lang producten bij jou meestal houdbaar zijn), je budget en uitgaven (met de winkel waar je ze deed), je gekozen supermarkt en het aantal porties dat je bij recepten kiest. Deze gegevens worden aan je account gekoppeld, zodat ze op al je apparaten beschikbaar zijn. Alleen jij kunt ze bekijken, behalve een voorraad die je met je familie deelt.</li>
@@ -7264,7 +7273,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>Waarvoor gebruiken we deze gegevens?</h4>
       <p>Om je aan te melden, boodschappenlijsten op te slaan en te synchroniseren, gedeelde lijsten/families te laten werken, je account te beheren en functies zoals barcode scannen aan te bieden.</p>
       <h4>Externe dienstverleners</h4>
-      <p><strong>Google Firebase</strong> wordt gebruikt voor je account en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
+      <p><strong>Google Firebase</strong> wordt gebruikt voor je account (ook voor inloggen met Google) en voor het online opslaan van je lijsten, weekplanning, voorraad en budget, en voor het delen van lijsten.</p>
       <p><strong>Google Play</strong> regelt het betalen voor Pro. Onze tussenserver bij <strong>Cloudflare</strong> controleert bij Google of een aankoop echt is en zet daarna Pro aan voor je account.</p>
       <p><strong>PrijsProfeet</strong> levert de actuele aanbiedingen van supermarkten in Nederland en België. Zoekopdrachten lopen via een eigen tussenserver bij <strong>Cloudflare</strong>, die alleen het zoekwoord en de supermarkt doorgeeft. Ook de persoonlijke assistent zoekt op deze manier aanbiedingen voor producten die je vaak koopt; de tips zelf worden op je telefoon berekend.</p>
       <p><strong>FormSubmit</strong> wordt gebruikt om je bericht te versturen als je via <strong>Meer → Feedback</strong> feedback geeft. Daarbij worden je bericht, je naam, je e-mailadres en het soort apparaat naar ons gestuurd, zodat we je kunnen antwoorden.</p>
@@ -7278,7 +7287,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p>Afhankelijk van de toepasselijke privacywetgeving kun je onder meer vragen om inzage, correctie of verwijdering van je persoonsgegevens.</p>
       <h4>Contact</h4>
       <dl class="legalContact"><dt>Verantwoordelijke</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 28 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 29 oktober 2026.</p>
     </div>
   </div>
 
@@ -7290,7 +7299,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">ALGEMENE VOORWAARDEN</div>
     <div class="legalCard">
       <h3>Algemene voorwaarden – Mijn Boodschappen</h3>
-      <p><strong>Versie:</strong> 28 oktober 2026</p>
+      <p><strong>Versie:</strong> 29 oktober 2026</p>
       <h4>1. Gebruik van de app</h4><p>Mijn Boodschappen is bedoeld om persoonlijke en gedeelde boodschappenlijsten te maken, beheren en gebruiken. Je gebruikt de app op eigen verantwoordelijkheid.</p>
       <h4>2. Account</h4><p>Wanneer je een account aanmaakt, ben je verantwoordelijk voor het vertrouwelijk houden van je inloggegevens en voor het gebruik van je account.</p>
       <h4>3. Gedeelde lijsten</h4><p>Wanneer je een familie of gedeelde lijst gebruikt, kunnen andere deelnemers de informatie zien en wijzigen die binnen die lijst beschikbaar is.</p>
@@ -7302,7 +7311,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <h4>9. Wijzigingen</h4><p>Functies, vormgeving en deze voorwaarden kunnen worden aangepast wanneer de app verder wordt ontwikkeld.</p>
       <h4>10. Account verwijderen</h4><p>Je kunt je account verwijderen via <strong>Meer → Mijn account → Account verwijderen</strong>.</p>
       <h4>11. Contact</h4><dl class="legalContact"><dt>Aanbieder en eigenaar</dt><dd>Stefano Graanoogst</dd><dt>E-mail</dt><dd><a href="mailto:support.mijnboodschappen@gmail.com">support.mijnboodschappen@gmail.com</a></dd></dl>
-      <p class="legalSmall">Laatst bijgewerkt: 28 oktober 2026.</p>
+      <p class="legalSmall">Laatst bijgewerkt: 29 oktober 2026.</p>
     </div>
   </div>
 
@@ -7398,6 +7407,10 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken. Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
       <p class="onlyPaid">Pro is een abonnement via Google Play, per maand of per jaar. Je kunt het eerst <strong>7 dagen gratis proberen</strong>; zeg je op tijd op, dan betaal je niets. Eén abonnement geldt voor je <strong>hele familie</strong>: iedereen in je familie kan dan alle Pro-onderdelen gebruiken. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
       <p class="onlyPaid">Je abonnement bekijk of stop je via <strong>Meer → Mijn Boodschappen Pro → Abonnement beheren</strong>. Nieuwe telefoon? Tik in het Pro-scherm op <strong>Aankoop herstellen</strong>. Verwijder je je account, zeg dan ook je abonnement op in Google Play; dat stopt niet vanzelf.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Inloggen met Google</span></div>
+      <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Je hoeft dan geen wachtwoord te onthouden. De eerste keer vraagt de app hoe we je mogen noemen; die naam pas je later aan bij <strong>Meer → Mijn account → Mijn naam</strong>. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
@@ -8668,6 +8681,12 @@ async function deleteAccountFromMenu() {
 
       const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
       await user.reauthenticateWithCredential(credential);
+    } else if (providerIds.includes("google.com") && typeof window.__googleReauth === "function") {
+      // Alleen Google: bevestig met hetzelfde Google-account.
+      const ok = await familyConfirm("Bevestig verwijderen", "Kies je Google-account om te bevestigen dat jij het bent.", true, { icon: "fa-lock", label: "Bevestigen met Google" });
+      if (!ok) return;
+      const confirmed = await window.__googleReauth(user);
+      if (!confirmed) return;
     }
 
     const uid = user.uid;
@@ -13205,6 +13224,135 @@ function toggleRegisterPassword(fieldId, button) {
       }
     }
   });
+})();
+</script>
+
+<script id="google-login">
+/* Inloggen met Google.
+   Android-app: via het eigen Google-venster van Android (Google staat inloggen in een webview niet toe).
+   Website/iPhone: via het Google-venster van Firebase (pop-up, anders doorsturen).
+   Na de eerste keer inloggen met Google vragen we verplicht om een naam. */
+(function(){
+  var WEB_CLIENT_ID="845995010779-f9ke15s147s7i2819mt0sj8hh9jkaq12.apps.googleusercontent.com";
+  var lastGivenName="";
+  function onAndroid(){return !!(window.AndroidApp&&typeof window.AndroidApp.googleSignIn==="function");}
+  function setBusy(on){var b=document.getElementById("googleLoginBtn");if(b)b.disabled=!!on;}
+  function message(e){
+    var c=(e&&e.code)||"";
+    if(c==="google/no_account")return "Er staat nog geen Google-account op deze telefoon. Voeg er een toe via Instellingen → Google, of log in met je e-mailadres.";
+    if(c==="auth/network-request-failed")return "Geen internetverbinding. Controleer je verbinding en probeer het opnieuw.";
+    if(c==="auth/account-exists-with-different-credential")return "Er bestaat al een account met dit e-mailadres. Log in met je e-mailadres en wachtwoord.";
+    if(c==="auth/user-disabled")return "Dit account is uitgeschakeld.";
+    if(c==="auth/user-mismatch")return "Kies hetzelfde Google-account waarmee je bent ingelogd.";
+    if(c==="auth/unauthorized-domain"||c==="auth/operation-not-allowed"||/DEVELOPER_ERROR|10:|28444/.test(String(e&&e.message||"")))return "Inloggen met Google is nog niet helemaal ingesteld. Probeer het later opnieuw of log in met je e-mailadres.";
+    return "Inloggen met Google is niet gelukt. Probeer het opnieuw of log in met je e-mailadres.";
+  }
+  function silent(e){var c=(e&&e.code)||"";return c==="google/cancelled"||c==="auth/popup-closed-by-user"||c==="auth/cancelled-popup-request";}
+  /* Android: Google-account kiezen → ID-token */
+  function androidToken(){
+    return new Promise(function(resolve,reject){
+      var done=false;
+      window.__onGoogleSignIn=function(json){
+        if(done)return;done=true;
+        var r;try{r=typeof json==="string"?JSON.parse(json):json;}catch(_){r={ok:false,reason:"error"};}
+        if(r&&r.ok&&r.idToken){lastGivenName=String(r.givenName||String(r.name||"").split(/\s+/)[0]||"").trim();resolve(r.idToken);}
+        else{var e=new Error((r&&r.message)||"");e.code="google/"+((r&&r.reason)||"error");reject(e);}
+      };
+      try{window.AndroidApp.googleSignIn(WEB_CLIENT_ID);}catch(err){done=true;reject(err);}
+    });
+  }
+  function provider(){var p=new firebase.auth.GoogleAuthProvider();try{p.setCustomParameters({prompt:"select_account"});}catch(_){}return p;}
+  window.googleLogin=async function(){
+    setBusy(true);
+    try{loginFlowActive=true;}catch(_){}
+    try{
+      if(onAndroid()){
+        var token=await androidToken();
+        await auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(token));
+      }else{
+        try{await auth.signInWithPopup(provider());}
+        catch(e){
+          var c=(e&&e.code)||"";
+          if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment"){
+            try{sessionStorage.setItem("mbGoogleRedirect","1");}catch(_){}
+            await auth.signInWithRedirect(provider());return;
+          }
+          throw e;
+        }
+      }
+    }catch(e){
+      try{loginFlowActive=false;}catch(_){}
+      if(!silent(e)){console.warn("Google-login:",e);familyAlert("Inloggen met Google",message(e),"fa-triangle-exclamation");}
+    }finally{setBusy(false);}
+  };
+  /* Terug van het doorsturen naar Google (website) */
+  try{
+    if(sessionStorage.getItem("mbGoogleRedirect")==="1"){
+      sessionStorage.removeItem("mbGoogleRedirect");
+      try{loginFlowActive=true;}catch(_){}
+      auth.getRedirectResult().catch(function(e){try{loginFlowActive=false;}catch(_){}if(!silent(e))familyAlert("Inloggen met Google",message(e),"fa-triangle-exclamation");});
+    }
+  }catch(_){}
+  /* Opnieuw bevestigen met Google (bijv. bij account verwijderen) */
+  window.__googleReauth=async function(user){
+    try{
+      if(onAndroid()){var token=await androidToken();await user.reauthenticateWithCredential(firebase.auth.GoogleAuthProvider.credential(token));}
+      else await user.reauthenticateWithPopup(provider());
+      return true;
+    }catch(e){
+      if(!silent(e))await familyAlert("Bevestigen met Google",message(e),"fa-triangle-exclamation");
+      return false;
+    }
+  };
+  /* Verplichte naam na de eerste keer inloggen met Google */
+  var asking=false;
+  async function ensureName(user){
+    try{
+      if(!user||asking)return;
+      var google=(user.providerData||[]).some(function(p){return p&&p.providerId==="google.com";});
+      if(!google)return;
+      var snap=await database.ref("users/"+user.uid+"/name").once("value");
+      if(!auth.currentUser||auth.currentUser.uid!==user.uid)return;
+      if(String(snap.val()||"").trim())return;
+      asking=true;
+      var suggestion=(lastGivenName||String(user.displayName||"").trim().split(/\s+/)[0]||"").slice(0,40);
+      var esc=function(t){return String(t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});};
+      var overlay=familyDialogBase("fa-user","Hoe mogen we je noemen?",
+        '<div class="familyDialogText">Je naam zie je in de begroeting, en je familie ziet hem bij gedeelde lijsten.</div>'+
+        '<input id="mbGoogleName" class="familyDialogInput" type="text" maxlength="40" autocomplete="given-name" placeholder="Je naam" value="'+esc(suggestion)+'">'+
+        '<div id="mbGoogleNameErr" class="familyDialogText" style="display:none;color:#b3412e;margin-top:8px">Vul een naam in.</div>',
+        '<button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>');
+      overlay.id="mbNameAsk";
+      var input=overlay.querySelector("#mbGoogleName"),err=overlay.querySelector("#mbGoogleNameErr"),btn=overlay.querySelector(".familyDialogPrimary");
+      var save=async function(){
+        var name=String(input.value||"").trim().slice(0,40);
+        if(!name){err.style.display="block";input.focus();return;}
+        btn.disabled=true;
+        try{
+          await database.ref("users/"+user.uid+"/name").set(name);
+          try{localStorage.setItem("boodschappenGreetingName",JSON.stringify({uid:user.uid,name:name}));}catch(_){}
+          try{__overviewNameCacheUid=user.uid;__overviewNameCache=name;}catch(_){}
+          try{if(typeof __syncMyNameToSharedLists==="function")__syncMyNameToSharedLists(name);}catch(_){}
+          try{if(window.__refreshAccountHeader)window.__refreshAccountHeader();}catch(_){}
+          try{if(typeof refreshOverviewGreeting==="function")refreshOverviewGreeting();}catch(_){}
+          try{if(typeof updateMemberCount==="function")updateMemberCount();}catch(_){}
+          asking=false;closeFamilyDialog(overlay);
+          /* Daarna mag de korte rondleiding voor nieuwe accounts alsnog starten. */
+          setTimeout(function(){try{if(window.__maybeAutoTour)window.__maybeAutoTour();}catch(_){}},900);
+        }catch(e){
+          btn.disabled=false;err.textContent="Je naam kon niet worden opgeslagen. Controleer je internetverbinding en probeer het opnieuw.";err.style.display="block";
+        }
+      };
+      btn.addEventListener("click",save);
+      input.addEventListener("input",function(){err.style.display="none";});
+      input.addEventListener("keydown",function(e){if(e.key==="Enter")save();});
+      /* Niet wegtikken en de terugknop van Android doet hier niets: een naam is nodig. */
+      if(!window.__nameBackWrapped){window.__nameBackWrapped=true;var prevBack=window.__appBack;window.__appBack=function(){if(document.getElementById("mbNameAsk"))return true;return prevBack?prevBack():false;};}
+      setTimeout(function(){try{input.focus();input.select();}catch(_){}},60);
+    }catch(e){asking=false;console.warn("Naam vragen mislukt:",e);}
+  }
+  window.__ensureGoogleName=ensureName;
+  try{auth.onAuthStateChanged(function(u){if(u)setTimeout(function(){ensureName(u);},700);else asking=false;});}catch(_){}
 })();
 </script>
 
@@ -18871,6 +19019,7 @@ body:not(.logged-in) #mbNet{display:none}
       window.startAppTour();
     }catch(_){}
   }
+  window.__maybeAutoTour=maybeAuto;
   try{if(typeof auth!=="undefined"&&auth&&auth.onAuthStateChanged)auth.onAuthStateChanged(function(u){if(!u){if(el){var x=el;el=null;x.remove();}return;}
     var n=0;var iv=setInterval(function(){n++;if(!window.__listLoading&&n>=4){clearInterval(iv);maybeAuto();}else if(n>40)clearInterval(iv);},500);});}catch(_){}
 })();
