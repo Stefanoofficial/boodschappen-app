@@ -5550,6 +5550,21 @@ body.dark-theme .productDeal{color:#f2a3a3}
 .dealThumb{flex:0 0 72px;width:72px;height:72px;border-radius:12px;background:#fff;border:1px solid #e1ece4;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .dealThumb img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box;opacity:0;transition:opacity .2s}
 .dealThumb.loaded img{opacity:1}
+.dealThumb{cursor:zoom-in;position:relative;-webkit-tap-highlight-color:transparent}
+.dealThumb.loaded::after{content:"";position:absolute;right:4px;bottom:4px;width:18px;height:18px;border-radius:50%;background:rgba(63,91,69,.85) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") center/11px no-repeat}
+.dealThumb:active{transform:scale(.96)}
+.dealPhotoOverlay{position:fixed;inset:0;z-index:100000;background:rgba(20,30,24,.72);display:flex;align-items:center;justify-content:center;padding:20px;animation:dpIn .18s ease-out}
+@keyframes dpIn{from{opacity:0}to{opacity:1}}
+.dealPhotoCard{position:relative;width:100%;max-width:420px;background:#fff;border-radius:22px;padding:18px 18px 16px;box-shadow:0 20px 50px rgba(0,0,0,.3);animation:dpUp .22s ease-out}
+@keyframes dpUp{from{transform:translateY(16px) scale(.97)}to{transform:none}}
+.dealPhotoImg{width:100%;height:min(56vh,420px);display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;overflow:hidden}
+.dealPhotoImg img{max-width:100%;max-height:100%;object-fit:contain}
+.dealPhotoStore{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:999px;background:#e8f3eb;color:#2f5a3c;font-weight:700;font-size:14px}
+.dealPhotoName{margin:8px 0 4px;font-size:19px;font-weight:700;color:#24392b;line-height:1.3}
+.dealPhotoPrice{font-size:20px;font-weight:800;color:#3F5B45}.dealPhotoPrice s{font-size:15px;font-weight:500;color:#8a978e;margin-left:8px}
+.dealPhotoClose{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:20px;color:#24392b;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
+.dealPhotoHint{margin-top:10px;font-size:13px;color:#8a978e;text-align:center}
+body.dark-theme .dealPhotoCard{background:#1f2a23}body.dark-theme .dealPhotoName{color:#e6efe8}body.dark-theme .dealPhotoStore{background:#2c3b31;color:#9fd3ac}body.dark-theme .dealPhotoPrice{color:#9fd3ac}
 body.dark-theme .dealThumb{border-color:#3a4a3f}
 .dealAddBtn.done{background:#e3f4e7;color:#2f6b45;cursor:default}
 body.dark-theme .dealAddBtn.done{background:#2c3d31;color:#9fd3ac}
@@ -15855,6 +15870,11 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       im.addEventListener("error",()=>{th.remove();card.classList.remove("hasThumb");});
       im.addEventListener("load",()=>th.classList.add("loaded"));
       im.src=img;th.appendChild(im);
+      // Tik op de foto: groot bekijken.
+      th.setAttribute("role","button");th.tabIndex=0;th.setAttribute("aria-label","Foto groot bekijken");
+      const openPhoto=ev=>{ev.preventDefault();ev.stopPropagation();if(window.__dealPhoto)window.__dealPhoto({src:img,name:p.name||p.product_name||p.title||label||"",store:p.__shop?shopName(p.__shop):retailerName(),price:money(amount),was:orig>amount?money(orig):""});};
+      th.addEventListener("click",openPhoto);
+      th.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" ")openPhoto(ev);});
       card.classList.add("hasThumb");card.appendChild(th);card.appendChild(body);
     }
     return card;
@@ -18525,6 +18545,36 @@ body.proPaidMode .onlyFree{display:none!important}
   setTimeout(tick,1200);
 })();
 </script>
+<script id="deal-photo">
+/* Productfoto bij een aanbieding groot bekijken. Sluiten: kruisje, tik ernaast, of de terugknop van Android. */
+(function(){
+  var el=null;
+  function close(){if(!el)return;var e=el;el=null;e.remove();}
+  window.__dealPhoto=function(d){
+    try{
+      close();
+      var ov=document.createElement("div");ov.className="dealPhotoOverlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
+      var card=document.createElement("div");card.className="dealPhotoCard";
+      var x=document.createElement("button");x.type="button";x.className="dealPhotoClose";x.setAttribute("aria-label","Sluiten");x.innerHTML='<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+      var box=document.createElement("div");box.className="dealPhotoImg";
+      var im=document.createElement("img");im.alt=d.name||"";im.referrerPolicy="no-referrer";im.src=d.src;box.appendChild(im);
+      card.appendChild(x);card.appendChild(box);
+      if(d.store){var st=document.createElement("span");st.className="dealPhotoStore";st.textContent=d.store;card.appendChild(st);}
+      if(d.name){var nm=document.createElement("div");nm.className="dealPhotoName";nm.textContent=d.name;card.appendChild(nm);}
+      if(d.price){var pr=document.createElement("div");pr.className="dealPhotoPrice";pr.textContent=d.price;if(d.was){var w=document.createElement("s");w.textContent=d.was;pr.appendChild(w);}card.appendChild(pr);}
+      var h=document.createElement("div");h.className="dealPhotoHint";h.textContent="Tik ergens om te sluiten";card.appendChild(h);
+      ov.appendChild(card);
+      ov.addEventListener("click",function(e){e.stopPropagation();close();});
+      x.addEventListener("click",function(e){e.stopPropagation();close();});
+      document.body.appendChild(ov);el=ov;
+    }catch(e){}
+  };
+  document.addEventListener("keydown",function(e){if(el&&e.key==="Escape")close();});
+  /* Terugknop: pas koppelen als alle scripts geladen zijn (latere scripts zetten __appBack opnieuw). */
+  function hookBack(){var ob=window.__appBack;window.__appBack=function(){if(el){close();return true;}return ob?ob():false;};}
+  if(document.readyState==="complete")setTimeout(hookBack,0);else window.addEventListener("load",function(){setTimeout(hookBack,0);});
+})();
+</script>
 <script id="app-haptic">
 /* Korte tik (trillen).
    Android-app: via AndroidApp.haptic(). Android-browser: navigator.vibrate.
@@ -18532,20 +18582,18 @@ body.proPaidMode .onlyFree{display:none!important}
    systeem-tikje als je een <input type="checkbox" switch> omzet. Dat doen we onzichtbaar.
    Werkt alleen direct binnen een tik van de gebruiker; anders gebeurt er niets. */
 (function(){
-  var lbl=null;
   function iosSwitch(){
+    /* Zelfde aanpak als de bekende "ios-haptics"-methode: een verborgen label met daarin
+       een switch-checkbox, telkens nieuw aangemaakt, aanklikken en weer weghalen. */
     try{
-      if(!lbl){
-        var id="mbHapticSwitch";
-        var inp=document.createElement("input");inp.type="checkbox";inp.id=id;inp.setAttribute("switch","");inp.tabIndex=-1;inp.setAttribute("aria-hidden","true");
-        lbl=document.createElement("label");lbl.htmlFor=id;lbl.setAttribute("aria-hidden","true");
-        var box=document.createElement("div");
-        box.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
-        box.appendChild(inp);box.appendChild(lbl);document.body.appendChild(box);
-        inp.addEventListener("click",function(e){e.stopPropagation();});
-        lbl.addEventListener("click",function(e){e.stopPropagation();});
-      }
+      var lbl=document.createElement("label");lbl.setAttribute("aria-hidden","true");lbl.style.display="none";
+      var inp=document.createElement("input");inp.type="checkbox";inp.setAttribute("switch","");
+      lbl.appendChild(inp);
+      lbl.addEventListener("click",function(e){e.stopPropagation();});
+      inp.addEventListener("click",function(e){e.stopPropagation();});
+      (document.head||document.body).appendChild(lbl);
       lbl.click();
+      lbl.remove();
     }catch(e){}
   }
   window.__tapHaptic=function(ms){
