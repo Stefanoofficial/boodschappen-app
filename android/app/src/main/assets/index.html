@@ -18525,6 +18525,38 @@ body.proPaidMode .onlyFree{display:none!important}
   setTimeout(tick,1200);
 })();
 </script>
+<script id="app-haptic">
+/* Korte tik (trillen).
+   Android-app: via AndroidApp.haptic(). Android-browser: navigator.vibrate.
+   iPhone (Safari / web-app, iOS 18+): Safari kent geen vibrate, maar geeft wel een
+   systeem-tikje als je een <input type="checkbox" switch> omzet. Dat doen we onzichtbaar.
+   Werkt alleen direct binnen een tik van de gebruiker; anders gebeurt er niets. */
+(function(){
+  var lbl=null;
+  function iosSwitch(){
+    try{
+      if(!lbl){
+        var id="mbHapticSwitch";
+        var inp=document.createElement("input");inp.type="checkbox";inp.id=id;inp.setAttribute("switch","");inp.tabIndex=-1;inp.setAttribute("aria-hidden","true");
+        lbl=document.createElement("label");lbl.htmlFor=id;lbl.setAttribute("aria-hidden","true");
+        var box=document.createElement("div");
+        box.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+        box.appendChild(inp);box.appendChild(lbl);document.body.appendChild(box);
+        inp.addEventListener("click",function(e){e.stopPropagation();});
+        lbl.addEventListener("click",function(e){e.stopPropagation();});
+      }
+      lbl.click();
+    }catch(e){}
+  }
+  window.__tapHaptic=function(ms){
+    try{
+      if(window.AndroidApp&&typeof AndroidApp.haptic==="function"){AndroidApp.haptic();return;}
+      if(navigator.vibrate&&navigator.vibrate(ms||12))return;
+      iosSwitch();
+    }catch(e){}
+  };
+})();
+</script>
 <script id="app-popups">
 (function(){
   /* Ruimte van de navigatiebalk, zodat pop-ups er nooit achter vallen. */
@@ -18901,8 +18933,7 @@ body.proPaidMode .onlyFree{display:none!important}
       try{
         var it=boodschappen[index];
         if(it&&!it.completed&&localStorage.getItem("boodschappenHaptics")!=="false"){
-          if(window.AndroidApp&&typeof AndroidApp.haptic==="function")AndroidApp.haptic();
-          else if(navigator.vibrate)navigator.vibrate(12);
+          if(window.__tapHaptic)window.__tapHaptic(12);
         }
       }catch(_){}
       return __oToggle.apply(this,arguments);
@@ -19339,7 +19370,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
     }
     return b;
   }
-  function haptic(){try{if(window.AndroidApp&&typeof AndroidApp.haptic==="function")AndroidApp.haptic();else if(navigator.vibrate)navigator.vibrate(12);}catch(e){}}
+  function haptic(){try{if(window.__tapHaptic)window.__tapHaptic(12);else if(window.AndroidApp&&typeof AndroidApp.haptic==="function")AndroidApp.haptic();else if(navigator.vibrate)navigator.vibrate(12);}catch(e){}}
   function toast(m,a,f){try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(m,a,f);}catch(e){}}
 
   /* Na elke keer tekenen van de lijst: tabbladen bijwerken en alleen de producten van de gekozen winkel tonen. */
