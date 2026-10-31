@@ -9490,6 +9490,7 @@ function normalizeBoodschappen(data) {
           promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
           until: item.deal.until ? String(item.deal.until).slice(0, 10) : "",
           store: item.deal.store ? String(item.deal.store).slice(0, 30) : "",
+          ...(typeof item.deal.img === "string" && /^https:\/\//i.test(item.deal.img) && item.deal.img.length <= 600 ? { img: item.deal.img } : {}),
           ...(Number(item.deal.was) > Number(item.deal.price) ? { was: Number(item.deal.was) } : {})
         } } : {})
       };
@@ -10748,7 +10749,26 @@ function showList(animationType = "") {
 
     const icon = document.createElement("span");
     icon.className = "productIcon";
-    if (item.imageUrl && productPhotosEnabled() && !isLooseProduce(productText)) {
+    const dealImg = item.deal && item.deal.img ? item.deal.img : "";
+    if (dealImg) {
+      // Foto van de aanbieding (zoals in Aanbiedingen). Lukt laden niet, dan het gewone icoon.
+      icon.classList.add("hasPhoto", "dealPhoto");
+      div.classList.add("hasDealPhoto");
+      const img = document.createElement("img");
+      img.className = "productRealImage productBarcodeImage";
+      img.src = dealImg;
+      img.alt = "";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        icon.classList.remove("hasPhoto", "dealPhoto");
+        div.classList.remove("hasDealPhoto");
+        const iconValue = getProductIcon(productText);
+        icon.innerHTML = productIconMarkup(iconValue);
+        if (!iconValue) icon.style.visibility = "hidden";
+      };
+      icon.appendChild(img);
+    } else if (item.imageUrl && productPhotosEnabled() && !isLooseProduce(productText)) {
       icon.classList.add("hasPhoto");
       const img = document.createElement("img");
       img.className = "productRealImage productBarcodeImage";
@@ -15859,7 +15879,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const meta=document.createElement("div");meta.className="dealMeta";
     meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
-    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:p.__shop?shopName(p.__shop):retailerName(),shop:p.__shop||""}));
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:p.__shop?shopName(p.__shop):retailerName(),shop:p.__shop||"",img:/^https:\/\//i.test(String(p.image_url||"").trim())?String(p.image_url).trim():""}));
     // Productfoto van PrijsProfeet (van de site van de supermarkt). Lukt laden niet, dan zonder foto.
     const img=String(p.image_url||"").trim();
     if(/^https:\/\//i.test(img)){
@@ -18187,6 +18207,7 @@ body.proPaidMode .onlyFree{display:none!important}
   // d = {name, term, price, promo, until, store}
   window.__addDealToList=async function(d){
     var deal={price:Number(d.price),promo:String(d.promo||""),until:String(d.until||"").slice(0,10),store:String(d.store||"")};
+    if(typeof d.img==="string"&&/^https:\/\//i.test(d.img)&&d.img.length<=600)deal.img=d.img;
     if(Number(d.was)>Number(d.price))deal.was=Number(d.was);
     var it=findOnList([d.name,d.term]),added=false;
     if(!it){
@@ -19874,8 +19895,10 @@ html body #list .item .itemProductContent .productInfo{overflow:hidden!important
 html body #list .item .itemProductContent .productName{width:auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-clamp:2;overflow-wrap:anywhere;line-height:1.22!important;-webkit-user-select:none;user-select:none}
 html body #list .item .itemProductContent .productBrand{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 /* Lange naam: het plaatje maakt plaats, de tekst iets kleiner en tot drie regels */
-html body #list .item.longName .itemProductContent{grid-template-columns:22px minmax(0,1fr) 0 92px!important}
-html body #list .item.longName .itemProductContent .productIcon{display:none!important}
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent{grid-template-columns:22px minmax(0,1fr) 0 92px!important}
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productIcon{display:none!important}
+/* Aanbiedingsfoto: wit vlakje zodat de foto net zo oogt als bij Aanbiedingen */
+html body #list .item .itemProductContent .productIcon.dealPhoto img{background:#fff!important;border:1px solid #e1ece4!important;padding:1px!important;box-sizing:border-box!important}
 /* Ruimte tussen productnaam en de rode aanbiedingsregel */
 html body #list .item .productDeal{margin-top:7px!important;margin-bottom:3px!important}
 html body #list .item.longName .itemProductContent .productName{font-size:16px!important;-webkit-line-clamp:3!important;line-clamp:3}
