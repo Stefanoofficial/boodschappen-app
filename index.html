@@ -18545,6 +18545,88 @@ body.proPaidMode .onlyFree{display:none!important}
   setTimeout(tick,1200);
 })();
 </script>
+<style id="app-consent-style">
+.mbConsentOv{position:fixed;inset:0;z-index:2147483000;background:rgba(24,38,29,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom));animation:mbcIn .2s ease-out}
+@keyframes mbcIn{from{opacity:0}to{opacity:1}}
+.mbConsent{width:100%;max-width:440px;max-height:calc(100% - 20px);overflow:auto;background:#fff;border-radius:26px;padding:26px 22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.25);text-align:center;animation:mbcUp .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes mbcUp{from{transform:translateY(40px)}to{transform:none}}
+.mbConsentIcon{width:76px;height:76px;margin:0 auto;border-radius:18px;background:#14BE4B;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(20,90,40,.25)}
+.mbConsentIcon img{width:84%;height:auto}
+.mbConsent h2{margin:14px 0 6px;font-size:22px;line-height:1.25;color:#24392b}
+.mbConsent p{margin:0 0 14px;font-size:15.5px;line-height:1.45;color:#5b6d61}
+.mbConsentLinks{display:flex;flex-direction:column;gap:8px;margin:0 0 16px}
+.mbConsentLinks button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border:0;border-radius:14px;background:#f1f7f2;color:#2f5a3c;font:inherit;font-weight:700;font-size:15.5px;cursor:pointer}
+.mbConsentLinks button span{display:flex;align-items:center;gap:10px}
+.mbConsentOk{width:100%;min-height:52px;border:0;border-radius:16px;background:#3F5B45;color:#fff;font:inherit;font-size:17px;font-weight:700;cursor:pointer}
+.mbConsentOk:active{transform:scale(.98)}
+.mbConsentSmall{margin-top:10px;font-size:12.5px;color:#8a978e}
+.mbLegalReader{position:fixed;inset:0;z-index:2147483001;background:#eef8f1;overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));animation:mbcIn .15s ease-out}
+.mbLegalReader .mbLegalBack{display:flex;align-items:center;gap:10px;border:0;background:none;color:#3F5B45;font:inherit;font-size:17px;font-weight:700;padding:10px 4px;cursor:pointer}
+body.dark-theme .mbConsent{background:#1f2a23}body.dark-theme .mbConsent h2{color:#e6efe8}body.dark-theme .mbConsent p{color:#b9c7bd}
+body.dark-theme .mbConsentLinks button{background:#2c3b31;color:#9fd3ac}body.dark-theme .mbLegalReader{background:#171d19}body.dark-theme .mbLegalReader .mbLegalBack{color:#9fd3ac}
+</style>
+<script id="app-consent">
+/* Akkoord met privacybeleid en voorwaarden.
+   Verschijnt bij de eerste keer openen (en opnieuw als TERMS_VERSION verandert).
+   Wordt bewaard op het apparaat en, als je ingelogd bent, in users/<uid>/termsAccepted.
+   Pas je de voorwaarden aan? Zet TERMS_VERSION en TERMS_DATE op de nieuwe datum. */
+(function(){
+  var TERMS_VERSION="2026-10-29", TERMS_DATE="29 oktober 2026", KEY="mbTermsAccepted";
+  var ov=null,reader=null;
+  function saved(){try{return JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){return null;}}
+  function isOk(){var s=saved();return !!(s&&s.v===TERMS_VERSION);}
+  function syncDb(){
+    try{
+      var s=saved();if(!s||s.v!==TERMS_VERSION)return;
+      if(typeof firebase==="undefined"||!firebase.auth)return;
+      var u=firebase.auth().currentUser;if(!u)return;
+      var ref=firebase.database().ref("users/"+u.uid+"/termsAccepted");
+      ref.once("value").then(function(sn){var v=sn.val();if(!v||v.v!==TERMS_VERSION)return ref.set({v:TERMS_VERSION,at:s.at});}).catch(function(){});
+    }catch(e){}
+  }
+  function openLegal(which){
+    try{
+      var src=document.querySelector((which==="terms"?"#termsMenuSub":"#privacyMenuSub")+" .legalCard");if(!src)return;
+      reader=document.createElement("div");reader.className="mbLegalReader legalTextPage";reader.setAttribute("role","dialog");
+      var back=document.createElement("button");back.type="button";back.className="mbLegalBack";back.innerHTML='<i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Terug</span>';
+      back.addEventListener("click",function(e){e.stopPropagation();closeLegal();});
+      reader.appendChild(back);reader.appendChild(src.cloneNode(true));
+      document.body.appendChild(reader);
+    }catch(e){}
+  }
+  function closeLegal(){if(reader){reader.remove();reader=null;}}
+  function show(){
+    if(ov||isOk())return;
+    var prev=saved();var update=!!(prev&&prev.v&&prev.v!==TERMS_VERSION);
+    var logo=document.querySelector(".loginLogo");var src=logo?logo.getAttribute("src"):"";
+    ov=document.createElement("div");ov.className="mbConsentOv";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
+    ov.innerHTML='<div class="mbConsent">'+
+      '<div class="mbConsentIcon">'+(src?'<img alt="" src="'+src+'">':'')+'</div>'+
+      (update?'<h2>We hebben onze voorwaarden bijgewerkt</h2><p>Bekijk wat er is veranderd. Door op <b>Akkoord</b> te tikken, ga je akkoord met de nieuwe versie.</p>'
+             :'<h2>Welkom bij Mijn Boodschappen</h2><p>Fijn dat je er bent! Lees hieronder hoe we met je gegevens omgaan. Door op <b>Akkoord</b> te tikken, ga je akkoord met ons privacybeleid en onze algemene voorwaarden.</p>')+
+      '<div class="mbConsentLinks"><button type="button" data-l="privacy"><span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Privacybeleid</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>'+
+      '<button type="button" data-l="terms"><span><i class="fa-solid fa-file-contract" aria-hidden="true"></i>Algemene voorwaarden</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button></div>'+
+      '<button type="button" class="mbConsentOk">Akkoord</button>'+
+      '<div class="mbConsentSmall">'+(update?'Bijgewerkt op '+TERMS_DATE:'Je kunt dit altijd teruglezen via Meer → Privacy &amp; voorwaarden.')+'</div></div>';
+    ov.addEventListener("click",function(e){e.stopPropagation();});
+    ov.querySelectorAll("[data-l]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();openLegal(b.getAttribute("data-l"));});});
+    ov.querySelector(".mbConsentOk").addEventListener("click",function(e){
+      e.stopPropagation();
+      try{localStorage.setItem(KEY,JSON.stringify({v:TERMS_VERSION,at:new Date().toISOString()}));}catch(_){}
+      var o=ov;ov=null;o.remove();syncDb();
+    });
+    document.body.appendChild(ov);
+  }
+  window.__termsConsent={show:show,ok:isOk,version:TERMS_VERSION};
+  function start(){
+    show();
+    try{if(typeof firebase!=="undefined"&&firebase.auth)firebase.auth().onAuthStateChanged(function(){setTimeout(syncDb,1500);});}catch(e){}
+    // Terugknop: eerst de leestekst sluiten; de melding zelf blijft staan tot je op Akkoord tikt.
+    setTimeout(function(){var ob=window.__appBack;window.__appBack=function(){if(reader){closeLegal();return true;}if(ov)return true;return ob?ob():false;};},0);
+  }
+  if(document.readyState==="complete")start();else window.addEventListener("load",start);
+})();
+</script>
 <script id="deal-photo">
 /* Productfoto bij een aanbieding groot bekijken. Sluiten: kruisje, tik ernaast, of de terugknop van Android. */
 (function(){
