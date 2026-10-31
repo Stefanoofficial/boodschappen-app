@@ -7390,7 +7390,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder van deze week</span></div>
-      <p>Bij <strong>Overzicht → Folder van deze week</strong> zie je alle aanbiedingen van je eigen winkels, ingedeeld per groep (zoals zuivel, vlees en groente). Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld per groep (zoals zuivel, vlees en groente). Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
@@ -7597,6 +7597,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
   <nav class="bottomNav" aria-label="Hoofdnavigatie">
     <button type="button" id="navList" class="bottomNavBtn active" onclick="showMainListView()"><i class="fa-solid fa-cart-shopping"></i><span>Lijst</span></button>
     <button type="button" id="navOverview" class="bottomNavBtn" onclick="showOverviewView()"><i class="fa-solid fa-table-cells-large"></i><span>Overzicht</span></button>
+    <button type="button" id="navFolder" class="bottomNavBtn" onclick="openFolder()"><i class="fa-solid fa-tag"></i><span>Folder</span></button>
     <button type="button" id="navMore" class="bottomNavBtn" onclick="showMoreView()"><i class="fa-solid fa-bars"></i><span>Meer</span></button>
   </nav>
 
@@ -18571,7 +18572,7 @@ body.proPaidMode .onlyFree{display:none!important}
 })();
 </script>
 <style id="app-folder-style">
-.mbFolder{position:fixed;inset:0;z-index:100500;background:var(--app-bg,#eef8f1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(10px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom));animation:mbfIn .18s ease-out}
+.mbFolder{position:fixed;inset:0;z-index:99990;background:var(--app-bg,#eef8f1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(18px + env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom));animation:mbfIn .18s ease-out}
 @keyframes mbfIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .mbFolderTop{display:flex;align-items:center;gap:8px;margin:0 0 6px}
 .mbFolderBack{display:flex;align-items:center;gap:8px;border:0;background:none;color:#3F5B45;font:inherit;font-size:17px;font-weight:700;padding:10px 4px;cursor:pointer}
@@ -18744,15 +18745,18 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     });
     var note=document.createElement("p");note.className="mbFolderNote";note.textContent="Aanbiedingen via PrijsProfeet. Prijzen kunnen afwijken; de winkel is leidend.";b.appendChild(note);
   }
-  function close(){if(!ov)return;var o=ov;ov=null;o.remove();document.documentElement.style.overflow="";document.documentElement.classList.remove("mbFolderOn");}
+  var prevNav="navList";
+  function close(restore){if(!ov)return;var o=ov;ov=null;o.remove();document.documentElement.style.overflow="";document.documentElement.classList.remove("mbFolderOn");
+    if(restore){try{setBottomNav(prevNav);}catch(e){}}}
   window.openFolder=function(shopKey){
     try{
-      close();
+      if(ov)return;
+      var a=document.querySelector(".bottomNavBtn.active");prevNav=a&&a.id&&a.id!=="navFolder"?a.id:"navList";
+      try{setBottomNav("navFolder");}catch(e){}
       var list=shops();state.shop=(shopKey&&list.indexOf(shopKey)>=0)?shopKey:(list[0]||"");state.cat="all";state.open={};
       ov=document.createElement("div");ov.className="mbFolder";ov.setAttribute("role","dialog");ov.setAttribute("aria-label","Folder van deze week");
-      ov.innerHTML='<div class="mbFolderTop"><button type="button" class="mbFolderBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Terug</span></button></div>'+
+      ov.innerHTML=
         '<div class="mbFolderHead"><h2>Folder van deze week</h2><span></span></div><div class="mbFolderShops"></div><div class="mbFolderCats"></div><div class="mbFolderBody"></div>';
-      ov.querySelector(".mbFolderBack").addEventListener("click",function(e){e.stopPropagation();close();});
       ov.addEventListener("click",function(e){e.stopPropagation();});
       document.body.appendChild(ov);document.documentElement.style.overflow="hidden";document.documentElement.classList.add("mbFolderOn");
       draw();
@@ -18762,14 +18766,6 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   /* Ingangen: een kaartje in Overzicht en een knop bij Aanbiedingen. */
   function addEntries(){
     try{
-      var area=document.getElementById("overviewScrollArea");
-      if(area&&!document.getElementById("overviewFolderCard")){
-        var c=document.createElement("button");c.type="button";c.id="overviewFolderCard";c.className="overview-new-card overview-click-card overviewFolderCard";
-        c.innerHTML='<div class="overview-new-title"><i class="fa-solid fa-tag overview-new-folder" aria-hidden="true"></i><span>Folder van deze week</span><i class="fa-solid fa-chevron-right overview-new-arrow" aria-hidden="true"></i></div><div class="overview-new-muted" id="overviewFolderText">Alle aanbiedingen van je winkels, per groep.</div>';
-        c.addEventListener("click",function(e){e.stopPropagation();window.openFolder();});
-        var exp=document.getElementById("overviewExpiryCard");
-        if(exp&&exp.nextSibling)area.insertBefore(c,exp.nextSibling);else area.insertBefore(c,area.firstChild);
-      }
       var row=document.getElementById("dealShopsRow");
       if(row&&!document.getElementById("dealFolderBtn")){
         var b=document.createElement("button");b.type="button";b.id="dealFolderBtn";b.className="dealFolderBtn";
@@ -18777,18 +18773,21 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
         b.addEventListener("click",function(e){e.stopPropagation();window.openFolder();});
         row.parentNode.insertBefore(b,row);
       }
-      var t=document.getElementById("overviewFolderText");
-      if(t){var n=shops().map(nameOf);t.textContent=n.length?"Alle aanbiedingen van "+(n.length<2?n[0]:n.slice(0,-1).join(", ")+" en "+n[n.length-1])+", per groep.":"Alle aanbiedingen van je winkels, per groep.";}
     }catch(e){}
   }
   function start(){
     addEntries();
-    if(typeof window.showOverviewView==="function"){var o=window.showOverviewView;window.showOverviewView=function(){var r=o.apply(this,arguments);addEntries();return r;};}
+    // Tik je onderin op een ander tabblad, dan gaat de folder dicht.
+    ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){
+      var o=window[fn];if(typeof o!=="function")return;
+      var id={showMainListView:"navList",showOverviewView:"navOverview",showMoreView:"navMore"}[fn];
+      window[fn]=function(){var was=!!ov;close(false);var r=o.apply(this,arguments);if(was){try{setBottomNav(id);}catch(e){}}return r;};
+    });
     // Terugknop: eerst een grote foto sluiten, dan de folder.
     setTimeout(function(){var ob=window.__appBack;window.__appBack=function(){
       if(ov&&document.querySelector(".dealPhotoOverlay"))return ob?ob():false;
       if(ov&&document.querySelector(".familyDialogOverlay.familyDialogShown"))return ob?ob():false;
-      if(ov){close();return true;}return ob?ob():false;};},0);
+      if(ov){close(true);return true;}return ob?ob():false;};},0);
   }
   if(document.readyState==="complete")start();else window.addEventListener("load",start);
 })();
