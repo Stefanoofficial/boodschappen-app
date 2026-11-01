@@ -18171,10 +18171,17 @@ body.proPaidMode .onlyFree{display:none!important}
   function fit(){
     var l=document.getElementById("list");if(!l)return;
     var app=document.querySelector(".app");if(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")))return;
-    var top=l.getBoundingClientRect().top+(window.scrollY||0);
-    if(top>0)document.documentElement.style.setProperty("--listTopOffset",Math.round(top+392-256)+"px");
+    // Meten zonder het "trek om te vernieuwen"-balkje en zonder hoe ver je gescrold hebt,
+    // anders verspringt de hoogte van de lijst (en "Bijgewerkt om") na het vernieuwen.
+    var ref=document.getElementById("refresh"),rh=ref?ref.getBoundingClientRect().height:0;
+    var top=l.getBoundingClientRect().top+(window.scrollY||0)+(app?app.scrollTop:0)-rh;
+    if(top>0){var v=Math.round(top+392-256),root=document.documentElement;
+      if(Math.abs(v-(fit.last||0))>2){fit.last=v;root.style.setProperty("--listTopOffset",v+"px");}}
   }
+  // Na het vernieuwen klapt het balkje dicht (0,2 s): daarna nog één keer meten.
+  try{var rf=document.getElementById("refresh");if(rf)rf.addEventListener("transitionend",function(){fit();});}catch(e){}
   window.addEventListener("resize",fit);
+  window.__listFit=fit;
   if(typeof showList==="function"){var __o=showList;showList=function(){var r=__o.apply(this,arguments);fit();return r;};}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fit);else fit();
   setTimeout(fit,300);
@@ -20695,6 +20702,8 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
         if(tot){sub.querySelector(".t").textContent=dn+" van "+tot+" in je mandje";sub.querySelector(".mbBar i").style.width=Math.round(dn/tot*100)+"%";}
       }
     }catch(e){console.warn("lijst-indeling",e);}
+    // De regel "x van y in je mandje" kan net verschenen zijn: hoogte van de lijst opnieuw meten.
+    try{if(window.__listFit)window.__listFit();}catch(e){}
     setTimeout(function(){busy=false;},0);
   }
   var raf=0;
