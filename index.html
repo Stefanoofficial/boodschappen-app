@@ -6525,7 +6525,8 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
 <style id="boot-no-jump">
 /* Bij het openen: de lijst pas tonen als de nieuwe indeling klaar is (geen oude balk die even verspringt). */
 html:not(.mbLayoutReady) .headerBar,html:not(.mbLayoutReady) .input-row-wrap,html:not(.mbLayoutReady) .searchBox,html:not(.mbLayoutReady) #list,html:not(.mbLayoutReady) #shopTabs,html:not(.mbLayoutReady) #status{opacity:0!important;pointer-events:none!important}
-html.mbLayoutReady .headerBar,html.mbLayoutReady .input-row-wrap,html.mbLayoutReady #list,html.mbLayoutReady #status{animation:mbBootIn .18s ease-out}
+/* Alleen bij het opstarten even infaden (niet bij elke wissel tussen Lijst en Overzicht). */
+html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list,html.mbBootFade #status{animation:mbBootIn .18s ease-out}
 @keyframes mbBootIn{from{opacity:0}to{opacity:1}}
 </style>
 <script>setTimeout(function(){document.documentElement.classList.add("mbLayoutReady");},3000);</script>
@@ -20710,7 +20711,7 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
     }
     run();
     // Klaar: nu pas de lijst laten zien (zie boot-no-jump bovenin).
-    requestAnimationFrame(function(){document.documentElement.classList.add("mbLayoutReady");});
+    requestAnimationFrame(function(){var h=document.documentElement;h.classList.add("mbLayoutReady","mbBootFade");setTimeout(function(){h.classList.remove("mbBootFade");},400);});
   }
   // Meteen starten (de lijst staat al in de pagina), niet wachten tot alle plaatjes en lettertypes geladen zijn.
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
