@@ -20415,7 +20415,10 @@ html body #list #listProgress{display:none!important}
 html body .app .searchBox{display:none!important}
 /* Eén veld: scannen zit in het veld, + ernaast */
 html body .input-row{position:relative}
-html body .input-row #product{padding-right:50px!important}
+html body .input-row #product{padding-right:50px!important;padding-left:51px!important}
+/* Hetzelfde vergrootglas als het oude zoekveld */
+#mbSearchIcon{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:22px;color:#9aa19d;pointer-events:none;z-index:2;line-height:1}
+body.dark-theme #mbSearchIcon{color:#8f9a93}
 #mbScanBtn{position:absolute;top:50%;transform:translateY(-50%);right:68px;width:40px;height:40px;border:0;background:transparent;color:#3F5B45;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;z-index:2;cursor:pointer}
 #mbScanBtn[hidden]{display:none}
 html body .input-row button.add{flex:0 0 56px!important;width:56px!important;min-width:56px!important;padding:0!important;font-size:0!important;display:flex!important;align-items:center;justify-content:center}
@@ -20471,6 +20474,8 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
     b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();try{openBarcodeScanner();}catch(_){}});
     try{if(localStorage.getItem("boodschappenScannerEnabled")==="false")b.hidden=true;}catch(_){}
     row.insertBefore(b,add||null);
+    var mg=document.createElement("i");mg.id="mbSearchIcon";mg.className="fa-solid fa-magnifying-glass";mg.setAttribute("aria-hidden","true");
+    row.insertBefore(mg,row.firstChild);
     // Typen = ook zoeken in je lijst
     var t=null;
     function sync(){var si=document.getElementById("searchInput");if(!si)return;var v=inp.value.trim();if(si.value===v)return;si.value=v;try{searchList();}catch(_){}try{si.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}schedule();}
