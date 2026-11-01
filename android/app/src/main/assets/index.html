@@ -4653,6 +4653,9 @@ body.dark-theme .overviewSavedListLine{color:#c2ccc5;border-bottom-color:rgba(25
 .clearListCancel{background:#eef0ef;color:#344039}
 .clearListConfirm{background:#b6534a;color:#fff}
 .clearListConfirm i{margin-right:6px}
+/* "Alleen <winkel> wissen": eigen rij met dezelfde ruimte (10px) als tussen de andere knoppen */
+html body #clearListOnlyShop{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 10px!important;border:0;border-radius:15px;padding:12px 10px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;background:#f6ebe9;color:#a9544b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark-theme #clearListOnlyShop{background:#3a2a28;color:#f0b8b0}
 body.dark-theme .clearListSheet{background:#202923;color:#e5ece7}
 body.dark-theme .clearListSheet h2{color:#bfe0c9}
 body.dark-theme .clearListSheet p{color:#b6c1ba}
@@ -5319,6 +5322,7 @@ body.dark-theme #status{color:#9fb8a6!important;background:transparent!important
 .frequentChip .plus{font-weight:700;color:#3f7a50}
 .frequentChip .fIcon{font-size:17px;line-height:1;display:inline-flex}
 .frequentChip .fIcon svg{width:20px;height:20px}
+.frequentChip .fIcon .fPhoto{width:26px;height:26px;object-fit:contain;border-radius:6px;background:#fff;display:block;margin:-3px 0}
 .frequentChip:active{transform:scale(.97)}
 .frequentChip.frequentMore{padding:0 14px;color:#3f6b4b;background:#f4f8f5}
 .frequentChip.frequentMore i{font-size:11px}
@@ -9941,7 +9945,7 @@ const CATEGORY_ICONS = [
   [/(melk|yoghurt|kwark|vla|room|zuivel)/, "milk-carton"],
   [/(kaas)/, "cheese-block"],
   [/(boter)/, "butter-pack"],
-  [/(brood|bolletje|broodje|pistolet|croissant|beschuit)/, "bread-loaf"],
+  [/(brood|bolletje|broodje|pistolet|croissant|beschuit|tijger|casino|waldkorn|(wit|bruin|volkoren|meergranen) (heel|half))/, "bread-loaf"],
   [/(kip|kalkoen)/, "🍗"],
   [/(vlees|worst|gehakt|burger|schnitzel|filet|biefstuk|spek|ham)/, "🥩"],
   [/(vis|zalm|tonijn|garnaal|garnalen|haring|kabeljauw)/, "🐟"],
@@ -17611,7 +17615,9 @@ body.proPaidMode .onlyFree{display:none!important}
     try{if(typeof readOverviewHistory==="function"){var h=await readOverviewHistory();sources=sources.concat((h||[]).map(function(x){return x.items||[];}));}}catch(e){}
     try{if(typeof readSavedLists==="function"){var sv=await readSavedLists();sources=sources.concat((sv||[]).map(function(x){return x.items||[];}));}}catch(e){}
     var counts={};
-    sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;(counts[k]=counts[k]||{text:t,n:0}).n++;});});
+    sources.forEach(function(list){var seen={};(list||[]).forEach(function(it){var t=typeof it==="string"?it:(it&&it.text);if(!t)return;t=String(t).trim();var k=norm(t);if(!k||seen[k])return;seen[k]=1;var c=(counts[k]=counts[k]||{text:t,n:0});c.n++;
+      // Had het product een foto (aanbieding uit de Folder)? Die tonen we bij "Snel opnieuw toevoegen".
+      var im=it&&it.deal&&it.deal.img;if(!c.img&&typeof im==="string"&&/^https:\/\//i.test(im)&&im.length<=600)c.img=im;});});
     cache=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n||a.text.localeCompare(b.text,"nl");});
     cacheAt=cache.length?Date.now():0;busy=false;
     if(cache.length)persist({freq:cache.slice(0,40)});
@@ -17620,6 +17626,12 @@ body.proPaidMode .onlyFree{display:none!important}
   }
   function onList(){var m={};try{(Array.isArray(boodschappen)?boodschappen:[]).forEach(function(x){if(x&&x.text)m[norm(x.text)]=1;});}catch(e){}return m;}
   function icon(t){try{return productIconMarkup(getProductIcon(t));}catch(e){return "";}}
+  function iconFor(p){
+    if(p&&p.img)return '<img class="fPhoto" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(p.img)+'" data-t="'+esc(p.text)+'">';
+    return icon(p&&p.text);
+  }
+  // Foto kan niet laden (offline, verlopen link): dan het gewone icoontje.
+  document.addEventListener("error",function(e){var im=e.target;if(im&&im.classList&&im.classList.contains("fPhoto")){var sp=im.parentNode;if(sp)sp.innerHTML=icon(im.getAttribute("data-t")||"");}},true);
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function onListView(){var a=document.querySelector(".app");return a&&!a.classList.contains("overview-active")&&!a.classList.contains("more-active");}
   async function render(){
@@ -17639,7 +17651,7 @@ body.proPaidMode .onlyFree{display:none!important}
     if(!pick.length&&!showR){box.hidden=true;return;}
     box.innerHTML='<div class="frequentTitle">Snel opnieuw toevoegen</div><div class="frequentChips">'+
       (showR?'<button type="button" class="frequentChip routineChip"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>Vaste boodschappen ('+routine.length+')</button>':'')+pick.map(function(p){
-      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+(pick.length?'<button type="button" class="frequentChip frequentMore">Meer <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>':'')+'</div>';
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+iconFor(p)+'</span>'+esc(p.text)+'</button>';}).join("")+(pick.length?'<button type="button" class="frequentChip frequentMore">Meer <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>':'')+'</div>';
     box.hidden=false;
     var rc=box.querySelector(".routineChip");if(rc)rc.onclick=function(e){e.stopPropagation();if(window.openRoutinePicker)window.openRoutinePicker();};
     var mo=box.querySelector(".frequentMore");if(mo)mo.onclick=function(e){e.stopPropagation();try{if(typeof openQuickAddFromOverview==="function"){openQuickAddFromOverview();return;}}catch(err){}try{showOverviewView();}catch(err){}};
@@ -17662,7 +17674,7 @@ body.proPaidMode .onlyFree{display:none!important}
       return;
     }
     box.innerHTML='<div class="frequentChips overviewQuickChips">'+pick.map(function(p){
-      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+icon(p.text)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
+      return '<button type="button" class="frequentChip" data-t="'+esc(p.text)+'"><span class="plus">+</span><span class="fIcon">'+iconFor(p)+'</span>'+esc(p.text)+'</button>';}).join("")+'</div>';
     box.querySelectorAll(".frequentChip").forEach(function(b){b.onclick=async function(e){
       e.stopPropagation();var inp=document.getElementById("product");if(!inp||typeof addProduct!=="function")return;
       inp.value=b.getAttribute("data-t");b.disabled=true;b.classList.add("added");await addProduct();};});
@@ -20218,7 +20230,10 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
         var sheet=document.getElementById("clearListSheet"),desc=document.getElementById("clearListDescription");
         var x=document.getElementById("clearListOnlyShop");
         if(!desc.dataset.orig)desc.dataset.orig=desc.textContent;
-        if(!on()){if(x)x.remove();desc.textContent=desc.dataset.orig;return r;}
+        var cf=sheet.querySelector(".clearListConfirm");
+        if(!on()){if(x)x.remove();desc.textContent=desc.dataset.orig;if(cf)cf.innerHTML='<i class="fa-solid fa-trash-can"></i> Lijst wissen';return r;}
+        // Met meerdere winkels: de rode knop wist alles, dat zeggen we er ook bij.
+        if(cf)cf.innerHTML='<i class="fa-solid fa-trash-can"></i> Alles wissen';
         var keys=tabKeys(),act=active(keys);
         desc.textContent="Je wist de lijsten van al je winkels ("+keys.map(nameOf).join(", ")+"). Of wis alleen de lijst van "+nameOf(act)+".";
         if(!x){x=document.createElement("button");x.type="button";x.id="clearListOnlyShop";x.className="clearListCancel clearListOnlyShop";
