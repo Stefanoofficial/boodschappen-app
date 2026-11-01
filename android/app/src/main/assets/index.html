@@ -18182,7 +18182,13 @@ body.proPaidMode .onlyFree{display:none!important}
     // anders verspringt de hoogte van de lijst (en "Bijgewerkt om") na het vernieuwen.
     var ref=document.getElementById("refresh"),rh=ref?ref.getBoundingClientRect().height:0;
     var top=l.getBoundingClientRect().top+(window.scrollY||0)+(app?app.scrollTop:0)-rh;
-    if(top>0){var v=Math.round(top+392-256),root=document.documentElement;
+    // Ruimte onder de lijst: de echte hoogte van de balk onderin (op iPhone met de veilige rand eronder),
+    // de regel "Bijgewerkt om" en 28 px lucht, zodat die regel niet tegen de balk aan zit.
+    var reserve=136;
+    try{var nav=document.querySelector(".bottomNav"),st=document.getElementById("status");
+      var nr=nav&&nav.getBoundingClientRect(),vh=window.innerHeight||document.documentElement.clientHeight;
+      if(nr&&nr.height>0&&nr.top>0){var sh=st&&st.offsetHeight?st.offsetHeight:30;reserve=Math.max(136,Math.round((vh-nr.top)+sh+4+28));}}catch(e){}
+    if(top>0){var v=Math.round(top+reserve),root=document.documentElement;
       if(Math.abs(v-(fit.last||0))>2){fit.last=v;root.style.setProperty("--listTopOffset",v+"px");}}
   }
   // Na het vernieuwen klapt het balkje dicht (0,2 s): daarna nog één keer meten.
