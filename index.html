@@ -11075,8 +11075,14 @@ let pulling = false;
 const appScroll = document.querySelector('.app');
 
 if (appScroll) {
+  // De lijst scrolt in zijn eigen vak. Scrol je daarin terug omhoog, dan is dat géén "trek om te vernieuwen".
+  const listBox = () => document.getElementById("list");
+  const listScrolled = () => { const l = listBox(); return !!(l && l.scrollTop > 0); };
   appScroll.addEventListener("touchstart", function(e) {
+    pulling = false;
     if (appScroll.classList.contains("more-active")) return;
+    const inList = e.target && e.target.closest && e.target.closest("#list");
+    if (inList && listScrolled()) return;
     if (appScroll.scrollTop <= 0 && e.touches.length === 1) {
       startY = e.touches[0].clientY;
       pulling = true;
@@ -11085,6 +11091,7 @@ if (appScroll) {
 
   appScroll.addEventListener("touchmove", function(e) {
     if (!pulling || appScroll.classList.contains("more-active")) return;
+    if (listScrolled()) { pulling = false; const r0 = document.getElementById("refresh"); if (r0) r0.style.height = "0"; return; }
     const distance = e.touches[0].clientY - startY;
     if (distance > 0 && distance < 100) {
       const refresh = document.getElementById("refresh");
