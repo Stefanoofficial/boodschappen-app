@@ -18642,6 +18642,7 @@ html body .app.more-active > #moreView.mbTabFromRight{animation:tabSlideInFromRi
 .mbFSheetRow .mbFAdd{position:static;flex:0 0 36px}
 body.dark-theme .mbFolderSearch{background:#202923}body.dark-theme .mbFolderSearch input{color:#e6efe8}
 body.dark-theme .mbFSheet{background:#1f2a23}body.dark-theme .mbFSheet h3,body.dark-theme .mbFSheetTxt b{color:#e6efe8}body.dark-theme .mbFSheetRow{border-color:#2f3b33}
+.mbFrom{font-size:12px;font-weight:600;color:#7a8a7f}
 body.dark-theme .mbFVar{background:#202923;border-color:#38453b;color:#cfe3d4}body.dark-theme .mbFCard.multi{box-shadow:4px 4px 0 -1px #171d19,4px 4px 0 0 #2c3b31}
 .mbFolderNote{font-size:12px;color:#8a978e;text-align:center;margin:6px 0 0}
 .overviewFolderCard{display:block;width:100%;text-align:left;font:inherit;cursor:pointer}.overviewFolderCard .overview-new-folder{background:#fdecec;color:#d64545}body.dark-theme .overviewFolderCard .overview-new-folder{background:#3a2626;color:#f19a9a}
@@ -18673,7 +18674,15 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     ["huishouden","Huishouden & verzorging","🧴",/drogist|verzorg|huishoud|schoonmaak|baby|dier|cosmetic|wasmiddel|gezondheid|hygi|non-food|nonfood/],
     ["overig","Overig","🧺",/./]
   ];
-  var mem={},ov=null,sheet=null,state={shop:"",cat:"all",open:{},q:""},photoOpen=false;
+  var mem={},ov=null,sheet=null,state={shop:"",cat:"all",open:{},q:""},photoOpen=false,CATS={};
+  // De groepen zijn de categorieën van PrijsProfeet zelf (met hun eigen naam). Hier alleen icoon + winkelvolgorde.
+  var CAT_LOOK=[[/^groente/,"🍎"],[/^aardappel/,"🥔"],[/brood|bakker/,"🍞"],[/ontbijt|beleg/,"🥣"],[/vlees|vis|vega/,"🍗"],[/^kaas/,"🧀"],[/zuivel|eier/,"🥛"],[/maaltijd/,"🥗"],[/pasta|rijst|wereld/,"🍝"],[/soep|conserv|saus/,"🥫"],[/bak|kruid|olie/,"🧂"],[/diepvries/,"❄️"],[/snoep|koek|chips|chocola|snack|noten/,"🍪"],[/frisdrank|sap|water/,"🥤"],[/koffie|thee/,"☕"],[/^bier/,"🍺"],[/wijn|sterke/,"🍷"],[/baby|kind/,"🍼"],[/huisdier|dier/,"🐾"],[/haar/,"💇"],[/huid|zon/,"🧴"],[/deo/,"🧴"],[/mond|tand/,"🪥"],[/gezond/,"💊"],[/drogist|verzorg/,"🧴"],[/huishoud|schoonmaak|was/,"🧽"]];
+  function catLook(slug){slug=String(slug||"").toLowerCase();for(var i=0;i<CAT_LOOK.length;i++)if(CAT_LOOK[i][0].test(slug))return {i:i,e:CAT_LOOK[i][1]};return {i:90,e:"🧺"};}
+  function niceSlug(slug){var w=String(slug||"").split("-").filter(Boolean);if(!w.length)return "Overig";var t=w.length>1?w.slice(0,-1).join(", ")+" & "+w[w.length-1]:w[0];return t.charAt(0).toUpperCase()+t.slice(1);}
+  function groupList(by){
+    return Object.keys(by).map(function(k){var L=catLook(k),c=CATS[k];return k==="overig"?[k,"Overig","🧺",null,999]:[k,(c&&c.name)||niceSlug(k),L.e,null,L.i];})
+      .sort(function(a,b){return (a[4]-b[4])||a[1].localeCompare(b[1],"nl");});
+  }
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
   function slugs(){try{return window.__budgetRetailerSlugs||{};}catch(e){return {};}}
@@ -18684,7 +18693,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     return f.filter(function(k){return s[k];});
   }
   function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
-  function groupOf(p){var c=String(p.unified_category||"").toLowerCase();for(var i=0;i<GROUPS.length-1;i++)if(GROUPS[i][3].test(c))return GROUPS[i][0];return "overig";}
+  function groupOf(p){var c=String(p.unified_category||"").toLowerCase().trim();return c&&c!=="food"?c:"overig";}
   function clean(name){name=String(name||"");return name.indexOf("|")>=0?name.split("|").map(function(x){return x.trim();}).filter(Boolean).join(" "):name;}
   function promoText(p){var k=String(p.promotion||(p.promotional_keywords||[])[0]||"").trim();return k;}
   function pct(p){var o=Number(p.original_price),n=Number(p.price);return o>n&&n>0?Math.round((1-n/o)*100):0;}
@@ -18692,10 +18701,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function untilTxt(iso){var m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return "";var d=new Date(+m[1],+m[2]-1,+m[3]);var D=["zo","ma","di","wo","do","vr","za"],M=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];return "t/m "+D[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
   function readCache(slug){
     if(mem[slug]&&Date.now()-mem[slug].at<CACHE_MS)return mem[slug].rows;
-    try{var c=JSON.parse(localStorage.getItem("mbFolder2_"+slug)||"null");if(c&&Date.now()-c.at<CACHE_MS&&Array.isArray(c.rows)){mem[slug]=c;return c.rows;}}catch(e){}
+    try{var c=JSON.parse(localStorage.getItem("mbFolder3_"+slug)||"null");if(c&&Date.now()-c.at<CACHE_MS&&Array.isArray(c.rows)){mem[slug]=c;if(c.cats)Object.keys(c.cats).forEach(function(k){CATS[k]=c.cats[k];});return c.rows;}}catch(e){}
     return null;
   }
-  function writeCache(slug,rows){var c={at:Date.now(),rows:rows};mem[slug]=c;try{localStorage.setItem("mbFolder2_"+slug,JSON.stringify(c));}catch(e){}}
+  function writeCache(slug,rows){var c={at:Date.now(),rows:rows,cats:CATS};mem[slug]=c;try{localStorage.removeItem("mbFolder2_"+slug);localStorage.setItem("mbFolder3_"+slug,JSON.stringify(c));}catch(e){}}
   async function getJson(url){
     var ctrl=typeof AbortController!=="undefined"?new AbortController():null,t=ctrl?setTimeout(function(){ctrl.abort();},15000):null;
     try{var r=await fetch(url,{headers:{Accept:"application/json"},signal:ctrl?ctrl.signal:undefined});if(t)clearTimeout(t);return r;}catch(e){if(t)clearTimeout(t);throw e;}
@@ -18704,7 +18713,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var hit=readCache(slug);if(hit)return hit;
     var rows=null,r;
     try{r=await getJson(PROXY+"/folder?retailer="+encodeURIComponent(slug));
-      if(r.ok){var d=await r.json();rows=d.results||[];}
+      if(r.ok){var d=await r.json();rows=d.results||[];if(Array.isArray(d.categories))d.categories.forEach(function(c){if(c&&c.slug)CATS[c.slug]={name:c.name};});}
       else if(r.status===429){var e=new Error("429");e.status=429;throw e;}
     }catch(e){if(e&&e.status===429)throw e;}
     if(!rows){ // Terugval: oude Worker zonder /folder
@@ -18733,17 +18742,23 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function bundle(rows){
     var map={},out=[];
     rows.forEach(function(p){
-      var k=groupOf(p)+"|"+norm(brandOf(p))+"|"+norm(promoText(p))+"|"+Number(p.price)+"|"+Number(p.original_price||0);
+      // De winkel zegt zelf welke producten bij één actie horen (promo_group_id). Zonder die id: merk + actie + prijs.
+      var k=p.promo_group_id?"pg|"+p.promo_group_id:groupOf(p)+"|"+norm(brandOf(p))+"|"+norm(promoText(p))+"|"+Number(p.price)+"|"+Number(p.original_price||0);
       if(!map[k]){map[k]={items:[],key:k};out.push(map[k]);}
       map[k].items.push(p);
     });
     out.forEach(function(b){
-      var r=b.items[0];b.rep=r;b.group=groupOf(r);
+      var r=b.items[0];b.rep=r;
+      // Groep van de actie = de categorie waar de meeste soorten in vallen.
+      var cnt={};b.items.forEach(function(x){var g=groupOf(x);cnt[g]=(cnt[g]||0)+1;});b.group=Object.keys(cnt).sort(function(a,c){return (a==="overig")-(c==="overig")||cnt[c]-cnt[a];})[0];
+      var pr=b.items.map(function(x){return Number(x.price);});b.min=Math.min.apply(null,pr);b.vanaf=b.min!==Math.max.apply(null,pr);
       if(b.items.length>1){
         // Naam: het deel dat alle namen gemeen hebben ("Beemster Kaas..."), anders het merk.
         var words=b.items.map(function(x){return String(x.name).split(/\s+/);}),pre=[];
         for(var i=0;i<words[0].length;i++){var w=words[0][i];if(words.every(function(a){return a[i]&&a[i].toLowerCase()===w.toLowerCase();}))pre.push(w);else break;}
-        b.name=pre.length>=2?pre.join(" "):(brandOf(r)||r.name);
+        // Eén actie met verschillende merken: noem de merken ("Pantene / Head & Shoulders"), niet alleen de eerste.
+        var brands=[];b.items.forEach(function(x){var br=brandOf(x);if(br&&brands.map(norm).indexOf(norm(br))<0)brands.push(br);});
+        b.name=pre.length>=2?pre.join(" "):brands.length<=1?(brands[0]||r.name):brands.length===2?brands.join(" / "):brands[0]+" en meer";
       }else b.name=r.name;
     });
     return out;
@@ -18790,7 +18805,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var el=document.createElement("div");el.className="mbFCard"+(multi?" multi":"");
     el.innerHTML='<div class="mbFImg">'+(img?'<img alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'<span class="fallback">🛒</span>')+'</div>'+
       '<span class="mbFBadge">'+esc(badge(p))+'</span>'+(multi?'<span class="mbFVar">'+bd.items.length+' soorten</span>':'')+'<div class="mbFName">'+esc(bd.name)+'</div>'+
-      '<div class="mbFPrice"><b>'+money(p.price)+'</b>'+(Number(p.original_price)>Number(p.price)?'<s>'+money(p.original_price)+'</s>':'')+'</div>'+
+      '<div class="mbFPrice">'+(bd.vanaf?'<small class="mbFrom">vanaf </small><b>'+money(bd.min)+'</b>':'<b>'+money(p.price)+'</b>'+(Number(p.original_price)>Number(p.price)?'<s>'+money(p.original_price)+'</s>':''))+'</div>'+
       '<div class="mbFMeta">'+esc([p.quantity||"",untilTxt(p.valid_until)].filter(Boolean).join(" · "))+'</div>'+
       '<button type="button" class="mbFAdd" aria-label="Op je lijst"><span class="mbPlus" aria-hidden="true"></span></button>';
     var box=el.querySelector(".mbFImg");
@@ -18833,7 +18848,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     if(state.q){var qw=norm(state.q).split(" ").filter(Boolean);rows=rows.filter(function(p){var t=norm(p.name+" "+(p.brand||""));return qw.every(function(w){return t.indexOf(w)>=0;});});}
     var bundles=bundle(rows);
     var by={};bundles.forEach(function(bd){(by[bd.group]=by[bd.group]||[]).push(bd);});
-    var shown=GROUPS.filter(function(g){return by[g[0]]&&by[g[0]].length;});
+    var shown=groupList(by);
     var until=allRows.map(function(p){return p.valid_until||"";}).filter(Boolean).sort();
     ov.querySelector(".mbFolderHead span").textContent=until.length?untilTxt(until[Math.floor(until.length/2)]):"";
     if(!rows.length){b.innerHTML='<div class="mbFolderMsg">'+(state.q?'Geen aanbiedingen gevonden voor “'+esc(state.q)+'”.':'Er staan op dit moment geen aanbiedingen van '+esc(nameOf(state.shop))+' bij ons.')+'</div>';return;}
@@ -19906,7 +19921,8 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
         list.appendChild(h);
       }else{
         var rest=mine.filter(function(it){return !it.completed;}),done=mine.length-rest.length,others=keys.filter(function(k){return k!==act;});
-        if(rest.length&&done){
+        // Pas tegen het eind tonen (70% afgevinkt of nog maar 1 over), niet meteen na het eerste vinkje.
+        if(rest.length&&done&&(done/mine.length>=0.7||(rest.length===1&&done>=2))){
           var m=document.createElement("div");m.className="shopMoveRest";
           m.innerHTML='<span>'+rest.length+' niet gevonden?</span><button type="button">'+(others.length===1?'Naar '+esc(nameOf(others[0])):'Verplaatsen')+'</button>';
           ["click","pointerdown","touchstart"].forEach(function(ev){m.addEventListener(ev,function(e){e.stopPropagation();});});
