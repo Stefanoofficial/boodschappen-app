@@ -18596,6 +18596,9 @@ html body .app.more-active > #moreView.mbTabFromRight{animation:tabSlideInFromRi
 .mbFolderShops::-webkit-scrollbar,.mbFolderCats::-webkit-scrollbar{display:none}
 .mbFolderShops button{flex:0 0 auto;padding:9px 16px;border:0;border-radius:999px;background:#e4ece6;color:#2f4a38;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 .mbFolderShops button.on{background:#3F5B45;color:#fff}
+.mbFolderShops button.edit{padding:9px 13px;background:transparent;border:1px solid #d5e3d9;color:#5c7465}
+body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
+.mbFolderPick{margin-top:14px;padding:11px 20px;border:0;border-radius:999px;background:#3F5B45;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 .mbFolderCats button{flex:0 0 auto;padding:7px 12px;border:1px solid #d5e3d9;border-radius:999px;background:#fff;color:#2f4a38;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .mbFolderCats button.on{border-color:#3F5B45;background:#e8f3eb}
 .mbFolderCats button span{opacity:.6;margin-left:4px}
@@ -18687,9 +18690,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
   function slugs(){try{return window.__budgetRetailerSlugs||{};}catch(e){return {};}}
   function shops(){
-    var s=slugs(),f=[];try{f=window.__favShops?window.__favShops():[];}catch(e){}
-    if(!f.length){try{var v=(document.getElementById("budgetSupermarket")||{}).value;if(v)f=[v];}catch(e){}}
-    if(!f.length)f=["ah"];
+    // Precies de winkels uit "Mijn winkels". Haal je er een weg, dan verdwijnt hij ook hier.
+    var s=slugs(),f=[];
+    if(window.__favShops){try{f=window.__favShops()||[];}catch(e){f=[];}}
+    else{try{var v=(document.getElementById("budgetSupermarket")||{}).value;if(v)f=[v];}catch(e){}if(!f.length)f=["ah"];}
     return f.filter(function(k){return s[k];});
   }
   function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
@@ -18844,10 +18848,21 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   async function draw(){
     var b=body();if(!b)return;
     var list=shops();
-    ov.querySelector(".mbFolderShops").innerHTML=list.length>1?list.map(function(k){return '<button type="button" data-k="'+esc(k)+'" class="'+(k===state.shop?"on":"")+'">'+esc(nameOf(k))+'</button>';}).join(""):"";
-    ov.querySelector(".mbFolderShops").style.display=list.length>1?"":"none";
-    ov.querySelectorAll(".mbFolderShops button").forEach(function(x){x.onclick=function(){state.shop=x.getAttribute("data-k");state.cat="all";state.open={};state.catScroll=0;draw();};});
+    if(list.indexOf(state.shop)<0){state.shop=list[0]||"";state.cat="all";state.open={};state.catScroll=0;}
+    var shopRow=ov.querySelector(".mbFolderShops");
+    shopRow.innerHTML=list.map(function(k){return '<button type="button" data-k="'+esc(k)+'" class="'+(k===state.shop?"on":"")+'">'+esc(nameOf(k))+'</button>';}).join("")+
+      (list.length?'<button type="button" class="edit" aria-label="Mijn winkels wijzigen"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>':"");
+    shopRow.style.display=list.length?"":"none";
+    var sb=ov.querySelector(".mbFolderSearch");if(sb)sb.style.display=list.length?"":"none";
+    shopRow.querySelectorAll("button[data-k]").forEach(function(x){x.onclick=function(){state.shop=x.getAttribute("data-k");state.cat="all";state.open={};state.catScroll=0;draw();};});
+    var ed=shopRow.querySelector(".edit");if(ed)ed.onclick=function(e){e.stopPropagation();if(window.openShopPicker)window.openShopPicker();};
     var cats=ov.querySelector(".mbFolderCats");cats.innerHTML="";
+    if(!list.length){
+      ov.querySelector(".mbFolderHead span").textContent="";
+      b.innerHTML='<div class="mbFolderMsg">Je hebt nog geen winkels gekozen.<br>Kies je winkels en je ziet hier hun aanbiedingen.<br><button type="button" class="mbFolderPick">Winkels kiezen</button></div>';
+      b.querySelector(".mbFolderPick").onclick=function(e){e.stopPropagation();if(window.openShopPicker)window.openShopPicker();};
+      return;
+    }
     var slug=slugs()[state.shop];
     if(!slug){b.innerHTML='<div class="mbFolderMsg">Voor deze winkel hebben we nog geen folder.</div>';return;}
     var cached=readCache(slug);
@@ -18889,6 +18904,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   var prevNav="navList";
   function close(restore){closeSheet();if(!ov)return;var o=ov;ov=null;o.remove();document.documentElement.style.overflow="";document.documentElement.classList.remove("mbFolderOn");
     if(restore){try{setBottomNav(prevNav);}catch(e){}}}
+  window.__folderRefresh=function(){if(ov)draw();};
   window.openFolder=function(shopKey){
     try{
       if(ov)return;
@@ -20093,6 +20109,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
     if(changed){try{await saveList();}catch(e){}}
     try{if(window.__refreshBudgetUI)window.__refreshBudgetUI();}catch(e){}
     renderDealShops();
+    try{if(window.__folderRefresh)window.__folderRefresh();}catch(e){}
     var m=sel.length>=2?"Je winkels zijn opgeslagen. Elke winkel heeft nu een eigen lijst.":(sel.length?"Je winkel is opgeslagen.":"Je hebt geen winkels meer gekozen.");
     toast(m);
   }
