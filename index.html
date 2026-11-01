@@ -7353,7 +7353,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
-      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op Toevoegen. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
+      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op de groene <strong>+</strong>. Tijdens het typen zie je ook of het product al op je lijst staat. Met het streepjescode-icoon in het veld scan je een product. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-circle-check"></i><span>Een product afvinken</span></div>
@@ -7390,11 +7390,11 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder van deze week</span></div>
-      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld per groep (zoals zuivel, vlees en groente). Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld per groep (zoals zuivel, vlees en groente), met de grootste korting eerst. Hetzelfde merk met dezelfde actie staat samen op één kaart, bijvoorbeeld <strong>3 soorten</strong>: tik erop en kies de soort die je wilt. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten; wat al op je lijst staat, krijgt een groen vinkje. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
-      <p>Tik bovenaan op <strong>⋮</strong> om alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+      <p>Je lijst staat op volgorde van de winkel: per afdeling, zoals groente &amp; fruit, brood en zuivel. Tik bovenaan op <strong>⋮</strong> om binnen die afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren. Wat je afvinkt, gaat naar <strong>In je mandje</strong> onderaan; tik daarop om het open of dicht te klappen. Bovenaan onder de titel zie je hoeveel er al in je mandje zit.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
@@ -19607,9 +19607,9 @@ body:not(.logged-in) #mbNet{display:none}
 (function(){
   var steps=[
     {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In vijf korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
-    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Probeer het maar: typ wat je nodig hebt en tik op Toevoegen. Tijdens het typen krijg je suggesties."},
-    {sel:".searchBox",t:"Zoeken en scannen",i:"fa-barcode",p:"Zoek in je lijst, of tik op het streepjescode-icoon om een product te scannen. Probeer het gerust."},
-    {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Tik op het rondje naast een product om het af te vinken. Met − en + pas je het aantal aan."},
+    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Probeer het maar: typ wat je nodig hebt en tik op +. Tijdens het typen krijg je suggesties en zie je of het al op je lijst staat."},
+    {sel:"#mbScanBtn",t:"Scannen",i:"fa-barcode",p:"Tik op het streepjescode-icoon in het veld om een product te scannen. Probeer het gerust."},
+    {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Je lijst staat op volgorde van de winkel, per afdeling. Tik op het rondje om af te vinken: het product gaat naar In je mandje. Met − en + pas je het aantal aan."},
     {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier zie je je voortgang, je opgeslagen lijsten en producten die je vaak koopt. Tik er gerust op.",tap:"next"},
     {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, Pro met de weekplanner en 30 recepten, je instellingen en Help & uitleg. Tik er gerust op.",last:true,tap:"close"}
   ];
@@ -20353,8 +20353,17 @@ html body .dealPhotoClose,html body .recipeSheetClose{padding:0!important;displa
 html body .dealPhotoClose i,html body .recipeSheetClose i{display:block!important;width:1em!important;height:1em!important;line-height:1!important;margin:0!important;text-align:center!important}
 </style>
 <style id="header-and-accents">
-/* Kopbalk: alleen titel en ⋮-menu. "Lijst wissen" staat nu in het menu. */
+/* Kop van de lijst: geen donkergroen blok meer, maar een grote titel zoals Overzicht, Folder en Meer.
+   "Lijst wissen" staat in het ⋮-menu. */
 html body .headerBar #mainListTrashButton{display:none!important}
+html body .app .headerBar{background:transparent!important;box-shadow:none!important;border:0!important;padding:4px 2px 2px!important;min-height:0!important}
+html body .app .headerBar h1{color:#24392b!important;font-size:27px!important;font-weight:800!important;letter-spacing:-.01em;line-height:1.15!important;padding:4px 0!important;text-shadow:none!important}
+html body .app .headerBar #listOptionsButton{background:#fff!important;color:#3F5B45!important;border:0!important;border-radius:50%!important;width:44px!important;height:44px!important;flex:0 0 44px!important;box-shadow:0 2px 8px rgba(40,70,50,.10)!important}
+html body .app .headerBar #listOptionsButton i{color:#3F5B45!important}
+body.dark-theme .app .headerBar{background:transparent!important}
+body.dark-theme .app .headerBar h1{color:#e6efe8!important}
+body.dark-theme .app .headerBar #listOptionsButton{background:#24302a!important;box-shadow:0 2px 8px rgba(0,0,0,.3)!important}
+body.dark-theme .app .headerBar #listOptionsButton i{color:#cfe3d4!important}
 .listOptionDanger{color:#b3473e!important}.listOptionDanger i{color:#c95b52!important}
 body.dark-theme .listOptionDanger{color:#f0a49d!important}body.dark-theme .listOptionDanger i{color:#f0a49d!important}
 /* Fel groen accent waar iets gekozen, aan of klaar is */
@@ -20393,6 +20402,143 @@ body.dark-theme #list .item .itemProductContent .itemCheck.isChecked,body.dark-t
 body.dark-theme .listProgress .listProgressTrack .listProgressFill{background:var(--mb-accent)!important}
 body.dark-theme .dealAddBtn.done{color:#9fe3b3!important}
 </style>
+<style id="list-layout-style">
+/* Nieuwe indeling van de lijst: voortgang onder de titel, één veld, per afdeling, "In je mandje" ingeklapt. */
+html body .app .headerBar{align-items:flex-start!important}
+.mbHeadTitle{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+.mbListSub{display:flex;align-items:center;gap:10px;margin:2px 0 0;font-size:13px;font-weight:650;color:#5b6d61}
+.mbListSub[hidden]{display:none}
+.mbListSub .mbBar{flex:0 0 110px;height:6px;border-radius:9px;background:#dfe9e2;overflow:hidden}
+.mbListSub .mbBar i{display:block;height:100%;width:0;background:var(--mb-accent,#14BE4B);border-radius:9px;transition:width .3s ease}
+body.dark-theme .mbListSub{color:#b9c7bd}body.dark-theme .mbListSub .mbBar{background:#2c3b31}
+html body #list #listProgress{display:none!important}
+html body .app .searchBox{display:none!important}
+/* Eén veld: scannen zit in het veld, + ernaast */
+html body .input-row{position:relative}
+html body .input-row #product{padding-right:50px!important}
+#mbScanBtn{position:absolute;top:50%;transform:translateY(-50%);right:68px;width:40px;height:40px;border:0;background:transparent;color:#3F5B45;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;z-index:2;cursor:pointer}
+#mbScanBtn[hidden]{display:none}
+html body .input-row button.add{flex:0 0 56px!important;width:56px!important;min-width:56px!important;padding:0!important;font-size:0!important;display:flex!important;align-items:center;justify-content:center}
+html body .input-row button.add .mbPlus{width:18px;height:18px;color:#fff}
+html body .input-row button.add .mbPlus::before{width:18px;height:2.6px}html body .input-row button.add .mbPlus::after{width:2.6px;height:18px}
+body.dark-theme #mbScanBtn{color:#cfe3d4}
+/* Afdelingen */
+.mbCatHead{display:flex;align-items:center;gap:8px;margin:12px 6px 6px;font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b7d71}
+.mbCatHead:first-of-type{margin-top:4px}
+.mbCatHead .c{margin-left:auto;font-weight:700;letter-spacing:0}
+.mbCatHead .ic{flex:0 0 20px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+.mbCatHead .ic:empty{display:none}
+html body .mbCatHead .ic{overflow:hidden}html body .mbCatHead .ic *{max-width:20px!important;max-height:20px!important}html body .mbCatHead .ic svg,html body .mbCatHead .ic img,html body .mbCatHead .ic .productInlineIcon{width:20px!important;height:20px!important;min-width:0!important;min-height:0!important;margin:0!important;transform:none!important;position:static!important}html body .mbCatHead .ic span{font-size:16px!important;line-height:1!important}
+.mbCatHead[hidden]{display:none}
+body.dark-theme .mbCatHead{color:#9fb0a5}
+/* In je mandje */
+.mbDoneHead{display:flex;align-items:center;gap:10px;width:100%;margin:14px 0 6px;padding:12px 14px;border:0;border-radius:14px;background:rgba(255,255,255,.7);color:#3F5B45;font:inherit;font-size:15px;font-weight:750;cursor:pointer;text-align:left}
+.mbDoneHead .ok{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:var(--mb-accent,#14BE4B);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mbDoneHead .chev{margin-left:auto;color:#8a978e;transition:transform .2s}
+.mbDoneHead.open .chev{transform:rotate(180deg)}
+.mbDoneHead[hidden],.mbDoneList[hidden]{display:none!important}
+body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
+</style>
+<script id="list-layout">
+(function(){
+  /* Afdelingen in de volgorde van de winkel (zelfde volgorde als "Per categorie" sorteren). */
+  // Het icoontje bij een kopje komt uit de eigen iconen van de app (via een voorbeeldproduct).
+  var AISLES=[["appel","Groente & fruit"],["brood","Brood & bakkerij"],["kipfilet","Vlees & vis"],["kaas","Zuivel, eieren & kaas"],["pindakaas","Broodbeleg"],["pasta","Pasta, rijst & sauzen"],["chips","Snoep & koek"],["cola","Drinken"],["pizza","Diepvries"],["shampoo","Verzorging"],["wasmiddel","Huishouden"],["luiers","Baby & huisdier"]];
+  var OTHER=["","Overig"],KEY="boodschappenDoneOpen",busy=false,obs=null;
+  var iconCache={};
+  function headIcon(word){if(!word)return "";if(iconCache[word]!=null)return iconCache[word];var h="";try{h=productIconMarkup(getProductIcon(word))||"";}catch(e){}iconCache[word]=h;return h;}
+  function aisleOf(text){try{var a=typeof productAisle==="function"?productAisle(String(text||"")):99;return (a>=0&&a<AISLES.length)?a:99;}catch(e){return 99;}}
+  function doneOpen(){try{return localStorage.getItem(KEY)==="1";}catch(e){return false;}}
+  function visible(el){return !el.classList.contains("shopHidden")&&el.style.display!=="none";}
+  function nameOf(el){var n=el.querySelector(".productName");return n?n.textContent.trim():"";}
+
+  function setupHeader(){
+    var hb=document.querySelector(".headerBar"),h1=hb&&hb.querySelector("h1");
+    if(!hb||!h1||document.getElementById("mbListSub"))return;
+    var w=document.createElement("div");w.className="mbHeadTitle";
+    h1.parentNode.insertBefore(w,h1);w.appendChild(h1);
+    var sub=document.createElement("div");sub.id="mbListSub";sub.className="mbListSub";sub.hidden=true;
+    sub.innerHTML='<span class="t"></span><span class="mbBar"><i></i></span>';
+    w.appendChild(sub);
+  }
+  function setupField(){
+    var row=document.querySelector(".input-row"),inp=document.getElementById("product"),add=row&&row.querySelector("button.add");
+    if(!row||!inp||document.getElementById("mbScanBtn"))return;
+    inp.setAttribute("placeholder","Toevoegen of zoeken…");
+    if(add){add.innerHTML='<span class="mbPlus" aria-hidden="true"></span>';add.setAttribute("aria-label","Toevoegen");add.setAttribute("title","Toevoegen");}
+    var b=document.createElement("button");b.type="button";b.id="mbScanBtn";b.setAttribute("aria-label","Barcode scannen");b.title="Barcode scannen";
+    b.innerHTML='<i class="fa-solid fa-barcode" aria-hidden="true"></i>';
+    b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();try{openBarcodeScanner();}catch(_){}});
+    try{if(localStorage.getItem("boodschappenScannerEnabled")==="false")b.hidden=true;}catch(_){}
+    row.insertBefore(b,add||null);
+    // Typen = ook zoeken in je lijst
+    var t=null;
+    function sync(){var si=document.getElementById("searchInput");if(!si)return;var v=inp.value.trim();if(si.value===v)return;si.value=v;try{searchList();}catch(_){}try{si.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}schedule();}
+    inp.addEventListener("input",function(){clearTimeout(t);t=setTimeout(sync,120);});
+    window.__mbSyncSearch=sync;
+  }
+  function run(){
+    var list=document.getElementById("list");if(!list)return;
+    busy=true;
+    try{
+      setupHeader();
+      // Opruimen van de vorige keer
+      list.querySelectorAll(".mbCatHead,.mbDoneHead").forEach(function(n){n.remove();});
+      var dl=list.querySelector(".mbDoneList");if(dl){while(dl.firstChild)list.appendChild(dl.firstChild);dl.remove();}
+      var items=[].slice.call(list.querySelectorAll(":scope > .item"));
+      var extras=[].slice.call(list.querySelectorAll(":scope > .shopEmptyHint, :scope > .shopMoveRest"));
+      var act=items.filter(function(el){return !el.classList.contains("completed");}),done=items.filter(function(el){return el.classList.contains("completed");});
+      // Afdelingen
+      var groups={};act.forEach(function(el){var a=aisleOf(nameOf(el));(groups[a]=groups[a]||[]).push(el);});
+      var order=Object.keys(groups).map(Number).sort(function(a,b){return a-b;});
+      var showHeads=act.length>=1;
+      order.forEach(function(a){
+        var g=groups[a],vis=g.filter(visible).length,lab=a===99?OTHER:AISLES[a];
+        if(showHeads){var h=document.createElement("div");h.className="mbCatHead";h.innerHTML='<span class="ic" aria-hidden="true">'+headIcon(lab[0])+'</span><span>'+lab[1]+'</span><span class="c">'+vis+'</span>';h.hidden=!vis;list.appendChild(h);}
+        g.forEach(function(el){list.appendChild(el);});
+      });
+      extras.forEach(function(el){list.appendChild(el);});
+      // In je mandje
+      var si=document.getElementById("searchInput"),searching=!!(si&&si.value.trim());
+      var dv=done.filter(visible).length;
+      if(done.length){
+        var open=doneOpen()||searching;
+        var hd=document.createElement("button");hd.type="button";hd.className="mbDoneHead"+(open?" open":"");hd.hidden=!dv;
+        hd.innerHTML='<span class="ok"><i class="fa-solid fa-check" aria-hidden="true"></i></span><span>In je mandje ('+dv+')</span><i class="fa-solid fa-chevron-down chev" aria-hidden="true"></i>';
+        hd.setAttribute("aria-expanded",String(open));
+        hd.addEventListener("click",function(e){e.stopPropagation();var o=!doneOpen();try{localStorage.setItem(KEY,o?"1":"0");}catch(_){}schedule();});
+        var box=document.createElement("div");box.className="mbDoneList";box.hidden=!open||!dv;
+        done.forEach(function(el){box.appendChild(el);});
+        list.appendChild(hd);list.appendChild(box);
+      }
+      // Voortgang onder de titel (zelfde getallen als het oude blok, ook per winkel)
+      var sub=document.getElementById("mbListSub");
+      if(sub){
+        var p=document.getElementById("listProgress"),txt=p?p.textContent:"",m=txt.match(/(\d+)\s*van\s*(\d+)/);
+        var tot=m?+m[2]:0,dn=m?+m[1]:0;
+        sub.hidden=!tot;
+        if(tot){sub.querySelector(".t").textContent=dn+" van "+tot+" in je mandje";sub.querySelector(".mbBar i").style.width=Math.round(dn/tot*100)+"%";}
+      }
+    }catch(e){console.warn("lijst-indeling",e);}
+    setTimeout(function(){busy=false;},0);
+  }
+  var raf=0;
+  function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;run();});}
+  function start(){
+    setupHeader();setupField();
+    if(typeof showList==="function"){var o=showList;showList=function(){var r=o.apply(this,arguments);run();return r;};}
+    if(typeof addProduct==="function"){var oa=addProduct;addProduct=async function(){var r=await oa.apply(this,arguments);try{var inp=document.getElementById("product");if(inp&&!inp.value.trim()&&window.__mbSyncSearch)window.__mbSyncSearch();}catch(_){}return r;};}
+    var list=document.getElementById("list");
+    if(list&&window.MutationObserver){
+      // Wisselen van winkel of zoeken verandert alleen wat zichtbaar is: dan de kopjes bijwerken.
+      obs=new MutationObserver(function(ms){if(busy)return;for(var i=0;i<ms.length;i++){var t=ms[i].target;if(ms[i].type==="attributes"&&t.classList&&t.classList.contains("item")){schedule();return;}if(ms[i].type==="childList"&&t===list){schedule();return;}}});
+      obs.observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});
+    }
+    run();
+  }
+  if(document.readyState==="complete")start();else window.addEventListener("load",start);
+})();
+</script>
 </body>
 
 
