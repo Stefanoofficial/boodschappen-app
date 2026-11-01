@@ -18693,7 +18693,22 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     return f.filter(function(k){return s[k];});
   }
   function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
-  function groupOf(p){var c=String(p.unified_category||"").toLowerCase().trim();return c&&c!=="food"?c:"overig";}
+  // Correctie: PrijsProfeet deelt sommige ketens (Aldi, Hoogvliet, Vomar, Lidl) in op naam, en dan belandt
+  // appelsap of een smoothie soms bij groente & fruit. Drinken zetten we terug bij de dranken.
+  var DRINK=/(^| )([a-z]*sap|juice|smoothies?|limonade|siroop|ranja|frisdrank|ice ?tea|cola|water|spa|fruitdrank|vruchtendrank|energy ?drink|red bull|monster|appelsientje|roosvicee|capri ?sun|dubbelfris|taksi|tonic|cassis|sinas)( |$)/;
+  var NOT_DRINK=/(^| )op (sap|siroop|lichte siroop|water)( |$)|compote|moes|in blik|watermeloen|waterkers|siroopwafel/;
+  var VOLUME=/\d\s*(ml|cl|l|liter)( |$)/;
+  function drinkSlug(){var k=Object.keys(CATS).filter(function(x){return /frisdrank|sap|drank/.test(x)&&!/bier|wijn|sterke/.test(x);})[0];if(k)return k;CATS["frisdrank-sappen"]=CATS["frisdrank-sappen"]||{name:"Frisdrank & sappen"};return "frisdrank-sappen";}
+  function groupOf(p){
+    if(p.__g)return p.__g;
+    var c=String(p.unified_category||"").toLowerCase().trim();if(!c||c==="food")c="overig";
+    if(/^groente|^aardappel|^overig$/.test(c)){
+      var n=norm(p.name),q=norm(String(p.quantity||"").replace(/,/g,"."));
+      if(!NOT_DRINK.test(n)&&(DRINK.test(n)||(VOLUME.test(q+" ")&&/^groente|^aardappel/.test(c))))c=drinkSlug();
+    }
+    try{Object.defineProperty(p,"__g",{value:c,enumerable:false,configurable:true});}catch(e){}
+    return c;
+  }
   function clean(name){name=String(name||"");return name.indexOf("|")>=0?name.split("|").map(function(x){return x.trim();}).filter(Boolean).join(" "):name;}
   function promoText(p){var k=String(p.promotion||(p.promotional_keywords||[])[0]||"").trim();return k;}
   function pct(p){var o=Number(p.original_price),n=Number(p.price);return o>n&&n>0?Math.round((1-n/o)*100):0;}
