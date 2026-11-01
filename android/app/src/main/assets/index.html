@@ -7370,7 +7370,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
       <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. </p>
-      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Alleen de maker kan de lijst verwijderen met de prullenbak bovenaan; wie meedoet, ziet daar een deur-icoon om de lijst te verlaten. Verwijdert de maker de lijst, dan ga je vanzelf terug naar je eigen lijst. Heb je de lijst eerder als vaste lijst bewaard, dan blijft die kopie gewoon bij je Opgeslagen lijsten staan. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
+      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Alleen de maker kan de lijst verwijderen via <strong>⋮ → Gedeelde lijst verwijderen</strong>; wie meedoet, kiest daar <strong>Gedeelde lijst verlaten</strong>. Verwijdert de maker de lijst, dan ga je vanzelf terug naar je eigen lijst. Heb je de lijst eerder als vaste lijst bewaard, dan blijft die kopie gewoon bij je Opgeslagen lijsten staan. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
@@ -7378,7 +7378,7 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via de prullenbak bovenaan, wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis. Wil je alles weghalen? Tik in <strong>Overzicht → Geschiedenis</strong> onderaan op <strong>Geschiedenis wissen</strong> en bevestig.</p>
+      <p>Als je de volledige boodschappenlijst wist via <strong>⋮ → Lijst wissen</strong> (rechtsboven op je lijst), wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis. Wil je alles weghalen? Tik in <strong>Overzicht → Geschiedenis</strong> onderaan op <strong>Geschiedenis wissen</strong> en bevestig.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
@@ -7591,6 +7591,8 @@ body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .regist
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Bewaren</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
+      <div class="listOptionDivider" aria-hidden="true"></div>
+      <button type="button" id="menuClearList" class="listOptionItem listOptionDanger" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){var b=document.getElementById('mainListTrashButton');if(b)b.click();},220)"><i class="fa-solid fa-trash-can"></i><span>Lijst wissen</span></button>
     </div>
   </div>
 
@@ -11921,6 +11923,13 @@ function updateSharedDeleteButton(isOwner){
 
   const old = document.getElementById("deleteSharedListBtn");
   if(old) old.remove();
+  // Dezelfde actie staat nu in het ⋮-menu: tekst en icoon meenemen.
+  try{
+    const mi=document.getElementById("menuClearList");
+    if(mi){const sh=activeListType==="shared"&&currentSharedListId;
+      mi.querySelector("span").textContent=sh?(isOwner?"Gedeelde lijst verwijderen":"Gedeelde lijst verlaten"):"Lijst wissen";
+      mi.querySelector("i").className=sh&&!isOwner?"fa-solid fa-right-from-bracket":"fa-solid fa-trash-can";}
+  }catch(_){}
 }
 
 async function deleteCurrentSharedList(){
@@ -13904,7 +13913,7 @@ async function openShoppingHistoryFromOverview(){
   body.innerHTML="";
   if(!entries.length){
     overlay.classList.add("overview-history-empty");
-    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier. Vink na het boodschappen doen alles af en bewaar de ronde, of wis je lijst met de prullenbak bovenaan.</p></div>';
+    body.innerHTML='<div class="overviewHistoryEmptyContent"><div class="overviewHistoryEmptyTitle"><strong>Nog geen geschiedenis</strong></div><p>Je eerdere lijsten verschijnen hier. Vink na het boodschappen doen alles af en bewaar de ronde, of wis je lijst via ⋮ → Lijst wissen.</p></div>';
     __overviewOpenSheet(overlay);
     return;
   }
@@ -18604,9 +18613,36 @@ html body .app.more-active > #moreView.mbTabFromRight{animation:tabSlideInFromRi
 .mbFMeta{font-size:12px;color:#7a8a7f;margin-top:2px;padding-right:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mbFAdd{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;border:0;background:#3F5B45;color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .mbFAdd.done{background:#e3f1e7;color:#3F5B45;font-size:16px}
+/* Plusje getekend in plaats van een letterteken, zodat het altijd precies in het midden staat */
+.mbFAdd{padding:0;line-height:1}
+.mbPlus{position:relative;display:block;width:14px;height:14px}
+.mbPlus::before,.mbPlus::after{content:"";position:absolute;left:50%;top:50%;background:currentColor;border-radius:2px;transform:translate(-50%,-50%)}
+.mbPlus::before{width:14px;height:2.5px}.mbPlus::after{width:2.5px;height:14px}
 .mbFolderMsg{text-align:center;color:#6b7d71;padding:40px 10px;font-size:15px;line-height:1.5}
 .mbFolderSkel{height:250px;border-radius:16px;background:linear-gradient(90deg,#e8efe9 25%,#f3f7f4 50%,#e8efe9 75%);background-size:200% 100%;animation:mbfSk 1.2s infinite}
 @keyframes mbfSk{to{background-position:-200% 0}}
+.mbFolderSearch{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 12px;margin:0 0 12px;background:#fff;border-radius:14px;color:#8a978e;box-shadow:0 1px 3px rgba(40,70,50,.05)}
+.mbFolderSearch:focus-within{box-shadow:inset 0 0 0 1px #3c7a52,0 0 0 3px rgba(60,122,82,.14)}
+.mbFolderSearch input{flex:1;min-width:0;border:0!important;outline:0;background:transparent;font:inherit;font-size:16px;color:#24392b;box-shadow:none!important;-webkit-appearance:none;appearance:none}
+.mbFolderSearch input::-webkit-search-cancel-button{display:none}
+.mbFolderSearchClear{border:0;background:#e4ece6;color:#3F5B45;width:26px;height:26px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mbFolderSearchClear[hidden]{display:none}
+.mbFVar{position:absolute;top:40px;left:10px;background:#fff;border:1px solid #d5e3d9;color:#2f4a38;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mbFCard.multi{cursor:pointer;box-shadow:0 2px 8px rgba(40,70,50,.06),4px 4px 0 -1px #fff,4px 4px 0 0 #dfe8e2}
+.mbFSheetWrap{position:fixed;inset:0;z-index:100700}
+.mbFSheetBack{position:absolute;inset:0;background:rgba(20,30,24,.45);animation:mbcIn .18s ease-out}
+.mbFSheet{position:absolute;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:12px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.18);animation:mbcUp .24s cubic-bezier(.2,.8,.2,1)}
+.mbFSheetWrap.closing .mbFSheet{transform:translateY(100%);transition:transform .18s ease-in}.mbFSheetWrap.closing .mbFSheetBack{opacity:0;transition:opacity .18s}
+.mbFSheetHandle{width:40px;height:5px;border-radius:3px;background:#d5ded8;margin:0 auto 12px}
+.mbFSheet h3{margin:0 0 3px;font-size:19px;color:#24392b}.mbFSheetSub{color:#6b7d71;font-size:13px;margin-bottom:10px}
+.mbFSheetRow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #edf2ee}
+.mbFSheetImg{flex:0 0 56px;width:56px;height:56px;border-radius:10px;border:1px solid #e6eee8;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
+.mbFSheetImg img{width:100%;height:100%;object-fit:contain}
+.mbFSheetTxt{flex:1;min-width:0}.mbFSheetTxt b{display:block;color:#24392b;font-size:14.5px;line-height:1.25}.mbFSheetTxt small{display:block;color:#7a8a7f;font-size:12.5px;margin-top:2px}.mbFSheetTxt s{color:#9aa79f}
+.mbFSheetRow .mbFAdd{position:static;flex:0 0 36px}
+body.dark-theme .mbFolderSearch{background:#202923}body.dark-theme .mbFolderSearch input{color:#e6efe8}
+body.dark-theme .mbFSheet{background:#1f2a23}body.dark-theme .mbFSheet h3,body.dark-theme .mbFSheetTxt b{color:#e6efe8}body.dark-theme .mbFSheetRow{border-color:#2f3b33}
+body.dark-theme .mbFVar{background:#202923;border-color:#38453b;color:#cfe3d4}body.dark-theme .mbFCard.multi{box-shadow:4px 4px 0 -1px #171d19,4px 4px 0 0 #2c3b31}
 .mbFolderNote{font-size:12px;color:#8a978e;text-align:center;margin:6px 0 0}
 .overviewFolderCard{display:block;width:100%;text-align:left;font:inherit;cursor:pointer}.overviewFolderCard .overview-new-folder{background:#fdecec;color:#d64545}body.dark-theme .overviewFolderCard .overview-new-folder{background:#3a2626;color:#f19a9a}
 html.mbFolderOn .familyDialogOverlay{z-index:100800!important}html.mbFolderOn .pantryToast{z-index:100900!important}html.mbFolderOn .dealPhotoOverlay{z-index:101000!important}
@@ -18634,9 +18670,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     ["diepvries","Diepvries","❄️",/diepvries/],
     ["drinken","Drinken","🥤",/drank|frisdrank|sap|koffie|thee|water|bier|wijn|alcohol/],
     ["snoep","Snoep, koek & chips","🍪",/snoep|koek|chips|chocola|snack|noten/],
+    ["huishouden","Huishouden & verzorging","🧴",/drogist|verzorg|huishoud|schoonmaak|baby|dier|cosmetic|wasmiddel|gezondheid|hygi|non-food|nonfood/],
     ["overig","Overig","🧺",/./]
   ];
-  var mem={},ov=null,state={shop:"",cat:"all",open:{}},photoOpen=false;
+  var mem={},ov=null,sheet=null,state={shop:"",cat:"all",open:{},q:""},photoOpen=false;
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
   function slugs(){try{return window.__budgetRetailerSlugs||{};}catch(e){return {};}}
@@ -18682,33 +18719,95 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     rows=rows.filter(function(p){
       var st=String(p.retailer||"").toLowerCase().replace(/[^a-z0-9]/g,"");
       return (!st||st===key)&&Number.isFinite(Number(p.price))&&(!p.valid_from||p.valid_from<=today)&&(!p.valid_until||p.valid_until>=today);
-    }).map(function(p){p.name=clean(p.name||p.product_name||p.title);return p;});
+    }).map(function(p){p.name=clean(p.name||p.product_name||p.title);return p;}).filter(function(p){
+      // Opschonen: alleen echte acties (lagere prijs of een actietekst) en geen dubbele producten.
+      return p.name&&(Number(p.original_price)>Number(p.price)||promoText(p));
+    });
+    var seen={};rows=rows.filter(function(p){var k=norm(p.name)+"|"+Number(p.price);if(seen[k])return false;seen[k]=1;return true;});
     rows.sort(function(a,b){return pct(b)-pct(a);});
     writeCache(slug,rows);return rows;
   }
+  function norm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();}
+  function brandOf(p){var b=String(p.brand||"").trim();if(b)return b;return String(p.name||"").split(/\s+/)[0]||"";}
+  /* Varianten samenvoegen: zelfde merk + zelfde actie + zelfde prijs = één kaart (zoals in de apps van de supermarkten). */
+  function bundle(rows){
+    var map={},out=[];
+    rows.forEach(function(p){
+      var k=groupOf(p)+"|"+norm(brandOf(p))+"|"+norm(promoText(p))+"|"+Number(p.price)+"|"+Number(p.original_price||0);
+      if(!map[k]){map[k]={items:[],key:k};out.push(map[k]);}
+      map[k].items.push(p);
+    });
+    out.forEach(function(b){
+      var r=b.items[0];b.rep=r;b.group=groupOf(r);
+      if(b.items.length>1){
+        // Naam: het deel dat alle namen gemeen hebben ("Beemster Kaas..."), anders het merk.
+        var words=b.items.map(function(x){return String(x.name).split(/\s+/);}),pre=[];
+        for(var i=0;i<words[0].length;i++){var w=words[0][i];if(words.every(function(a){return a[i]&&a[i].toLowerCase()===w.toLowerCase();}))pre.push(w);else break;}
+        b.name=pre.length>=2?pre.join(" "):(brandOf(r)||r.name);
+      }else b.name=r.name;
+    });
+    return out;
+  }
   function photoFallback(box){box.classList.add("noImg");box.innerHTML='<span class="fallback">🛒</span>';}
-  function cardEl(p){
-    var shopKey=state.shop,img=/^https:\/\//i.test(String(p.image_url||""))?String(p.image_url).trim():"";
-    var el=document.createElement("div");el.className="mbFCard";
+  function imgOf(p){return /^https:\/\//i.test(String(p.image_url||""))?String(p.image_url).trim():"";}
+  function dealOf(p){return {name:p.name||"Product",term:p.name||"",price:Number(p.price),was:Number(p.original_price)||0,promo:promoText(p),until:p.valid_until||"",store:nameOf(state.shop),shop:state.shop,img:imgOf(p)};}
+  function onList(p){try{return !!(window.__dealOnList&&window.__dealOnList(dealOf(p)));}catch(e){return false;}}
+  async function addOne(p,btn,onDone){
+    var d=dealOf(p);btn.disabled=true;
+    var dd=d;try{if(window.__chooseShopList){var t=await window.__chooseShopList(d.shop,d.name);if(t===null){btn.disabled=false;return;}if(t)dd=Object.assign({},d,{shop:t});}}catch(err){}
+    var ok=false;try{ok=window.__addDealToList?await window.__addDealToList(dd):false;}catch(err){}
+    if(ok)onDone();else btn.disabled=false;
+  }
+  function bigPhoto(p){var img=imgOf(p);if(img&&window.__dealPhoto){photoOpen=true;window.__dealPhoto({src:img,name:p.name,store:nameOf(state.shop),price:money(p.price),was:Number(p.original_price)>Number(p.price)?money(p.original_price):""});}}
+  function closeSheet(){if(!sheet)return;var s0=sheet;sheet=null;s0.classList.add("closing");setTimeout(function(){s0.remove();},180);}
+  function openSheet(bd){
+    closeSheet();
+    var r=bd.rep,wrap=document.createElement("div");wrap.className="mbFSheetWrap";
+    wrap.innerHTML='<div class="mbFSheetBack"></div><div class="mbFSheet" role="dialog" aria-label="'+esc(bd.name)+'"><div class="mbFSheetHandle"></div>'+
+      '<h3>'+esc(bd.name)+'</h3><div class="mbFSheetSub">'+esc([badge(r)==="Actie"?"":badge(r),/%|korting/i.test(promoText(r))&&/%/.test(badge(r))?"":promoText(r),untilTxt(r.valid_until),nameOf(state.shop)].filter(function(x,i,arr){return x&&arr.indexOf(x)===i;}).join(" · "))+'</div><div class="mbFSheetList"></div></div>';
+    var list=wrap.querySelector(".mbFSheetList");
+    bd.items.forEach(function(p){
+      var row=document.createElement("div");row.className="mbFSheetRow";var img=imgOf(p);
+      row.innerHTML='<div class="mbFSheetImg">'+(img?'<img alt="" loading="lazy" referrerpolicy="no-referrer">':'<span>🛒</span>')+'</div>'+
+        '<div class="mbFSheetTxt"><b>'+esc(p.name)+'</b><small>'+money(p.price)+(p.quantity?' · '+esc(p.quantity):'')+(Number(p.original_price)>Number(p.price)?' <s>'+money(p.original_price)+'</s>':'')+'</small></div>'+
+        '<button type="button" class="mbFAdd" aria-label="Op je lijst"><span class="mbPlus" aria-hidden="true"></span></button>';
+      if(img){var im=row.querySelector("img");im.addEventListener("error",function(){row.querySelector(".mbFSheetImg").innerHTML="<span>🛒</span>";});im.src=img;
+        row.querySelector(".mbFSheetImg").addEventListener("click",function(e){e.stopPropagation();bigPhoto(p);});}
+      var b=row.querySelector(".mbFAdd");
+      function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i>';refreshCards();}
+      if(onList(p))done();
+      b.addEventListener("click",function(e){e.stopPropagation();if(!b.disabled)addOne(p,b,done);});
+      list.appendChild(row);
+    });
+    wrap.querySelector(".mbFSheetBack").addEventListener("click",function(e){e.stopPropagation();closeSheet();});
+    wrap.addEventListener("click",function(e){e.stopPropagation();});
+    document.body.appendChild(wrap);sheet=wrap;
+  }
+  function refreshCards(){try{if(ov)ov.querySelectorAll(".mbFCard").forEach(function(c){if(c.__refresh)c.__refresh();});}catch(e){}}
+  function cardEl(bd){
+    var p=bd.rep,multi=bd.items.length>1;
+    var shopKey=state.shop,img=imgOf(p);
+    var el=document.createElement("div");el.className="mbFCard"+(multi?" multi":"");
     el.innerHTML='<div class="mbFImg">'+(img?'<img alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'<span class="fallback">🛒</span>')+'</div>'+
-      '<span class="mbFBadge">'+esc(badge(p))+'</span><div class="mbFName">'+esc(p.name)+'</div>'+
+      '<span class="mbFBadge">'+esc(badge(p))+'</span>'+(multi?'<span class="mbFVar">'+bd.items.length+' soorten</span>':'')+'<div class="mbFName">'+esc(bd.name)+'</div>'+
       '<div class="mbFPrice"><b>'+money(p.price)+'</b>'+(Number(p.original_price)>Number(p.price)?'<s>'+money(p.original_price)+'</s>':'')+'</div>'+
       '<div class="mbFMeta">'+esc([p.quantity||"",untilTxt(p.valid_until)].filter(Boolean).join(" · "))+'</div>'+
-      '<button type="button" class="mbFAdd" aria-label="Op je lijst">+</button>';
+      '<button type="button" class="mbFAdd" aria-label="Op je lijst"><span class="mbPlus" aria-hidden="true"></span></button>';
     var box=el.querySelector(".mbFImg");
-    if(img){var im=box.querySelector("img");im.addEventListener("error",function(){photoFallback(box);});im.src=img;
-      box.addEventListener("click",function(e){e.stopPropagation();if(window.__dealPhoto){photoOpen=true;window.__dealPhoto({src:img,name:p.name,store:nameOf(shopKey),price:money(p.price),was:Number(p.original_price)>Number(p.price)?money(p.original_price):""});}});}
+    if(img){var im=box.querySelector("img");im.addEventListener("error",function(){photoFallback(box);});im.src=img;}
     else box.classList.add("noImg");
-    var d={name:p.name||"Product",term:p.name||"",price:Number(p.price),was:Number(p.original_price)||0,promo:promoText(p),until:p.valid_until||"",store:nameOf(shopKey),shop:shopKey,img:img};
     var b=el.querySelector(".mbFAdd");
-    function done(){b.classList.add("done");b.disabled=true;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i>';b.setAttribute("aria-label","Staat op je lijst");}
-    try{if(window.__dealOnList&&window.__dealOnList(d))done();}catch(e){}
-    b.addEventListener("click",async function(e){
-      e.stopPropagation();if(b.disabled)return;b.disabled=true;
-      var dd=d;try{if(window.__chooseShopList){var t=await window.__chooseShopList(d.shop,d.name);if(t===null){b.disabled=false;return;}if(t)dd=Object.assign({},d,{shop:t});}}catch(err){}
-      var ok=false;try{ok=window.__addDealToList?await window.__addDealToList(dd):false;}catch(err){}
-      if(ok)done();else b.disabled=false;
-    });
+    function done(){b.classList.add("done");b.disabled=!multi;b.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i>';b.setAttribute("aria-label","Staat op je lijst");}
+    el.__refresh=function(){if(bd.items.some(onList))done();};
+    el.__refresh();
+    if(multi){
+      // Meerdere soorten: tik op de kaart (of +) en kies de soort.
+      el.addEventListener("click",function(e){e.stopPropagation();openSheet(bd);});
+      b.addEventListener("click",function(e){e.stopPropagation();openSheet(bd);});
+    }else{
+      if(img)box.addEventListener("click",function(e){e.stopPropagation();bigPhoto(p);});
+      b.addEventListener("click",function(e){e.stopPropagation();if(!b.disabled)addOne(p,b,done);});
+    }
     return el;
   }
   function body(){return ov&&ov.querySelector(".mbFolderBody");}
@@ -18717,7 +18816,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var list=shops();
     ov.querySelector(".mbFolderShops").innerHTML=list.length>1?list.map(function(k){return '<button type="button" data-k="'+esc(k)+'" class="'+(k===state.shop?"on":"")+'">'+esc(nameOf(k))+'</button>';}).join(""):"";
     ov.querySelector(".mbFolderShops").style.display=list.length>1?"":"none";
-    ov.querySelectorAll(".mbFolderShops button").forEach(function(x){x.onclick=function(){state.shop=x.getAttribute("data-k");state.cat="all";state.open={};draw();};});
+    ov.querySelectorAll(".mbFolderShops button").forEach(function(x){x.onclick=function(){state.shop=x.getAttribute("data-k");state.cat="all";state.open={};state.catScroll=0;draw();};});
     var cats=ov.querySelector(".mbFolderCats");cats.innerHTML="";
     var slug=slugs()[state.shop];
     if(!slug){b.innerHTML='<div class="mbFolderMsg">Voor deze winkel hebben we nog geen folder.</div>';return;}
@@ -18730,28 +18829,35 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       return;
     }
     if(want!==state.shop||!ov)return;
-    var by={};rows.forEach(function(p){var g=groupOf(p);(by[g]=by[g]||[]).push(p);});
+    var allRows=rows;
+    if(state.q){var qw=norm(state.q).split(" ").filter(Boolean);rows=rows.filter(function(p){var t=norm(p.name+" "+(p.brand||""));return qw.every(function(w){return t.indexOf(w)>=0;});});}
+    var bundles=bundle(rows);
+    var by={};bundles.forEach(function(bd){(by[bd.group]=by[bd.group]||[]).push(bd);});
     var shown=GROUPS.filter(function(g){return by[g[0]]&&by[g[0]].length;});
-    var until=rows.map(function(p){return p.valid_until||"";}).filter(Boolean).sort();
+    var until=allRows.map(function(p){return p.valid_until||"";}).filter(Boolean).sort();
     ov.querySelector(".mbFolderHead span").textContent=until.length?untilTxt(until[Math.floor(until.length/2)]):"";
-    if(!rows.length){b.innerHTML='<div class="mbFolderMsg">Er staan op dit moment geen aanbiedingen van '+esc(nameOf(state.shop))+' bij ons.</div>';return;}
-    cats.innerHTML='<button type="button" data-c="all" class="'+(state.cat==="all"?"on":"")+'">Alles<span>'+rows.length+'</span></button>'+shown.map(function(g){return '<button type="button" data-c="'+g[0]+'" class="'+(state.cat===g[0]?"on":"")+'">'+g[2]+' '+esc(g[1])+'<span>'+by[g[0]].length+'</span></button>';}).join("");
-    cats.querySelectorAll("button").forEach(function(x){x.onclick=function(){state.cat=x.getAttribute("data-c");draw();try{ov.scrollTo({top:0,behavior:"smooth"});}catch(e){}};});
+    if(!rows.length){b.innerHTML='<div class="mbFolderMsg">'+(state.q?'Geen aanbiedingen gevonden voor “'+esc(state.q)+'”.':'Er staan op dit moment geen aanbiedingen van '+esc(nameOf(state.shop))+' bij ons.')+'</div>';return;}
+    if(state.cat!=="all"&&!by[state.cat])state.cat="all";
+    cats.innerHTML='<button type="button" data-c="all" class="'+(state.cat==="all"?"on":"")+'">Alles<span>'+bundles.length+'</span></button>'+shown.map(function(g){return '<button type="button" data-c="'+g[0]+'" class="'+(state.cat===g[0]?"on":"")+'">'+g[2]+' '+esc(g[1])+'<span>'+by[g[0]].length+'</span></button>';}).join("");
+    // Groepen-balk: na het kiezen niet terugspringen; de gekozen groep blijft in beeld.
+    try{cats.scrollLeft=state.catScroll||0;var on=cats.querySelector("button.on");if(on&&state.cat!=="all"){var l=on.offsetLeft-cats.offsetLeft,r=l+on.offsetWidth;if(l<cats.scrollLeft+8||r>cats.scrollLeft+cats.clientWidth-8)cats.scrollLeft=Math.max(0,l-(cats.clientWidth-on.offsetWidth)/2);}}catch(e){}
+    cats.onscroll=function(){state.catScroll=cats.scrollLeft;};
+    cats.querySelectorAll("button").forEach(function(x){x.onclick=function(){state.catScroll=cats.scrollLeft;state.cat=x.getAttribute("data-c");draw();try{ov.scrollTo({top:0,behavior:"smooth"});}catch(e){}};});
     b.innerHTML="";
     shown.forEach(function(g){
       if(state.cat!=="all"&&state.cat!==g[0])return;
-      var items=by[g[0]],all=state.cat!=="all"||state.open[g[0]],list2=all?items:items.slice(0,PER_GROUP);
+      var items=by[g[0]],all=state.cat!=="all"||state.open[g[0]]||!!state.q,list2=all?items:items.slice(0,PER_GROUP);
       var sec=document.createElement("div");sec.className="mbFolderSec";
       sec.innerHTML='<span>'+g[2]+' '+esc(g[1])+'</span>'+(state.cat==="all"&&items.length>PER_GROUP?'<button type="button">'+(all?"Minder":"Alle "+items.length+" ›")+'</button>':'<span>'+items.length+'</span>');
       var sb=sec.querySelector("button");if(sb)sb.onclick=function(){state.open[g[0]]=!state.open[g[0]];draw();};
       var grid=document.createElement("div");grid.className="mbFolderGrid";
-      list2.forEach(function(p){grid.appendChild(cardEl(p));});
+      list2.forEach(function(bd){grid.appendChild(cardEl(bd));});
       b.appendChild(sec);b.appendChild(grid);
     });
     var note=document.createElement("p");note.className="mbFolderNote";note.textContent="Aanbiedingen via PrijsProfeet. Prijzen kunnen afwijken; de winkel is leidend.";b.appendChild(note);
   }
   var prevNav="navList";
-  function close(restore){if(!ov)return;var o=ov;ov=null;o.remove();document.documentElement.style.overflow="";document.documentElement.classList.remove("mbFolderOn");
+  function close(restore){closeSheet();if(!ov)return;var o=ov;ov=null;o.remove();document.documentElement.style.overflow="";document.documentElement.classList.remove("mbFolderOn");
     if(restore){try{setBottomNav(prevNav);}catch(e){}}}
   window.openFolder=function(shopKey){
     try{
@@ -18761,8 +18867,15 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       var list=shops();state.shop=(shopKey&&list.indexOf(shopKey)>=0)?shopKey:(list[0]||"");state.cat="all";state.open={};
       ov=document.createElement("div");ov.className="mbFolder "+(prevNav==="navMore"?"fromLeft":"fromRight");ov.setAttribute("role","dialog");ov.setAttribute("aria-label","Folder van deze week");
       ov.innerHTML=
-        '<div class="mbFolderHead"><h2>Folder van deze week</h2><span></span></div><div class="mbFolderShops"></div><div class="mbFolderCats"></div><div class="mbFolderBody"></div>';
+        '<div class="mbFolderHead"><h2>Folder van deze week</h2><span></span></div><div class="mbFolderShops"></div>'+
+        '<label class="mbFolderSearch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="Zoek in de folder…" aria-label="Zoek in de folder" enterkeyhint="search"><button type="button" class="mbFolderSearchClear" aria-label="Wissen" hidden><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>'+
+        '<div class="mbFolderCats"></div><div class="mbFolderBody"></div>';
       ov.addEventListener("click",function(e){e.stopPropagation();});
+      state.q="";
+      var si=ov.querySelector(".mbFolderSearch input"),sc=ov.querySelector(".mbFolderSearchClear"),st=null;
+      si.addEventListener("input",function(){clearTimeout(st);sc.hidden=!si.value;st=setTimeout(function(){state.q=si.value.trim();state.cat="all";state.catScroll=0;draw();},220);});
+      si.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();si.blur();}});
+      sc.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();si.value="";sc.hidden=true;state.q="";draw();});
       document.body.appendChild(ov);document.documentElement.style.overflow="hidden";document.documentElement.classList.add("mbFolderOn");
       draw();
     }catch(e){}
@@ -18800,6 +18913,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     // Terugknop: eerst een grote foto sluiten, dan de folder.
     setTimeout(function(){var ob=window.__appBack;window.__appBack=function(){
       if(ov&&document.querySelector(".dealPhotoOverlay"))return ob?ob():false;
+      if(sheet){closeSheet();return true;}
       if(ov&&document.querySelector(".familyDialogOverlay.familyDialogShown"))return ob?ob():false;
       if(ov){close(true);return true;}return ob?ob():false;};},0);
   }
@@ -20223,8 +20337,8 @@ html body #list .item.longName .itemProductContent .productName{font-size:16px!i
 </script>
 <style id="focus-green-all">
 /* Alle invoervelden: dezelfde groene focusrand (velden met een eigen rand-vak, zoals inloggen en zoeken, houden hun eigen stijl). */
-:where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#3c7a52!important;box-shadow:0 0 0 3px rgba(60,122,82,.14)!important;outline:none!important}
-body.dark-theme :where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#9ed5ad!important;box-shadow:0 0 0 3px rgba(158,213,173,.15)!important}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *,.mbFolderSearch *)){border-color:#3c7a52!important;box-shadow:0 0 0 3px rgba(60,122,82,.14)!important;outline:none!important}
+body.dark-theme :where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *,.mbFolderSearch *)){border-color:#9ed5ad!important;box-shadow:0 0 0 3px rgba(158,213,173,.15)!important}
 </style>
 <style id="focus-list-fix">
 /* Invoer- en zoekveld op de lijst: dezelfde dunne groene rand (1px) als de andere velden in de app. */
@@ -20234,6 +20348,23 @@ body.dark-theme .input-row #product:focus,body.dark-theme .input-row #product:fo
 body.dark-theme .searchBox:focus-within{box-shadow:inset 0 0 0 1px #9ed5ad,0 0 0 3px rgba(158,213,173,.15)!important}
 /* Maan-knop (weergave) hoort alleen bij Meer: niet zichtbaar als de Folder open is. */
 html.mbFolderOn #themeButton,html.mbFolderOn #themePicker{opacity:0!important;pointer-events:none!important}
+/* Ronde sluitknoppen: kruisje precies in het midden (ook in Safari op iPhone). */
+html body .dealPhotoClose,html body .recipeSheetClose{padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;-webkit-appearance:none;appearance:none}
+html body .dealPhotoClose i,html body .recipeSheetClose i{display:block!important;width:1em!important;height:1em!important;line-height:1!important;margin:0!important;text-align:center!important}
+</style>
+<style id="header-and-accents">
+/* Kopbalk: alleen titel en ⋮-menu. "Lijst wissen" staat nu in het menu. */
+html body .headerBar #mainListTrashButton{display:none!important}
+.listOptionDanger{color:#b3473e!important}.listOptionDanger i{color:#c95b52!important}
+body.dark-theme .listOptionDanger{color:#f0a49d!important}body.dark-theme .listOptionDanger i{color:#f0a49d!important}
+/* Fel groen accent waar iets gekozen, aan of klaar is */
+html body .frequentChip .plus{color:var(--mb-accent,#14BE4B)!important}
+html body .mbFolderCats button.on{border-color:var(--mb-accent,#14BE4B)!important;background:#e3f7e9!important;color:#1f5a33!important}
+body.dark-theme .mbFolderCats button.on{background:#1f3a29!important;color:#cfeedd!important}
+html body .shopPickRow.on{border-color:var(--mb-accent,#14BE4B)!important;background:#eefaf1!important}
+html body .shopPickRow.on .num{background:var(--mb-accent,#14BE4B)!important;border-color:var(--mb-accent,#14BE4B)!important}
+html body .mbThemeRow .mbThemeCheck,html body .mbSelOpt i{color:var(--mb-accent,#14BE4B)!important}
+html body .mbThemeRow.sel{box-shadow:inset 0 0 0 2px rgba(20,190,75,.45)!important}
 </style>
 <style id="accent-green">
 /* Twee groenen, elk met een eigen rol:
