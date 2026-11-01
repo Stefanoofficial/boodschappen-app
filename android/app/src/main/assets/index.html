@@ -7397,11 +7397,11 @@ html.mbLayoutReady .headerBar,html.mbLayoutReady .input-row-wrap,html.mbLayoutRe
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder</span></div>
-      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld per categorie (zoals zuivel, vlees en groente), met de grootste korting eerst. Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet; de acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren. Zet je zo'n actie op je lijst, dan zie je erbij vanaf wanneer hij geldt. Met het tandwieltje naast de winkels kies je je winkels. Producten van dezelfde actie staan samen op één kaart, bijvoorbeeld <strong>3 soorten</strong>: tik erop en kies de soort die je wilt. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten; wat al op je lijst staat, krijgt een groen vinkje. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld in dezelfde afdelingen als je lijst (zoals groente &amp; fruit, brood en zuivel), met de grootste korting eerst. Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet; de acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren. Zet je zo'n actie op je lijst, dan zie je erbij vanaf wanneer hij geldt. Met het tandwieltje naast de winkels kies je je winkels. Producten van dezelfde actie staan samen op één kaart, bijvoorbeeld <strong>3 soorten</strong>: tik erop en kies de soort die je wilt. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten; wat al op je lijst staat, krijgt een groen vinkje. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
-      <p>Je lijst staat op volgorde van de winkel: per afdeling, zoals groente &amp; fruit, brood en zuivel. Tik bovenaan op <strong>⋮</strong> om binnen die afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren. Wat je afvinkt, gaat naar <strong>In je mandje</strong> onderaan; tik daarop om het open of dicht te klappen. Bovenaan onder de titel zie je hoeveel er al in je mandje zit.</p>
+      <p>Je lijst staat op volgorde van de winkel: per afdeling, zoals groente &amp; fruit, brood en zuivel. Tik bovenaan op <strong>⋮</strong> om binnen die afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren. Wat je afvinkt, gaat naar <strong>In je mandje</strong> onderaan; tik daarop om het open of dicht te klappen. Bovenaan onder de titel zie je hoeveel er al in je mandje zit. Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt. De Folder gebruikt dezelfde afdelingen.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
@@ -9499,11 +9499,13 @@ function normalizeBoodschappen(data) {
         brand: item.brand ? String(item.brand) : "",
         quantity: Math.max(1, Number(item.quantity) || 1),
         ...(item.shop ? { shop: String(item.shop).slice(0, 30) } : {}),
+        ...((Number.isInteger(item.aisle) && ((item.aisle >= 0 && item.aisle <= 11) || item.aisle === 99)) ? { aisle: item.aisle } : {}),
         ...(item.deal && typeof item.deal === "object" && Number.isFinite(Number(item.deal.price)) ? { deal: {
           price: Number(item.deal.price),
           promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
           until: item.deal.until ? String(item.deal.until).slice(0, 10) : "",
           ...(/^\d{4}-\d{2}-\d{2}$/.test(String(item.deal.from || "")) ? { from: String(item.deal.from) } : {}),
+          ...(/^[a-z-]{2,40}$/.test(String(item.deal.cat || "")) ? { cat: String(item.deal.cat) } : {}),
           store: item.deal.store ? String(item.deal.store).slice(0, 30) : "",
           ...(typeof item.deal.img === "string" && /^https:\/\//i.test(item.deal.img) && item.deal.img.length <= 600 ? { img: item.deal.img } : {}),
           ...(Number(item.deal.was) > Number(item.deal.price) ? { was: Number(item.deal.was) } : {})
@@ -15901,7 +15903,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const meta=document.createElement("div");meta.className="dealMeta";
     meta.textContent=[window.__tidyPromo?window.__tidyPromo(promo):promo,p.quantity||"",p.valid_until?"t/m "+niceDate(p.valid_until):""].filter(Boolean).join(" · ");
     if(meta.textContent)card.appendChild(meta);
-    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:p.__shop?shopName(p.__shop):retailerName(),shop:p.__shop||"",img:/^https:\/\//i.test(String(p.image_url||"").trim())?String(p.image_url).trim():""}));
+    if(window.__dealButton)card.appendChild(window.__dealButton({name:p.name||p.product_name||p.title||label||"Product",term:label||searchTerm||"",price:amount,was:orig,promo:String(p.promotion||(p.promotional_keywords||[])[0]||""),until:p.valid_until||"",store:p.__shop?shopName(p.__shop):retailerName(),shop:p.__shop||"",cat:String(p.unified_category||""),img:/^https:\/\//i.test(String(p.image_url||"").trim())?String(p.image_url).trim():""}));
     // Productfoto van PrijsProfeet (van de site van de supermarkt). Lukt laden niet, dan zonder foto.
     const img=String(p.image_url||"").trim();
     if(/^https:\/\//i.test(img)){
@@ -16091,6 +16093,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
      refresh:function(){if(window.__refreshPantryUI)window.__refreshPantryUI();}},
     {path:"shelfLife", key:function(){return "pantryShelfLearned";}, scoped:false,
      refresh:function(){}},
+    {path:"aisleLearned", key:function(){return "mbAisleLearned";}, scoped:false,
+     refresh:function(){try{showList();}catch(e){}}},
     {path:"servings", key:function(){return "plannerDefaultServings";}, scoped:false,
      refresh:function(){try{if(typeof renderRecipeCatalog==="function")renderRecipeCatalog();}catch(e){}}}
   ];
@@ -18233,6 +18237,8 @@ body.proPaidMode .onlyFree{display:none!important}
   window.__addDealToList=async function(d){
     var deal={price:Number(d.price),promo:String(d.promo||""),until:String(d.until||"").slice(0,10),store:String(d.store||"")};
     if(/^\d{4}-\d{2}-\d{2}$/.test(String(d.from||""))&&d.from>todayIso())deal.from=d.from;
+    // Categorie van de winkel (PrijsProfeet), zodat het product op je lijst bij de goede afdeling staat.
+    var cat=String(d.cat||"").toLowerCase();if(/^[a-z-]{2,40}$/.test(cat)&&cat!=="food")deal.cat=cat;
     if(typeof d.img==="string"&&/^https:\/\//i.test(d.img)&&d.img.length<=600)deal.img=d.img;
     if(Number(d.was)>Number(d.price))deal.was=Number(d.was);
     var it=findOnList([d.name,d.term]),added=false;
@@ -18618,6 +18624,11 @@ body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
 .mbFolderCats button{flex:0 0 auto;padding:7px 12px;border:1px solid #d5e3d9;border-radius:999px;background:#fff;color:#2f4a38;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .mbFolderCats button.on{border-color:#3F5B45;background:#e8f3eb}
 .mbFolderCats button span{opacity:.6;margin-left:4px}
+.mbFolderCats button{display:inline-flex;align-items:center;gap:6px}
+.mbIc{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-style:normal;vertical-align:-4px}
+.mbIc:empty{display:none}
+.mbIc svg,.mbIc img{width:18px;height:18px}
+.mbFolderSec .mbIc{margin-right:6px}
 .mbFolderSec{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 10px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b7d71}
 .mbFolderSec button{border:0;background:none;color:#3F5B45;font:inherit;font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;cursor:pointer;padding:4px}
 .mbFolderGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -18702,9 +18713,14 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   var CAT_LOOK=[[/^groente/,"🍎"],[/^aardappel/,"🥔"],[/brood|bakker/,"🍞"],[/ontbijt|beleg/,"🥣"],[/vlees|vis|vega/,"🍗"],[/^kaas/,"🧀"],[/zuivel|eier/,"🥛"],[/maaltijd/,"🥗"],[/pasta|rijst|wereld/,"🍝"],[/soep|conserv|saus/,"🥫"],[/bak|kruid|olie/,"🧂"],[/diepvries/,"❄️"],[/snoep|koek|chips|chocola|snack|noten/,"🍪"],[/frisdrank|sap|water/,"🥤"],[/koffie|thee/,"☕"],[/^bier/,"🍺"],[/wijn|sterke/,"🍷"],[/baby|kind/,"🍼"],[/huisdier|dier/,"🐾"],[/haar/,"💇"],[/huid|zon/,"🧴"],[/deo/,"🧴"],[/mond|tand/,"🪥"],[/gezond/,"💊"],[/drogist|verzorg/,"🧴"],[/huishoud|schoonmaak|was/,"🧽"]];
   function catLook(slug){slug=String(slug||"").toLowerCase();for(var i=0;i<CAT_LOOK.length;i++)if(CAT_LOOK[i][0].test(slug))return {i:i,e:CAT_LOOK[i][1]};return {i:90,e:"🧺"};}
   function niceSlug(slug){var w=String(slug||"").split("-").filter(Boolean);if(!w.length)return "Overig";var t=w.length>1?w.slice(0,-1).join(", ")+" & "+w[w.length-1]:w[0];return t.charAt(0).toUpperCase()+t.slice(1);}
+  // Groepen = dezelfde afdelingen als op je lijst (zelfde naam, icoon en volgorde).
+  function aisleKey(p){var A=window.__mbAisles,c=groupOf(p);if(!A||c==="overig")return "overig";var i=A.fromCat(c);return i>=0?"a"+i:"overig";}
   function groupList(by){
-    return Object.keys(by).map(function(k){var L=catLook(k),c=CATS[k];return k==="overig"?[k,"Overig","🧺",null,999]:[k,(c&&c.name)||niceSlug(k),L.e,null,L.i];})
-      .sort(function(a,b){return (a[4]-b[4])||a[1].localeCompare(b[1],"nl");});
+    var A=window.__mbAisles;
+    return Object.keys(by).map(function(k){
+      if(k==="overig"||!A)return [k,"Overig","",null,999];
+      var i=Number(k.slice(1));return [k,A.label(i),'<em class="mbIc" aria-hidden="true">'+A.icon(i)+'</em>',null,i];
+    }).sort(function(a,b){return a[4]-b[4];});
   }
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -18785,14 +18801,14 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var map={},out=[];
     rows.forEach(function(p){
       // De winkel zegt zelf welke producten bij één actie horen (promo_group_id). Zonder die id: merk + actie + prijs.
-      var k=p.promo_group_id?"pg|"+p.promo_group_id:groupOf(p)+"|"+norm(brandOf(p))+"|"+norm(promoText(p))+"|"+Number(p.price)+"|"+Number(p.original_price||0);
+      var k=p.promo_group_id?"pg|"+p.promo_group_id:aisleKey(p)+"|"+norm(brandOf(p))+"|"+norm(promoText(p))+"|"+Number(p.price)+"|"+Number(p.original_price||0);
       if(!map[k]){map[k]={items:[],key:k};out.push(map[k]);}
       map[k].items.push(p);
     });
     out.forEach(function(b){
       var r=b.items[0];b.rep=r;
       // Groep van de actie = de categorie waar de meeste soorten in vallen.
-      var cnt={};b.items.forEach(function(x){var g=groupOf(x);cnt[g]=(cnt[g]||0)+1;});b.group=Object.keys(cnt).sort(function(a,c){return (a==="overig")-(c==="overig")||cnt[c]-cnt[a];})[0];
+      var cnt={};b.items.forEach(function(x){var g=aisleKey(x);cnt[g]=(cnt[g]||0)+1;});b.group=Object.keys(cnt).sort(function(a,c){return (a==="overig")-(c==="overig")||cnt[c]-cnt[a];})[0];
       var pr=b.items.map(function(x){return Number(x.price);});b.min=Math.min.apply(null,pr);b.vanaf=b.min!==Math.max.apply(null,pr);
       if(b.items.length>1){
         // Naam: het deel dat alle namen gemeen hebben ("Beemster Kaas..."), anders het merk.
@@ -18807,7 +18823,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   }
   function photoFallback(box){box.classList.add("noImg");box.innerHTML='<span class="fallback">🛒</span>';}
   function imgOf(p){return /^https:\/\//i.test(String(p.image_url||""))?String(p.image_url).trim():"";}
-  function dealOf(p){return {name:p.name||"Product",term:p.name||"",price:Number(p.price),was:Number(p.original_price)||0,promo:promoText(p),until:p.valid_until||"",from:soon(p)?p.valid_from:"",store:nameOf(state.shop),shop:state.shop,img:imgOf(p)};}
+  function dealOf(p){return {name:p.name||"Product",term:p.name||"",price:Number(p.price),was:Number(p.original_price)||0,promo:promoText(p),until:p.valid_until||"",from:soon(p)?p.valid_from:"",cat:groupOf(p)==="overig"?"":groupOf(p),store:nameOf(state.shop),shop:state.shop,img:imgOf(p)};}
   function onList(p){try{return !!(window.__dealOnList&&window.__dealOnList(dealOf(p)));}catch(e){return false;}}
   async function addOne(p,btn,onDone){
     var d=dealOf(p);btn.disabled=true;
@@ -19842,7 +19858,7 @@ body.dark-theme .shopTab.active{background:#3a4a3f;color:#fff;box-shadow:none}
 body.dark-theme .shopTab.active .n{background:#9fd3ac;color:#1d241f}
 .app.overview-active #shopTabs,.app.more-active #shopTabs{display:none!important}
 #list .item.shopHidden{display:none!important}
-html.shops-on #list .item{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#list .item{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #list .item.shopPressed{transform:scale(.985);transition:transform .12s}
 .shopEmptyHint{margin:6px 4px 10px;padding:18px 14px;border:1.5px dashed #cfe0d4;border-radius:16px;text-align:center;color:#5d7464;font-size:14px;line-height:1.45}
 .shopEmptyHint strong{display:block;color:#2f4a38;font-size:15px;margin-bottom:3px}
@@ -20059,7 +20075,6 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
   function cancelLp(){if(lp){clearTimeout(lp.t);lp=null;}}
   document.addEventListener("pointerdown",function(e){
     fired=false;
-    if(!document.documentElement.classList.contains("shops-on"))return;
     var it=e.target.closest&&e.target.closest("#list .item");
     if(!it||e.target.closest("button"))return;
     cancelLp();
@@ -20067,7 +20082,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
     lp={x:e.clientX,y:e.clientY,t:setTimeout(function(){
       lp=null;fired=true;haptic();
       it.classList.add("shopPressed");setTimeout(function(){it.classList.remove("shopPressed");},250);
-      openMove(idx);
+      openItemMenu(idx);
     },520)};
   },true);
   document.addEventListener("pointermove",function(e){if(lp&&(Math.abs(e.clientX-lp.x)>10||Math.abs(e.clientY-lp.y)>10))cancelLp();},true);
@@ -20076,7 +20091,24 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
   window.addEventListener("scroll",cancelLp,true);
   /* De tik die bij het loslaten volgt mag het product niet afvinken en de keuze niet meteen sluiten. */
   document.addEventListener("click",function(e){if(Date.now()<swallowUntil){swallowUntil=0;e.preventDefault();e.stopImmediatePropagation();}},true);
-  document.addEventListener("contextmenu",function(e){if(document.documentElement.classList.contains("shops-on")&&e.target.closest&&e.target.closest("#list .item"))e.preventDefault();},true);
+  document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest("#list .item"))e.preventDefault();},true);
+  /* Ingedrukt houden: met meerdere winkels kies je verplaatsen of afdeling, anders meteen de afdeling. */
+  function openItemMenu(idx){
+    var keys=tabKeys(),it=items()[idx];if(!it)return;
+    if(it.completed)return;
+    if(keys.length<2){if(window.__mbPickAisle)window.__mbPickAisle(idx);return;}
+    var cur=shopOf(it,keys),others=keys.filter(function(k){return k!==cur;});
+    var ov=familyDialogBase("fa-hand-pointer",esc(String(it.text)),'<div class="familyDialogText">Wat wil je doen?</div>',
+      others.map(function(k){return '<button type="button" class="familyDialogBtn shopAlt" data-k="'+esc(k)+'"><i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i> Naar '+esc(nameOf(k))+'</button>';}).join("")+
+      '<button type="button" class="familyDialogBtn shopAlt" data-a="1"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Andere afdeling</button>'+
+      '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>');
+    ov.classList.add("shopDialog");
+    var close=function(f){closeFamilyDialog(ov,f);};
+    ov.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();var t=b.dataset.k;close(function(){var i=items().indexOf(it);if(i>=0)moveItems([i],t);});});});
+    ov.querySelector("[data-a]").addEventListener("click",function(e){e.stopPropagation();close(function(){var i=items().indexOf(it);if(i>=0&&window.__mbPickAisle)window.__mbPickAisle(i);});});
+    ov.querySelector(".familyDialogCancel").addEventListener("click",function(e){e.stopPropagation();close();});
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  }
   async function openMove(idx){
     var keys=tabKeys(),it=items()[idx];if(!it||keys.length<2)return;
     var cur=shopOf(it,keys),others=keys.filter(function(k){return k!==cur;});
@@ -20508,6 +20540,15 @@ body.dark-theme #mbScanBtn{color:#cfe3d4}
 .mbCatHead .c{margin-left:auto;font-weight:700;letter-spacing:0}
 .mbCatHead .ic{flex:0 0 20px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
 .mbCatHead .ic:empty{display:none}
+.mbAislePick{display:flex;flex-direction:column;gap:6px;max-height:min(52vh,430px);overflow-y:auto;margin-top:10px;-webkit-overflow-scrolling:touch}
+.mbAislePick button{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1px solid #e1e9e3;border-radius:14px;background:#fff;color:#24392b;font:inherit;font-size:15.5px;font-weight:600;text-align:left;cursor:pointer}
+.mbAislePick button .ic{flex:0 0 26px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center}
+.mbAislePick button .ic:empty::before{content:"";width:8px;height:8px;border-radius:50%;background:#b8c6bc}
+.mbAislePick button .ic svg,.mbAislePick button .ic img{width:24px;height:24px}
+.mbAislePick button .nm{flex:1}
+.mbAislePick button.on{border-color:var(--mb-accent,#14BE4B);background:#eaf8ef}
+.mbAislePick button.on i{color:var(--mb-accent,#14BE4B)}
+body.dark-theme .mbAislePick button{background:#202923;border-color:#38453b;color:#e6efe8}body.dark-theme .mbAislePick button.on{background:#1f3a29}
 html body .mbCatHead .ic{overflow:hidden}html body .mbCatHead .ic *{max-width:20px!important;max-height:20px!important}html body .mbCatHead .ic svg,html body .mbCatHead .ic img,html body .mbCatHead .ic .productInlineIcon{width:20px!important;height:20px!important;min-width:0!important;min-height:0!important;margin:0!important;transform:none!important;position:static!important}html body .mbCatHead .ic span{font-size:16px!important;line-height:1!important}
 .mbCatHead[hidden]{display:none}
 body.dark-theme .mbCatHead{color:#9fb0a5}
@@ -20528,6 +20569,57 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
   var iconCache={};
   function headIcon(word){if(!word)return "";if(iconCache[word]!=null)return iconCache[word];var h="";try{h=productIconMarkup(getProductIcon(word))||"";}catch(e){}iconCache[word]=h;return h;}
   function aisleOf(text){try{var a=typeof productAisle==="function"?productAisle(String(text||"")):99;return (a>=0&&a<AISLES.length)?a:99;}catch(e){return 99;}}
+  // Categorie van PrijsProfeet (bij een aanbieding uit de Folder) → afdeling op je lijst.
+  var CAT2AISLE=[[/^groente|^aardappel/,0],[/brood|bakker/,1],[/vlees|vis|vega|kip/,2],[/zuivel|eier|^kaas/,3],[/beleg|ontbijt|granen/,4],[/pasta|rijst|wereld|soep|conserv|saus|kruid|bak|olie|maaltijd/,5],[/snoep|koek|chips|chocola|snack|noten/,6],[/drank|sap|frisdrank|koffie|thee|water|bier|wijn|sterke/,7],[/diepvries/,8],[/drogist|verzorg|haar|huid|deo|mond|gezond/,9],[/huishoud|schoonmaak/,10],[/baby|kind|huisdier|dier/,11]];
+  function aisleOfCat(c){c=String(c||"");if(!c)return -1;for(var i=0;i<CAT2AISLE.length;i++)if(CAT2AISLE[i][0].test(c))return CAT2AISLE[i][1];return -1;}
+  // Extra woorden voor productnamen uit de folder die de app niet herkent ("AH Tijger volkoren heel").
+  var NAME_EXTRA=[[/(^| )(tijger|volkoren|meergranen|waldkorn|bolletjes?|broodjes?|croissants?|stokbrood|pistolets?|beschuit|krentenbol|bruin heel|wit heel|casino|wraps?)( |$)/i,1]];
+  // Wat je zelf kiest (ingedrukt houden → Afdeling), per productnaam onthouden. Gaat mee met je account.
+  var LEARN="mbAisleLearned";
+  function normName(t){return String(t||"").toLowerCase().replace(/\s+/g," ").trim();}
+  function learned(){try{return JSON.parse(localStorage.getItem(LEARN)||"{}")||{};}catch(e){return {};}}
+  function okAisle(v){return v===99||(Number.isInteger(v)&&v>=0&&v<AISLES.length);}
+  function aisleForItem(it,name){
+    name=name||(it&&it.text)||"";
+    // 1. Zelf gekozen voor dit product, of eerder voor deze naam.
+    if(it&&okAisle(it.aisle))return it.aisle;
+    var L=learned()[normName(name)];if(okAisle(L))return L;
+    // 2. De categorie van de winkel (bij een aanbieding uit de Folder of Aanbiedingen).
+    var c=aisleOfCat(it&&it.deal&&it.deal.cat);if(c>=0)return c;
+    // 3. De productnaam (via de iconen van de app).
+    var a=aisleOf(name);if(a!==99)return a;
+    for(var i=0;i<NAME_EXTRA.length;i++)if(NAME_EXTRA[i][0].test(name))return NAME_EXTRA[i][1];
+    return 99;
+  }
+  function aisleOfEl(el){
+    var it=null;try{it=Array.isArray(boodschappen)?boodschappen[Number(el.dataset.index)]:null;}catch(e){}
+    return aisleForItem(it,nameOf(el));
+  }
+  function aisleLabel(i){return i===99?OTHER[1]:AISLES[i][1];}
+  function aisleIcon(i){return i===99?"":headIcon(AISLES[i][0]);}
+  // Voor de Folder: zelfde afdelingen, namen, iconen en volgorde als je lijst.
+  window.__mbAisles={count:AISLES.length,label:aisleLabel,icon:aisleIcon,fromCat:aisleOfCat};
+  window.__mbAisleFor=function(it){return aisleForItem(it);};
+  function escH(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  window.__mbPickAisle=function(idx){
+    var it=Array.isArray(boodschappen)?boodschappen[idx]:null;if(!it)return;
+    var cur=aisleForItem(it),opts=AISLES.map(function(a,i){return i;}).concat([99]);
+    var html='<div class="familyDialogText">Waar ligt <strong>'+escH(it.text)+'</strong> in de winkel? De app onthoudt je keuze voor de volgende keer.</div><div class="mbAislePick">'+
+      opts.map(function(i){return '<button type="button" data-a="'+i+'" class="'+(i===cur?"on":"")+'"><span class="ic" aria-hidden="true">'+aisleIcon(i)+'</span><span class="nm">'+escH(aisleLabel(i))+'</span>'+(i===cur?'<i class="fa-solid fa-check" aria-hidden="true"></i>':'')+'</button>';}).join("")+'</div>';
+    var ov=familyDialogBase("fa-layer-group","Afdeling",html,'<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>');
+    ov.classList.add("mbAisleDialog");
+    var close=function(){closeFamilyDialog(ov);};
+    ov.querySelector(".familyDialogCancel").addEventListener("click",function(e){e.stopPropagation();close();});
+    ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    ov.querySelectorAll("[data-a]").forEach(function(b){b.addEventListener("click",async function(e){
+      e.stopPropagation();var a=Number(b.getAttribute("data-a"));close();
+      it.aisle=a;
+      try{var m=learned();m[normName(it.text)]=a;var keys=Object.keys(m);if(keys.length>400)delete m[keys[0]];localStorage.setItem(LEARN,JSON.stringify(m));}catch(_){}
+      try{showList();}catch(_){}
+      try{await saveList();}catch(_){}
+      try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(escH(it.text)+" staat nu bij "+escH(aisleLabel(a))+".");}catch(_){}
+    });});
+  };
   function doneOpen(){try{return localStorage.getItem(KEY)==="1";}catch(e){return false;}}
   function visible(el){return !el.classList.contains("shopHidden")&&el.style.display!=="none";}
   function nameOf(el){var n=el.querySelector(".productName");return n?n.textContent.trim():"";}
@@ -20571,7 +20663,7 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
       var extras=[].slice.call(list.querySelectorAll(":scope > .shopEmptyHint, :scope > .shopMoveRest"));
       var act=items.filter(function(el){return !el.classList.contains("completed");}),done=items.filter(function(el){return el.classList.contains("completed");});
       // Afdelingen
-      var groups={};act.forEach(function(el){var a=aisleOf(nameOf(el));(groups[a]=groups[a]||[]).push(el);});
+      var groups={};act.forEach(function(el){var a=aisleOfEl(el);(groups[a]=groups[a]||[]).push(el);});
       var order=Object.keys(groups).map(Number).sort(function(a,b){return a-b;});
       var showHeads=act.length>=1;
       order.forEach(function(a){
