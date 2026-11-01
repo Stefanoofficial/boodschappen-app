@@ -18655,10 +18655,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function untilTxt(iso){var m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return "";var d=new Date(+m[1],+m[2]-1,+m[3]);var D=["zo","ma","di","wo","do","vr","za"],M=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];return "t/m "+D[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
   function readCache(slug){
     if(mem[slug]&&Date.now()-mem[slug].at<CACHE_MS)return mem[slug].rows;
-    try{var c=JSON.parse(localStorage.getItem("mbFolder_"+slug)||"null");if(c&&Date.now()-c.at<CACHE_MS&&Array.isArray(c.rows)){mem[slug]=c;return c.rows;}}catch(e){}
+    try{var c=JSON.parse(localStorage.getItem("mbFolder2_"+slug)||"null");if(c&&Date.now()-c.at<CACHE_MS&&Array.isArray(c.rows)){mem[slug]=c;return c.rows;}}catch(e){}
     return null;
   }
-  function writeCache(slug,rows){var c={at:Date.now(),rows:rows};mem[slug]=c;try{localStorage.setItem("mbFolder_"+slug,JSON.stringify(c));}catch(e){}}
+  function writeCache(slug,rows){var c={at:Date.now(),rows:rows};mem[slug]=c;try{localStorage.setItem("mbFolder2_"+slug,JSON.stringify(c));}catch(e){}}
   async function getJson(url){
     var ctrl=typeof AbortController!=="undefined"?new AbortController():null,t=ctrl?setTimeout(function(){ctrl.abort();},15000):null;
     try{var r=await fetch(url,{headers:{Accept:"application/json"},signal:ctrl?ctrl.signal:undefined});if(t)clearTimeout(t);return r;}catch(e){if(t)clearTimeout(t);throw e;}
@@ -20225,6 +20225,15 @@ html body #list .item.longName .itemProductContent .productName{font-size:16px!i
 /* Alle invoervelden: dezelfde groene focusrand (velden met een eigen rand-vak, zoals inloggen en zoeken, houden hun eigen stijl). */
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#3c7a52!important;box-shadow:0 0 0 3px rgba(60,122,82,.14)!important;outline:none!important}
 body.dark-theme :where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#9ed5ad!important;box-shadow:0 0 0 3px rgba(158,213,173,.15)!important}
+</style>
+<style id="focus-list-fix">
+/* Invoer- en zoekveld op de lijst: dezelfde dunne groene rand (1px) als de andere velden in de app. */
+html body .input-row #product:focus,html body .input-row #product:focus-visible{border-color:transparent!important;box-shadow:inset 0 0 0 1px #3c7a52,0 0 0 3px rgba(60,122,82,.14)!important}
+html body .searchBox:focus-within{border-width:0!important;border-color:transparent!important;box-shadow:inset 0 0 0 1px #3c7a52,0 0 0 3px rgba(60,122,82,.14)!important}
+body.dark-theme .input-row #product:focus,body.dark-theme .input-row #product:focus-visible{box-shadow:inset 0 0 0 1px #9ed5ad,0 0 0 3px rgba(158,213,173,.15)!important}
+body.dark-theme .searchBox:focus-within{box-shadow:inset 0 0 0 1px #9ed5ad,0 0 0 3px rgba(158,213,173,.15)!important}
+/* Maan-knop (weergave) hoort alleen bij Meer: niet zichtbaar als de Folder open is. */
+html.mbFolderOn #themeButton,html.mbFolderOn #themePicker{opacity:0!important;pointer-events:none!important}
 </style>
 <style id="accent-green">
 /* Twee groenen, elk met een eigen rol:
