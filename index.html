@@ -20207,6 +20207,16 @@ html body #list .item.longName .itemProductContent .productName{font-size:16px!i
   };
 })();
 </script>
+<style id="accent-green">
+/* Accent (optie 3): het felle groen van het app-icoon bij afvinken en voortgang. Kop en knoppen blijven donkergroen. */
+:root{--mb-accent:#14BE4B}
+html body #list .item .itemProductContent .itemCheck.isChecked,html body #list .itemProductContent .itemCheck.isChecked{background:var(--mb-accent)!important;border-color:var(--mb-accent)!important}
+html body .listProgress .listProgressTrack .listProgressFill{background:var(--mb-accent)!important}
+html body .listProgress .listProgressText .fa-basket-shopping{color:var(--mb-accent)!important}
+html body .shopTabs .shopTab.active{box-shadow:0 1px 4px rgba(47,90,61,.16),inset 0 -3px 0 var(--mb-accent)!important}
+body.dark-theme #list .item .itemProductContent .itemCheck.isChecked,body.dark-theme #list .itemProductContent .itemCheck.isChecked{background:#22c45a!important;border-color:#22c45a!important}
+body.dark-theme .listProgress .listProgressTrack .listProgressFill{background:#22c45a!important}
+</style>
 </body>
 
 
