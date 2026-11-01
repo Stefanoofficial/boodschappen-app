@@ -6522,6 +6522,13 @@ body.dark-theme #loginScreen .inputBox,body.dark-theme .registerModal .registerI
 body.dark-theme #loginScreen .inputBox:focus-within,body.dark-theme .registerModal .registerInputBox:focus-within{border-color:#9ed5ad!important;box-shadow:0 0 0 4px rgba(158,213,173,.15)!important}
 body.dark-theme #loginScreen .loginBox > .registerButton,body.dark-theme .registerModal .registerBack{background:transparent!important}
 </style>
+<style id="boot-no-jump">
+/* Bij het openen: de lijst pas tonen als de nieuwe indeling klaar is (geen oude balk die even verspringt). */
+html:not(.mbLayoutReady) .headerBar,html:not(.mbLayoutReady) .input-row-wrap,html:not(.mbLayoutReady) .searchBox,html:not(.mbLayoutReady) #list,html:not(.mbLayoutReady) #shopTabs,html:not(.mbLayoutReady) #status{opacity:0!important;pointer-events:none!important}
+html.mbLayoutReady .headerBar,html.mbLayoutReady .input-row-wrap,html.mbLayoutReady #list,html.mbLayoutReady #status{animation:mbBootIn .18s ease-out}
+@keyframes mbBootIn{from{opacity:0}to{opacity:1}}
+</style>
+<script>setTimeout(function(){document.documentElement.classList.add("mbLayoutReady");},3000);</script>
 </head>
 
 <body>
@@ -20610,8 +20617,11 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
       obs.observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});
     }
     run();
+    // Klaar: nu pas de lijst laten zien (zie boot-no-jump bovenin).
+    requestAnimationFrame(function(){document.documentElement.classList.add("mbLayoutReady");});
   }
-  if(document.readyState==="complete")start();else window.addEventListener("load",start);
+  // Meteen starten (de lijst staat al in de pagina), niet wachten tot alle plaatjes en lettertypes geladen zijn.
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
 })();
 </script>
 </body>
