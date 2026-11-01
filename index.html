@@ -1702,11 +1702,11 @@ body.dark-theme .androidTimePreview span:not(.androidTimeColon){background:#2935
   margin-top: 4px;
 }
 
-/* Search field gets the same clear blue focus treatment as the add-product field. */
+/* Zoekveld krijgt dezelfde groene focusrand als het invoerveld (zelfde als inlogscherm). */
 .searchBox:focus-within {
-  border: 2px solid #7fa8e8 !important;
+  border: 2px solid #3c7a52 !important;
   outline: none !important;
-  box-shadow: 0 0 0 1px rgba(127,168,232,0.10) !important;
+  box-shadow: 0 0 0 3px rgba(60,122,82,.14) !important;
 }
 
 .searchBox input:focus {
@@ -2373,8 +2373,8 @@ body.dark-theme .familyDialogDanger { background:#b92e2e; }
   outline:none;
 }
 .familyDialogInput:focus {
-  border-color:#7fa8e8;
-  box-shadow:0 0 0 3px rgba(127,168,232,.12);
+  border-color:#3c7a52;
+  box-shadow:0 0 0 3px rgba(60,122,82,.14);
 }
 .familyDialogActions {
   display:flex;
@@ -3649,7 +3649,7 @@ body.logged-in {
 </style>
 
 <style id="final-focus-and-login-keyboard-fix">
-/* Exact same subtle blue focus as the search field (#7fa8e8). */
+/* Exact same subtle blue focus as the search field (#3c7a52). */
 .input-row #product {
   border: 2px solid transparent !important;
   outline: none !important;
@@ -3658,13 +3658,13 @@ body.logged-in {
 }
 .input-row #product:focus,
 .input-row #product:focus-visible {
-  border-color: #7fa8e8 !important;
+  border-color: #3c7a52 !important;
   outline: none !important;
-  box-shadow: 0 0 0 1px rgba(127,168,232,0.10) !important;
+  box-shadow: 0 0 0 3px rgba(60,122,82,.14) !important;
 }
 .searchBox:focus-within {
-  border-color: #7fa8e8 !important;
-  box-shadow: 0 0 0 1px rgba(127,168,232,0.10) !important;
+  border-color: #3c7a52 !important;
+  box-shadow: 0 0 0 3px rgba(60,122,82,.14) !important;
 }
 #loginScreen {
   overflow: hidden !important;
@@ -18572,7 +18572,12 @@ body.proPaidMode .onlyFree{display:none!important}
 })();
 </script>
 <style id="app-folder-style">
-.mbFolder{position:fixed;inset:0;z-index:99990;background:var(--app-bg,#eef8f1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(18px + env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom));animation:mbfIn .18s ease-out}
+.mbFolder{position:fixed;inset:0;z-index:99990;background:var(--app-bg,#eef8f1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(18px + env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom))}
+.mbFolder.fromRight{animation:tabSlideInFromRight .34s cubic-bezier(.22,.61,.36,1) both}
+.mbFolder.fromLeft{animation:tabSlideInFromLeft .34s cubic-bezier(.22,.61,.36,1) both}
+/* Meer schuift nu ook binnen, net als Lijst en Overzicht */
+html body .app.more-active > #moreView.mbTabFromRight{animation:tabSlideInFromRight .34s cubic-bezier(.22,.61,.36,1) both!important}
+@media (prefers-reduced-motion: reduce){.mbFolder.fromRight,.mbFolder.fromLeft,html body .app.more-active > #moreView.mbTabFromRight{animation:none!important}}
 @keyframes mbfIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .mbFolderTop{display:flex;align-items:center;gap:8px;margin:0 0 6px}
 .mbFolderBack{display:flex;align-items:center;gap:8px;border:0;background:none;color:#3F5B45;font:inherit;font-size:17px;font-weight:700;padding:10px 4px;cursor:pointer}
@@ -18754,7 +18759,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       var a=document.querySelector(".bottomNavBtn.active");prevNav=a&&a.id&&a.id!=="navFolder"?a.id:"navList";
       try{setBottomNav("navFolder");}catch(e){}
       var list=shops();state.shop=(shopKey&&list.indexOf(shopKey)>=0)?shopKey:(list[0]||"");state.cat="all";state.open={};
-      ov=document.createElement("div");ov.className="mbFolder";ov.setAttribute("role","dialog");ov.setAttribute("aria-label","Folder van deze week");
+      ov=document.createElement("div");ov.className="mbFolder "+(prevNav==="navMore"?"fromLeft":"fromRight");ov.setAttribute("role","dialog");ov.setAttribute("aria-label","Folder van deze week");
       ov.innerHTML=
         '<div class="mbFolderHead"><h2>Folder van deze week</h2><span></span></div><div class="mbFolderShops"></div><div class="mbFolderCats"></div><div class="mbFolderBody"></div>';
       ov.addEventListener("click",function(e){e.stopPropagation();});
@@ -18781,7 +18786,16 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     ["showMainListView","showOverviewView","showMoreView"].forEach(function(fn){
       var o=window[fn];if(typeof o!=="function")return;
       var id={showMainListView:"navList",showOverviewView:"navOverview",showMoreView:"navMore"}[fn];
-      window[fn]=function(){var was=!!ov;close(false);var r=o.apply(this,arguments);if(was){try{setBottomNav(id);}catch(e){}}return r;};
+      window[fn]=function(){
+        var was=!!ov,from=was?"navFolder":((document.querySelector(".bottomNavBtn.active")||{}).id||"navList");
+        close(false);
+        // Volgorde onderin: Lijst · Overzicht · Folder · Meer. Komt je van de Folder, dan schuift het scherm van links binnen.
+        if(was&&fn!=="showMoreView"){try{if(fn==="showMainListView")__activeMainTab=1;else __activeMainTab=2;}catch(e){}}
+        var r=o.apply(this,arguments);
+        if(was){try{setBottomNav(id);}catch(e){}}
+        if(fn==="showMoreView"&&from!=="navMore"){try{var mv=document.getElementById("moreView");if(mv){mv.classList.remove("mbTabFromRight");void mv.offsetWidth;mv.classList.add("mbTabFromRight");clearTimeout(mv.__t);mv.__t=setTimeout(function(){mv.classList.remove("mbTabFromRight");},400);}}catch(e){}}
+        return r;
+      };
     });
     // Terugknop: eerst een grote foto sluiten, dan de folder.
     setTimeout(function(){var ob=window.__appBack;window.__appBack=function(){
@@ -20207,15 +20221,37 @@ html body #list .item.longName .itemProductContent .productName{font-size:16px!i
   };
 })();
 </script>
+<style id="focus-green-all">
+/* Alle invoervelden: dezelfde groene focusrand (velden met een eigen rand-vak, zoals inloggen en zoeken, houden hun eigen stijl). */
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#3c7a52!important;box-shadow:0 0 0 3px rgba(60,122,82,.14)!important;outline:none!important}
+body.dark-theme :where(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):focus:not(:where(.inputBox *,.registerInputBox *,.searchBox *,.input-row *)){border-color:#9ed5ad!important;box-shadow:0 0 0 3px rgba(158,213,173,.15)!important}
+</style>
 <style id="accent-green">
-/* Accent (optie 3): het felle groen van het app-icoon bij afvinken en voortgang. Kop en knoppen blijven donkergroen. */
-:root{--mb-accent:#14BE4B}
+/* Twee groenen, elk met een eigen rol:
+   - Donkergroen #3F5B45 (de handvatten van het mandje): kop, knoppen, tekst. Rustig en chique.
+   - Fel groen #14BE4B (de mand zelf): alles wat "gelukt / aan / actief" betekent. */
+:root{--mb-accent:#14BE4B;--mb-accent-soft:#e3f7e9}
+/* Afvinken en voortgang */
 html body #list .item .itemProductContent .itemCheck.isChecked,html body #list .itemProductContent .itemCheck.isChecked{background:var(--mb-accent)!important;border-color:var(--mb-accent)!important}
 html body .listProgress .listProgressTrack .listProgressFill{background:var(--mb-accent)!important}
 html body .listProgress .listProgressText .fa-basket-shopping{color:var(--mb-accent)!important}
+html body #status .fa-circle-check{color:var(--mb-accent)!important}
+/* Actieve winkel: een fel groen streepje onder het tabblad */
 html body .shopTabs .shopTab.active{box-shadow:0 1px 4px rgba(47,90,61,.16),inset 0 -3px 0 var(--mb-accent)!important}
-body.dark-theme #list .item .itemProductContent .itemCheck.isChecked,body.dark-theme #list .itemProductContent .itemCheck.isChecked{background:#22c45a!important;border-color:#22c45a!important}
-body.dark-theme .listProgress .listProgressTrack .listProgressFill{background:#22c45a!important}
+/* Navigatie onderin: donkergroen blijft, met een klein fel groen streepje boven het actieve tabblad */
+html body .bottomNavBtn{position:relative}
+html body .bottomNavBtn.active::before{content:"";position:absolute;top:-7px;left:50%;width:28px;height:4px;margin-left:-14px;border-radius:0 0 4px 4px;background:var(--mb-accent)}
+/* Schakelaars die aan staan */
+html body .settingsToggle.on{background:var(--mb-accent)!important}
+/* "Staat op je lijst" in Folder en Aanbiedingen */
+html body .mbFAdd.done{background:var(--mb-accent)!important;color:#fff!important}
+html body .dealAddBtn.done{background:var(--mb-accent-soft)!important;color:#13863a!important;border-color:var(--mb-accent)!important}
+html body .dealAddBtn.done i{color:var(--mb-accent)!important}
+/* Donkere modus: iets zachter fel groen */
+body.dark-theme{--mb-accent:#22c45a;--mb-accent-soft:#1f3a29}
+body.dark-theme #list .item .itemProductContent .itemCheck.isChecked,body.dark-theme #list .itemProductContent .itemCheck.isChecked{background:var(--mb-accent)!important;border-color:var(--mb-accent)!important}
+body.dark-theme .listProgress .listProgressTrack .listProgressFill{background:var(--mb-accent)!important}
+body.dark-theme .dealAddBtn.done{color:#9fe3b3!important}
 </style>
 </body>
 
