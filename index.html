@@ -4653,6 +4653,9 @@ body.dark-theme .overviewSavedListLine{color:#c2ccc5;border-bottom-color:rgba(25
 .clearListCancel{background:#eef0ef;color:#344039}
 .clearListConfirm{background:#b6534a;color:#fff}
 .clearListConfirm i{margin-right:6px}
+/* "Alleen <winkel> wissen": eigen rij met dezelfde ruimte (10px) als tussen de andere knoppen */
+html body #clearListOnlyShop{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 10px!important;border:0;border-radius:15px;padding:12px 10px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;background:#f6ebe9;color:#a9544b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark-theme #clearListOnlyShop{background:#3a2a28;color:#f0b8b0}
 body.dark-theme .clearListSheet{background:#202923;color:#e5ece7}
 body.dark-theme .clearListSheet h2{color:#bfe0c9}
 body.dark-theme .clearListSheet p{color:#b6c1ba}
@@ -20218,7 +20221,10 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
         var sheet=document.getElementById("clearListSheet"),desc=document.getElementById("clearListDescription");
         var x=document.getElementById("clearListOnlyShop");
         if(!desc.dataset.orig)desc.dataset.orig=desc.textContent;
-        if(!on()){if(x)x.remove();desc.textContent=desc.dataset.orig;return r;}
+        var cf=sheet.querySelector(".clearListConfirm");
+        if(!on()){if(x)x.remove();desc.textContent=desc.dataset.orig;if(cf)cf.innerHTML='<i class="fa-solid fa-trash-can"></i> Lijst wissen';return r;}
+        // Met meerdere winkels: de rode knop wist alles, dat zeggen we er ook bij.
+        if(cf)cf.innerHTML='<i class="fa-solid fa-trash-can"></i> Alles wissen';
         var keys=tabKeys(),act=active(keys);
         desc.textContent="Je wist de lijsten van al je winkels ("+keys.map(nameOf).join(", ")+"). Of wis alleen de lijst van "+nameOf(act)+".";
         if(!x){x=document.createElement("button");x.type="button";x.id="clearListOnlyShop";x.className="clearListCancel clearListOnlyShop";
