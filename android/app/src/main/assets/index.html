@@ -5540,6 +5540,10 @@ html body .aboutInfoLine > i{flex:0 0 24px!important;width:24px!important;min-wi
 #helpMenuSub .helpSection:not(.open) > p{display:none!important}
 #helpMenuSub .helpSection.open .helpQuestion{margin-bottom:8px!important}
 #helpMenuSub .helpSection > p + p{margin-top:8px}
+/* Help & uitleg: kopjes per onderwerp */
+#helpMenuSub .helpGroup{margin:18px 6px 8px;font-size:12.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#6b7d71}
+#helpMenuSub .familyMenuSubTitle + .helpGroup{margin-top:4px}
+body.dark-theme #helpMenuSub .helpGroup{color:#9fb3a5}
 </style>
 <style id="deal-to-list-style">
 #list .item.seenItem:not(.completedMoving):not(.uncompleting){animation:none!important}
@@ -7363,120 +7367,160 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <span>Help &amp; uitleg</span>
     </button>
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
+    <div class="helpGroup">Je boodschappenlijst</div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
-      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong>. Kies daarna de juiste productsuggestie als die verschijnt en tik op de groene <strong>+</strong>. Tijdens het typen zie je ook of het product al op je lijst staat; het veld zoekt meteen mee in je lijst. Met het streepjescode-icoon in het veld scan je een product. Wil je echte productfoto’s zien in plaats van de iconen, zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
+      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong> in het veld bovenaan. Kies de juiste suggestie als die verschijnt, of tik op de groene <strong>+</strong>.</p>
+      <p>Het veld zoekt meteen mee in je lijst, dus je ziet direct of iets er al op staat.</p>
+      <p>Met het streepjescode-icoon in het veld scan je een product.</p>
+      <p>Liever echte productfoto’s in plaats van de iconen? Zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-circle-check"></i><span>Een product afvinken</span></div>
-      <p>Tik op het rondje naast een product om het af te vinken. Het gaat dan naar <strong>In je mandje</strong> onderaan je lijst, en bovenaan zie je hoeveel je al hebt. Per ongeluk afgevinkt? Tik in je mandje nog een keer op het rondje.</p>
+      <p>Tik op het rondje naast een product. Het gaat dan naar <strong>In je mandje</strong> onderaan je lijst. Bovenaan zie je hoeveel je al hebt.</p>
+      <p>Per ongeluk afgevinkt? Tik in je mandje nog een keer op het rondje.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-plus-minus"></i><span>Aantal aanpassen of verwijderen</span></div>
-      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak: daarmee haal je alleen dat product van je huidige lijst. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
+      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan.</p>
+      <p>Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak. Daarmee haal je alleen dat product van je lijst. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
-      <p>Via <strong>Mijn familie</strong> maak je een nieuwe familie, of doe je met <strong>Meedoen met een code</strong> mee met een bestaande familie. Bij <strong>Familielid</strong> zie je wie erbij hoort; de hoofdpersoon staat bovenaan. Je kunt de app ook gewoon alleen gebruiken.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
-      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst voor bijvoorbeeld een BBQ of feestje, en deel de <strong>Deelcode</strong> met anderen. Kopieer de code en stuur hem bijvoorbeeld via WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in. </p>
-      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong> om hem als boodschappenlijst te gebruiken; met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Alleen de maker kan de lijst verwijderen via <strong>⋮ → Gedeelde lijst verwijderen</strong>; wie meedoet, kiest daar <strong>Gedeelde lijst verlaten</strong>. Verwijdert de maker de lijst, dan ga je vanzelf terug naar je eigen lijst. Heb je de lijst eerder als vaste lijst bewaard, dan blijft die kopie gewoon bij je Opgeslagen lijsten staan. Bij <strong>Personen</strong> zie je wie meedoet; de maker van de lijst staat bovenaan. Tik op een profielfoto om hem groter te zien. Sluit je de app terwijl een gedeelde lijst open staat, dan opent de app de volgende keer weer in die lijst.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te laden: tik bovenaan op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone boodschappenlijst blijft daarbij behouden. Je bewaarde lijsten vind je op het Overzicht onder <strong>Opgeslagen lijsten</strong>: tik op <strong>Lijst openen</strong> om er een te gebruiken, of op <strong>Lijsten beheren</strong> om er een te verwijderen. Anders dan bij de geschiedenis kies je zelf welke lijsten je bewaart.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Geschiedenis</span></div>
-      <p>Als je de volledige boodschappenlijst wist via <strong>⋮ → Lijst wissen</strong> (rechtsboven op je lijst), wordt die eerst automatisch bewaard in je geschiedenis. Daarna is je lijst weer leeg. Heb je meerdere winkels, dan kies je <strong>Alleen &lt;winkel&gt; wissen</strong> of <strong>Alles wissen</strong>. Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen. Een los product dat je verwijdert, komt niet in je geschiedenis. Wil je alles weghalen? Tik in <strong>Overzicht → Geschiedenis</strong> onderaan op <strong>Geschiedenis wissen</strong> en bevestig.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
-      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het Overzicht en, als je lijst kort is, ook onder je boodschappen. Wat al op je lijst staat, wordt niet voorgesteld. Had een product een foto (een aanbieding uit de Folder), dan zie je die foto er ook bij. Onder je lijst tik je op <strong>Meer</strong> om alle producten te zien. In een gedeelde lijst (zoals een BBQ-lijst) staat het niet onder de lijst.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-layer-group"></i><span>Afdelingen en sorteren</span></div>
+      <p>Je lijst staat op volgorde van de winkel, per afdeling: groente &amp; fruit, brood, zuivel, enzovoort.</p>
+      <p>Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt.</p>
+      <p>Tik bovenaan op <strong>⋮</strong> om binnen de afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
+      <p>Wat je afvinkt, staat bij <strong>In je mandje</strong>. Tik daarop om het open of dicht te klappen.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cart-shopping"></i><span>Meerdere winkels</span></div>
-      <p>Doe je boodschappen bij meer dan één winkel? Tik op de lijst op <strong>⋮ → Mijn winkels</strong> (of ga naar <strong>Meer → Instellingen → Lijstopties</strong>) en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad boven je lijst; wat je toevoegt komt bij de winkel die openstaat. <strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen (of een andere afdeling te kiezen). Ben je bijna klaar in een winkel en staat er nog iets open, dan zie je onderaan <strong>Niet gevonden?</strong>: daarmee zet je alles wat over is in één keer op de lijst van een andere winkel. Met Pro zoek je bij <strong>Aanbiedingen</strong> bij al je winkels tegelijk, en kies je bij <strong>+ Op lijst</strong> op welke lijst het product komt.</p>
+      <p>Doe je boodschappen bij meer dan één winkel? Tik op je lijst op <strong>⋮ → Mijn winkels</strong> en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad; wat je toevoegt, komt bij de winkel die openstaat.</p>
+      <p><strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen.</p>
+      <p>Ben je bijna klaar in een winkel en staat er nog iets open? Dan zie je onderaan <strong>Niet gevonden?</strong>. Daarmee zet je alles wat over is in één keer op de lijst van een andere winkel.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder</span></div>
-      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, ingedeeld in dezelfde afdelingen als je lijst (zoals groente &amp; fruit, brood en zuivel), met de grootste korting eerst. Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet; de acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren. Zet je zo'n actie op je lijst, dan zie je erbij vanaf wanneer hij geldt. Met het tandwieltje naast de winkels kies je je winkels. Producten van dezelfde actie staan samen op één kaart, bijvoorbeeld <strong>3 soorten</strong>: tik erop en kies de soort die je wilt. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten; wat al op je lijst staat, krijgt een groen vinkje. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, in dezelfde afdelingen als je lijst, met de grootste korting eerst.</p>
+      <p>Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet. De acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren.</p>
+      <p>Staat er <strong>3 soorten</strong> op een kaart? Tik erop en kies de soort die je wilt. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. Wat al op je lijst staat, krijgt een groen vinkje.</p>
+      <p>Met het tandwieltje naast de winkels kies je je winkels. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>.</p>
+      <p>De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-arrow-down-a-z"></i><span>Sorteren</span></div>
-      <p>Je lijst staat op volgorde van de winkel: per afdeling, zoals groente &amp; fruit, brood en zuivel. Tik bovenaan op <strong>⋮</strong> om binnen die afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren. Wat je afvinkt, gaat naar <strong>In je mandje</strong> onderaan; tik daarop om het open of dicht te klappen. Bovenaan onder de titel zie je hoeveel er al in je mandje zit. Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt. De Folder gebruikt dezelfde afdelingen.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
+      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het <strong>Overzicht</strong> en, als je lijst kort is, ook onder je boodschappen.</p>
+      <p>Wat al op je lijst staat, wordt niet voorgesteld. Was een product eerder een aanbieding uit de Folder, dan zie je de foto erbij.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
-      <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je boodschappenlijst open staat en er nog iets af te vinken is. Handig in de winkel. Ga je naar een ander scherm of is alles afgevinkt, dan werkt je telefoon weer zoals normaal.</p>
-      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan en werken in de Android-app.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
+      <p>Bewaar een lijst om hem later opnieuw te gebruiken: tik op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone lijst blijft gewoon staan.</p>
+      <p>Je bewaarde lijsten vind je op het <strong>Overzicht</strong> onder <strong>Opgeslagen lijsten</strong>. Tik op <strong>Lijst openen</strong> om er een te gebruiken, of op <strong>Lijsten beheren</strong> om er een te verwijderen.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-triangle-exclamation"></i><span>Geen internet</span></div>
-      <p>Heb je geen bereik, bijvoorbeeld in de supermarkt? Dan zie je onderin een melding <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen. Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Lijst wissen en geschiedenis</span></div>
+      <p>Wis je je lijst via <strong>⋮ → Lijst wissen</strong>, dan wordt hij eerst bewaard in je geschiedenis. Heb je meerdere winkels, dan kies je <strong>Alleen &lt;winkel&gt; wissen</strong> of <strong>Alles wissen</strong>.</p>
+      <p>Heb je alles afgevinkt? Dan vraagt de app of je de ronde wilt bewaren en met een nieuwe lijst wilt beginnen.</p>
+      <p>Je geschiedenis vind je op het <strong>Overzicht</strong>. Een los product dat je verwijdert, komt er niet in. Alles weghalen? Tik onderaan op <strong>Geschiedenis wissen</strong>.</p>
+    </div>
+
+    <div class="helpGroup">Samen</div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
+      <p>Via <strong>Mijn familie</strong> maak je een nieuwe familie, of doe je met <strong>Meedoen met een code</strong> mee met een bestaande familie. Jullie delen dan dezelfde lijst.</p>
+      <p>Bij <strong>Familielid</strong> zie je wie erbij hoort; de hoofdpersoon staat bovenaan. Je kunt de app ook gewoon alleen gebruiken.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
-      <p>Tik in <strong>Meer</strong> rechtsboven op het maantje (of zonnetje) en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>. Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
+      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst, bijvoorbeeld voor een BBQ of feestje. Stuur de <strong>Deelcode</strong> via bijvoorbeeld WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in.</p>
+      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong>. Met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet.</p>
+      <p>Alleen de maker kan de lijst verwijderen via <strong>⋮ → Gedeelde lijst verwijderen</strong>. Wie meedoet, kiest daar <strong>Gedeelde lijst verlaten</strong>.</p>
     </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
-      <p>Een pop-up sluit je met het kruisje <strong>✕</strong> rechtsboven, of door naast de pop-up op het scherm te tikken. Op Android kan het ook met de terugknop van je telefoon. Wat je instelt, wordt meteen bewaard.</p>
-      <p>Keuzelijsten, zoals de winkel in de budgetplanner, openen als lijstje van de app zelf. Tik op je keuze; tik je ernaast, dan verandert er niets. Zo werkt het op iPhone en Android hetzelfde.</p>
-    </div>
+
+    <div class="helpGroup">Mijn Boodschappen Pro</div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, uit je boodschappenlijst of wat je vaak koopt, met aantal en houdbaarheid erbij. Tik op een product om het aan te passen of te verwijderen. Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in (bijvoorbeeld ± 1 week voor melk); die kun je met 3 dagen, 1 week, 2 weken, 1 maand aanpassen, of via <strong>Andere datum</strong> een dag kiezen in de kalender (veeg opzij voor een andere maand). </p>
-      <p>Pas je de datum aan, dan onthoudt de app dat voor de volgende keer. Controleer altijd de datum op de verpakking. Is iets op, dan zet je het met één tik op je lijst.</p>
-      <p>Na het boodschappen doen kun je je gekochte producten in één keer aan je voorraad toevoegen. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Tik op een product om het aan te passen of te verwijderen.</p>
+      <p>Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, met aantal en houdbaarheid erbij.</p>
+      <p>Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in, bijvoorbeeld ± 1 week voor melk. Pas je die aan, dan onthoudt de app dat. Controleer altijd de datum op de verpakking.</p>
+      <p>Is iets op, dan zet je het met één tik op je lijst. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro</strong> en tik op een onderdeel. Het opent als eigen scherm; met <strong>‹ Pro</strong> ga je terug. In de weekplanner zie je bij <strong>Mijn week</strong> je geplande maaltijden en voeg je een maaltijd toe; met <strong>Ingrediënten aan boodschappenlijst toevoegen</strong> zet je alle ingrediënten van je week in één keer op je lijst. Wat je al in je voorraad hebt, slaat de app over. Meer over de recepten lees je hieronder bij <strong>Recepten</strong>.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Slimme weekplanner</strong>. Bij <strong>Mijn week</strong> zie je je geplande maaltijden en voeg je een maaltijd toe.</p>
+      <p>Met <strong>Ingrediënten aan boodschappenlijst toevoegen</strong> zet je alle ingrediënten van je week in één keer op je lijst. Wat je al in je voorraad hebt, slaat de app over.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-utensils"></i><span>Recepten <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Slimme weekplanner</strong> en kies het tabblad <strong>Recepten</strong>. Er staan 30 recepten klaar, van stamppot tot curry. Zoek op naam of ingrediënt, of tik op een label zoals <strong>Vegetarisch</strong>, <strong>Snel klaar</strong> of <strong>Italiaans</strong> om alle recepten met dat label te zien.</p>
-      <p>Tik op een recept om de ingrediënten, de bereidingswijze en een tip te zien. Met <strong>−</strong> en <strong>+</strong> kies je voor hoeveel porties je kookt; de hoeveelheden rekenen vanzelf mee, ook op je boodschappenlijst. De app onthoudt dat aantal voor de volgende recepten.</p>
-      <p>Tik op <strong>Kies dit recept</strong> om het in je weekplanning te zetten: kies de dag en tik op <strong>Maaltijd opslaan</strong>. Daarna zet je met <strong>Ingrediënten aan boodschappenlijst toevoegen</strong> alles in één keer op je lijst.</p>
+      <p>In de weekplanner kies je het tabblad <strong>Recepten</strong>. Er staan 30 recepten klaar, van stamppot tot curry. Zoek op naam of ingrediënt, of tik op een label zoals <strong>Vegetarisch</strong> of <strong>Snel klaar</strong>.</p>
+      <p>Tik op een recept voor de ingrediënten, de bereiding en een tip. Met <strong>−</strong> en <strong>+</strong> kies je het aantal porties; de hoeveelheden rekenen vanzelf mee.</p>
+      <p>Met <strong>Kies dit recept</strong> zet je het op een dag in je week.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Bij <strong>Mijn budget</strong> vul je bij <strong>Budget per week</strong> een bedrag in en tik je op <strong>Budget opslaan</strong>. Daarna zie je steeds hoeveel je hebt uitgegeven en wat er nog beschikbaar is. Zet je via <strong>Aanbiedingen</strong> of de <strong>Folder</strong> een product op je persoonlijke lijst, dan komt de prijs vanzelf bij je uitgaven zodra je het afvinkt (weer uitvinken haalt het er weer af). Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan: de app vraagt dan bij afvinken wat het kostte.</p>
-      <p>Na het boodschappen doen vul je bij <strong>Uitgave toevoegen</strong> een omschrijving, het bedrag en de winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf; met <strong>Wis uitgaven</strong> begin je opnieuw.</p>
-      <p>Bij <strong>Aanbiedingen</strong> kies je eerst je winkels: tik bij <strong>Mijn winkels</strong> op <strong>Wijzigen</strong>. Je kunt tot 3 winkels kiezen, in Nederland en België; de app zoekt dan bij al je winkels tegelijk. Zoek daarna een product, of tik op <strong>Zoek aanbiedingen voor mijn week</strong> om te zien welke producten uit je weekplanning in de aanbieding zijn. Tik bij een aanbieding op <strong>+ Op lijst</strong>: onder het product zie je dan de korting, de prijs, de actie en tot wanneer die geldt. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is.</p>
+      <p>Zet je een aanbieding via <strong>Aanbiedingen</strong> of de <strong>Folder</strong> op je lijst, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
+      <p>Bij <strong>Uitgave toevoegen</strong> vul je zelf een bedrag en winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf.</p>
+      <p>Bij <strong>Aanbiedingen</strong> zoek je een product bij al je winkels tegelijk, of tik je op <strong>Zoek aanbiedingen voor mijn week</strong>. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
-      <p>De assistent zet je <strong>vaste boodschappen</strong> klaar: wat je bijna elke keer koopt, zet je met één tik op je lijst, of je kiest zelf wat je deze keer nodig hebt. Daarnaast geeft hij tips over wat waarschijnlijk bijna op is, wat je meestal samen koopt, welke producten die je vaak koopt in de aanbieding zijn en wat je vandaag kunt koken met wat je in huis hebt. Bij <strong>Wat eten we vandaag?</strong> zet <strong>Plan voor vandaag</strong> het recept in je weekplanner en de ontbrekende ingrediënten op je lijst. Hij leert van je boodschappenrondes, dus na een paar keer "Bewaren en nieuwe lijst" verschijnen de eerste tips. Je ziet de belangrijkste tip op het Overzicht.</p>
+      <p>De assistent zet je <strong>vaste boodschappen</strong> klaar: wat je bijna elke keer koopt, zet je met één tik op je lijst.</p>
+      <p>Ook geeft hij tips: wat bijna op is, wat je meestal samen koopt, wat van je vaste producten in de aanbieding is en wat je vandaag kunt koken. Bij <strong>Wat eten we vandaag?</strong> zet <strong>Plan voor vandaag</strong> het recept in je week en de ontbrekende ingrediënten op je lijst.</p>
+      <p>Hij leert van je boodschappenrondes, dus na een paar keer "Bewaren en nieuwe lijst" verschijnen de eerste tips op het Overzicht.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-crown"></i><span>Pro en je familie</span></div>
-      <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken. Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
-      <p class="onlyPaid">Pro is een abonnement via Google Play, per maand of per jaar. Je kunt het eerst <strong>7 dagen gratis proberen</strong>; zeg je op tijd op, dan betaal je niets. Eén abonnement geldt voor je <strong>hele familie</strong>: iedereen in je familie kan dan alle Pro-onderdelen gebruiken. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken.</p>
+      <p class="onlyFree">Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyPaid">Pro is een abonnement via Google Play, per maand of per jaar. Je kunt het eerst <strong>7 dagen gratis proberen</strong>; zeg je op tijd op, dan betaal je niets. Eén abonnement geldt voor je <strong>hele familie</strong>. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
       <p class="onlyPaid">Je abonnement bekijk of stop je via <strong>Meer → Mijn Boodschappen Pro → Abonnement beheren</strong>. Nieuwe telefoon? Tik in het Pro-scherm op <strong>Aankoop herstellen</strong>. Verwijder je je account, zeg dan ook je abonnement op in Google Play; dat stopt niet vanzelf.</p>
     </div>
+
+    <div class="helpGroup">Instellingen</div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Inloggen met Google</span></div>
-      <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Je hoeft dan geen wachtwoord te onthouden. De eerste keer vraagt de app hoe we je mogen noemen; die naam pas je later aan bij <strong>Meer → Mijn account → Mijn naam</strong>. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
+      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de dag en tijd.</p>
+      <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten:</p>
+      <p><strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Was de datum geschat, dan vraagt de app of je het even wilt checken: tik op <strong>Op</strong> of <strong>Nog goed</strong>.</p>
+      <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
+      <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-gift"></i><span>Updates</span></div>
-      <p>Op Android krijg je een melding als er een nieuwe versie van de app is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer. Op de iPhone gebruik je altijd vanzelf de nieuwste versie.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
+      <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je lijst open staat en er nog iets af te vinken is. Handig in de winkel.</p>
+      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan en werken in de Android-app.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
+      <p>Tik in <strong>Meer</strong> rechtsboven op het maantje (of zonnetje) en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>.</p>
+      <p>Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-triangle-exclamation"></i><span>Geen internet</span></div>
+      <p>Geen bereik, bijvoorbeeld in de supermarkt? Dan zie je onderin <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen.</p>
+      <p>Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
+      <p>Een pop-up sluit je met het kruisje <strong>✕</strong>, of door ernaast op het scherm te tikken. Op Android kan het ook met de terugknop. Wat je instelt, wordt meteen bewaard.</p>
+      <p>Bij een keuzelijst tik je op je keuze. Tik je ernaast, dan verandert er niets.</p>
+    </div>
+
+    <div class="helpGroup">Account</div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Inloggen met Google</span></div>
+      <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Je hoeft dan geen wachtwoord te onthouden.</p>
+      <p>De eerste keer vraagt de app hoe we je mogen noemen. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
-      <p>Bovenaan in <strong>Meer</strong> zie je je naam, e-mailadres en profielfoto; tik erop om naar <strong>Mijn account</strong> te gaan. Ga naar <strong>Meer → Mijn account → Profielfoto</strong> en tik op <strong>Foto kiezen</strong>. Verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Je familieleden zien je foto bij <strong>Mijn familie</strong>. Via hetzelfde scherm kun je de foto ook weer verwijderen. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien.</p>
+      <p>Ga naar <strong>Meer → Mijn account</strong>. Bij <strong>Profielfoto</strong> tik je op <strong>Foto kiezen</strong>; verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Via hetzelfde scherm verwijder je hem weer.</p>
+      <p>Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien. Je familieleden zien je foto en naam bij <strong>Mijn familie</strong>.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
-      <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de gewenste dag en tijd. Je keuzes worden meteen bewaard; sluit het venster met <strong>✕</strong> of door ernaast te tikken.</p>
-      <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten en een tijdstip kiezen.</p>
-      <p><strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Heeft de app de datum geschat, dan vraagt hij op die dag of je het even wilt checken; tik op <strong>Op</strong> of <strong>Nog goed</strong> (dan vraagt de app het over 3 dagen opnieuw en onthoudt hij dat het langer goed blijft). Producten in de vriezer met een geschatte datum geven geen melding.</p>
-      <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
-      <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-gift"></i><span>Updates</span></div>
+      <p>Op Android krijg je een melding als er een nieuwe versie is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer.</p>
+      <p>Op de iPhone gebruik je altijd vanzelf de nieuwste versie.</p>
     </div>
     <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" style="margin-top:12px" onclick="openAppTourFromHelp(event)">
       <i class="fa-solid fa-hand-pointer"></i>
