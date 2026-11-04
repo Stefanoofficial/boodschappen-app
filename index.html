@@ -7483,12 +7483,12 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p>Met Pro kun je daar ook <strong>voorraadmeldingen</strong> aanzetten:</p>
       <p><strong>Bijna over de datum</strong>: de dag voordat een product over de datum gaat, krijg je een seintje. Was de datum geschat, dan vraagt de app of je het even wilt checken: tik op <strong>Op</strong> of <strong>Nog goed</strong>.</p>
       <p><strong>Bijna op</strong>: heb je minder dan je minimum, dan zet je het met <strong>Op mijn lijst</strong> meteen op je boodschappenlijst.</p>
-      <p id="helpReminderPlatform">Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.</p>
+      <p id="helpReminderPlatform">Meldingen worden op je telefoon zelf ingepland, ook als je je telefoon opnieuw opstart.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
       <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je lijst open staat en er nog iets af te vinken is. Handig in de winkel.</p>
-      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan en werken in de Android-app.</p>
+      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
@@ -7502,7 +7502,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
-      <p>Een pop-up sluit je met het kruisje <strong>✕</strong>, of door ernaast op het scherm te tikken. Op Android kan het ook met de terugknop. Wat je instelt, wordt meteen bewaard.</p>
+      <p>Een pop-up sluit je met het kruisje <strong>✕</strong>, of door ernaast op het scherm te tikken. Je kunt ook de terugknop van je telefoon gebruiken. Wat je instelt, wordt meteen bewaard.</p>
       <p>Bij een keuzelijst tik je op je keuze. Tik je ernaast, dan verandert er niets.</p>
     </div>
 
@@ -7519,8 +7519,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-gift"></i><span>Updates</span></div>
-      <p>Op Android krijg je een melding als er een nieuwe versie is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer.</p>
-      <p>Op de iPhone gebruik je altijd vanzelf de nieuwste versie.</p>
+      <p>Je krijgt een melding als er een nieuwe versie van de app is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer.</p>
     </div>
     <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" style="margin-top:12px" onclick="openAppTourFromHelp(event)">
       <i class="fa-solid fa-hand-pointer"></i>
@@ -15401,7 +15400,7 @@ document.addEventListener('visibilitychange',function(){
   if (isIOS && helpReminderPlatform) {
     helpReminderPlatform.textContent = "Op de iPhone zijn meldingen nog niet beschikbaar. Ze werken nu alleen in de Android-app.";
   } else if (helpReminderPlatform) {
-    helpReminderPlatform.textContent = "Meldingen werken in de Android-app. Ze worden op je telefoon zelf ingepland, ook na het opnieuw opstarten van je telefoon.";
+    helpReminderPlatform.textContent = "Meldingen worden op je telefoon zelf ingepland, ook als je je telefoon opnieuw opstart.";
   }
   if (isIOS) {
     const testButton = document.querySelector(".notificationTestButton");
@@ -18680,7 +18679,9 @@ body.proPaidMode .onlyFree{display:none!important}
 .mbFolder.fromRight{animation:tabSlideInFromRight .34s cubic-bezier(.22,.61,.36,1) both}
 .mbFolder.fromLeft{animation:tabSlideInFromLeft .34s cubic-bezier(.22,.61,.36,1) both}
 /* Meer schuift nu ook binnen, net als Lijst en Overzicht */
-html body .app.more-active > #moreView.mbTabFromRight{animation:tabSlideInFromRight .34s cubic-bezier(.22,.61,.36,1) both!important}
+/* Meer schuift van rechts binnen. Via "translate" (los van transform), want #moreView heeft elders transform:none!important. */
+@keyframes mbMeerIn{from{translate:38px 0}to{translate:0 0}}
+html body .app.more-active > #moreView.mbTabFromRight{animation:mbMeerIn .34s cubic-bezier(.22,.61,.36,1) both!important}
 @media (prefers-reduced-motion: reduce){.mbFolder.fromRight,.mbFolder.fromLeft,html body .app.more-active > #moreView.mbTabFromRight{animation:none!important}}
 @keyframes mbfIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .mbFolderTop{display:flex;align-items:center;gap:8px;margin:0 0 6px}
