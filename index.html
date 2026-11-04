@@ -4481,6 +4481,14 @@ body.dark-theme .recipeSheetHero{background:linear-gradient(135deg,#34503b,#2a40
 .recipeSheetBody{padding:16px 18px 0}
 .recipeSheetBody h3{margin:0 0 6px;font-size:22px;line-height:1.2;color:var(--rs-head)!important}
 .recipeSheetBody .rsMeta{margin:0 0 8px;font-size:14px;color:var(--rs-muted)!important}
+.recipeSheetBody .rsNutri{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 4px}
+.recipeSheetBody .rsNutri div{background:#f1f7f3;border:1px solid #dfeae2;border-radius:12px;padding:8px 4px;text-align:center;min-width:0}
+.recipeSheetBody .rsNutri b{display:block;font-size:16px;font-weight:800;color:#24392b;line-height:1.2}
+.recipeSheetBody .rsNutri span{display:block;font-size:11.5px;color:#6b7d71;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipeSheetBody .rsNutri div:first-child{background:#fff4e5;border-color:#f6dfbd}.recipeSheetBody .rsNutri div:first-child b{color:#a8570e}
+.recipeSheetBody .rsNutriNote{margin:2px 0 12px;font-size:12px;color:var(--rs-muted)!important}
+body.dark-theme .recipeSheetBody .rsNutri div{background:#243028;border-color:#34443a}body.dark-theme .recipeSheetBody .rsNutri b{color:#e6efe8}body.dark-theme .recipeSheetBody .rsNutri span{color:#a9bfb0}
+body.dark-theme .recipeSheetBody .rsNutri div:first-child{background:#3a2e1f;border-color:#57442a}body.dark-theme .recipeSheetBody .rsNutri div:first-child b{color:#f2c58c}
 .recipeSheetBody .rsDesc{margin:10px 0 14px;font-size:14px;line-height:1.5;color:var(--rs-text)!important}
 .recipeSheetPanel .recipeTags{display:flex;flex-wrap:wrap;gap:6px}
 .recipeSheetPanel .recipeTags span{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:650;background:#dcefe0;color:#2f6a40}
@@ -7452,7 +7460,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-utensils"></i><span>Recepten <b class="aboutProBadge">PRO</b></span></div>
       <p>In de weekplanner kies je het tabblad <strong>Recepten</strong>. Er staan 30 recepten klaar, van stamppot tot curry. Zoek op naam of ingrediënt, of tik op een label zoals <strong>Vegetarisch</strong> of <strong>Snel klaar</strong>.</p>
-      <p>Tik op een recept voor de ingrediënten, de bereiding en een tip. Met <strong>−</strong> en <strong>+</strong> kies je het aantal porties; de hoeveelheden rekenen vanzelf mee.</p>
+      <p>Tik op een recept voor de ingrediënten, de bereiding en een tip. Je ziet ook ongeveer hoeveel <strong>kcal</strong>, eiwit, koolhydraten en vet er per portie in zit. Met <strong>−</strong> en <strong>+</strong> kies je het aantal porties; de hoeveelheden rekenen vanzelf mee.</p>
       <p>Met <strong>Kies dit recept</strong> zet je het op een dag in je week.</p>
     </div>
     <div class="helpSection">
@@ -9547,7 +9555,7 @@ function normalizeBoodschappen(data) {
         brand: item.brand ? String(item.brand) : "",
         quantity: Math.max(1, Number(item.quantity) || 1),
         ...(item.shop ? { shop: String(item.shop).slice(0, 30) } : {}),
-        ...((Number.isInteger(item.aisle) && ((item.aisle >= 0 && item.aisle <= 11) || item.aisle === 99)) ? { aisle: item.aisle } : {}),
+        ...((Number.isInteger(item.aisle) && ((item.aisle >= 0 && item.aisle <= 12) || item.aisle === 99)) ? { aisle: item.aisle } : {}),
         ...(item.deal && typeof item.deal === "object" && Number.isFinite(Number(item.deal.price)) ? { deal: {
           price: Number(item.deal.price),
           promo: item.deal.promo ? String(item.deal.promo).slice(0, 40) : "",
@@ -9671,7 +9679,7 @@ const productCatalog = [
   ["stofzuigerzak", "🧹"], ["bezem", "🧹"], ["dweil", "🧹"], ["wc borstel", "🪥"],
 
   // Baby & huisdieren
-  ["luiers", "👶"], ["luier", "👶"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
+  ["luiers", "👶"], ["luier", "👶"], ["babydoekjes", "🍼"], ["billendoekjes", "🍼"], ["babyvoeding", "🍼"], ["flesvoeding", "🍼"],
   ["kattenvoer", "🐱"], ["hondenvoer", "🐶"], ["dierenvoer", "🐾"], ["kattenbakvulling", "🐱"],
   ["hondensnoepjes", "🐶"], ["kattensnoepjes", "🐱"],
 
@@ -10105,7 +10113,8 @@ const AISLE_GROUPS = [
   ["🧊🍕🍟🍦", []],
   ["🧴🪥🧼", []],
   ["🧽🧻🧺🗑️🛒🕯️🔋", []],
-  ["🍼🐾🐱🐶", []]
+  ["🍼👶🧸", []],
+  ["🐾🐱🐶🐕🐈", []]
 ];
 function productAisle(text) {
   const icon = getProductIcon(text);
@@ -15455,6 +15464,12 @@ const recipes=window.__recipeList=[
 {"id": "turkse-pizza", "img": "recipes/turkse-pizza.jpeg", "emoji": "🍕", "desc": "Snelle pizza's op Turks brood, die iedereen zelf belegt.", "tags": ["Familie", "Oven", "Snel klaar"], "name": "Pizza's op Turks brood", "time": 20, "servings": 2, "ingredients": ["1 Turks brood", "1 pak passata (200 g)", "1 bol mozzarella", "100 g salami of ham", "1 paprika", "2 tl Italiaanse kruiden"], "steps": ["Verwarm de oven voor op 220 °C.", "Snijd het Turks brood in vier stukken en halveer ze, zodat je acht pizzabodems hebt.", "Besmeer met passata en bestrooi met de kruiden.", "Beleg met salami of ham, paprika en stukjes mozzarella.", "Bak 8 tot 10 minuten in de oven, tot de kaas borrelt."], "tip": "Laat kinderen hun eigen pizza beleggen: dan eten ze alles op."},
 {"id": "gehaktballen", "img": "recipes/gehaktballen.jpeg", "emoji": "🧆", "desc": "Zondagse gehaktballen in jus met aardappelen en sperziebonen.", "tags": ["Nederlands", "Familie"], "name": "Gehaktballen in jus", "time": 45, "servings": 2, "ingredients": ["300 g half-om-half gehakt", "1 ei", "2 el paneermeel", "600 g aardappelen", "300 g sperziebonen", "2 el boter", "1 runderbouillonblokje", "1 tl maizena", "Peper, zout en nootmuskaat"], "steps": ["Meng het gehakt met het ei, paneermeel, peper, zout en een snufje nootmuskaat. Draai er 4 ballen van.", "Smelt de boter en bak de ballen rondom bruin. Schenk 250 ml water met het bouillonblokje erbij.", "Laat de gehaktballen met het deksel op de pan 25 minuten zachtjes stoven. Draai ze halverwege om.", "Kook ondertussen de aardappelen en de sperziebonen gaar.", "Haal de ballen uit de pan. Bind de jus met de maizena (aangelengd met een beetje water) en schenk over de ballen."], "tip": "Een scheutje melk of een klontje boter in de jus maakt hem extra romig."}
 ];
+// Voedingswaarden per portie (ongeveer): [kcal, eiwit g, koolhydraten g, vet g].
+// Berekend uit de ingrediënten met gangbare voedingswaarden (NEVO / etiketten), afgerond.
+const __NUTRI={"tomato-pasta":[540,20,82,13],"veggie-wraps":[460,19,70,9],"fried-rice":[430,15,64,11],"potato-carrot":[350,9,59,8],"chickpea-curry":[820,21,89,40],"salmon-veg":[520,35,42,22],"lentil-soup":[250,15,36,3],"chicken-traybake":[430,42,45,8],"pesto-pasta":[540,20,74,17],"bean-chili":[630,26,107,5],"omelette":[400,24,33,19],"couscous":[530,21,84,10],"boerenkool-worst":[780,31,64,43],"pancakes":[430,14,67,12],"witlof-ham":[570,33,52,26],"hutspot":[720,40,78,26],"andijvie-spek":[500,19,55,22],"erwtensoep":[730,43,91,20],"kip-kerrie":[700,44,70,26],"carbonara":[700,38,70,29],"kip-wraps":[580,39,46,27],"nasi-goreng":[490,15,78,11],"groene-curry":[900,46,74,45],"lasagne":[850,47,66,43],"shakshuka":[420,21,42,17],"kibbeling-bowl":[830,27,83,41],"zalm-teriyaki":[650,36,70,23],"macaroni":[750,42,84,25],"turkse-pizza":[870,41,114,26],"gehaktballen":[870,41,67,47]};
+recipes.forEach(r=>{const n=__NUTRI[r.id];if(n)r.nutri={kcal:n[0],eiwit:n[1],kh:n[2],vet:n[3]};});
+function nutriHtml(r){const n=r.nutri;if(!n)return "";
+ return '<div class="rsNutri" aria-label="Voedingswaarde per portie"><div><b>'+n.kcal+'</b><span>kcal</span></div><div><b>'+n.eiwit+' g</b><span>eiwit</span></div><div><b>'+n.kh+' g</b><span>koolhydraten</span></div><div><b>'+n.vet+' g</b><span>vet</span></div></div><p class="rsNutriNote">Per portie, ongeveer. Berekend uit de ingrediënten.</p>';}
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
 function write(items){localStorage.setItem(KEY,JSON.stringify(items))}
 var recipeFilter="all";
@@ -15489,7 +15504,7 @@ window.renderRecipeCatalog=function(){
  if(!found.length){box.innerHTML='<p class="plannerEmpty">Geen recepten gevonden. Probeer een andere zoekterm.</p>';return}
  const __lim=!q&&recipeFilter==="all"&&!window.__showAllRecipes&&found.length>3;
  const __shown=__lim?found.slice(0,3):found;
- box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" decoding="sync" onerror="__recipeImgFallback(this)"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
+ box.innerHTML=__shown.map(r=>'<article class="plannerRecipeCard"><div class="recipeTop" role="button" tabindex="0" onclick="openRecipeSheet(&quot;'+r.id+'&quot;)" onkeydown="if(event.key===&quot;Enter&quot;)openRecipeSheet(&quot;'+r.id+'&quot;)"><div class="recipeThumb"><span class="recipeThumbEmoji" aria-hidden="true">'+(r.emoji||'🍽️')+'</span><img src="'+__recipeImgSrc(r.img)+'" alt="'+esc(r.name)+'" decoding="sync" onerror="__recipeImgFallback(this)"></div><div class="recipeHead"><strong>'+esc(r.name)+'</strong><p class="recipeMeta">⏱ '+r.time+' min · 👥 '+defServ(r)+' porties'+(r.nutri?' · <span style="white-space:nowrap">🔥\u00a0'+r.nutri.kcal+' kcal</span>':'')+'</p><p class="recipeDesc">'+esc(r.desc||'')+'</p><div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'" onclick="event.stopPropagation();filterRecipeTag(this.dataset.tag)">'+esc(t)+'</span>').join('')+'</div><span class="recipeMore">Bekijk recept ›</span></div></div><button type="button" class="proPlannerButton" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;)">Kies recept</button></article>').join('')+(__lim?'<button type="button" class="recipeShowAll" onclick="event.stopPropagation();window.__showAllRecipes=true;renderRecipeCatalog()">Toon alle '+found.length+' recepten <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>':'');
 };
 window.openRecipeSheet=function(id){
  const r=recipes.find(x=>x.id===id);if(!r)return;
@@ -15504,6 +15519,7 @@ window.openRecipeSheet=function(id){
  +'<p class="rsMeta">⏱ '+r.time+' min · 👥 <span class="rsServMeta">'+defServ(r)+'</span> porties</p>'
  +'<div class="recipeTags">'+(r.tags||[]).map(t=>'<span role="button" tabindex="0" class="recipeTagBtn" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('')+'</div>'
  +'<p class="rsDesc">'+esc(r.desc||"")+'</p>'
+ +nutriHtml(r)
  +'<button type="button" class="recipeSheetChoose" onclick="choosePlannerRecipe(&quot;'+r.id+'&quot;,window.__rsServ);closeRecipeSheet();">Kies dit recept</button>'
  +'<section class="rsCard"><div class="rsIngHead"><h4><i class="fa-solid fa-basket-shopping"></i> Ingrediënten</h4><div class="servStepper" aria-label="Aantal porties"><button type="button" class="servBtn" data-d="-1" aria-label="Minder porties"><span class="stepIcon" aria-hidden="true"></span></button><span class="servVal"><b class="rsServVal">'+defServ(r)+'</b> porties</span><button type="button" class="servBtn" data-d="1" aria-label="Meer porties"><span class="stepIcon plus" aria-hidden="true"></span></button></div></div><ul class="rsIngredients">'+scaleIngredients(r.ingredients,defServ(r)/r.servings).map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul></section>'
  +'<section class="rsCard"><h4><i class="fa-solid fa-utensils"></i> Bereidingswijze</h4><ol class="rsSteps">'+steps.map(st=>'<li>'+esc(st)+'</li>').join('')+'</ol>'
@@ -18706,6 +18722,11 @@ body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
 .mbIc{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-style:normal;vertical-align:-4px}
 .mbIc:empty{display:none}
 .mbIc svg,.mbIc img{width:18px;height:18px}
+/* Emoji-iconen (zoals de kip) even groot als de andere iconen */
+.mbIc .productInlineIcon,.mbAislePick .ic .productInlineIcon{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important}
+.mbIc .productEmojiIcon>span{font-size:16px!important;line-height:1!important}
+.mbAislePick .ic .productInlineIcon{width:24px!important;height:24px!important;max-width:24px!important;max-height:24px!important}
+.mbAislePick .ic .productEmojiIcon>span{font-size:21px!important}
 .mbFolderSec .mbIc{margin-right:6px}
 .mbFolderSec{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 10px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b7d71}
 .mbFolderSec button{border:0;background:none;color:#3F5B45;font:inherit;font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;cursor:pointer;padding:4px}
@@ -20645,13 +20666,13 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
 (function(){
   /* Afdelingen in de volgorde van de winkel (zelfde volgorde als "Per categorie" sorteren). */
   // Het icoontje bij een kopje komt uit de eigen iconen van de app (via een voorbeeldproduct).
-  var AISLES=[["appel","Groente & fruit"],["brood","Brood & bakkerij"],["kipfilet","Vlees & vis"],["kaas","Zuivel, eieren & kaas"],["pindakaas","Broodbeleg"],["pasta","Pasta, rijst & sauzen"],["chips","Snoep & koek"],["cola","Drinken"],["pizza","Diepvries"],["shampoo","Verzorging"],["wasmiddel","Huishouden"],["luiers","Baby & huisdier"]];
+  var AISLES=[["appel","Groente & fruit"],["brood","Brood & bakkerij"],["kipfilet","Vlees & vis"],["kaas","Zuivel, eieren & kaas"],["pindakaas","Broodbeleg"],["pasta","Pasta, rijst & sauzen"],["chips","Snoep & koek"],["cola","Drinken"],["pizza","Diepvries"],["shampoo","Verzorging"],["wasmiddel","Huishouden"],["luiers","Baby & kind"],["kattenvoer","Huisdier"]];
   var OTHER=["","Overig"],KEY="boodschappenDoneOpen",busy=false,obs=null;
   var iconCache={};
   function headIcon(word){if(!word)return "";if(iconCache[word]!=null)return iconCache[word];var h="";try{h=productIconMarkup(getProductIcon(word))||"";}catch(e){}iconCache[word]=h;return h;}
   function aisleOf(text){try{var a=typeof productAisle==="function"?productAisle(String(text||"")):99;return (a>=0&&a<AISLES.length)?a:99;}catch(e){return 99;}}
   // Categorie van PrijsProfeet (bij een aanbieding uit de Folder) → afdeling op je lijst.
-  var CAT2AISLE=[[/^groente|^aardappel/,0],[/brood|bakker/,1],[/vlees|vis|vega|kip/,2],[/zuivel|eier|^kaas/,3],[/beleg|ontbijt|granen/,4],[/pasta|rijst|wereld|soep|conserv|saus|kruid|bak|olie|maaltijd/,5],[/snoep|koek|chips|chocola|snack|noten/,6],[/drank|sap|frisdrank|koffie|thee|water|bier|wijn|sterke/,7],[/diepvries/,8],[/drogist|verzorg|haar|huid|deo|mond|gezond/,9],[/huishoud|schoonmaak/,10],[/baby|kind|huisdier|dier/,11]];
+  var CAT2AISLE=[[/^groente|^aardappel/,0],[/brood|bakker/,1],[/vlees|vis|vega|kip/,2],[/zuivel|eier|^kaas/,3],[/beleg|ontbijt|granen/,4],[/pasta|rijst|wereld|soep|conserv|saus|kruid|bak|olie|maaltijd/,5],[/snoep|koek|chips|chocola|snack|noten/,6],[/drank|sap|frisdrank|koffie|thee|water|bier|wijn|sterke/,7],[/diepvries/,8],[/drogist|verzorg|haar|huid|deo|mond|gezond/,9],[/huishoud|schoonmaak/,10],[/huisdier|dier/,12],[/baby|kind/,11]];
   function aisleOfCat(c){c=String(c||"");if(!c)return -1;for(var i=0;i<CAT2AISLE.length;i++)if(CAT2AISLE[i][0].test(c))return CAT2AISLE[i][1];return -1;}
   // Extra woorden voor productnamen uit de folder die de app niet herkent ("AH Tijger volkoren heel").
   var NAME_EXTRA=[[/(^| )(tijger|volkoren|meergranen|waldkorn|bolletjes?|broodjes?|croissants?|stokbrood|pistolets?|beschuit|krentenbol|bruin heel|wit heel|casino|wraps?)( |$)/i,1]];
