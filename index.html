@@ -9997,6 +9997,8 @@ const CATEGORY_ICONS = [
   [/(kaas)/, "cheese-block"],
   [/(boter)/, "butter-pack"],
   [/(brood|bolletje|broodje|pistolet|croissant|beschuit|tijger|casino|waldkorn|(wit|bruin|volkoren|meergranen) (heel|half))/, "bread-loaf"],
+  [/(bechamel|pastasaus|passata|tomatenblok)/, "🥫"],
+  [/(lasagne|tagliatelle|spaghetti|macaroni|penne|fusilli|pasta)/, "🍝"],
   [/(kip|kalkoen)/, "🍗"],
   [/(vlees|worst|gehakt|burger|schnitzel|filet|biefstuk|spek|ham)/, "🥩"],
   [/(vis|zalm|tonijn|garnaal|garnalen|haring|kabeljauw)/, "🐟"],
@@ -20462,9 +20464,11 @@ body.dark-theme .mbPriceInput b{color:#edf5ef}
 html body #list .item .itemProductContent .productInfo{overflow:hidden!important;touch-action:manipulation!important;-webkit-mask-image:none!important;mask-image:none!important}
 html body #list .item .itemProductContent .productName{width:auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-clamp:2;overflow-wrap:anywhere;line-height:1.22!important;-webkit-user-select:none;user-select:none}
 html body #list .item .itemProductContent .productBrand{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-/* Lange naam: het plaatje maakt plaats, de tekst iets kleiner en tot drie regels */
-html body #list .item.longName:not(.hasDealPhoto) .itemProductContent{grid-template-columns:22px minmax(0,1fr) 0 92px!important}
-html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productIcon{display:none!important}
+/* Lange naam: het icoon blijft staan (iets kleiner), de tekst iets kleiner en tot drie regels */
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent{grid-template-columns:22px minmax(0,1fr) 26px 92px!important}
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productIcon{width:26px!important;height:26px!important;min-width:26px!important;font-size:21px!important;margin:0!important}
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productIcon svg,html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productIcon .productInlineIcon{width:24px!important;height:24px!important}
+html body #list .item.longName:not(.hasDealPhoto) .itemProductContent .productEmojiIcon>span{font-size:20px!important}
 /* Aanbiedingsfoto: wit vlakje zodat de foto net zo oogt als bij Aanbiedingen */
 html body #list .item .itemProductContent .productIcon.dealPhoto img{background:#fff!important;border:1px solid #e1ece4!important;padding:1px!important;box-sizing:border-box!important}
 /* Ruimte tussen productnaam en de rode aanbiedingsregel */
