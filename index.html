@@ -7396,7 +7396,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-layer-group"></i><span>Afdelingen en sorteren</span></div>
       <p>Je lijst staat op volgorde van de winkel, per afdeling: groente &amp; fruit, brood, zuivel, enzovoort.</p>
-      <p>Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt.</p>
+      <p>Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt, en in de Folder.</p>
       <p>Tik bovenaan op <strong>⋮</strong> om binnen de afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
       <p>Wat je afvinkt, staat bij <strong>In je mandje</strong>. Tik daarop om het open of dicht te klappen.</p>
     </div>
@@ -18813,7 +18813,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function catLook(slug){slug=String(slug||"").toLowerCase();for(var i=0;i<CAT_LOOK.length;i++)if(CAT_LOOK[i][0].test(slug))return {i:i,e:CAT_LOOK[i][1]};return {i:90,e:"🧺"};}
   function niceSlug(slug){var w=String(slug||"").split("-").filter(Boolean);if(!w.length)return "Overig";var t=w.length>1?w.slice(0,-1).join(", ")+" & "+w[w.length-1]:w[0];return t.charAt(0).toUpperCase()+t.slice(1);}
   // Groepen = dezelfde afdelingen als op je lijst (zelfde naam, icoon en volgorde).
-  function aisleKey(p){var A=window.__mbAisles,c=groupOf(p);if(!A||c==="overig")return "overig";var i=A.fromCat(c);return i>=0?"a"+i:"overig";}
+  function aisleKey(p){
+    var A=window.__mbAisles,c=groupOf(p);
+    if(window.__mbAisleSmart){var i=window.__mbAisleSmart(p.name||"",c==="overig"?"":c);return (i>=0&&i!==99)?"a"+i:"overig";}
+    if(!A||c==="overig")return "overig";var j=A.fromCat(c);return j>=0?"a"+j:"overig";}
   function groupList(by){
     var A=window.__mbAisles;
     return Object.keys(by).map(function(k){
@@ -20681,18 +20684,51 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
   function normName(t){return String(t||"").toLowerCase().replace(/\s+/g," ").trim();}
   function learned(){try{return JSON.parse(localStorage.getItem(LEARN)||"{}")||{};}catch(e){return {};}}
   function okAisle(v){return v===99||(Number.isInteger(v)&&v>=0&&v<AISLES.length);}
+  /* Correctielijst op productnaam. Volgorde telt: de eerste regel die past, wint.
+     1 = non-food (huisdier, baby, verzorging, huishouden) en 2 = heel duidelijke woorden: verbeteren de winkelcategorie altijd;
+     de eetregels verbeteren alleen een ontbrekende of waarschijnlijk foute categorie. */
+  var B="(^|[^a-z])",E="([^a-z]|$)";
+  function W(words){return new RegExp(B+"("+words+")"+E);}
+  var RULES=[
+    [12,W("katten ?voer|honden ?voer|kattenbak|kattengrit|kattenbakvulling|dierenvoer|vogelzaad|whiskas|felix|sheba|gourmet kat|pedigree|hondensnack|kattensnack|hondenbrokken|kattenbrokken|brokken"),1],
+    [11,W("luiers?|pampers|babydoekjes|billendoekjes|flesvoeding|opvolgmelk|nutrilon|olvarit|babyvoeding|fruithapje|zuigfles|speen"),1],
+    [9,W("shampoo|conditioner|douchegel|douchecreme|deodorant|deo|tandpasta|tandenborstels?|mondwater|scheermes(jes)?|scheergel|scheerschuim|bodylotion|dagcreme|nachtcreme|handcreme|zonnebrand|aftersun|maandverband|tampons?|inlegkruisjes|haarlak|haargel|wattenschijfjes|lippenbalsem|vitamines?|paracetamol|ibuprofen|pleisters|zeep|handzeep|zakdoekjes|scheerapparaat|make-?up|mascara|nagellak"),1],
+    [10,W("wasmiddel|wasverzachter|waspoeder|wascapsules|afwasmiddel|vaatwas(tabletten|middel)?|allesreiniger|wc-?reiniger|wc-?blok|toiletpapier|wc-?papier|keukenrol|keukenpapier|vuilniszakken|afvalzakken|pedaalemmerzakken|schoonmaakazijn|ontkalker|chloor|bleekmiddel|sponzen|schuursponsjes|vaatdoekjes|aluminiumfolie|vershoudfolie|bakpapier|diepvrieszakjes|batterijen|kaarsen|lucifers|luchtverfrisser|glasreiniger|vloerreiniger"),1],
+    [7,W("chocolademelk|bier|pils|radler|wijn|rose|prosecco|cava|champagne|whisky|vodka|rum|jenever|likeur|gin|koffiebonen|koffiepads|koffiecups|nespresso|senseo|oploskoffie|koffie|thee|theezakjes|frisdrank|cola|sinas|ice ?tea|energy ?drink|limonade|siroop|ranja|spa|mineraalwater|bronwater|vruchtensap|sinaasappelsap|appelsap|jus d'orange|smoothie"),2],
+    [4,W("pindakaas|hagelslag|vlokken|chocoladepasta|chocopasta|nutella|jam|honing|appelstroop|smeerkaas|leverworst|filet americain|sandwichspread|zoet beleg"),2],
+    [8,W("diepvries|ijs|ijsjes|roomijs|magnum|cornetto|friet|frites|patat|kroketten|bitterballen|frikandellen?|snacks? diepvries|pizza diepvries|diepvriespizza|vissticks"),2],
+    [6,W("chips|chocolade|chocola|reep|koek|koekjes|stroopwafels?|ontbijtkoek|snoep|drop|winegums|zuurtjes|kauwgom|popcorn|borrelnoten|nootjes|cashewnoten|pinda'?s|toffees|pepernoten|kruidnoten|speculaas|wafels"),0],
+    [3,W("melk|halfvolle|volle melk|karnemelk|yoghurt|kwark|skyr|vla|slagroom|kookroom|room|roomboter|boter|margarine|eieren|scharreleieren|kaas|geraspte kaas|mozzarella|feta|brie|camembert|zuivel"),0],
+    [2,W("kipfilet|kip|kipdijen|kippenpoten|gehakt|rundergehakt|worst|rookworst|braadworst|spek|spekjes|ontbijtspek|biefstuk|varkens\\w*|runder\\w*|schnitzel|hamburgers?|ham|zalm|kabeljauw|tonijn|garnalen|vis|vlees|vegaburger|vegetarische"),0],
+    [1,W("brood|bolletjes|broodjes|croissants?|stokbrood|baguette|pistolets?|beschuit|crackers|knackebrod|wraps?|tortilla|krentenbollen|tijger|casino"),0],
+    [5,W("pasta|spaghetti|macaroni|penne|fusilli|lasagne|rijst|noedels|mie|saus|pastasaus|ketchup|mayonaise|mosterd|soep|bouillon|olie|olijfolie|azijn|kruiden|bloem|suiker|tomatenpuree|passata|tomatenblokjes|bonen in blik|kikkererwten|couscous|wereldkeuken|curry|taco"),0]
+  ];
+  var FOOD_A={0:1,1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1};
+  function ruleFor(name){var n=normName(name);for(var i=0;i<RULES.length;i++)if(RULES[i][1].test(n))return RULES[i];return null;}
+  // Slimme afdeling uit naam + winkelcategorie. Geeft 99 voor Overig.
+  function smartAisle(name,cat){
+    var r=ruleFor(name),c=aisleOfCat(cat);
+    if(r&&r[2]===1)return r[0];                               // non-food: altijd
+    if(r&&r[2]===2&&c>=0&&r[0]!==c)return r[0];               // heel duidelijke woorden (pindakaas, bier, ijs): ook boven een andere eetcategorie
+    if(c>=0){
+      if(r&&r[0]!==c&&(c===0||!FOOD_A[c]))return r[0];        // groente & fruit en non-food zijn de bekende foutplekken
+      return c;
+    }
+    if(r)return r[0];
+    var a=aisleOf(name);if(a!==99)return a;
+    for(var i=0;i<NAME_EXTRA.length;i++)if(NAME_EXTRA[i][0].test(name))return NAME_EXTRA[i][1];
+    return 99;
+  }
   function aisleForItem(it,name){
     name=name||(it&&it.text)||"";
     // 1. Zelf gekozen voor dit product, of eerder voor deze naam.
     if(it&&okAisle(it.aisle))return it.aisle;
     var L=learned()[normName(name)];if(okAisle(L))return L;
-    // 2. De categorie van de winkel (bij een aanbieding uit de Folder of Aanbiedingen).
-    var c=aisleOfCat(it&&it.deal&&it.deal.cat);if(c>=0)return c;
-    // 3. De productnaam (via de iconen van de app).
-    var a=aisleOf(name);if(a!==99)return a;
-    for(var i=0;i<NAME_EXTRA.length;i++)if(NAME_EXTRA[i][0].test(name))return NAME_EXTRA[i][1];
-    return 99;
+    // 2. Naam + categorie van de winkel, met de correctielijst.
+    return smartAisle(name,it&&it.deal&&it.deal.cat);
   }
+  // Voor de Folder: zelfde keuze als op je lijst (wat jij eerder koos, gaat voor).
+  window.__mbAisleSmart=function(name,cat){var L=learned()[normName(name)];if(okAisle(L))return L;return smartAisle(name,cat);};
   function aisleOfEl(el){
     var it=null;try{it=Array.isArray(boodschappen)?boodschappen[Number(el.dataset.index)]:null;}catch(e){}
     return aisleForItem(it,nameOf(el));
