@@ -15558,7 +15558,7 @@ window.toggleSmartPlanner=function(event){ if(event) event.stopPropagation();
 window.saveSmartMeal=function(event){ if(event) event.stopPropagation();
  const day=document.getElementById("plannerDay").value;
  const meal=document.getElementById("plannerMeal").value.trim();
- const ingredients=document.getElementById("plannerIngredients").value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+ const ingredients=document.getElementById("plannerIngredients").value.split(/\n|(?<!\d),|,(?!\d)/).map(x=>x.trim()).filter(Boolean);
  const status=document.getElementById("smartPlannerStatus");
  if(!meal){status.textContent="Vul eerst de naam van de maaltijd in.";return}
  if(!ingredients.length){status.textContent="Vul minimaal één ingrediënt in.";return}
@@ -20701,7 +20701,7 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
     [3,W("melk|halfvolle|volle melk|karnemelk|yoghurt|kwark|skyr|vla|slagroom|kookroom|room|roomboter|boter|margarine|eieren|scharreleieren|kaas|geraspte kaas|mozzarella|feta|brie|camembert|zuivel"),0],
     [2,W("kipfilet|kip|kipdijen|kippenpoten|gehakt|rundergehakt|worst|rookworst|braadworst|spek|spekjes|ontbijtspek|biefstuk|varkens\\w*|runder\\w*|schnitzel|hamburgers?|ham|zalm|kabeljauw|tonijn|garnalen|vis|vlees|vegaburger|vegetarische"),0],
     [1,W("brood|bolletjes|broodjes|croissants?|stokbrood|baguette|pistolets?|beschuit|crackers|knackebrod|wraps?|tortilla|krentenbollen|tijger|casino"),0],
-    [5,W("pasta|spaghetti|macaroni|penne|fusilli|lasagne|rijst|noedels|mie|saus|pastasaus|ketchup|mayonaise|mosterd|soep|bouillon|olie|olijfolie|azijn|kruiden|bloem|suiker|tomatenpuree|passata|tomatenblokjes|bonen in blik|kikkererwten|couscous|wereldkeuken|curry|taco"),0]
+    [5,W("pasta|spaghetti|macaroni|penne|fusilli|lasagne|lasagnebladen|rijst|noedels|mie|[a-z]*saus|ketchup|mayonaise|mosterd|soep|bouillon|olie|olijfolie|azijn|kruiden|bloem|suiker|tomatenpuree|passata|tomatenblokjes|bonen in blik|kikkererwten|couscous|wereldkeuken|curry|taco"),0]
   ];
   var FOOD_A={0:1,1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1};
   function ruleFor(name){var n=normName(name);for(var i=0;i<RULES.length;i++)if(RULES[i][1].test(n))return RULES[i];return null;}
