@@ -4849,6 +4849,11 @@ body.dark-theme .overviewInsightCard{background:#202620;border-color:#354238;col
 .budgetStats>div{display:flex;flex-direction:column;gap:4px}.budgetStats span{font-size:12px;color:var(--muted-text,#718177)}.budgetStats strong{font-size:16px;color:var(--text-color,#344d3b)}
 .budgetProgressTrack,.budgetCategoryTrack{height:8px;border-radius:99px;background:var(--border-color,#e1e8e3);overflow:hidden}
 .budgetProgress{height:100%;width:0;background:#57956c;border-radius:99px;transition:width .2s ease}
+.budgetPill{display:table;margin:-4px auto 12px;padding:6px 13px;border-radius:999px;font-weight:800;font-size:13px}
+.budgetPill[hidden]{display:none}
+.budgetPill.warn{background:#fff1dc;color:#a8570e}.budgetPill.warn::before{content:"⚠️ "}
+.budgetPill.over{background:#fde4e2;color:#c03b33}.budgetPill.over::before{content:"⛔ "}
+body.dark-theme .budgetPill.warn{background:#4a3424;color:#f3c08f}body.dark-theme .budgetPill.over{background:#4a2624;color:#f5a39d}
 .budgetStatus{margin:10px 0 0;font-size:12px;line-height:1.45;color:var(--muted-text,#718177)}
 .budgetSectionTitle{font-size:16px;margin:18px 0 9px;color:var(--text-color,#344d3b)}
 .budgetFullInput{display:block}
@@ -5132,6 +5137,15 @@ body.dark-theme .pantryTip > i,body.dark-theme .pantryTipClose{color:#a9c2ec}
 body.dark-theme .pantryEditHint{color:#7f8f85}
 .pantryTag.low{color:#a86b12}
 .pantryTag.out{color:#b04545}
+/* Bijna of over de datum: gekleurd streepje links en een labeltje */
+.pantryRow.expSoon{box-shadow:inset 4px 0 0 #e08a1e}
+.pantryRow.expGone{box-shadow:inset 4px 0 0 #d64545}
+.pantryRow.expSoon .pantryTag.low,.pantryRow.expGone .pantryTag.out{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:800;font-size:12px;line-height:1.35}
+.pantryRow.expSoon .pantryTag.low{background:#fff1dc;color:#b4620a}
+.pantryRow.expGone .pantryTag.out{background:#fde4e2;color:#c03b33}
+body.dark-theme .pantryRow.expSoon .pantryTag.low{background:#4a3424;color:#f3c08f}
+body.dark-theme .pantryRow.expGone .pantryTag.out{background:#4a2624;color:#f5a39d}
+#overviewExpiryCard{border-left:4px solid #e08a1e!important}
 .pantryControls{flex:0 0 auto;display:flex;align-items:center;gap:4px}
 .pantryStep{position:relative;width:36px;height:36px;padding:0;border-radius:11px;border:0;background:#fff;color:#2f4a38;font-size:20px;font-weight:600;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(40,60,45,.08)}
 .pantryStep:active{transform:scale(.95)}
@@ -7410,7 +7424,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder</span></div>
       <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, in dezelfde afdelingen als je lijst, met de grootste korting eerst.</p>
       <p>Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet. De acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren.</p>
-      <p>Staat er <strong>3 soorten</strong> op een kaart? Tik erop en kies de soort die je wilt. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. Wat al op je lijst staat, krijgt een groen vinkje.</p>
+      <p>Staat er <strong>3 soorten</strong> op een kaart? Tik erop en kies de soort die je wilt. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. Wat al op je lijst staat, krijgt een groen vinkje. Bij 60% korting of meer zie je <strong>🔥 Topdeal</strong>.</p>
       <p>Met het tandwieltje naast de winkels kies je je winkels. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>.</p>
       <p>De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
@@ -7451,6 +7465,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p>Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, met aantal en houdbaarheid erbij.</p>
       <p>Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in, bijvoorbeeld ± 1 week voor melk. Pas je die aan, dan onthoudt de app dat. Controleer altijd de datum op de verpakking.</p>
       <p>Is iets op, dan zet je het met één tik op je lijst. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+      <p>Gaat iets bijna over de datum, dan krijgt het een <strong>oranje</strong> streepje en labeltje; is het over de datum, dan <strong>rood</strong>.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner <b class="aboutProBadge">PRO</b></span></div>
@@ -7465,7 +7480,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is.</p>
+      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is. Heb je 80% uitgegeven, dan wordt de ring <strong>oranje</strong>; ga je over je budget, dan wordt hij <strong>rood</strong>.</p>
       <p>Zet je een aanbieding via <strong>Aanbiedingen</strong> of de <strong>Folder</strong> op je lijst, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
       <p>Bij <strong>Uitgave toevoegen</strong> vul je zelf een bedrag en winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf.</p>
       <p>Bij <strong>Aanbiedingen</strong> zoek je een product bij al je winkels tegelijk, of tik je op <strong>Zoek aanbiedingen voor mijn week</strong>. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
@@ -16099,8 +16114,15 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     const d=read(),spent=d.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),remaining=d.budget-spent,pct=d.budget>0?Math.min(100,spent/d.budget*100):0;
     const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
     put("budgetSpent",euro(spent));put("budgetSpentSmall",euro(spent));put("budgetOf","van "+euro(d.budget));put("budgetRemaining",euro(Math.max(0,remaining)));
-    const progress=document.getElementById("budgetProgress");if(progress)progress.style.width=pct+"%";
-    const ring=document.getElementById("budgetRing");if(ring){const over=d.budget>0&&spent>d.budget;ring.style.background=d.budget>0?`conic-gradient(${over?"#c95b52":"#57956c"} 0 ${pct}%, #83b8e8 ${pct}% 100%)`:"conic-gradient(#dfe9e2 0 100%)";ring.setAttribute("aria-label",`Uitgegeven ${euro(spent)} van ${euro(d.budget)}`);}
+    // Kleur: groen, oranje vanaf 80% van je budget, rood als je erover gaat.
+    const over=d.budget>0&&spent>d.budget,warn=d.budget>0&&!over&&pct>=80,bcol=over?"#d64545":warn?"#e08a1e":"#57956c";
+    const progress=document.getElementById("budgetProgress");if(progress){progress.style.width=pct+"%";progress.style.background=bcol;}
+    const ring=document.getElementById("budgetRing");if(ring){ring.style.background=d.budget>0?`conic-gradient(${bcol} 0 ${pct}%, #83b8e8 ${pct}% 100%)`:"conic-gradient(#dfe9e2 0 100%)";
+      let pill=document.getElementById("budgetPill");
+      if(!pill){pill=document.createElement("div");pill.id="budgetPill";pill.className="budgetPill";ring.insertAdjacentElement("afterend",pill);}
+      if(over){pill.className="budgetPill over";pill.textContent="Je zit "+euro(spent-d.budget)+" boven je budget";pill.hidden=false;}
+      else if(warn){pill.className="budgetPill warn";pill.textContent="Nog "+euro(remaining)+" over deze week";pill.hidden=false;}
+      else pill.hidden=true;ring.setAttribute("aria-label",`Uitgegeven ${euro(spent)} van ${euro(d.budget)}`);}
     const status=document.getElementById("budgetStatus");if(status){if(!d.budget)status.textContent="Stel je weekbudget in en voeg je uitgaven toe.";else if(spent>d.budget)status.textContent="Je zit "+euro(spent-d.budget)+" boven je weekbudget.";else if(pct>=80)status.textContent="Let op: je hebt al "+Math.round(pct)+"% van je weekbudget gebruikt.";else status.textContent="Je hebt nog "+euro(remaining)+" van je weekbudget over.";}
     fillStores();
     const storeOf=x=>x.store||"Zonder winkel";
@@ -16448,9 +16470,9 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     if(q===0){cls+=" isOut";meta.push('<b class="pantryTag out">Op</b>');}
     else if(m>0&&q<m){cls+=" isLow";meta.push('<b class="pantryTag low">Bijna op</b>');}
     if(days!=null){
-      if(days<0)meta.push('<b class="pantryTag out">Over de datum</b>');
-      else if(days===0)meta.push('<b class="pantryTag low">Vandaag op</b>');
-      else if(days<=2)meta.push('<b class="pantryTag low">Nog '+days+(days===1?' dag':' dagen')+'</b>');
+      if(days<0){cls+=" expGone";meta.push('<b class="pantryTag out">Over de datum</b>');}
+      else if(days===0){cls+=" expSoon";meta.push('<b class="pantryTag low">Vandaag op</b>');}
+      else if(days<=2){cls+=" expSoon";meta.push('<b class="pantryTag low">Nog '+days+(days===1?' dag':' dagen')+'</b>');}
       else meta.push('THT '+(i.estExp?'± ':'')+fmtDate(i.exp));
     }
     if(m>0&&q>=m)meta.push('min. '+m);
@@ -18737,6 +18759,7 @@ body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
 .mbFImg{width:100%;aspect-ratio:1/1;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
 .mbFImg img{width:100%;height:100%;object-fit:contain}
 .mbFImg.noImg{background:#f1f6f2;cursor:default}.mbFImg .fallback{font-size:34px;opacity:.8}
+.mbFBadge.mbTop{background:linear-gradient(90deg,#ff7a1a,#ff4d2e)}
 .mbFBadge{position:absolute;top:10px;left:10px;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#d64545;color:#fff;font-weight:800;font-size:12.5px;padding:3px 8px;border-radius:8px}
 .mbFName{font-size:14px;font-weight:700;color:#24392b;line-height:1.25;margin:7px 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px}
 .mbFPrice{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;padding-right:40px}
@@ -18966,7 +18989,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var shopKey=state.shop,img=imgOf(p);
     var el=document.createElement("div");el.className="mbFCard"+(multi?" multi":"");
     el.innerHTML='<div class="mbFImg">'+(img?'<img alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'<span class="fallback">🛒</span>')+'</div>'+
-      '<span class="mbFBadge">'+esc(badge(p))+'</span>'+(multi?'<span class="mbFVar">'+bd.items.length+' soorten</span>':'')+'<div class="mbFName">'+esc(bd.name)+'</div>'+
+      '<span class="mbFBadge'+(pct(p)>=60?' mbTop':'')+'">'+(pct(p)>=60?'🔥 Topdeal ':'')+esc(badge(p))+'</span>'+(multi?'<span class="mbFVar">'+bd.items.length+' soorten</span>':'')+'<div class="mbFName">'+esc(bd.name)+'</div>'+
       '<div class="mbFPrice">'+(bd.vanaf?'<small class="mbFrom">vanaf </small><b>'+money(bd.min)+'</b>':'<b>'+money(p.price)+'</b>'+(Number(p.original_price)>Number(p.price)?'<s>'+money(p.original_price)+'</s>':''))+'</div>'+
       '<div class="mbFMeta">'+esc([p.quantity||"",soon(p)?fromTxt(p.valid_from):untilTxt(p.valid_until)].filter(Boolean).join(" · "))+'</div>'+
       '<button type="button" class="mbFAdd" aria-label="Op je lijst"><span class="mbPlus" aria-hidden="true"></span></button>';
