@@ -18740,6 +18740,8 @@ html body .app.more-active > #moreView.mbTabFromRight{animation:mbMeerIn .34s cu
 .mbFolderShops::-webkit-scrollbar,.mbFolderCats::-webkit-scrollbar{display:none}
 .mbFolderShops button{flex:0 0 auto;padding:9px 16px;border:0;border-radius:999px;background:#e4ece6;color:#2f4a38;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 .mbFolderShops button.on{background:#3F5B45;color:#fff}
+.mbFolderShops button.lg{padding:8px 12px;display:inline-flex;align-items:center}
+.mbFolderShops button.lg .mbShopLg{height:28px;font-size:12px;padding:0 9px;border-radius:8px}
 .mbFolderWeek{display:flex;background:#e4ece6;border-radius:12px;padding:3px;margin:0 0 12px}
 .mbFolderWeek button{flex:1;border:0;background:transparent;border-radius:10px;padding:8px 6px;font:inherit;font-size:14px;font-weight:700;color:#5c7465;cursor:pointer}
 .mbFolderWeek button.on{background:#fff;color:#24392b;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -19026,7 +19028,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var list=shops();
     if(list.indexOf(state.shop)<0){state.shop=list[0]||"";state.cat="all";state.open={};state.catScroll=0;}
     var shopRow=ov.querySelector(".mbFolderShops");
-    shopRow.innerHTML=list.map(function(k){return '<button type="button" data-k="'+esc(k)+'" class="'+(k===state.shop?"on":"")+'">'+esc(nameOf(k))+'</button>';}).join("")+
+    shopRow.innerHTML=list.map(function(k){return '<button type="button" data-k="'+esc(k)+'" class="'+(k===state.shop?"on":"")+(window.__mbShopLogo?" lg":"")+'" aria-label="'+esc(nameOf(k))+'">'+(window.__mbShopLogo?window.__mbShopLogo(k,"tab"):esc(nameOf(k)))+'</button>';}).join("")+
       (list.length?'<button type="button" class="edit" aria-label="Mijn winkels wijzigen"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>':"");
     shopRow.style.display=list.length?"":"none";
     var sb=ov.querySelector(".mbFolderSearch");if(sb)sb.style.display=list.length?"":"none";
@@ -20057,8 +20059,8 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
   var LOOK={ah:["#00a0e2","#fff","AH"],ah_be:["#00a0e2","#fff","AH BE"],jumbo:["#f2b705","#222","JUMBO"],jumbo_be:["#f2b705","#222","JUMBO BE"],
     lidl:["#0050aa","#fff","LIDL"],lidl_be:["#0050aa","#fff","LIDL BE"],aldi:["#00205b","#fff","ALDI"],aldi_be:["#00205b","#fff","ALDI BE"],
     dirk:["#d8232a","#fff","DIRK"],plus:["#5aa02c","#fff","PLUS"],colruyt:["#e30613","#fff","COLRUYT"],delhaize:["#d2232a","#fff","DELHAIZE"],
-    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#ffd200","#004b93","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
-    coop:["#f37021","#fff","COOP"],gewooncoop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#e30613","#fff","POIESZ"],
+    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#0074af","#fff","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
+    coop:["#f37021","#fff","COOP"],gewooncoop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#39b54a","#fff","POIESZ"],
     nettorama:["#ffd400","#e30613","NETTORAMA"],boni:["#e2001a","#fff","BONI"],mcd:["#0067b1","#fff","MCD"],dagwinkel:["#00843d","#fff","DAGWINKEL"],boons:["#c8102e","#fff","BOONS"]};
   function shopLogo(k,cls){
     var l=LOOK[k];
@@ -20981,8 +20983,8 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
   var LOOK={ah:["#00a0e2","#fff","AH"],ah_be:["#00a0e2","#fff","AH"],jumbo:["#f2b705","#222","JUMBO"],jumbo_be:["#f2b705","#222","JUMBO"],
     lidl:["#0050aa","#fff","LIDL"],lidl_be:["#0050aa","#fff","LIDL"],aldi:["#00205b","#fff","ALDI"],aldi_be:["#00205b","#fff","ALDI"],
     dirk:["#d8232a","#fff","DIRK"],plus:["#5aa02c","#fff","PLUS"],colruyt:["#e30613","#fff","COLRUYT"],delhaize:["#d2232a","#fff","DELHAIZE"],
-    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#ffd200","#004b93","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
-    coop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#e30613","#fff","POIESZ"],
+    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#0074af","#fff","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
+    coop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#39b54a","#fff","POIESZ"],
     nettorama:["#ffd400","#e30613","NETTORAMA"],boni:["#e2001a","#fff","BONI"],mcd:["#0067b1","#fff","MCD"],dagwinkel:["#00843d","#fff","DAGWINKEL"],
     gewooncoop:["#f37021","#fff","COOP"],boons:["#c8102e","#fff","BOONS"]};
   function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
