@@ -8368,12 +8368,19 @@ function __finishMoreMenuTransition(menu, page, targetHeight) {
   }, 300);
 }
 
+/* Waar je in Meer was gescrold, per pagina. Ga je terug, dan kom je weer op dezelfde plek uit. */
+var __menuScrollMemo = window.__menuScrollMemo = window.__menuScrollMemo || {};
+function __menuVisiblePageId(){
+  try { const pages = document.querySelectorAll("#familyMenu .familyMenuPage, #familyMenuMain"); for (const p of pages) { if (p.id && p.offsetParent !== null && getComputedStyle(p).display !== "none") return p.id; } } catch (_) {}
+  return "";
+}
 function switchMenuPage(pageId, event) {
   if (event) event.stopPropagation();
 
   const page = __getMenuPage(pageId);
   const menu = document.getElementById("familyMenu");
   if (!page || !menu) return;
+  try { const mv0 = document.getElementById("moreView"), from = __menuVisiblePageId(); if (mv0 && from && from !== pageId) __menuScrollMemo[from] = mv0.scrollTop; } catch (_) {}
 
   // Stabiele Meer-navigatie: één pagina tegelijk.
   __cancelMenuTransition();
@@ -8399,6 +8406,17 @@ function returnMenuToPage(pageId, targetId, event) {
   menu.style.display = "block";
   __showOnlyMenuPage(targetId);
   target.scrollTop = 0;
+  /* Terug naar de plek waar je was (bijvoorbeeld onderaan bij "Over de app"). */
+  const y = __menuScrollMemo[targetId] || 0;
+  delete __menuScrollMemo[targetId];
+  try {
+    const mv = document.getElementById("moreView");
+    if (mv) {
+      mv.scrollTop = y;
+      requestAnimationFrame(function(){ mv.scrollTop = y; });
+      setTimeout(function(){ if (__menuVisiblePageId() === targetId) mv.scrollTop = y; }, 330);
+    }
+  } catch (_) {}
 }
 
 function openAccountSubmenu(event) {
@@ -15167,6 +15185,9 @@ document.addEventListener('visibilitychange',function(){
     if(more && menu.parentElement!==more){
       more.appendChild(menu);
     }
+    // Scrollpositie onthouden (zoals in de rest van Meer): terug = weer op dezelfde plek.
+    var memo=window.__menuScrollMemo||(window.__menuScrollMemo={});
+    try{var from=window.__menuVisiblePageId?window.__menuVisiblePageId():"";if(more&&from&&from!==pageId&&more.scrollTop>0)memo[from]=more.scrollTop;}catch(_){}
     if(more){
       // Niet meer vast op "zichtbaar" zetten: dan bleef het Meer-scherm ook op Lijst en Overzicht staan.
       more.style.removeProperty("display");
@@ -15195,6 +15216,8 @@ document.addEventListener('visibilitychange',function(){
     page.style.setProperty("opacity","1","important");
     page.style.setProperty("transform","none","important");
     page.scrollTop=0;
+    var back=memo[pageId]||0;delete memo[pageId];
+    if(more&&back){more.scrollTop=back;requestAnimationFrame(function(){more.scrollTop=back;});}
     return true;
   }
 
@@ -21324,7 +21347,9 @@ body.dark-theme .budgetToFolder{background:#24342a;border-color:#34443a;color:#c
     var box=document.getElementById("ovTiles");if(!box)return;
     box.innerHTML=TILES.map(function(t){
       var ok=t.pantry?pantryOk():pro(),i=ok?t.info():{t:t.lock};
-      return '<button type="button" class="ovTile'+(ok?'':' locked')+'" data-k="'+t.k+'"><span class="pro">'+(ok?'PRO':'<i class="fa-solid fa-lock" aria-hidden="true"></i> PRO')+'</span>'+
+      var paid=false;try{paid=!!(window.__proPaidMode&&window.__proPaidMode());}catch(e){}
+      var lbl=!ok?'<i class="fa-solid fa-lock" aria-hidden="true"></i> PRO':(paid?'PRO':'Tijdelijk gratis');
+      return '<button type="button" class="ovTile'+(ok?'':' locked')+'" data-k="'+t.k+'"><span class="pro">'+lbl+'</span>'+
         '<span class="ic '+t.cls+'"><i class="fa-solid '+t.ic+'" aria-hidden="true"></i></span><b>'+t.name+'</b><span class="tx'+(i.cls?' '+i.cls:'')+'">'+esc(i.t)+'</span>'+
         (i.bar!=null?'<span class="bar"><i style="width:'+i.bar+'%;background:'+i.col+'"></i></span>':'')+'</button>';
     }).join("");
