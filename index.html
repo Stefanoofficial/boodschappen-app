@@ -20012,6 +20012,11 @@ body.dark-theme .shopMoveRest{background:#3a3424;color:#f1dfa6}
 .shopPickRow .num{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #b8c6bc;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-sizing:border-box;color:transparent}
 .shopPickRow .nm{flex:1 1 auto}
 .shopPickRow .tag{font-size:12px;font-weight:600;color:#8a998f}
+.mbShopLg{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:24px;padding:0 7px;border-radius:7px;font-weight:900;font-size:10.5px;letter-spacing:-.2px;line-height:1;white-space:nowrap;box-sizing:border-box}
+.mbShopLg.tab{height:26px;font-size:11px;padding:0 8px}
+.shopTabs.many .mbShopLg.tab{height:24px;font-size:10.5px;padding:0 6px}
+.shopTab:not(.active) .mbShopLg.tab{opacity:.88}
+.shopPickRow .mbShopLg.pick{margin-left:auto}
 .shopPickRow.on{border-color:#3F5B45;background:#f2f8f3}
 .shopPickRow.on .num{background:#3F5B45;border-color:#3F5B45;color:#fff}
 body.dark-theme .shopPickRow{background:#29352d;border-color:#3a4a3f;color:#e4eee7}
@@ -20048,6 +20053,19 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
    bewaard bij je budgetgegevens (en dus aan je account gekoppeld). Producten krijgen een veld "shop". */
 (function(){
   var KEY="boodschappen_budgetplanner_v1",ACTIVE="boodschappenActiveShop",TIP="boodschappenShopTipShown",MAX=3;
+  /* Winkelblokjes: winkelnaam in de kleur van de winkel, in de letter van de app (geen officiële logo's). */
+  var LOOK={ah:["#00a0e2","#fff","AH"],ah_be:["#00a0e2","#fff","AH BE"],jumbo:["#f2b705","#222","JUMBO"],jumbo_be:["#f2b705","#222","JUMBO BE"],
+    lidl:["#0050aa","#fff","LIDL"],lidl_be:["#0050aa","#fff","LIDL BE"],aldi:["#00205b","#fff","ALDI"],aldi_be:["#00205b","#fff","ALDI BE"],
+    dirk:["#d8232a","#fff","DIRK"],plus:["#5aa02c","#fff","PLUS"],colruyt:["#e30613","#fff","COLRUYT"],delhaize:["#d2232a","#fff","DELHAIZE"],
+    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#ffd200","#004b93","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
+    coop:["#f37021","#fff","COOP"],gewooncoop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#e30613","#fff","POIESZ"],
+    nettorama:["#ffd400","#e30613","NETTORAMA"],boni:["#e2001a","#fff","BONI"],mcd:["#0067b1","#fff","MCD"],dagwinkel:["#00843d","#fff","DAGWINKEL"],boons:["#c8102e","#fff","BOONS"]};
+  function shopLogo(k,cls){
+    var l=LOOK[k];
+    if(!l){var n=String(nameOf(k)||k||"").toUpperCase();if(k==="other"||!n)n="ANDERE";l=["#57956c","#fff",n.length>9?n.slice(0,8)+"…":n];}
+    return '<span class="mbShopLg'+(cls?" "+cls:"")+'" style="background:'+l[0]+';color:'+l[1]+'" aria-hidden="true">'+esc(l[2])+'</span>';
+  }
+  window.__mbShopLogo=shopLogo;
   function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function readB(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
   function writeB(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
@@ -20117,7 +20135,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
     var open={};keys.forEach(function(k){open[k]=0;});
     var L=items();L.forEach(function(it){if(it&&!it.completed)open[shopOf(it,keys)]++;});
     var html=keys.map(function(k){
-      return '<button type="button" role="tab" class="shopTab'+(k===act?" active":"")+'" data-k="'+esc(k)+'" aria-selected="'+(k===act)+'"><span class="nm">'+esc(tabName(k,keys.length))+'</span><span class="n">'+open[k]+'</span></button>';
+      return '<button type="button" role="tab" class="shopTab'+(k===act?" active":"")+'" data-k="'+esc(k)+'" aria-selected="'+(k===act)+'"><span class="nm" aria-label="'+esc(nameOf(k))+'">'+shopLogo(k,"tab")+'</span><span class="n">'+open[k]+'</span></button>';
     }).join("")+'<button type="button" class="shopTab edit" aria-label="Mijn winkels kiezen" title="Mijn winkels"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>';
     if(b.innerHTML!==html)b.innerHTML=html;
     b.classList.toggle("many",keys.length>=3);
@@ -20263,7 +20281,7 @@ body.dark-theme .dealShopChip.active{background:#4f8a62;color:#fff}
     var slugs=window.__budgetRetailerSlugs||{};
     var html='<div class="familyDialogText">Kies maximaal 3 winkels waar je boodschappen doet. Kies je er twee of drie, dan krijgt elke winkel een eigen lijst. De eerste is je vaste winkel.</div><div class="shopPickList">'+
       groups.map(function(g){return '<div class="shopPickGroup">'+esc(g)+'</div>'+by[g].map(function(o){
-        return '<button type="button" class="shopPickRow" data-k="'+esc(o.key)+'"><span class="num"></span><span class="nm">'+esc(o.name)+'</span>'+(slugs[o.key]?'':'<span class="tag">geen aanbiedingen</span>')+'</button>';
+        return '<button type="button" class="shopPickRow" data-k="'+esc(o.key)+'"><span class="num"></span><span class="nm">'+esc(o.name)+'</span>'+(slugs[o.key]?'':'<span class="tag">geen aanbiedingen</span>')+(o.key==="other"?'':shopLogo(o.key,"pick"))+'</button>';
       }).join("");}).join("")+'</div><div class="shopPickMsg" aria-live="polite"></div>';
     var overlay=familyDialogBase("fa-cart-shopping","Mijn winkels",html,
       '<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button><button type="button" class="familyDialogBtn familyDialogPrimary">Opslaan</button>');
@@ -20623,6 +20641,7 @@ html body .mbFolderCats button.on{border-color:var(--mb-accent,#14BE4B)!importan
 body.dark-theme .mbFolderCats button.on{background:#1f3a29!important;color:#cfeedd!important}
 html body .shopPickRow.on{border-color:var(--mb-accent,#14BE4B)!important;background:#eefaf1!important}
 html body .shopPickRow.on .num{background:var(--mb-accent,#14BE4B)!important;border-color:var(--mb-accent,#14BE4B)!important}
+html body.dark-theme .shopPickRow.on{background:#24402d!important;color:#f0f7f2}
 html body .mbThemeRow .mbThemeCheck,html body .mbSelOpt i{color:var(--mb-accent,#14BE4B)!important}
 html body .mbThemeRow.sel{box-shadow:inset 0 0 0 2px rgba(20,190,75,.45)!important}
 </style>
@@ -20904,14 +20923,14 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
 #mbCmpBar .x{border:0;background:transparent;color:#8a978e;font-size:15px;width:30px;height:30px;border-radius:50%;flex:none;cursor:pointer}
 @keyframes mbCmpIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .app.overview-active #mbCmpBar,.app.more-active #mbCmpBar{display:none!important}
-.mbCmpOv{position:fixed;inset:0;z-index:2147480000;background:rgba(20,35,25,.42);display:flex;align-items:flex-end;opacity:0;transition:opacity .2s}
-.mbCmpOv.on{opacity:1}
-.mbCmpSheet{width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(30px);transition:transform .25s;color:#22382a}
+.mbCmpOv{position:fixed;inset:0;z-index:2147480000;display:flex;align-items:flex-end;background:rgba(24,37,29,0);-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);transition:background-color .22s ease,-webkit-backdrop-filter .22s ease,backdrop-filter .22s ease}
+.mbCmpOv.on{background:rgba(24,37,29,.22);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mbCmpSheet{width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);color:#22382a;box-shadow:0 -10px 30px rgba(0,0,0,.16)}
 .mbCmpOv.on .mbCmpSheet{transform:none}
 .mbCmpGrab{width:42px;height:5px;background:#d6dfd9;border-radius:9px;margin:2px auto 12px}
 .mbCmpHead{display:flex;align-items:flex-start;gap:10px}
 .mbCmpHead h3{font-size:20px;font-weight:800;margin:0;line-height:1.25;flex:1}
-.mbCmpClose,.mbCmpBack{border:0;background:#f1f5f2;color:#3f5b45;width:34px;height:34px;border-radius:50%;font-size:15px;flex:none;cursor:pointer}
+.mbCmpBack{border:0;background:#eef4f0;color:#3f5b45;width:38px;height:38px;border-radius:50%;font-size:17px;flex:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .mbCmpSub{font-size:13px;color:#6a7c70;margin:3px 0 14px}
 .mbCmpRow{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;margin-bottom:8px;background:#f4f8f5;cursor:pointer;border:2px solid transparent}
 .mbCmpRow.best{background:#e5f3e9;border-color:#57956c}
@@ -20946,7 +20965,7 @@ body.dark-theme .mbCmpSheet{background:#1d241f;color:#e4eee7}
 body.dark-theme .mbCmpRow{background:#29352d}
 body.dark-theme .mbCmpRow.best{background:#24402d;border-color:#57956c}
 body.dark-theme .mbCmpRow .s,body.dark-theme .mbCmpRow .pr div,body.dark-theme .mbCmpSub{color:#a9b9ae}
-body.dark-theme .mbCmpClose,body.dark-theme .mbCmpBack{background:#29352d;color:#cfe3d5}
+body.dark-theme .mbCmpBack{background:#26302a;color:#cfe0d4}
 body.dark-theme .mbCmpTbl td{border-color:#2f3a33}
 body.dark-theme .mbCmpBtn.sec{background:#29352d;color:#cfe3d5}
 body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
@@ -20970,7 +20989,7 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
   function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
   function slugs(){return window.__budgetRetailerSlugs||{};}
   function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
-  function logo(k,big){var l=LOOK[k]||["#57956c","#fff",String(nameOf(k)||k).toUpperCase().slice(0,8)];
+  function logo(k,big){if(window.__mbShopLogo){var h=window.__mbShopLogo(k);return h.replace('class="mbShopLg','class="mbCmpLg'+(big?" big":""));}var l=LOOK[k]||["#57956c","#fff",String(nameOf(k)||k).toUpperCase().slice(0,8)];
     return '<span class="mbCmpLg'+(big?" big":"")+'" style="background:'+l[0]+';color:'+l[1]+'">'+esc(l[2])+'</span>';}
   function favs(){try{return (window.__favShops?window.__favShops():[]).filter(function(k){return slugs()[k];});}catch(e){return [];}}
   function shops(){
@@ -21135,12 +21154,12 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
 
   /* Het vergelijkscherm */
   var ov=null;
-  function close(){if(!ov)return;var o=ov;ov=null;o.classList.remove("on");setTimeout(function(){o.remove();},220);}
+  function close(){if(!ov)return;var o=ov;ov=null;o.classList.remove("on");setTimeout(function(){o.remove();},300);}
   function sheet(html){
     if(ov&&!ov.isConnected)ov=null;
     if(!ov){
       ov=document.createElement("div");ov.className="mbCmpOv";ov.innerHTML='<div class="mbCmpSheet" role="dialog" aria-modal="true"></div>';
-      document.body.appendChild(ov);requestAnimationFrame(function(){ov&&ov.classList.add("on");});
+      document.body.appendChild(ov);var o2=ov;requestAnimationFrame(function(){requestAnimationFrame(function(){if(o2.isConnected)o2.classList.add("on");});});
       ov.addEventListener("click",function(e){if(e.target===ov)close();});
     }
     var s=ov.querySelector(".mbCmpSheet");s.innerHTML='<div class="mbCmpGrab"></div>'+html;s.scrollTop=0;
@@ -21149,18 +21168,18 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
   }
   window.openCompare=async function(){
     var items=list(),ks=shops();
-    if(!items.length){sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">Zet eerst een paar producten op je lijst. Dan rekent de app uit bij welke winkel je het minst betaalt.</div>');return;}
-    var s=sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpLoad">Prijzen ophalen bij '+ks.map(function(k){return esc(nameOf(k));}).join(", ")+'…<div class="bar"><i></i></div></div>');
+    if(!items.length){sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">Zet eerst een paar producten op je lijst. Dan rekent de app uit bij welke winkel je het minst betaalt.</div>');return;}
+    var s=sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpLoad">Prijzen ophalen bij '+ks.map(function(k){return esc(nameOf(k));}).join(", ")+'…<div class="bar"><i></i></div></div>');
     var res;
     try{res=await compute(function(d,n){if(!ov)return;var i=ov.querySelector(".mbCmpLoad .bar i");if(i)i.style.width=Math.round(d/n*100)+"%";});}
-    catch(e){if(ov)sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">De prijzen konden niet worden opgehaald. Controleer je internetverbinding en probeer het opnieuw.</div>');return;}
+    catch(e){if(ov)sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">De prijzen konden niet worden opgehaald. Controleer je internetverbinding en probeer het opnieuw.</div>');return;}
     if(!ov)return;
     drawOverview(res);
     updateBar();
   };
   function drawOverview(res){
     var best=res.shops[0],n=res.items;
-    var html='<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
+    var html='<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
       '<div class="mbCmpSub">'+n+' product'+(n===1?'':'en')+' · prijzen en aanbiedingen van deze week</div>';
     if(res.blocked){
       html+='<div class="mbCmpEmpty">Niet alle prijzen konden nu worden opgehaald. Misschien is je verbinding even weg, of wordt er op dit moment veel gezocht.<br><br>De prijzen die al binnen zijn, worden bewaard. Probeer het over een minuutje opnieuw.</div><button type="button" class="mbCmpBtn" data-retry="1">Opnieuw proberen</button>';
@@ -21206,7 +21225,7 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
     var save=other?Math.round((other.total-sh.total)*100)/100:0;
     var html='<div class="mbCmpHead"><button class="mbCmpBack" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>'+logo(k,true)+
       '<div style="flex:1;min-width:0"><h3>'+esc(nameOf(k))+' · '+money(sh.total)+'</h3><div class="mbCmpSub" style="margin:2px 0 0">'+(other?(save>0?'je bespaart '+money(save)+' t.o.v. '+esc(nameOf(other.k)):save<0?money(-save)+' duurder dan '+esc(nameOf(other.k)):'even duur als '+esc(nameOf(other.k))):'')+'</div></div>'+
-      '<button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>';
+      '<button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>';
     html+='<table class="mbCmpTbl" style="margin-top:12px"><tr><th>PRODUCT</th><th>'+esc(String(nameOf(k)).toUpperCase())+'</th>'+(other?'<th>'+esc((LOOK[other.k]||[0,0,String(nameOf(other.k)).toUpperCase()])[2])+'</th>':'')+'</tr>';
     var anyEst=false;
     sh.rows.forEach(function(r){
