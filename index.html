@@ -6693,7 +6693,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     </button>
     <button type="button" class="familyMenuItem familyMenuPrimary proMenuCard" onclick="openProSubmenu(event)">
       <i class="fa-solid fa-crown"></i>
-      <span><strong>Mijn Boodschappen Pro</strong><small>Weekplanner, budget en aanbiedingen.</small><b class="proFreeBadge proFreeCard">Tijdelijk gratis</b></span>
+      <span><strong>Mijn Boodschappen Pro</strong><small>Weekplanner, recepten, budget en voorraad.</small><b class="proFreeBadge proFreeCard">Tijdelijk gratis</b></span>
       <i class="fa-solid fa-chevron-right familyMenuArrow"></i>
     </button>
     <div class="moreMenuSectionLabel">SAMEN</div>
@@ -6766,7 +6766,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <div class="proHeroIcon"><i class="fa-solid fa-crown"></i></div>
       <h2>Mijn Boodschappen Pro</h2>
       <span class="proFreeBadge proFreeHero"><i class="fa-solid fa-gift" aria-hidden="true"></i> Tijdelijk gratis</span>
-      <p>Plan je maaltijden, houd je voorraad en budget bij en vind aanbiedingen bij je supermarkt.</p>
+      <p>Plan je maaltijden, houd je voorraad en budget bij en krijg tips die bij jou passen.</p>
       <div id="proSubBox" class="proSubBox" hidden></div>
     </div>
     <div class="proFeatureCard proPlannerLaunch" onclick="toggleSmartPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSmartPlanner(event)}">
@@ -6806,7 +6806,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       </div>
     </section>
     <div class="proFeatureCard budgetPlannerLaunch" onclick="toggleBudgetPlanner(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBudgetPlanner(event)}">
-      <i class="fa-solid fa-wallet"></i><div><strong>Prijs- en budgetplanner</strong><p>Houd je uitgaven bij en vind aanbiedingen bij jouw supermarkt.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
+      <i class="fa-solid fa-wallet"></i><div><strong>Budgetplanner</strong><p>Houd je uitgaven bij en zie wat je nog over hebt deze week.</p><button type="button" class="budgetLaunchButton" onclick="event.stopPropagation();toggleBudgetPlanner(event)">Open budgetplanner <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
     <section id="budgetPlannerPanel" class="budgetPlannerPanel" hidden aria-label="Prijs- en budgetplanner">
       <div class="budgetPanelHeading">
@@ -6935,7 +6935,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     <div class="proFeatureCard assistantLaunch" onclick="toggleAssistant(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAssistant(event)}">
       <i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Persoonlijke assistent</strong><p>Slimme tips: je vaste boodschappen, wat bijna op is en wat je vandaag kunt koken.</p><button type="button" class="budgetLaunchButton assistantLaunchButton" onclick="event.stopPropagation();toggleAssistant(event)">Open assistent <i class="fa-solid fa-chevron-down"></i></button></div>
     </div>
-    <section id="assistantPanel" class="budgetPlannerPanel assistantPanel" hidden aria-label="Persoonlijke assistent" onclick="event.stopPropagation()">
+    <section id="assistantPanel" class="budgetPlannerPanel assistantPanel" hidden aria-label="Tips voor jou" onclick="event.stopPropagation()">
       <div class="budgetPanelHeading"><div><h3>Je assistent</h3><p>Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten.</p></div></div>
       <div id="assistantTips"></div>
       <h3 class="budgetSectionTitle">Welke tips wil je zien?</h3>
@@ -7391,58 +7391,40 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     <div class="familyMenuSubTitle">HELP &amp; UITLEG</div>
     <div class="helpGroup">Je boodschappenlijst</div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Een product toevoegen</span></div>
-      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong> in het veld bovenaan. Kies de juiste suggestie als die verschijnt, of tik op de groene <strong>+</strong>.</p>
-      <p>Het veld zoekt meteen mee in je lijst, dus je ziet direct of iets er al op staat.</p>
-      <p>Met het streepjescode-icoon in het veld scan je een product.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-plus"></i><span>Je lijst: toevoegen, afvinken en aantal</span></div>
+      <p>Typ bijvoorbeeld <strong>jam</strong>, <strong>pindakaas</strong> of <strong>brood</strong> in het veld bovenaan. Kies de juiste suggestie als die verschijnt, of tik op de groene <strong>+</strong>. Het veld zoekt meteen mee in je lijst, dus je ziet direct of iets er al op staat. Met het streepjescode-icoon in het veld scan je een product.</p>
+      <p>Tik op het rondje naast een product om het af te vinken. Het gaat dan naar <strong>In je mandje</strong> onderaan je lijst; bovenaan zie je hoeveel je al hebt. Per ongeluk afgevinkt? Tik in je mandje nog een keer op het rondje.</p>
+      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan. Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
       <p>Liever echte productfoto’s in plaats van de iconen? Zet dan bij <strong>Meer → Instellingen → Suggesties</strong> “Productfoto’s tonen” aan.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-circle-check"></i><span>Een product afvinken</span></div>
-      <p>Tik op het rondje naast een product. Het gaat dan naar <strong>In je mandje</strong> onderaan je lijst. Bovenaan zie je hoeveel je al hebt.</p>
-      <p>Per ongeluk afgevinkt? Tik in je mandje nog een keer op het rondje.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-plus-minus"></i><span>Aantal aanpassen of verwijderen</span></div>
-      <p>Met <strong>−</strong> en <strong>+</strong> pas je het aantal aan.</p>
-      <p>Staat een product op 1, dan wordt de <strong>−</strong> een prullenbak. Daarmee haal je alleen dat product van je lijst. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-layer-group"></i><span>Afdelingen en sorteren</span></div>
       <p>Je lijst staat op volgorde van de winkel, per afdeling: groente &amp; fruit, brood, zuivel, enzovoort.</p>
       <p>Staat een product bij de verkeerde afdeling of bij <strong>Overig</strong>? Houd het ingedrukt en kies <strong>Andere afdeling</strong>. De app onthoudt je keuze, ook de volgende keer dat je dat product typt, en in de Folder.</p>
-      <p>Tik bovenaan op <strong>⋮</strong> om binnen de afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren.</p>
-      <p>Wat je afvinkt, staat bij <strong>In je mandje</strong>. Tik daarop om het open of dicht te klappen.</p>
+      <p>Tik bovenaan op <strong>⋮</strong> om binnen de afdelingen alfabetisch, per categorie of op nieuwste eerst te sorteren. Tik op <strong>In je mandje</strong> om het open of dicht te klappen.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-cart-shopping"></i><span>Meerdere winkels</span></div>
-      <p>Doe je boodschappen bij meer dan één winkel? Tik op je lijst op <strong>⋮ → Mijn winkels</strong> en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad; wat je toevoegt, komt bij de winkel die openstaat.</p>
-      <p><strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen.</p>
-      <p>Ben je bijna klaar in een winkel en staat er nog iets open? Dan zie je onderaan <strong>Niet gevonden?</strong>. Daarmee zet je alles wat over is in één keer op de lijst van een andere winkel.</p>
+      <p>Doe je boodschappen bij meer dan één winkel? Tik op je lijst op <strong>⋮ → Mijn winkels</strong> en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad met het blokje van die winkel; wat je toevoegt, komt bij de winkel die openstaat.</p>
+      <p><strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen. Ben je bijna klaar in een winkel en staat er nog iets open? Dan zie je onderaan <strong>Niet gevonden?</strong>. Daarmee zet je alles wat over is in één keer op de lijst van een andere winkel.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></div>
       <p>De app rekent uit wat je hele lijst kost bij je winkels, met de gewone prijzen en de aanbiedingen van deze week. Staan er 5 of meer producten op je lijst en is een andere winkel minstens € 1 goedkoper? Dan zie je boven je lijst bijvoorbeeld <strong>Jumbo is € 6,40 goedkoper</strong>. Tik erop voor alle winkels en de prijs per product.</p>
-      <p>Je kunt het ook altijd zelf openen via <strong>⋮ → Vergelijk winkels</strong>. Met het kruisje verberg je de melding voor de rest van de week.</p>
-      <p>Vindt de app een product niet bij een winkel, dan rekent hij met een geschatte prijs (<strong>±</strong>). De prijzen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Je opent het ook via <strong>⋮ → Vergelijk winkels</strong>, via het <strong>Overzicht</strong> of in de <strong>Folder</strong>. Met het kruisje verberg je de melding voor de rest van de week.</p>
+      <p>Vindt de app een product niet bij een winkel, dan rekent hij met een geschatte prijs (<strong>±</strong>). Vergelijk winkels is gratis. De prijzen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder</span></div>
       <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, in dezelfde afdelingen als je lijst, met de grootste korting eerst.</p>
       <p>Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet. De acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren.</p>
       <p>Staat er <strong>3 soorten</strong> op een kaart? Tik erop en kies de soort die je wilt. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. Wat al op je lijst staat, krijgt een groen vinkje. Bij 60% korting of meer zie je <strong>🔥 Topdeal</strong>.</p>
-      <p>Met het tandwieltje naast de winkels kies je je winkels. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>.</p>
-      <p>De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+      <p>Met het tandwieltje naast de winkels kies je je winkels. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen</span></div>
-      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het <strong>Overzicht</strong> en, als je lijst kort is, ook onder je boodschappen.</p>
-      <p>Wat al op je lijst staat, wordt niet voorgesteld. Was een product eerder een aanbieding uit de Folder, dan zie je de foto erbij.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-folder-open"></i><span>Opgeslagen lijsten</span></div>
-      <p>Bewaar een lijst om hem later opnieuw te gebruiken: tik op <strong>⋮ → Vaste lijst bewaren</strong>. Je gewone lijst blijft gewoon staan.</p>
-      <p>Je bewaarde lijsten vind je op het <strong>Overzicht</strong> onder <strong>Opgeslagen lijsten</strong>. Tik op <strong>Lijst openen</strong> om er een te gebruiken, of op <strong>Lijsten beheren</strong> om er een te verwijderen.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen en vaste lijsten</span></div>
+      <p>Producten die je vaak koopt, zet je met één tik opnieuw op je lijst. Je vindt ze op het <strong>Overzicht</strong> en, als je lijst kort is, ook onder je boodschappen. Was een product eerder een aanbieding uit de Folder, dan zie je de foto erbij.</p>
+      <p>Bewaar een lijst om hem later opnieuw te gebruiken: tik op <strong>⋮ → Vaste lijst bewaren</strong>. Je bewaarde lijsten vind je bij <strong>Meer → Opgeslagen lijsten</strong>. Tik op <strong>Lijst openen</strong> om er een te gebruiken, of op <strong>Lijsten beheren</strong> om er een te verwijderen.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-clock-rotate-left"></i><span>Lijst wissen en geschiedenis</span></div>
@@ -7453,59 +7435,45 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
 
     <div class="helpGroup">Samen</div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie gebruiken</span></div>
-      <p>Via <strong>Mijn familie</strong> maak je een nieuwe familie, of doe je met <strong>Meedoen met een code</strong> mee met een bestaande familie. Jullie delen dan dezelfde lijst.</p>
-      <p>Bij <strong>Familielid</strong> zie je wie erbij hoort; de hoofdpersoon staat bovenaan. Je kunt de app ook gewoon alleen gebruiken.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-people-group"></i><span>Gedeelde lijsten</span></div>
-      <p>Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een aparte lijst, bijvoorbeeld voor een BBQ of feestje. Stuur de <strong>Deelcode</strong> via bijvoorbeeld WhatsApp; de ander tikt op <strong>Meedoen met een code</strong> en vult hem in.</p>
-      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong>. Met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet.</p>
-      <p>Alleen de maker kan de lijst verwijderen via <strong>⋮ → Gedeelde lijst verwijderen</strong>. Wie meedoet, kiest daar <strong>Gedeelde lijst verlaten</strong>.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-users"></i><span>Familie en gedeelde lijsten</span></div>
+      <p>Via <strong>Meer → Mijn familie</strong> maak je een nieuwe familie, of doe je met <strong>Meedoen met een code</strong> mee met een bestaande familie. Jullie delen dan dezelfde lijst. Bij <strong>Familielid</strong> zie je wie erbij hoort; de hoofdpersoon staat bovenaan. Je kunt de app ook gewoon alleen gebruiken.</p>
+      <p>Wil je een aparte lijst delen, bijvoorbeeld voor een BBQ of met je huisgenoot? Maak via <strong>Meer → Gedeelde lijsten → Nieuwe lijst</strong> een lijst en stuur de <strong>Deelcode</strong> via bijvoorbeeld WhatsApp; de ander tikt op <strong>Meedoen met een code</strong>. Wat de een toevoegt of afvinkt, ziet de ander meteen.</p>
+      <p>Tik op een gedeelde lijst en kies <strong>Lijst openen</strong>. Met <strong>‹ Boodschappenlijst</strong> ga je terug naar je eigen lijst. Bij <strong>Personen</strong> zie je wie meedoet. Alleen de maker kan de lijst verwijderen via <strong>⋮ → Gedeelde lijst verwijderen</strong>; wie meedoet, kiest daar <strong>Gedeelde lijst verlaten</strong>.</p>
     </div>
 
     <div class="helpGroup">Mijn Boodschappen Pro</div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad bijhouden <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Voorraadbeheer</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Tik op een product om het aan te passen of te verwijderen.</p>
-      <p>Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt, met aantal en houdbaarheid erbij.</p>
-      <p>Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in, bijvoorbeeld ± 1 week voor melk. Pas je die aan, dan onthoudt de app dat. Controleer altijd de datum op de verpakking.</p>
-      <p>Is iets op, dan zet je het met één tik op je lijst. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
-      <p>Gaat iets bijna over de datum, dan krijgt het een <strong>oranje</strong> streepje en labeltje; is het over de datum, dan <strong>rood</strong>.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner en recepten <b class="aboutProBadge">PRO</b></span></div>
+      <p>Tik op het <strong>Overzicht</strong> op <strong>Weekplanner</strong>. Bij <strong>Mijn week</strong> zie je je geplande maaltijden en voeg je een maaltijd toe. Met <strong>Ingrediënten aan boodschappenlijst toevoegen</strong> zet je alle ingrediënten van je week in één keer op je lijst; wat je al in je voorraad hebt, slaat de app over. Met <strong>Zoek aanbiedingen voor mijn week</strong> zie je welke ingrediënten nu in de aanbieding zijn.</p>
+      <p>Tik op <strong>Recepten</strong> (op het Overzicht of als tabblad in de weekplanner). Er staan 30 recepten klaar, van stamppot tot curry. Zoek op naam of ingrediënt, of tik op een label zoals <strong>Vegetarisch</strong> of <strong>Snel klaar</strong>.</p>
+      <p>Tik op een recept voor de ingrediënten, de bereiding en een tip. Je ziet ook ongeveer hoeveel <strong>kcal</strong>, eiwit, koolhydraten en vet er per portie in zit. Met <strong>−</strong> en <strong>+</strong> kies je het aantal porties. Met <strong>Kies dit recept</strong> zet je het op een dag in je week.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-calendar-days"></i><span>Weekplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Slimme weekplanner</strong>. Bij <strong>Mijn week</strong> zie je je geplande maaltijden en voeg je een maaltijd toe.</p>
-      <p>Met <strong>Ingrediënten aan boodschappenlijst toevoegen</strong> zet je alle ingrediënten van je week in één keer op je lijst. Wat je al in je voorraad hebt, slaat de app over.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-utensils"></i><span>Recepten <b class="aboutProBadge">PRO</b></span></div>
-      <p>In de weekplanner kies je het tabblad <strong>Recepten</strong>. Er staan 30 recepten klaar, van stamppot tot curry. Zoek op naam of ingrediënt, of tik op een label zoals <strong>Vegetarisch</strong> of <strong>Snel klaar</strong>.</p>
-      <p>Tik op een recept voor de ingrediënten, de bereiding en een tip. Je ziet ook ongeveer hoeveel <strong>kcal</strong>, eiwit, koolhydraten en vet er per portie in zit. Met <strong>−</strong> en <strong>+</strong> kies je het aantal porties; de hoeveelheden rekenen vanzelf mee.</p>
-      <p>Met <strong>Kies dit recept</strong> zet je het op een dag in je week.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Prijs- en budgetplanner <b class="aboutProBadge">PRO</b></span></div>
-      <p>Ga naar <strong>Meer → Mijn Boodschappen Pro → Prijs- en budgetplanner</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is. Heb je 80% uitgegeven, dan wordt de ring <strong>oranje</strong>; ga je over je budget, dan wordt hij <strong>rood</strong>.</p>
-      <p>Zet je een aanbieding via <strong>Aanbiedingen</strong> of de <strong>Folder</strong> op je lijst, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Budget <b class="aboutProBadge">PRO</b></span></div>
+      <p>Tik op het <strong>Overzicht</strong> op <strong>Budget</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is, ook op de tegel. Heb je 80% uitgegeven, dan wordt het <strong>oranje</strong>; ga je over je budget, dan <strong>rood</strong>.</p>
+      <p>Zet je een aanbieding uit de <strong>Folder</strong> op je lijst, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
       <p>Bij <strong>Uitgave toevoegen</strong> vul je zelf een bedrag en winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf.</p>
-      <p>Bij <strong>Aanbiedingen</strong> zoek je een product bij al je winkels tegelijk, of tik je op <strong>Zoek aanbiedingen voor mijn week</strong>. Bij acties als "2e halve prijs" zet de app het aantal meteen goed. Controleer de prijs altijd even in de winkel.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Persoonlijke assistent <b class="aboutProBadge">PRO</b></span></div>
-      <p>De assistent zet je <strong>vaste boodschappen</strong> klaar: wat je bijna elke keer koopt, zet je met één tik op je lijst.</p>
-      <p>Ook geeft hij tips: wat bijna op is, wat je meestal samen koopt, wat van je vaste producten in de aanbieding is en wat je vandaag kunt koken. Bij <strong>Wat eten we vandaag?</strong> zet <strong>Plan voor vandaag</strong> het recept in je week en de ontbrekende ingrediënten op je lijst.</p>
-      <p>Hij leert van je boodschappenrondes, dus na een paar keer "Bewaren en nieuwe lijst" verschijnen de eerste tips op het Overzicht.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-cube"></i><span>Voorraad <b class="aboutProBadge">PRO</b></span></div>
+      <p>Tik op het <strong>Overzicht</strong> op <strong>Voorraad</strong>. Voeg producten toe of scan een barcode, en gebruik <strong>−</strong> en <strong>+</strong> voor het aantal. Met <strong>Meerdere tegelijk toevoegen</strong> vink je in één keer aan wat je in huis hebt.</p>
+      <p>Bij <strong>Houdbaar tot</strong> vult de app een geschatte datum in, bijvoorbeeld ± 1 week voor melk. Pas je die aan, dan onthoudt de app dat. Controleer altijd de datum op de verpakking.</p>
+      <p>Gaat iets bijna over de datum, dan krijgt het een <strong>oranje</strong> streepje en labeltje, en zie je het op de tegel op het Overzicht; is het over de datum, dan <strong>rood</strong>. Is iets op, dan zet je het met één tik op je lijst. Zit je in een familie, dan delen jullie dezelfde voorraad.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Tips voor jou <b class="aboutProBadge">PRO</b></span></div>
+      <p>Bovenaan het <strong>Overzicht</strong> zie je een <strong>Tip voor jou</strong>: wat bijna op is, wat je meestal samen koopt, wat van je vaste producten in de aanbieding is en wat je vandaag kunt koken. Met <strong>Alle tips</strong> zie je ze allemaal en zet je je <strong>vaste boodschappen</strong> met één tik op je lijst.</p>
+      <p>Bij <strong>Wat eten we vandaag?</strong> zet <strong>Plan voor vandaag</strong> het recept in je week en de ontbrekende ingrediënten op je lijst. De tips leren van je boodschappenrondes, dus na een paar keer "Bewaren en nieuwe lijst" verschijnen de eerste.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-crown"></i><span>Pro en je familie</span></div>
-      <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken.</p>
-      <p class="onlyFree">Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budgetplanner en assistent zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
+      <p class="onlyFree">Pro is tijdelijk gratis: iedereen kan alle Pro-onderdelen gebruiken. Je herkent ze aan het <strong>PRO</strong>-labeltje op het Overzicht.</p>
+      <p class="onlyFree">Heeft iemand in je familie Pro, dan kan de hele familie de gedeelde voorraad gebruiken. Weekplanner, budget en tips zijn voor wie zelf Pro heeft. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
       <p class="onlyPaid">Pro is een abonnement via Google Play, per maand of per jaar. Je kunt het eerst <strong>7 dagen gratis proberen</strong>; zeg je op tijd op, dan betaal je niets. Eén abonnement geldt voor je <strong>hele familie</strong>. Bij <strong>Mijn familie → Familielid</strong> zie je wie Pro heeft.</p>
       <p class="onlyPaid">Je abonnement bekijk of stop je via <strong>Meer → Mijn Boodschappen Pro → Abonnement beheren</strong>. Nieuwe telefoon? Tik in het Pro-scherm op <strong>Aankoop herstellen</strong>. Verwijder je je account, zeg dan ook je abonnement op in Google Play; dat stopt niet vanzelf.</p>
     </div>
 
-    <div class="helpGroup">Instellingen</div>
+    <div class="helpGroup">Instellingen en account</div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bell"></i><span>Meldingen</span></div>
       <p id="helpReminderSetup">Ga naar <strong>Meer → Instellingen → Meldingen</strong>. Zet de boodschappenherinnering aan en kies de dag en tijd.</p>
@@ -7515,40 +7483,20 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p id="helpReminderPlatform">Meldingen worden op je telefoon zelf ingepland, ook als je je telefoon opnieuw opstart.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-sun"></i><span>Scherm aan laten en trillen</span></div>
-      <p>Ga naar <strong>Meer → Instellingen → Lijstopties</strong>. Met <strong>Scherm aan laten</strong> gaat je scherm niet uit zolang je lijst open staat en er nog iets af te vinken is. Handig in de winkel.</p>
-      <p>Met <strong>Trillen bij afvinken</strong> voel je een korte tik als je een product afvinkt. Beide staan standaard aan.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-gear"></i><span>Instellingen en thema</span></div>
+      <p>Tik in <strong>Meer</strong> rechtsboven op het maantje (of zonnetje) en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>. Bij Automatisch volgt de app je telefoon.</p>
+      <p><strong>Meer → Instellingen → Suggesties</strong>: zet <strong>Automatische suggesties</strong> aan of uit, en kies of je <strong>Productfoto’s</strong> wilt zien in plaats van iconen.</p>
+      <p><strong>Meer → Instellingen → Lijstopties</strong>: met <strong>Voltooide producten onderaan</strong> komen afgevinkte producten onderaan je lijst te staan. <strong>Scherm aan laten</strong> houdt je scherm aan zolang er nog iets af te vinken is, en met <strong>Trillen bij afvinken</strong> voel je een korte tik. Beide staan standaard aan.</p>
+      <p><strong>Meer → Instellingen → Scannen</strong>: zet <strong>Barcode scannen</strong> aan of uit. Staat het uit, dan werkt het streepjescode-icoon in het veld niet.</p>
+      <p>Een pop-up sluit je met het kruisje <strong>✕</strong>, door ernaast te tikken of met de terugknop van je telefoon. Bij een keuzelijst tik je op je keuze; tik je ernaast, dan verandert er niets. Wat je instelt, wordt meteen bewaard.</p>
     </div>
     <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-moon"></i><span>Licht of donker</span></div>
-      <p>Tik in <strong>Meer</strong> rechtsboven op het maantje (of zonnetje) en kies <strong>Licht</strong>, <strong>Donker</strong> of <strong>Automatisch</strong>.</p>
-      <p>Bij Automatisch volgt de app je telefoon: staat je telefoon op donker, dan wordt de app ook donker.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-triangle-exclamation"></i><span>Geen internet</span></div>
-      <p>Geen bereik, bijvoorbeeld in de supermarkt? Dan zie je onderin <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen.</p>
-      <p>Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-xmark"></i><span>Pop-ups en keuzelijsten</span></div>
-      <p>Een pop-up sluit je met het kruisje <strong>✕</strong>, of door ernaast op het scherm te tikken. Je kunt ook de terugknop van je telefoon gebruiken. Wat je instelt, wordt meteen bewaard.</p>
-      <p>Bij een keuzelijst tik je op je keuze. Tik je ernaast, dan verandert er niets.</p>
-    </div>
-
-    <div class="helpGroup">Account</div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Inloggen met Google</span></div>
-      <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Je hoeft dan geen wachtwoord te onthouden.</p>
-      <p>De eerste keer vraagt de app hoe we je mogen noemen. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-camera"></i><span>Profielfoto en naam</span></div>
-      <p>Ga naar <strong>Meer → Mijn account</strong>. Bij <strong>Profielfoto</strong> tik je op <strong>Foto kiezen</strong>; verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Via hetzelfde scherm verwijder je hem weer.</p>
-      <p>Bij <strong>Mijn naam</strong> pas je de naam aan die anderen in de app zien. Je familieleden zien je foto en naam bij <strong>Mijn familie</strong>.</p>
-    </div>
-    <div class="helpSection">
-      <div class="helpQuestion"><i class="fa-solid fa-gift"></i><span>Updates</span></div>
-      <p>Je krijgt een melding als er een nieuwe versie van de app is. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer.</p>
+      <div class="helpQuestion"><i class="fa-solid fa-right-to-bracket"></i><span>Account, offline en updates</span></div>
+      <p>Tik op het inlogscherm op <strong>Doorgaan met Google</strong> en kies je Google-account. Heb je al een account met hetzelfde e-mailadres? Dan kom je in dat account, met je eigen lijstjes.</p>
+      <p>Bij <strong>Meer → Mijn account</strong> tik je bij <strong>Profielfoto</strong> op <strong>Foto kiezen</strong>; verschuif en zoom tot je foto mooi in de cirkel staat en sla hem op. Bij <strong>Mijn naam</strong> pas je de naam aan die anderen zien. Je familieleden zien je foto en naam bij <strong>Mijn familie</strong>.</p>
+      <p>Geen bereik, bijvoorbeeld in de supermarkt? Dan zie je onderin <strong>Geen internet</strong>. Je kunt gewoon verder met afvinken en toevoegen. Zodra je weer verbinding hebt, gaan je wijzigingen mee en zie je even <strong>Weer verbonden</strong>. Sluit de app liever niet helemaal af zolang je offline bent.</p>
+      <p>Is er een nieuwe versie, dan krijg je een melding. Tik op <strong>Nu bijwerken</strong> om naar de Play Store te gaan, of op <strong>Later</strong>: dan krijg je de melding de volgende dag nog een keer.</p>
+      <p>Iets gezien dat niet klopt, of mis je iets? Laat het weten via <strong>Meer → Feedback</strong>. De rondleiding bekijk je opnieuw met de knop hieronder.</p>
     </div>
     <button type="button" class="familyMenuItem settingsMenuItem helpTourBtn" style="margin-top:12px" onclick="openAppTourFromHelp(event)">
       <i class="fa-solid fa-hand-pointer"></i>
@@ -7611,6 +7559,9 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       </div>
     </button>
 
+    <div id="ovTiles" class="ovTiles" aria-label="Pro-functies"></div>
+    <button type="button" id="ovCompare" class="ovCompare" onclick="if(window.openCompare)openCompare()"></button>
+
     <div class="overview-new-card overview-click-card" onclick="openQuickAddFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-bolt overview-new-bolt"></i><span>Snel opnieuw toevoegen</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
       <div id="overviewQuickNew" class="overview-quick-content">
@@ -7618,12 +7569,6 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       </div>
     </div>
 
-    <button type="button" class="overview-new-card overview-click-card" onclick="openSavedListsFromOverview()">
-      <div class="overview-new-title"><i class="fa-solid fa-bookmark overview-new-lists"></i><span>Opgeslagen lijsten</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
-      <div class="overview-new-row">
-        <div><strong>Jouw bewaarde boodschappenlijsten</strong><div class="overview-new-muted">Open een lijst en gebruik deze opnieuw.</div></div>
-      </div>
-    </button>
 
     <button type="button" class="overview-new-card overview-click-card" onclick="openShoppingHistoryFromOverview()">
       <div class="overview-new-title"><i class="fa-solid fa-clock-rotate-left overview-new-history"></i><span>Geschiedenis</span><i class="fa-solid fa-chevron-right overview-new-arrow"></i></div>
@@ -17279,7 +17224,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       '<li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span><strong>Slimme weekplanner</strong>Recepten kiezen en alle ingrediënten in één keer op je lijst.</span></li>'+
       '<li><i class="fa-solid fa-wallet" aria-hidden="true"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de aanbiedingen bij jouw supermarkt.</span></li>'+
       '<li><i class="fa-solid fa-cube" aria-hidden="true"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en delen met je familie.</span></li>'+
-      '<li><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span><strong>Persoonlijke assistent</strong>Je vaste boodschappen klaarzetten en tips over wat bijna op is, wat je vergeet en wat in de aanbieding is.</span></li>'+
+      '<li><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span><strong>Tips voor jou</strong>Je vaste boodschappen klaarzetten en tips over wat bijna op is, wat je vergeet en wat in de aanbieding is.</span></li>'+
       '</ul>'+(hasData()?'<p class="proUpsellNote"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Je gegevens blijven bewaard. Met Pro kun je ze meteen weer gebruiken.</p>':'')+
       '<p class="proUpsellTest">Pro is tijdelijk gratis.</p></div>',
       '<button type="button" class="familyDialogBtn familyDialogCancel" data-b="later">Niet nu</button><button type="button" class="familyDialogBtn familyDialogPrimary" data-b="on">Pro aanzetten</button>');
@@ -17553,7 +17498,7 @@ body.proPaidMode .onlyFree{display:none!important}
       '<li><i class="fa-solid fa-calendar-days"></i><span><strong>Slimme weekplanner en 30 recepten</strong>Alle ingrediënten in één keer op je lijst.</span></li>'+
       '<li><i class="fa-solid fa-wallet"></i><span><strong>Budget en aanbiedingen</strong>Houd je uitgaven bij en zie de acties bij jouw supermarkt.</span></li>'+
       '<li><i class="fa-solid fa-cube"></i><span><strong>Voorraadbeheer</strong>Weet wat je in huis hebt, met houdbaarheid en meldingen.</span></li>'+
-      '<li><i class="fa-solid fa-wand-magic-sparkles"></i><span><strong>Persoonlijke assistent</strong>Je vaste boodschappen klaar en tips over wat bijna op is.</span></li>'+
+      '<li><i class="fa-solid fa-wand-magic-sparkles"></i><span><strong>Tips voor jou</strong>Je vaste boodschappen klaar en tips over wat bijna op is.</span></li>'+
       '</ul><div class="proPayFam"><i class="fa-solid fa-users"></i><span>Eén abonnement voor je hele familie</span></div>';
     if(st.kind==="grace")html+='<p class="proPayNote">Je kunt Pro nog gratis gebruiken tot <b>'+fmtDate(st.until)+'</b>. Neem je nu Pro, dan loopt alles daarna gewoon door.</p>';
     html+='<div class="proPlans">'+
@@ -18206,9 +18151,9 @@ body.proPaidMode .onlyFree{display:none!important}
   var SUB=document.getElementById("proMenuSub");if(!SUB)return;
   var P=[
     {id:"smartPlannerPanel",title:"Slimme weekplanner",fn:"toggleSmartPlanner",sub:"Plan je maaltijden en zet alle ingrediënten in één keer op je lijst."},
-    {id:"budgetPlannerPanel",title:"Prijs- en budgetplanner",fn:"toggleBudgetPlanner",sub:"Houd je uitgaven bij en zie wat je nog over hebt."},
+    {id:"budgetPlannerPanel",title:"Budgetplanner",fn:"toggleBudgetPlanner",sub:"Houd je uitgaven bij en zie wat je nog over hebt."},
     {id:"pantryPanel",title:"Voorraadbeheer",fn:"togglePantry",sub:"Houd bij wat je thuis hebt. Is iets op, dan zet je het met één tik op je lijst."},
-    {id:"assistantPanel",title:"Persoonlijke assistent",fn:"toggleAssistant",sub:"Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten."}
+    {id:"assistantPanel",title:"Tips voor jou",fn:"toggleAssistant",sub:"Tips die passen bij hoe jij boodschappen doet. Tik op + om iets meteen op je lijst te zetten."}
   ];
   var bar=document.createElement("div");bar.className="proScreenBar";bar.hidden=true;
   bar.innerHTML='<button type="button" class="familyMenuBack proScreenBack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Pro</span></button><div class="proScreenTitle" role="heading" aria-level="2"></div><p class="proScreenSub"></p>';
@@ -19032,6 +18977,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       (list.length?'<button type="button" class="edit" aria-label="Mijn winkels wijzigen"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>':"");
     shopRow.style.display=list.length?"":"none";
     var sb=ov.querySelector(".mbFolderSearch");if(sb)sb.style.display=list.length?"":"none";
+    var cb=ov.querySelector(".mbFolderCmp");if(cb)cb.style.display=list.length&&!state.q&&state.week!=="next"?"":"none";
     var wk=ov.querySelector(".mbFolderWeek");if(wk)wk.style.display=list.length?"":"none";
     shopRow.querySelectorAll("button[data-k]").forEach(function(x){x.onclick=function(){state.shop=x.getAttribute("data-k");state.cat="all";state.open={};state.catScroll=0;draw();};});
     var ed=shopRow.querySelector(".edit");if(ed)ed.onclick=function(e){e.stopPropagation();if(window.openShopPicker)window.openShopPicker();};
@@ -19098,8 +19044,10 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
         '<div class="mbFolderHead"><h2>Folder</h2><span></span></div><div class="mbFolderShops"></div>'+
         '<div class="mbFolderWeek" role="tablist"><button type="button" data-w="now" class="on">Deze week</button><button type="button" data-w="next">Volgende week</button></div>'+
         '<label class="mbFolderSearch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="Zoek in de folder…" aria-label="Zoek in de folder" enterkeyhint="search"><button type="button" class="mbFolderSearchClear" aria-label="Wissen" hidden><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>'+
+        '<button type="button" class="mbFolderCmp"><span class="ic" aria-hidden="true">💰</span><span class="tx"><b>Waar is je lijst het goedkoopst?</b><small>Vergelijk je hele lijst bij je winkels</small></span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>'+
         '<div class="mbFolderCats"></div><div class="mbFolderBody"></div>';
       ov.addEventListener("click",function(e){e.stopPropagation();});
+      ov.querySelector(".mbFolderCmp").onclick=function(e){e.stopPropagation();if(window.openCompare)window.openCompare();};
       state.q="";state.week="now";
       ov.querySelectorAll(".mbFolderWeek button").forEach(function(x){x.onclick=function(e){e.stopPropagation();var w=x.getAttribute("data-w");if(w===state.week)return;state.week=w;state.cat="all";state.open={};state.catScroll=0;draw();try{ov.scrollTo({top:0});}catch(_){}};});
       var si=ov.querySelector(".mbFolderSearch input"),sc=ov.querySelector(".mbFolderSearchClear"),st=null;
@@ -19836,13 +19784,15 @@ body:not(.logged-in) #mbNet{display:none}
 /* Korte rondleiding voor nieuwe gebruikers: wijst de echte knoppen in de app aan. */
 (function(){
   var steps=[
-    {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In vijf korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
-    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Probeer het maar: typ wat je nodig hebt en tik op +. Tijdens het typen krijg je suggesties en zie je of het al op je lijst staat."},
-    {sel:"#mbScanBtn",t:"Scannen",i:"fa-barcode",p:"Tik op het streepjescode-icoon in het veld om een product te scannen. Probeer het gerust."},
+    {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In zes korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
+    {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Typ wat je nodig hebt en tik op +. Tijdens het typen krijg je suggesties. Met het streepjescode-icoon in het veld scan je een product."},
     {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Je lijst staat op volgorde van de winkel, per afdeling. Tik op het rondje om af te vinken: het product gaat naar In je mandje. Met − en + pas je het aantal aan."},
-    {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier zie je je voortgang, je opgeslagen lijsten en producten die je vaak koopt. Tik er gerust op.",tap:"next"},
-    {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, Pro met de weekplanner en 30 recepten, je instellingen en Help & uitleg. Tik er gerust op.",last:true,tap:"close"}
+    {sel:"#navFolder",t:"Folder",i:"fa-tag",p:"Alle aanbiedingen van jouw winkels, deze week en volgende week. Met + zet je een aanbieding met foto op je lijst."},
+    {sel:"#listOptionsButton",t:"Vergelijk winkels",i:"fa-wallet",p:"Bij ⋮ vind je Vergelijk winkels: zie bij welke winkel je hele lijst het goedkoopst is. Is een andere winkel goedkoper, dan zie je dat ook boven je lijst."},
+    {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier staan je weekplanner, recepten, budget en voorraad, plus tips voor jou en wat je vaak koopt. Tik er gerust op.",tap:"next"},
+    {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, opgeslagen lijsten, je instellingen en Help & uitleg. Tik er gerust op.",last:true,tap:"close"}
   ];
+
   var el=null,idx=0;
   function uid(){try{return (auth&&auth.currentUser&&auth.currentUser.uid)||"";}catch(_){return "";}}
   function doneKey(){return "boodschappenTourDone_"+uid();}
@@ -21152,6 +21102,7 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
     if(best.k===ref.k||diff<MIN_DIFF){b.hidden=true;return;}
     b.innerHTML=logo(best.k)+'<span class="t"><b>'+esc(nameOf(best.k))+'</b> is <b>'+money(diff)+'</b> goedkoper</span><span class="ar"><i class="fa-solid fa-chevron-right"></i></span><button type="button" class="x" aria-label="Verbergen voor deze week"><i class="fa-solid fa-xmark"></i></button>';
     b.hidden=false;
+    try{if(window.__renderOverviewTiles)window.__renderOverviewTiles();}catch(e){}
   }
 
   /* Het vergelijkscherm */
@@ -21262,6 +21213,162 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
   window.__mbCompareRefresh=schedule;
+  window.__mbCompareLast=function(){
+    if(!last||last.blocked||!last.shops||last.shops.length<2||last.comparable<MIN_ITEMS)return null;
+    var best=last.shops[0],cur=current(),ref=last.shops.filter(function(s){return s.k===cur;})[0]||last.shops[last.shops.length-1];
+    var diff=Math.round((ref.total-best.total)*100)/100;if(best.k===ref.k||diff<MIN_DIFF)return null;
+    return {k:best.k,name:nameOf(best.k),diff:diff};
+  };
+})();
+</script>
+
+<style id="ovTilesStyle">
+.ovTiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:0 0 11px}
+.ovTile{position:relative;display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-height:112px;padding:13px 13px 12px;border:1px solid #e1ece4;border-radius:16px;background:#fff;box-shadow:0 2px 8px rgba(40,70,50,.05);font:inherit;color:#22382a;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
+.ovTile:active{transform:scale(.97)}
+.ovTile .ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:8px}
+.ovTile b{font-size:15.5px;line-height:1.2}
+.ovTile .tx{font-size:12.5px;color:#66776d;margin-top:3px;line-height:1.3}
+.ovTile .tx.warn{color:#c96f10;font-weight:700}
+.ovTile .tx.bad{color:#d64545;font-weight:700}
+.ovTile .bar{width:100%;height:6px;border-radius:9px;background:#e5ece7;margin-top:7px;overflow:hidden}
+.ovTile .bar i{display:block;height:100%;border-radius:9px}
+.ovTile .pro{position:absolute;right:10px;top:10px;font-size:10px;font-weight:900;letter-spacing:.3px;border-radius:6px;padding:2px 6px;background:#fdf1cf;color:#8a6a10}
+.ovTile.locked .pro{background:#eef2ef;color:#66776d}
+.ovTile.locked .ic{filter:grayscale(.6);opacity:.75}
+.ic-plan{background:#e3eefc;color:#2f6fb5}.ic-rec{background:#fdeede;color:#c8641a}.ic-bud{background:#e5f3e9;color:#3f7a52}.ic-pan{background:#fdf3d6;color:#b07d0c}
+.ovCompare{display:flex;align-items:center;gap:11px;width:100%;margin:0 0 11px;padding:12px 13px;border:1.5px solid #9fcfac;border-radius:16px;background:#e5f3e9;font:inherit;color:#22382a;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ovCompare .tx{flex:1;min-width:0}.ovCompare b{display:block;font-size:15px}.ovCompare small{display:block;font-size:12.5px;color:#4d6455;margin-top:1px}
+.ovCompare .ic0{width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.ovCompare>i{color:#3f5b45}
+.ovAllTips{float:right;border:0;background:transparent;color:#3f5b45;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 2px;margin-left:auto}
+.mbFolderCmp{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:10px 12px;border:1.5px solid #cfe3d5;border-radius:14px;background:#fff;font:inherit;color:#22382a;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mbFolderCmp .ic{font-size:18px}.mbFolderCmp .tx{flex:1;min-width:0}.mbFolderCmp b{display:block;font-size:14.5px}.mbFolderCmp small{display:block;font-size:12px;color:#5d6f63;margin-top:1px}
+.mbFolderCmp>i{color:#3f5b45;font-size:13px}
+.assistantLaunch{display:none!important}
+#overviewExpiryCard{display:none!important}
+.proTabs[data-for="budgetPlannerPanel"]{display:none!important}
+.budgetToFolder{display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:11px 13px;border-radius:14px;background:#f2f8f3;border:1px solid #dcebe0;font-size:13.5px;color:#33463a}
+.budgetToFolder button{margin-left:auto;border:0;background:#3f5b45;color:#fff;font:inherit;font-weight:800;font-size:13px;border-radius:10px;padding:8px 11px;cursor:pointer;white-space:nowrap}
+.weekDealsMoved{margin-top:16px}
+body.dark-theme .ovTile{background:#202923;border-color:#34443a;color:#e4eee7}
+body.dark-theme .ovTile .tx{color:#a9b9ae}
+body.dark-theme .ovTile .tx.warn{color:#f0a64a}
+body.dark-theme .ovTile .bar{background:#2f3a33}
+body.dark-theme .ovTile .pro{background:#3a3320;color:#f0d68a}
+body.dark-theme .ovTile.locked .pro{background:#29352d;color:#a9b9ae}
+body.dark-theme .ic-plan{background:#22334a;color:#9cc2ef}body.dark-theme .ic-rec{background:#3e2c1d;color:#f2b07a}body.dark-theme .ic-bud{background:#24402d;color:#9fd3ac}body.dark-theme .ic-pan{background:#3a3320;color:#f0d68a}
+body.dark-theme .ovCompare{background:#24342a;border-color:#3f6a4c;color:#e4eee7}
+body.dark-theme .ovCompare small{color:#a9b9ae}
+body.dark-theme .ovCompare .ic0{background:#1d241f}
+body.dark-theme .ovCompare>i,body.dark-theme .ovAllTips{color:#9fd3ad}
+body.dark-theme .mbFolderCmp{background:#202923;border-color:#34443a;color:#e4eee7}
+body.dark-theme .mbFolderCmp small{color:#a9b9ae}
+body.dark-theme .mbFolderCmp>i{color:#9fd3ad}
+body.dark-theme .budgetToFolder{background:#24342a;border-color:#34443a;color:#cfe0d4}
+</style>
+<script id="ovTilesScript">
+/* Overzicht: de Pro-functies als tegels met live informatie, en Vergelijk winkels.
+   Met Pro (nu tijdelijk gratis voor iedereen): tik opent de functie. Zonder Pro: slotje, tik opent de Pro-pagina. */
+(function(){
+  function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function euro(n){return "€ "+Math.round(Number(n)||0).toLocaleString("nl-NL");}
+  function pro(){try{return !window.isProActive||window.isProActive();}catch(e){return true;}}
+  function pantryOk(){try{return window.hasPantryAccess?window.hasPantryAccess():pro();}catch(e){return pro();}}
+  function readJ(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+  var DAYS=["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"];
+
+  function planInfo(){
+    var meals=readJ("boodschappen_pro_smart_weekplanner_v1",[]);if(!Array.isArray(meals)||!meals.length)return {t:"Plan je maaltijden voor de week"};
+    var today=DAYS[new Date().getDay()],m=meals.filter(function(x){return x&&x.day===today;})[0];
+    if(m)return {t:"Vandaag: "+String(m.meal||"").slice(0,40)};
+    return {t:meals.length+(meals.length===1?" maaltijd":" maaltijden")+" gepland"};
+  }
+  function recInfo(){var n=0;try{n=(window.__recipeList||[]).length;}catch(e){}return {t:(n||30)+" recepten met kcal"};}
+  function budInfo(){
+    var d=readJ("boodschappen_budgetplanner_v1",{})||{},b=Number(d.budget)||0,sp=(Array.isArray(d.expenses)?d.expenses:[]).reduce(function(s,x){return s+(Number(x.amount)||0);},0);
+    if(!b)return {t:"Stel je weekbudget in"};
+    var pct=Math.min(100,sp/b*100),over=sp>b,warn=!over&&pct>=80;
+    return {t:euro(sp)+" van "+euro(b),cls:over?"bad":warn?"warn":"",bar:pct,col:over?"#d64545":warn?"#e08a1e":"#57956c"};
+  }
+  function panInfo(){
+    var A=window.__pantryApi;if(!A)return {t:"Houd bij wat je thuis hebt"};
+    var items=[];try{items=A.read().items||[];}catch(e){}
+    if(!items.length)return {t:"Houd bij wat je thuis hebt"};
+    var exp=items.filter(function(i){var d=A.daysUntil(i.exp);return A.int(i.qty,0)>0&&d!=null&&d<=2;});
+    var gone=exp.filter(function(i){return A.daysUntil(i.exp)<0;}).length;
+    if(exp.length)return {t:gone?gone+" over de datum":exp.length+" bijna over de datum",cls:gone?"bad":"warn"};
+    var n=items.filter(function(i){return A.int(i.qty,0)>0;}).length;
+    return {t:n+(n===1?" product":" producten")+" in huis"};
+  }
+  var TILES=[
+    {k:"plan",name:"Weekplanner",ic:"fa-calendar-days",cls:"ic-plan",lock:"Plan je maaltijden voor de week",info:planInfo,panel:"smartPlannerPanel",fn:"toggleSmartPlanner",tab:"week"},
+    {k:"rec",name:"Recepten",ic:"fa-utensils",cls:"ic-rec",lock:"30 recepten met kcal",info:recInfo,panel:"smartPlannerPanel",fn:"toggleSmartPlanner",tab:"recipes"},
+    {k:"bud",name:"Budget",ic:"fa-wallet",cls:"ic-bud",lock:"Houd je uitgaven bij",info:budInfo,panel:"budgetPlannerPanel",fn:"toggleBudgetPlanner",tab:"budget"},
+    {k:"pan",name:"Voorraad",ic:"fa-cube",cls:"ic-pan",lock:"Weet wat je thuis hebt",info:panInfo,panel:"pantryPanel",fn:"togglePantry",pantry:true}
+  ];
+  function openPanel(t){
+    try{showMoreView();}catch(e){}
+    try{openProSubmenu();}catch(e){}
+    if(!t)return;
+    setTimeout(function(){
+      var el=document.getElementById(t.panel);
+      try{if(el&&el.hidden&&typeof window[t.fn]==="function")window[t.fn]();}catch(e){}
+      try{if(t.tab&&window.__proSetTab)window.__proSetTab(t.panel,t.tab);}catch(e){}
+    },90);
+  }
+  window.__ovOpenPanel=function(k){openPanel(TILES.filter(function(t){return t.k===k;})[0]||{panel:k,fn:"toggleAssistant"});};
+  window.openAssistantFromOverview=function(){openPanel({panel:"assistantPanel",fn:"toggleAssistant"});};
+
+  function render(){
+    var box=document.getElementById("ovTiles");if(!box)return;
+    box.innerHTML=TILES.map(function(t){
+      var ok=t.pantry?pantryOk():pro(),i=ok?t.info():{t:t.lock};
+      return '<button type="button" class="ovTile'+(ok?'':' locked')+'" data-k="'+t.k+'"><span class="pro">'+(ok?'PRO':'<i class="fa-solid fa-lock" aria-hidden="true"></i> PRO')+'</span>'+
+        '<span class="ic '+t.cls+'"><i class="fa-solid '+t.ic+'" aria-hidden="true"></i></span><b>'+t.name+'</b><span class="tx'+(i.cls?' '+i.cls:'')+'">'+esc(i.t)+'</span>'+
+        (i.bar!=null?'<span class="bar"><i style="width:'+i.bar+'%;background:'+i.col+'"></i></span>':'')+'</button>';
+    }).join("");
+    box.querySelectorAll(".ovTile").forEach(function(b){b.onclick=function(e){e.stopPropagation();var t=TILES.filter(function(x){return x.k===b.dataset.k;})[0];
+      var ok=t.pantry?pantryOk():pro();openPanel(ok?t:null);};});
+    var c=document.getElementById("ovCompare");
+    if(c){
+      var r=null;try{r=window.__mbCompareLast&&window.__mbCompareLast();}catch(e){}
+      var sub="Zie bij welke winkel je hele lijst het minst kost",logo='<span class="ic0" aria-hidden="true">💰</span>';
+      if(r&&r.diff>=1){sub=esc(r.name)+" is "+("€ "+r.diff.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2}))+" goedkoper";try{if(window.__mbShopLogo)logo=window.__mbShopLogo(r.k);}catch(e){}}
+      c.innerHTML=logo+'<span class="tx"><b>Vergelijk winkels</b><small>'+sub+'</small></span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i>';
+    }
+  }
+  window.__renderOverviewTiles=render;
+
+  /* Tip voor jou: link naar alle tips */
+  function tipsLink(){
+    var t=document.querySelector("#overviewAssistCard .overview-new-title");if(!t||t.querySelector(".ovAllTips"))return;
+    var b=document.createElement("button");b.type="button";b.className="ovAllTips";b.innerHTML='Alle tips <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>';
+    b.onclick=function(e){e.stopPropagation();window.openAssistantFromOverview();};t.appendChild(b);
+  }
+  /* Budget: aanbiedingen staan in de Folder; "aanbiedingen voor mijn week" verhuist naar de weekplanner */
+  function budgetTidy(){
+    var pane=document.querySelector('#budgetPlannerPanel .proTabPane[data-pane="budget"]');
+    if(pane&&!pane.querySelector(".budgetToFolder")){
+      var n=document.createElement("div");n.className="budgetToFolder";
+      n.innerHTML='<span>🏷️ Aanbiedingen zoeken? Die staan in de <b>Folder</b>.</span><button type="button">Naar Folder</button>';
+      n.querySelector("button").onclick=function(e){e.stopPropagation();try{openFolder();}catch(_){}};
+      var lab=pane.querySelector('label[for="budgetAmount"]');pane.insertBefore(n,pane.firstChild);
+    }
+    try{if(window.__proSetTab)window.__proSetTab("budgetPlannerPanel","budget");}catch(e){}
+    var week=document.querySelector('#smartPlannerPanel .proTabPane[data-pane="week"]'),btn=document.querySelector(".budgetWeekButton"),res=document.getElementById("weekplanDealsResults");
+    if(week&&btn&&res&&!week.querySelector(".weekDealsMoved")){
+      var w=document.createElement("div");w.className="weekDealsMoved";w.appendChild(btn);w.appendChild(res);week.appendChild(w);
+    }
+  }
+  function hook(){
+    if(typeof updateOverviewView==="function"&&!updateOverviewView.__tiles){
+      var o=updateOverviewView;updateOverviewView=function(){var r=o.apply(this,arguments);try{render();tipsLink();}catch(e){}return r;};updateOverviewView.__tiles=1;
+    }
+    render();tipsLink();budgetTidy();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);else hook();
+  document.addEventListener("click",function(e){if(e.target&&e.target.closest&&e.target.closest("#navOverview"))setTimeout(render,50);},true);
 })();
 </script>
 
