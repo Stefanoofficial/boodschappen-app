@@ -7421,6 +7421,12 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p>Ben je bijna klaar in een winkel en staat er nog iets open? Dan zie je onderaan <strong>Niet gevonden?</strong>. Daarmee zet je alles wat over is in één keer op de lijst van een andere winkel.</p>
     </div>
     <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></div>
+      <p>De app rekent uit wat je hele lijst kost bij je winkels, met de gewone prijzen en de aanbiedingen van deze week. Staan er 5 of meer producten op je lijst en is een andere winkel minstens € 1 goedkoper? Dan zie je boven je lijst bijvoorbeeld <strong>Jumbo is € 6,40 goedkoper</strong>. Tik erop voor alle winkels en de prijs per product.</p>
+      <p>Je kunt het ook altijd zelf openen via <strong>⋮ → Vergelijk winkels</strong>. Met het kruisje verberg je de melding voor de rest van de week.</p>
+      <p>Vindt de app een product niet bij een winkel, dan rekent hij met een geschatte prijs (<strong>±</strong>). De prijzen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+    </div>
+    <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Folder</span></div>
       <p>Tik onderin op <strong>Folder</strong>. Je ziet alle aanbiedingen van je eigen winkels, in dezelfde afdelingen als je lijst, met de grootste korting eerst.</p>
       <p>Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet. De acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren.</p>
@@ -7666,6 +7672,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Winkels</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openShopPicker)openShopPicker();},220)"><i class="fa-solid fa-cart-shopping"></i><span>Mijn winkels</span></button>
+      <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openCompare)openCompare();},220)"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></button>
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Bewaren</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
@@ -15955,6 +15962,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       .sort((a,b)=>b.s-a.s||(Number(b.p.savings_percentage)||0)-(Number(a.p.savings_percentage)||0)||Number(a.p.price)-Number(b.p.price))
       .map(x=>x.p);
   }
+  window.__mbRankDeals=rankDeals;
   function bestDeal(rows,term){
     return rankDeals(rows,term)[0]||null;
   }
@@ -18921,6 +18929,8 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     rows.sort(function(a,b){return pct(b)-pct(a);});
     writeCache(key0,rows);return rows;
   }
+  // Voor "Vergelijk winkels": de aanbiedingen van deze week, los van wat de Folder nu toont.
+  window.__mbFolderNow=function(slug){var w=state.week;state.week="now";try{return load(slug);}finally{state.week=w;}};
   function norm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();}
   function brandOf(p){var b=String(p.brand||"").trim();if(b)return b;return String(p.name||"").split(/\s+/)[0]||"";}
   /* Varianten samenvoegen: zelfde merk + zelfde actie + zelfde prijs = één kaart (zoals in de apps van de supermarkten). */
@@ -20884,6 +20894,356 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
 })();
 </script>
+<style id="mbCmpStyle">
+.mbCmpLg{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border-radius:8px;font-weight:900;font-size:10.5px;letter-spacing:-.2px;color:#fff;flex:none;line-height:1;white-space:nowrap}
+.mbCmpLg.big{min-width:44px;height:44px;border-radius:13px;font-size:11px;padding:0 5px}
+#mbCmpBar{display:flex;align-items:center;gap:9px;background:#e5f3e9;border:1.5px solid #9fcfac;border-radius:14px;padding:7px 8px 7px 9px;margin:0 0 12px;font-size:14.5px;color:#22382a;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:mbCmpIn .35s ease}
+#mbCmpBar[hidden]{display:none!important}
+#mbCmpBar .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mbCmpBar .ar{font-size:15px;color:#3f5b45}
+#mbCmpBar .x{border:0;background:transparent;color:#8a978e;font-size:15px;width:30px;height:30px;border-radius:50%;flex:none;cursor:pointer}
+@keyframes mbCmpIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.app.overview-active #mbCmpBar,.app.more-active #mbCmpBar{display:none!important}
+.mbCmpOv{position:fixed;inset:0;z-index:2147480000;background:rgba(20,35,25,.42);display:flex;align-items:flex-end;opacity:0;transition:opacity .2s}
+.mbCmpOv.on{opacity:1}
+.mbCmpSheet{width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(30px);transition:transform .25s;color:#22382a}
+.mbCmpOv.on .mbCmpSheet{transform:none}
+.mbCmpGrab{width:42px;height:5px;background:#d6dfd9;border-radius:9px;margin:2px auto 12px}
+.mbCmpHead{display:flex;align-items:flex-start;gap:10px}
+.mbCmpHead h3{font-size:20px;font-weight:800;margin:0;line-height:1.25;flex:1}
+.mbCmpClose,.mbCmpBack{border:0;background:#f1f5f2;color:#3f5b45;width:34px;height:34px;border-radius:50%;font-size:15px;flex:none;cursor:pointer}
+.mbCmpSub{font-size:13px;color:#6a7c70;margin:3px 0 14px}
+.mbCmpRow{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;margin-bottom:8px;background:#f4f8f5;cursor:pointer;border:2px solid transparent}
+.mbCmpRow.best{background:#e5f3e9;border-color:#57956c}
+.mbCmpRow .nm{flex:1;min-width:0}
+.mbCmpRow .nm b{font-size:16px}
+.mbCmpRow .s{font-size:12.5px;color:#6a7c70;margin-top:2px}
+.mbCmpRow .pr{text-align:right;white-space:nowrap}
+.mbCmpRow .pr b{font-size:18px}
+.mbCmpRow .pr div{font-size:12.5px;color:#6a7c70}
+.mbCmpTag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:2px;background:#57956c;color:#fff}
+.mbCmpNote{background:#fdf3d6;color:#6d5513;border-radius:12px;padding:9px 11px;font-size:12.5px;margin-top:10px;line-height:1.4}
+.mbCmpBtn{display:block;width:100%;border:0;background:#3f5b45;color:#fff;text-align:center;font:inherit;font-weight:800;border-radius:14px;padding:13px;margin-top:12px;font-size:15px;cursor:pointer}
+.mbCmpBtn.sec{background:#eaf2ec;color:#31543b}
+.mbCmpLoad{padding:26px 6px;text-align:center;color:#5d6f63;font-size:14.5px}
+.mbCmpLoad .bar{height:6px;background:#e5ece7;border-radius:9px;overflow:hidden;margin:14px auto 0;max-width:260px}
+.mbCmpLoad .bar i{display:block;height:100%;background:#57956c;width:0;transition:width .3s}
+.mbCmpTbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.mbCmpTbl th{font-size:11px;font-weight:800;color:#6a7c70;text-align:right;padding:4px 0;letter-spacing:.4px}
+.mbCmpTbl th:first-child{text-align:left}
+.mbCmpTbl td{padding:9px 0;border-top:1px solid #eef2ef;vertical-align:top}
+.mbCmpTbl td.p{text-align:right;font-weight:800;white-space:nowrap;padding-left:8px}
+.mbCmpTbl td.c{text-align:right;color:#8a978e;font-size:12.5px;white-space:nowrap;padding-left:10px;width:64px}
+.mbCmpTbl td.p.deal{color:#d64545}
+.mbCmpTbl tr.miss td{color:#9aa69e}
+.mbCmpTbl tr.miss td.p{font-weight:600}
+.mbCmpTbl .pn{font-size:11.5px;color:#8a978e;margin-top:1px}
+.mbCmpDeal{font-size:10.5px;font-weight:800;color:#fff;background:#d64545;border-radius:6px;padding:1px 5px;margin-left:4px;white-space:nowrap}
+.mbCmpEmpty{padding:18px 4px;color:#5d6f63;font-size:14.5px;line-height:1.45}
+body.dark-theme #mbCmpBar{background:#24342a;border-color:#3f6a4c;color:#e4eee7}
+body.dark-theme #mbCmpBar .ar{color:#9fd3ad}
+body.dark-theme .mbCmpSheet{background:#1d241f;color:#e4eee7}
+body.dark-theme .mbCmpRow{background:#29352d}
+body.dark-theme .mbCmpRow.best{background:#24402d;border-color:#57956c}
+body.dark-theme .mbCmpRow .s,body.dark-theme .mbCmpRow .pr div,body.dark-theme .mbCmpSub{color:#a9b9ae}
+body.dark-theme .mbCmpClose,body.dark-theme .mbCmpBack{background:#29352d;color:#cfe3d5}
+body.dark-theme .mbCmpTbl td{border-color:#2f3a33}
+body.dark-theme .mbCmpBtn.sec{background:#29352d;color:#cfe3d5}
+body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
+</style>
+<script>
+/* Winkels vergelijken: wat kost je hele lijst bij elke winkel? (prijzen en aanbiedingen van PrijsProfeet) */
+(function(){
+  var PROXY="https://boodschappen-prijzen.stefanoofficialgraanoogst.workers.dev";
+  var CACHE_KEY="mbCmpPrices1",CACHE_MS=24*3600*1000,HIDE_KEY="mbCmpHide",MIN_ITEMS=5,MIN_DIFF=1;
+  var POP_NL=["ah","jumbo","lidl","dirk"],POP_BE=["colruyt","delhaize","ah_be","lidl_be"];
+  var BE_KEYS=["ah_be","aldi_be","carrefour","colruyt","delhaize","jumbo_be","lidl_be"];
+  // Eigen blokjes met de winkelnaam in de kleur van de winkel (geen officiële logo's).
+  var LOOK={ah:["#00a0e2","#fff","AH"],ah_be:["#00a0e2","#fff","AH"],jumbo:["#f2b705","#222","JUMBO"],jumbo_be:["#f2b705","#222","JUMBO"],
+    lidl:["#0050aa","#fff","LIDL"],lidl_be:["#0050aa","#fff","LIDL"],aldi:["#00205b","#fff","ALDI"],aldi_be:["#00205b","#fff","ALDI"],
+    dirk:["#d8232a","#fff","DIRK"],plus:["#5aa02c","#fff","PLUS"],colruyt:["#e30613","#fff","COLRUYT"],delhaize:["#d2232a","#fff","DELHAIZE"],
+    carrefour:["#004e9f","#fff","CARREFOUR"],hoogvliet:["#ffd200","#004b93","HOOGVLIET"],vomar:["#e30613","#fff","VOMAR"],dekamarkt:["#e2001a","#fff","DEKA"],
+    coop:["#f37021","#fff","COOP"],spar:["#00843d","#fff","SPAR"],ekoplaza:["#6fa83a","#fff","EKOPLAZA"],poiesz:["#e30613","#fff","POIESZ"],
+    nettorama:["#ffd400","#e30613","NETTORAMA"],boni:["#e2001a","#fff","BONI"],mcd:["#0067b1","#fff","MCD"],dagwinkel:["#00843d","#fff","DAGWINKEL"],
+    gewooncoop:["#f37021","#fff","COOP"],boons:["#c8102e","#fff","BOONS"]};
+  function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function slugs(){return window.__budgetRetailerSlugs||{};}
+  function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
+  function logo(k,big){var l=LOOK[k]||["#57956c","#fff",String(nameOf(k)||k).toUpperCase().slice(0,8)];
+    return '<span class="mbCmpLg'+(big?" big":"")+'" style="background:'+l[0]+';color:'+l[1]+'">'+esc(l[2])+'</span>';}
+  function favs(){try{return (window.__favShops?window.__favShops():[]).filter(function(k){return slugs()[k];});}catch(e){return [];}}
+  function shops(){
+    var f=favs();if(f.length>=2)return f.slice(0,4);
+    var be=f.length&&BE_KEYS.indexOf(f[0])>=0,out=f.slice();
+    (be?POP_BE:POP_NL).forEach(function(k){if(out.length<4&&out.indexOf(k)<0)out.push(k);});
+    return out;
+  }
+  function current(){
+    try{var a=localStorage.getItem("boodschappenActiveShop")||"";var f=favs();if(f.indexOf(a)>=0&&window.__shopsOn&&window.__shopsOn())return a;return f[0]||"";}catch(e){return "";}
+  }
+  function list(){try{return (Array.isArray(boodschappen)?boodschappen:[]).filter(function(it){return it&&String(it.text||"").trim();});}catch(e){return [];}}
+  function inSharedOrMain(){var app=document.querySelector(".app");return !(app&&(app.classList.contains("overview-active")||app.classList.contains("more-active")));}
+
+  /* Zoekterm uit een productnaam: zonder winkelnaam en zonder gewicht/aantal. */
+  var SHOPWORDS=/\b(ah|albert heijn|jumbo|lidl|aldi|dirk|plus|colruyt|delhaize|carrefour|hoogvliet|vomar|dekamarkt|coop|spar|ekoplaza|poiesz|nettorama|huismerk|g'woon|everyday|excellent|basic)\b/g;
+  function term(t){
+    var s=String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+    s=s.replace(/\(.*?\)/g," ").replace(SHOPWORDS," ");
+    s=s.replace(/\b(ca\.?|circa|per|stuks?|st\.?|pak|zak|doos|fles|blik|pot|bak|los|1 stuk)\b/g," ");
+    s=s.replace(/\b\d+([.,]\d+)?\s*(x|kg|g|gr|gram|ml|cl|l|liter|stuks?|st)?\b/g," ");
+    s=s.replace(/[^a-z' -]+/g," ").replace(/\s+/g," ").trim();
+    var w=s.split(" ");if(w.length>4)s=w.slice(0,4).join(" ");
+    return s;
+  }
+  function qtyOf(it){var q=Number(it&&it.quantity);return q>0&&q<100?q:1;}
+
+  /* Prijzen: per winkel en zoekterm een dag bewaard op de telefoon. */
+  var mem=null;
+  function cache(){if(mem)return mem;try{mem=JSON.parse(localStorage.getItem(CACHE_KEY)||"{}")||{};}catch(e){mem={};}
+    var now=Date.now();Object.keys(mem).forEach(function(k){if(!mem[k]||now-mem[k].at>CACHE_MS)delete mem[k];});return mem;}
+  function saveCache(){try{var c=cache(),keys=Object.keys(c);if(keys.length>600){keys.sort(function(a,b){return c[a].at-c[b].at;}).slice(0,keys.length-600).forEach(function(k){delete c[k];});}localStorage.setItem(CACHE_KEY,JSON.stringify(c));}catch(e){}}
+
+  function simpleRank(rows,t){
+    var words=t.split(" ").filter(function(w){return w.length>1;});if(!words.length)return [];
+    var head=words[words.length-1];
+    var SIDE=/(chocola|snoep|koek|chips|smaak|drop|taart|cake|speelgoed)/;
+    return rows.filter(function(p){if(SIDE.test(String(p.name||"").toLowerCase())&&!SIDE.test(t))return false;var n=String(p.name||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+      return n.indexOf(head.replace(/(en|s)$/,""))>=0&&words.every(function(w){return n.replace(/\s/g,"").indexOf(w.replace(/(en|s)$/,""))>=0;});});
+  }
+  function rank(rows,t){
+    var r=[];try{if(window.__mbRankDeals)r=window.__mbRankDeals(rows,t)||[];}catch(e){}
+    if(!r.length)r=simpleRank(rows,t);
+    return r.filter(function(p){return Number(p.price)>0;});
+  }
+  // Het goedkoopste van de best passende producten (meestal het huismerk).
+  function pick(rows,t){
+    var r=rank(rows,t).slice(0,5);if(!r.length)return null;
+    r.sort(function(a,b){return Number(a.price)-Number(b.price);});
+    var p=r[0];return {n:String(p.name||"").split("|").map(function(x){return x.trim();}).filter(Boolean).join(" "),price:Number(p.price),q:[p.quantity,p.unit].filter(Boolean).join(" ")};
+  }
+  var stopNet=false,oldWorker=false;
+  function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  async function get(url){
+    var ctrl=typeof AbortController!=="undefined"?new AbortController():null,tm=ctrl?setTimeout(function(){ctrl.abort();},15000):null;
+    try{var r=await fetch(url,{headers:{Accept:"application/json"},signal:ctrl?ctrl.signal:undefined});if(tm)clearTimeout(tm);return r;}
+    catch(e){if(tm)clearTimeout(tm);return null;}
+  }
+  // Gewone prijs van één product bij één winkel. De worker bewaart dit 24 uur voor alle gebruikers samen.
+  async function shelf(k,t){
+    var c=cache(),key=k+"|"+t;if(c[key])return c[key].v;
+    if(stopNet)return undefined;
+    var slug=slugs()[k],qs="q="+encodeURIComponent(t)+"&retailer="+encodeURIComponent(slug);
+    for(var attempt=0;attempt<3;attempt++){
+      var r=await get(PROXY+(oldWorker?"/search?"+qs+"&promotion_status=shelf&page_size=20":"/shelf?"+qs));
+      if(!r)return undefined;                                       // geen verbinding: niet bewaren, later opnieuw
+      if(r.status===404&&!oldWorker){oldWorker=true;attempt--;continue;}  // oude worker zonder /shelf
+      if(r.status===429){if(attempt<2){await wait(1500*(attempt+1));continue;}stopNet=true;return undefined;}
+      if(!r.ok)return undefined;
+      try{
+        var d=await r.json(),rows=(d.results||d.products||[]).filter(function(p){var s=String(p.promotion_status||"shelf");return s==="shelf"||s==="active";});
+        var v=pick(rows,t);c[key]={at:Date.now(),v:v};return v;
+      }catch(e){return undefined;}
+    }
+    return undefined;
+  }
+  async function folderRows(k){
+    try{if(window.__mbFolderNow)return await window.__mbFolderNow(slugs()[k]);}catch(e){}
+    return [];
+  }
+  async function pool(tasks,n,onDone){
+    var i=0,done=0;
+    async function run(){while(i<tasks.length){var j=i++;await tasks[j]();done++;if(onDone)onDone(done,tasks.length);}}
+    var w=[];for(var x=0;x<Math.min(n,tasks.length);x++)w.push(run());await Promise.all(w);
+  }
+
+  /* De berekening */
+  var last=null,running=null;
+  function signature(items,ks){return ks.join(",")+"#"+items.map(function(it){return term(it.text)+"x"+qtyOf(it);}).join(";");}
+  async function compute(onProgress){
+    var items=list(),ks=shops();
+    var sig=signature(items,ks);
+    if(last&&last.sig===sig&&Date.now()-last.at<30*60*1000)return last;
+    if(running&&running.sig===sig)return running.p;
+    stopNet=false;
+    var p=(async function(){
+      var terms=[];items.forEach(function(it){var t=term(it.text);if(t&&terms.indexOf(t)<0)terms.push(t);});
+      var deals={};await Promise.all(ks.map(async function(k){deals[k]=await folderRows(k);}));
+      var shelfRes={},tasks=[];
+      ks.forEach(function(k){shelfRes[k]={};terms.forEach(function(t){tasks.push(async function(){shelfRes[k][t]=await shelf(k,t);});});});
+      await pool(tasks,3,onProgress);saveCache();
+      var miss=0;ks.forEach(function(k){terms.forEach(function(t){if(shelfRes[k][t]===undefined)miss++;});});
+      var res={sig:sig,at:Date.now(),shops:[],items:items.length,blocked:stopNet||miss>0};
+      // Per product per winkel: aanbieding (als die goedkoper is) of de gewone prijs.
+      var grid={};
+      terms.forEach(function(t){grid[t]={};ks.forEach(function(k){
+        var s=shelfRes[k][t],dl=null;
+        var dr=rank(deals[k]||[],t).slice(0,3);if(dr.length){dr.sort(function(a,b){return Number(a.price)-Number(b.price);});var d=dr[0];dl={n:String(d.name||""),price:Number(d.price),pct:(Number(d.original_price)>Number(d.price)?Math.round((1-Number(d.price)/Number(d.original_price))*100):0),promo:String(d.promotion||"")};}
+        var best=s||null,isDeal=false;
+        if(dl&&(!best||dl.price<=best.price)){best={n:dl.n,price:dl.price,q:""};isDeal=true;}
+        grid[t][k]=best?{n:best.n,price:best.price,q:best.q,deal:isDeal,pct:isDeal?dl.pct:0,promo:isDeal?dl.promo:""}:(s===undefined&&!dl?{err:1}:null);
+      });});
+      ks.forEach(function(k){
+        var total=0,found=0,dealsN=0,rows=[];
+        items.forEach(function(it){
+          var t=term(it.text),q=qtyOf(it),g=grid[t]&&grid[t][k];
+          var others=ks.map(function(o){var x=grid[t]&&grid[t][o];return x&&x.price>0?x.price:null;}).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});
+          if(g&&g.price>0){total+=g.price*q;found++;if(g.deal)dealsN++;rows.push({it:it,q:q,g:g});}
+          else if(others.length){var est=others[Math.floor(others.length/2)];total+=est*q;rows.push({it:it,q:q,est:est});}
+          else rows.push({it:it,q:q,none:1});
+        });
+        res.shops.push({k:k,total:Math.round(total*100)/100,found:found,deals:dealsN,rows:rows});
+      });
+      res.comparable=items.filter(function(it){var t=term(it.text);return ks.some(function(k){var g=grid[t]&&grid[t][k];return g&&g.price>0;});}).length;
+      res.shops.sort(function(a,b){return a.total-b.total;});
+      res.grid=grid;
+      last=res.blocked?null:res;return res;
+    })();
+    running={sig:sig,p:p};
+    try{return await p;}finally{running=null;}
+  }
+
+  /* De smalle balk boven je lijst */
+  function weekId(){var d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+"-"+Math.ceil(((d-j)/864e5+j.getDay()+1)/7);}
+  function hidden(){try{return localStorage.getItem(HIDE_KEY)===weekId();}catch(e){return false;}}
+  function barEl(){
+    var b=document.getElementById("mbCmpBar"),l=document.getElementById("list");
+    if(b){if(l&&b.nextSibling!==l)l.parentNode.insertBefore(b,l);return b;}
+    if(!l)return null;
+    b=document.createElement("div");b.id="mbCmpBar";b.hidden=true;b.setAttribute("role","button");
+    l.parentNode.insertBefore(b,l);
+    b.addEventListener("click",function(e){
+      if(e.target.closest(".x")){e.stopPropagation();try{localStorage.setItem(HIDE_KEY,weekId());}catch(_){}b.hidden=true;return;}
+      openCompare();
+    });
+    return b;
+  }
+  var tmr=null;
+  function schedule(){clearTimeout(tmr);tmr=setTimeout(updateBar,1800);}
+  async function updateBar(){
+    var b=barEl();if(!b)return;
+    var items=list(),ks=shops();
+    if(hidden()||items.length<MIN_ITEMS||ks.length<2||!inSharedOrMain()||!navigator.onLine){b.hidden=true;return;}
+    var res;try{res=await compute();}catch(e){b.hidden=true;return;}
+    if(!res||res.blocked||res.comparable<MIN_ITEMS||res.shops.length<2){b.hidden=true;return;}
+    var best=res.shops[0],cur=current(),ref=res.shops.filter(function(s){return s.k===cur;})[0]||res.shops[res.shops.length-1];
+    var diff=Math.round((ref.total-best.total)*100)/100;
+    if(best.k===ref.k||diff<MIN_DIFF){b.hidden=true;return;}
+    b.innerHTML=logo(best.k)+'<span class="t"><b>'+esc(nameOf(best.k))+'</b> is <b>'+money(diff)+'</b> goedkoper</span><span class="ar"><i class="fa-solid fa-chevron-right"></i></span><button type="button" class="x" aria-label="Verbergen voor deze week"><i class="fa-solid fa-xmark"></i></button>';
+    b.hidden=false;
+  }
+
+  /* Het vergelijkscherm */
+  var ov=null;
+  function close(){if(!ov)return;var o=ov;ov=null;o.classList.remove("on");setTimeout(function(){o.remove();},220);}
+  function sheet(html){
+    if(ov&&!ov.isConnected)ov=null;
+    if(!ov){
+      ov=document.createElement("div");ov.className="mbCmpOv";ov.innerHTML='<div class="mbCmpSheet" role="dialog" aria-modal="true"></div>';
+      document.body.appendChild(ov);requestAnimationFrame(function(){ov&&ov.classList.add("on");});
+      ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    }
+    var s=ov.querySelector(".mbCmpSheet");s.innerHTML='<div class="mbCmpGrab"></div>'+html;s.scrollTop=0;
+    var c=s.querySelector(".mbCmpClose");if(c)c.onclick=close;
+    return s;
+  }
+  window.openCompare=async function(){
+    var items=list(),ks=shops();
+    if(!items.length){sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">Zet eerst een paar producten op je lijst. Dan rekent de app uit bij welke winkel je het minst betaalt.</div>');return;}
+    var s=sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpLoad">Prijzen ophalen bij '+ks.map(function(k){return esc(nameOf(k));}).join(", ")+'…<div class="bar"><i></i></div></div>');
+    var res;
+    try{res=await compute(function(d,n){if(!ov)return;var i=ov.querySelector(".mbCmpLoad .bar i");if(i)i.style.width=Math.round(d/n*100)+"%";});}
+    catch(e){if(ov)sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">De prijzen konden niet worden opgehaald. Controleer je internetverbinding en probeer het opnieuw.</div>');return;}
+    if(!ov)return;
+    drawOverview(res);
+    updateBar();
+  };
+  function drawOverview(res){
+    var best=res.shops[0],n=res.items;
+    var html='<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
+      '<div class="mbCmpSub">'+n+' product'+(n===1?'':'en')+' · prijzen en aanbiedingen van deze week</div>';
+    if(res.blocked){
+      html+='<div class="mbCmpEmpty">Niet alle prijzen konden nu worden opgehaald. Misschien is je verbinding even weg, of wordt er op dit moment veel gezocht.<br><br>De prijzen die al binnen zijn, worden bewaard. Probeer het over een minuutje opnieuw.</div><button type="button" class="mbCmpBtn" data-retry="1">Opnieuw proberen</button>';
+      var sb=sheet(html);sb.querySelector("[data-retry]").onclick=function(){openCompare();};return;
+    }
+    if(!res.comparable){
+      html+='<div class="mbCmpEmpty">We konden de producten op je lijst nog niet bij de winkels vinden. Probeer het straks opnieuw'+(res.blocked?' (er werd net te vaak gezocht)':'')+'.</div>';
+      sheet(html);return;
+    }
+    res.shops.forEach(function(sh,i){
+      var d=Math.round((sh.total-best.total)*100)/100;
+      html+='<div class="mbCmpRow'+(i===0?' best':'')+'" data-k="'+esc(sh.k)+'">'+logo(sh.k,true)+
+        '<div class="nm"><b>'+esc(nameOf(sh.k))+'</b>'+(i===0?'<span class="mbCmpTag">Goedkoopst</span>':'')+
+        '<div class="s">'+sh.found+' van '+n+' gevonden'+(sh.deals?' · '+sh.deals+' aanbieding'+(sh.deals===1?'':'en'):'')+'</div></div>'+
+        '<div class="pr"><b>'+money(sh.total)+'</b>'+(i>0?'<div>+ '+money(d)+'</div>':'')+'</div></div>';
+    });
+    html+='<div class="mbCmpNote">💡 Niet gevonden producten tellen mee met een geschatte prijs (de prijs bij de andere winkels). Tik op een winkel voor de details.'+''+'</div>';
+    var act=action(best.k);if(act)html+='<button type="button" class="mbCmpBtn" data-act="1">'+esc(act.label)+'</button>';
+    var s=sheet(html);
+    s.querySelectorAll(".mbCmpRow").forEach(function(r){r.onclick=function(){drawDetail(res,r.getAttribute("data-k"));};});
+    var b=s.querySelector("[data-act]");if(b)b.onclick=function(){act.run();};
+  }
+  function action(k){
+    var f=favs(),on=false;try{on=!!(window.__shopsOn&&window.__shopsOn());}catch(e){}
+    if(on&&f.indexOf(k)>=0){
+      var idx=[];
+      try{boodschappen.forEach(function(it,i){if(it&&!it.completed&&it.shop!==k)idx.push(i);});}catch(e){}
+      if(!idx.length)return null;
+      return {label:"Zet alles bij "+nameOf(k),run:async function(){close();try{localStorage.setItem("boodschappenActiveShop",k);await window.__moveItemsToShop(idx,k);showList();}catch(e){}updateBar();}};
+    }
+    if(f.indexOf(k)<0&&f.length<3){
+      return {label:"Zet "+nameOf(k)+" bij je winkels",run:function(){
+        try{var d=JSON.parse(localStorage.getItem("boodschappen_budgetplanner_v1")||"{}")||{};var arr=Array.isArray(d.favorites)?d.favorites.slice():(d.supermarket?[d.supermarket]:[]);if(arr.indexOf(k)<0)arr.push(k);d.favorites=arr.slice(0,3);localStorage.setItem("boodschappen_budgetplanner_v1",JSON.stringify(d));}catch(e){}
+        close();try{showList();}catch(e){}
+        try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast("<b>"+esc(nameOf(k))+"</b> staat nu bij je winkels.");}catch(e){}
+      }};
+    }
+    return null;
+  }
+  function drawDetail(res,k){
+    var sh=res.shops.filter(function(s){return s.k===k;})[0];if(!sh)return;
+    var ref=res.shops.filter(function(s){return s.k!==k;}),cur=current(),other=ref.filter(function(s){return s.k===cur;})[0]||ref[ref.length-1]||ref[0];
+    var save=other?Math.round((other.total-sh.total)*100)/100:0;
+    var html='<div class="mbCmpHead"><button class="mbCmpBack" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>'+logo(k,true)+
+      '<div style="flex:1;min-width:0"><h3>'+esc(nameOf(k))+' · '+money(sh.total)+'</h3><div class="mbCmpSub" style="margin:2px 0 0">'+(other?(save>0?'je bespaart '+money(save)+' t.o.v. '+esc(nameOf(other.k)):save<0?money(-save)+' duurder dan '+esc(nameOf(other.k)):'even duur als '+esc(nameOf(other.k))):'')+'</div></div>'+
+      '<button class="mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>';
+    html+='<table class="mbCmpTbl" style="margin-top:12px"><tr><th>PRODUCT</th><th>'+esc(String(nameOf(k)).toUpperCase())+'</th>'+(other?'<th>'+esc((LOOK[other.k]||[0,0,String(nameOf(other.k)).toUpperCase()])[2])+'</th>':'')+'</tr>';
+    var anyEst=false;
+    sh.rows.forEach(function(r){
+      var t=term(r.it.text),og=other&&res.grid[t]?res.grid[t][other.k]:null;
+      var qt=r.q>1?r.q+'× ':'';
+      var oc=og&&og.price>0?money(og.price*r.q):'–';
+      if(r.g){
+        html+='<tr><td>'+qt+esc(r.it.text)+(r.g.deal?'<span class="mbCmpDeal">'+(r.g.pct?'-'+r.g.pct+'%':'actie')+'</span>':'')+'<div class="pn">'+esc(r.g.n)+(r.g.q?' · '+esc(r.g.q):'')+'</div></td><td class="p'+(r.g.deal?' deal':'')+'">'+money(r.g.price*r.q)+'</td>'+(other?'<td class="c">'+oc+'</td>':'')+'</tr>';
+      }else if(r.est){anyEst=true;
+        html+='<tr class="miss"><td>'+qt+esc(r.it.text)+'<div class="pn">niet gevonden bij '+esc(nameOf(k))+'</div></td><td class="p">± '+money(r.est*r.q)+'</td>'+(other?'<td class="c">'+oc+'</td>':'')+'</tr>';
+      }else{
+        html+='<tr class="miss"><td>'+qt+esc(r.it.text)+'<div class="pn">bij geen enkele winkel gevonden</div></td><td class="p">–</td>'+(other?'<td class="c">–</td>':'')+'</tr>';
+      }
+    });
+    html+='</table>';
+    if(anyEst)html+='<div class="mbCmpSub" style="margin-top:8px">± = niet gevonden, geschatte prijs</div>';
+    html+='<div class="mbCmpSub" style="margin-top:6px">Prijzen via PrijsProfeet. De prijs in de winkel kan afwijken.</div>';
+    var act=action(k);if(act)html+='<button type="button" class="mbCmpBtn" data-act="1">'+esc(act.label)+'</button>';
+    var s=sheet(html);
+    s.querySelector(".mbCmpBack").onclick=function(){drawOverview(res);};
+    var b=s.querySelector("[data-act]");if(b)b.onclick=function(){act.run();};
+  }
+
+  /* Na elke wijziging van de lijst de balk opnieuw bekijken (met wat vertraging). */
+  function watch(){
+    var l=document.getElementById("list");if(!l){setTimeout(watch,800);return;}
+    barEl();
+    try{new MutationObserver(schedule).observe(l,{childList:true,subtree:false});}catch(e){}
+    window.addEventListener("online",schedule);
+    document.addEventListener("click",function(e){if(e.target&&e.target.closest&&e.target.closest(".shopTab"))setTimeout(updateBar,60);},true);
+    schedule();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
+  window.__mbCompareRefresh=schedule;
+})();
+</script>
+
 </body>
 
 
