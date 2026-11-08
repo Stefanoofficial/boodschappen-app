@@ -18774,6 +18774,10 @@ body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
 .mbFSheet{position:absolute;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:12px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.18);animation:mbcUp .24s cubic-bezier(.2,.8,.2,1)}
 .mbFSheetWrap.closing .mbFSheet{transform:translateY(100%);transition:transform .18s ease-in}.mbFSheetWrap.closing .mbFSheetBack{opacity:0;transition:opacity .18s}
 .mbFSheetHandle{width:40px;height:5px;border-radius:3px;background:#d5ded8;margin:0 auto 12px}
+.mbFSheetTop{position:sticky;top:-12px;z-index:2;background:#fff;margin:-12px -16px 0;padding:12px 16px 2px;border-bottom:1px solid transparent;touch-action:none}
+.mbFSheetTitle{display:flex;align-items:flex-start;gap:10px}.mbFSheetTitle h3{flex:1;min-width:0}
+.mbFSheetClose{flex:none;margin-top:-4px}
+body.dark-theme .mbFSheetTop{background:#1f2a23}
 .mbFSheet h3{margin:0 0 3px;font-size:19px;color:#24392b}.mbFSheetSub{color:#6b7d71;font-size:13px;margin-bottom:10px}
 .mbFSheetRow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #edf2ee}
 .mbFSheetImg{flex:0 0 56px;width:56px;height:56px;border-radius:10px;border:1px solid #e6eee8;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
@@ -18951,8 +18955,8 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function openSheet(bd){
     closeSheet();
     var r=bd.rep,wrap=document.createElement("div");wrap.className="mbFSheetWrap";
-    wrap.innerHTML='<div class="mbFSheetBack"></div><div class="mbFSheet" role="dialog" aria-label="'+esc(bd.name)+'"><div class="mbFSheetHandle"></div>'+
-      '<h3>'+esc(bd.name)+'</h3><div class="mbFSheetSub">'+esc([badge(r)==="Actie"?"":badge(r),/%|korting/i.test(promoText(r))&&/%/.test(badge(r))?"":promoText(r),soon(r)?fromTxt(r.valid_from)+" "+untilTxt(r.valid_until):untilTxt(r.valid_until),nameOf(state.shop)].filter(function(x,i,arr){return x&&arr.indexOf(x)===i;}).join(" · "))+'</div><div class="mbFSheetList"></div></div>';
+    wrap.innerHTML='<div class="mbFSheetBack"></div><div class="mbFSheet" role="dialog" aria-label="'+esc(bd.name)+'"><div class="mbFSheetTop"><div class="mbFSheetHandle"></div>'+
+      '<div class="mbFSheetTitle"><h3>'+esc(bd.name)+'</h3><button type="button" class="mbDialogClose mbFSheetClose" aria-label="Sluiten"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div><div class="mbFSheetSub">'+esc([badge(r)==="Actie"?"":badge(r),/%|korting/i.test(promoText(r))&&/%/.test(badge(r))?"":promoText(r),soon(r)?fromTxt(r.valid_from)+" "+untilTxt(r.valid_until):untilTxt(r.valid_until),nameOf(state.shop)].filter(function(x,i,arr){return x&&arr.indexOf(x)===i;}).join(" · "))+'</div></div><div class="mbFSheetList"></div></div>';
     var list=wrap.querySelector(".mbFSheetList");
     bd.items.forEach(function(p){
       var row=document.createElement("div");row.className="mbFSheetRow";var img=imgOf(p);
@@ -18968,7 +18972,19 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       list.appendChild(row);
     });
     wrap.querySelector(".mbFSheetBack").addEventListener("click",function(e){e.stopPropagation();closeSheet();});
+    wrap.querySelector(".mbFSheetClose").addEventListener("click",function(e){e.stopPropagation();closeSheet();});
     wrap.addEventListener("click",function(e){e.stopPropagation();});
+    // Omlaag vegen om te sluiten: bovenaan het venster, of overal zolang de lijst helemaal bovenaan staat.
+    (function(){
+      var sh=wrap.querySelector(".mbFSheet"),y0=null,dy=0,drag=false;
+      sh.addEventListener("touchstart",function(e){if(e.touches.length!==1)return;var top=!!e.target.closest(".mbFSheetTop");if(!top&&sh.scrollTop>0)return;y0=e.touches[0].clientY;dy=0;drag=false;},{passive:true});
+      sh.addEventListener("touchmove",function(e){if(y0==null)return;dy=e.touches[0].clientY-y0;
+        if(!drag){if(dy>8&&(sh.scrollTop<=0||e.target.closest(".mbFSheetTop")))drag=true;else if(dy<-4){y0=null;return;}}
+        if(drag){if(e.cancelable)e.preventDefault();sh.style.transition="none";sh.style.transform="translateY("+Math.max(0,dy)+"px)";}},{passive:false});
+      function end(){if(y0==null)return;y0=null;if(!drag)return;drag=false;sh.style.transition="transform .18s ease";
+        if(dy>90){sh.style.transform="translateY(100%)";setTimeout(closeSheet,150);}else{sh.style.transform="";setTimeout(function(){sh.style.transition="";},200);}}
+      sh.addEventListener("touchend",end);sh.addEventListener("touchcancel",end);
+    })();
     document.body.appendChild(wrap);sheet=wrap;
   }
   function refreshCards(){try{if(ov)ov.querySelectorAll(".mbFCard").forEach(function(c){if(c.__refresh)c.__refresh();});}catch(e){}}
@@ -21341,14 +21357,22 @@ body.dark-theme .budgetToFolder{background:#24342a;border-color:#34443a;color:#c
     {k:"pan",name:"Voorraad",ic:"fa-cube",cls:"ic-pan",lock:"Weet wat je thuis hebt",info:panInfo,panel:"pantryPanel",fn:"togglePantry",pantry:true}
   ];
   function openPanel(t){
-    try{showMoreView();}catch(e){}
-    try{openProSubmenu();}catch(e){}
-    if(!t)return;
-    setTimeout(function(){
+    // Eerst alles wat eerder open stond sluiten en het juiste onderdeel klaarzetten, dán pas het scherm tonen.
+    // Anders zie je even het vorige onderdeel voordat het juiste verschijnt.
+    try{if(window.__proScreenClose)window.__proScreenClose();}catch(e){}
+    if(t){
       var el=document.getElementById(t.panel);
       try{if(el&&el.hidden&&typeof window[t.fn]==="function")window[t.fn]();}catch(e){}
       try{if(t.tab&&window.__proSetTab)window.__proSetTab(t.panel,t.tab);}catch(e){}
-    },90);
+    }
+    try{showMoreView();}catch(e){}
+    try{openProSubmenu();}catch(e){}
+    if(t)setTimeout(function(){
+      var el=document.getElementById(t.panel);
+      try{if(el&&el.hidden&&typeof window[t.fn]==="function")window[t.fn]();}catch(e){}
+      try{if(t.tab&&window.__proSetTab)window.__proSetTab(t.panel,t.tab);}catch(e){}
+      try{var mv=document.getElementById("moreView");if(mv)mv.scrollTop=0;}catch(e){}
+    },60);
   }
   window.__ovOpenPanel=function(k){openPanel(TILES.filter(function(t){return t.k===k;})[0]||{panel:k,fn:"toggleAssistant"});};
   window.openAssistantFromOverview=function(){openPanel({panel:"assistantPanel",fn:"toggleAssistant"});};
@@ -21648,6 +21672,9 @@ window.__mbStrictDeals=(function(){
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
   window.__mbListDealsRefresh=function(){sig="";schedule();};
+  /* Terugknop van Android: sluit eerst een open venster van Vergelijk winkels of Aanbiedingen op je lijst. */
+  function hookBack(){var ob=window.__appBack;window.__appBack=function(){var o=document.querySelector(".mbCmpOv.on");if(o){var c=o.querySelector(".mbCmpClose");if(c)c.click();else o.remove();return true;}return ob?ob():false;};}
+  if(document.readyState==="complete")setTimeout(hookBack,0);else window.addEventListener("load",function(){setTimeout(hookBack,0);});
 })();
 </script>
 
