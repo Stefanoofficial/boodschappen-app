@@ -6563,6 +6563,8 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
 </head>
 
 <body>
+<script>/* Vergelijk winkels staat uit tot PrijsProfeet gewone prijzen (shelf) levert. Aanzetten: true. */
+window.MB_COMPARE_ON=false;if(!window.MB_COMPARE_ON)document.documentElement.classList.add("noCompare");</script>
 <script>
 /* Was je de vorige keer ingelogd? Toon dan meteen de app in plaats van het inlogscherm.
    Firebase bevestigt de sessie op de achtergrond; mocht die toch verlopen zijn, dan verschijnt het inlogscherm alsnog. */
@@ -7408,7 +7410,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p>Doe je boodschappen bij meer dan één winkel? Tik op je lijst op <strong>⋮ → Mijn winkels</strong> en kies maximaal 3 winkels. Elke winkel krijgt dan een eigen tabblad met het blokje van die winkel; wat je toevoegt, komt bij de winkel die openstaat.</p>
       <p><strong>Houd een product ingedrukt</strong> om het naar een andere winkel te verplaatsen. Ben je bijna klaar in een winkel en staat er nog iets open? Dan zie je onderaan <strong>Niet gevonden?</strong>. Daarmee zet je alles wat over is in één keer op de lijst van een andere winkel.</p>
     </div>
-    <div class="helpSection">
+    <div class="helpSection" id="helpCompare">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></div>
       <p>De app rekent uit wat je hele lijst kost bij je winkels, met de gewone prijzen en de aanbiedingen van deze week. Staan er 5 of meer producten op je lijst en is een andere winkel minstens € 1 goedkoper? Dan zie je boven je lijst bijvoorbeeld <strong>Jumbo is € 6,40 goedkoper</strong>. Tik erop voor alle winkels en de prijs per product.</p>
       <p>Je opent het ook via <strong>⋮ → Vergelijk winkels</strong>, via het <strong>Overzicht</strong> of in de <strong>Folder</strong>. Met het kruisje verberg je de melding voor de rest van de week.</p>
@@ -7420,6 +7422,12 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <p>Met <strong>Deze week</strong> en <strong>Volgende week</strong> kies je welke week je ziet. De acties van volgende week verschijnen zodra de winkel ze online zet, meestal een paar dagen van tevoren.</p>
       <p>Staat er <strong>3 soorten</strong> op een kaart? Tik erop en kies de soort die je wilt. Tik op een foto om hem groot te bekijken, en op <strong>+</strong> om het product met foto op je lijst te zetten. Wat al op je lijst staat, krijgt een groen vinkje. Bij 60% korting of meer zie je <strong>🔥 Topdeal</strong>.</p>
       <p>Met het tandwieltje naast de winkels kies je je winkels. Zoek je iets? Typ het in <strong>Zoek in de folder</strong>. De folder is gratis voor iedereen. De aanbiedingen komen van PrijsProfeet; de prijs in de winkel is leidend.</p>
+    </div>
+    <div class="helpSection">
+      <div class="helpQuestion"><i class="fa-solid fa-tag"></i><span>Aanbiedingen op je lijst</span></div>
+      <p>De app kijkt in de folders van jouw winkels of iets wat je zelf op je lijst zette deze week in de aanbieding is. Zo ja, dan zie je onder het product een oranje regeltje, bijvoorbeeld <strong>-35% bij Jumbo · € 4,19</strong>, en boven je lijst hoeveel producten in de aanbieding zijn en wat je samen bespaart.</p>
+      <p>Tik op het regeltje of de balk voor alle aanbiedingen, met foto. Kijk even of het product klopt. Met <strong>Gebruik deze aanbieding</strong> hangt de aanbieding aan je product: vink je het af, dan telt de prijs vanzelf mee in je budget. Vergist? Tik op <strong>Ongedaan maken</strong>.</p>
+      <p>Met het kruisje verberg je de balk voor de rest van de week. Dit is gratis voor iedereen.</p>
     </div>
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-bolt"></i><span>Snel opnieuw toevoegen en vaste lijsten</span></div>
@@ -7451,7 +7459,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
     <div class="helpSection">
       <div class="helpQuestion"><i class="fa-solid fa-wallet"></i><span>Budget <b class="aboutProBadge">PRO</b></span></div>
       <p>Tik op het <strong>Overzicht</strong> op <strong>Budget</strong>. Vul bij <strong>Budget per week</strong> een bedrag in en tik op <strong>Budget opslaan</strong>. Je ziet dan steeds wat je hebt uitgegeven en wat er nog over is, ook op de tegel. Heb je 80% uitgegeven, dan wordt het <strong>oranje</strong>; ga je over je budget, dan <strong>rood</strong>.</p>
-      <p>Zet je een aanbieding uit de <strong>Folder</strong> op je lijst, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
+      <p>Zet je een aanbieding uit de <strong>Folder</strong> op je lijst, of tik je bij een product op <strong>Gebruik deze aanbieding</strong>, dan telt de prijs vanzelf mee zodra je hem afvinkt. Wil je dat ook producten zonder prijs meetellen, zet dan <strong>Vraag prijs bij producten zonder prijs</strong> aan.</p>
       <p>Bij <strong>Uitgave toevoegen</strong> vul je zelf een bedrag en winkel in. Bij <strong>Waar ging je geld naartoe?</strong> zie je per winkel hoeveel je uitgaf.</p>
     </div>
     <div class="helpSection">
@@ -7617,7 +7625,7 @@ html.mbBootFade .headerBar,html.mbBootFade .input-row-wrap,html.mbBootFade #list
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Winkels</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openShopPicker)openShopPicker();},220)"><i class="fa-solid fa-cart-shopping"></i><span>Mijn winkels</span></button>
-      <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openCompare)openCompare();},220)"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></button>
+      <button type="button" id="menuCompare" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(function(){if(window.openCompare)openCompare();},220)"><i class="fa-solid fa-wallet"></i><span>Vergelijk winkels</span></button>
       <div class="listOptionDivider" aria-hidden="true"></div>
       <div class="listOptionTitle">Bewaren</div>
       <button type="button" class="listOptionItem" onclick="event.stopPropagation();closeSortOptions();setTimeout(saveCurrentListAs,220)"><i class="fa-solid fa-bookmark"></i><span>Vaste lijst bewaren</span></button>
@@ -19810,11 +19818,12 @@ body:not(.logged-in) #mbNet{display:none}
     {t:"Welkom bij Mijn Boodschappen",i:"fa-basket-shopping",p:"In zes korte stappen laten we zien hoe de app werkt. Duurt nog geen halve minuut."},
     {sel:".input-row",t:"Zet iets op je lijst",i:"fa-plus",p:"Typ wat je nodig hebt en tik op +. Tijdens het typen krijg je suggesties. Met het streepjescode-icoon in het veld scan je een product."},
     {sel:"#list",t:"Afvinken in de winkel",i:"fa-circle-check",p:"Je lijst staat op volgorde van de winkel, per afdeling. Tik op het rondje om af te vinken: het product gaat naar In je mandje. Met − en + pas je het aantal aan."},
-    {sel:"#navFolder",t:"Folder",i:"fa-tag",p:"Alle aanbiedingen van jouw winkels, deze week en volgende week. Met + zet je een aanbieding met foto op je lijst."},
+    {sel:"#navFolder",t:"Folder",i:"fa-tag",p:"Alle aanbiedingen van jouw winkels, deze week en volgende week. Is iets van je lijst in de aanbieding, dan zie je dat ook meteen op je lijst."},
     {sel:"#listOptionsButton",t:"Vergelijk winkels",i:"fa-wallet",p:"Bij ⋮ vind je Vergelijk winkels: zie bij welke winkel je hele lijst het goedkoopst is. Is een andere winkel goedkoper, dan zie je dat ook boven je lijst."},
     {sel:"#navOverview",t:"Overzicht",i:"fa-table-cells-large",p:"Hier staan je weekplanner, recepten, budget en voorraad, plus tips voor jou en wat je vaak koopt. Tik er gerust op.",tap:"next"},
     {sel:"#navMore",t:"Meer",i:"fa-bars",p:"Je familie, gedeelde lijsten, opgeslagen lijsten, je instellingen en Help & uitleg. Tik er gerust op.",last:true,tap:"close"}
   ];
+  if(window.MB_COMPARE_ON===false){steps=steps.filter(function(x){return x.t!=="Vergelijk winkels";});steps[0].p=steps[0].p.replace("zes","vijf");}
 
   var el=null,idx=0;
   function uid(){try{return (auth&&auth.currentUser&&auth.currentUser.uid)||"";}catch(_){return "";}}
@@ -21234,7 +21243,7 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
     document.addEventListener("click",function(e){if(e.target&&e.target.closest&&e.target.closest(".shopTab"))setTimeout(updateBar,60);},true);
     schedule();
   }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
+  if(window.MB_COMPARE_ON!==false){if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();}
   window.__mbCompareRefresh=schedule;
   window.__mbCompareLast=function(){
     if(!last||last.blocked||!last.shops||last.shops.length<2||last.comparable<MIN_ITEMS)return null;
@@ -21269,6 +21278,7 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
 .mbFolderCmp .ic{font-size:18px}.mbFolderCmp .tx{flex:1;min-width:0}.mbFolderCmp b{display:block;font-size:14.5px}.mbFolderCmp small{display:block;font-size:12px;color:#5d6f63;margin-top:1px}
 .mbFolderCmp>i{color:#3f5b45;font-size:13px}
 .assistantLaunch{display:none!important}
+.noCompare #mbCmpBar,.noCompare #ovCompare,.noCompare .mbFolderCmp,.noCompare #menuCompare,.noCompare #helpCompare{display:none!important}
 #overviewExpiryCard{display:none!important}
 .proTabs[data-for="budgetPlannerPanel"]{display:none!important}
 .budgetToFolder{display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:11px 13px;border-radius:14px;background:#f2f8f3;border:1px solid #dcebe0;font-size:13.5px;color:#33463a}
@@ -21394,6 +21404,250 @@ body.dark-theme .budgetToFolder{background:#24342a;border-color:#34443a;color:#c
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);else hook();
   document.addEventListener("click",function(e){if(e.target&&e.target.closest&&e.target.closest("#navOverview"))setTimeout(render,50);},true);
+})();
+</script>
+
+<style id="mbLDStyle">
+#list .item .productDeal.mbLDHint{color:#c96f10;cursor:pointer}
+#list .item .productDeal.mbLDHint .productDealBadge{background:#e08a1e}
+html body.dark-theme #list .item .productDeal.mbLDHint{color:#f0a64a!important}
+#mbDealBar{display:flex;align-items:center;gap:9px;background:#fff4e6;border:1.5px solid #f5c58a;border-radius:14px;padding:7px 8px 7px 11px;margin:0 0 12px;font-size:14px;color:#22382a;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:mbCmpIn .35s ease}
+#mbDealBar[hidden]{display:none!important}
+#mbDealBar .t{flex:1;min-width:0}#mbDealBar b{color:#b85c00}
+#mbDealBar .ar{color:#b85c00;font-size:14px}
+#mbDealBar .x{border:0;background:transparent;color:#8a978e;font-size:15px;width:30px;height:30px;border-radius:50%;flex:none;cursor:pointer}
+.app.overview-active #mbDealBar,.app.more-active #mbDealBar{display:none!important}
+.mbLDOffer{border:1px solid #e6eee8;border-radius:16px;padding:11px;margin-bottom:10px}
+.mbLDMine{font-size:12px;color:#66776d;font-weight:700;margin-bottom:7px}
+.mbLDRow{display:flex;gap:11px;align-items:center}
+.mbLDImg{width:60px;height:60px;border-radius:12px;background:#f3f6f4;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.mbLDImg img{width:100%;height:100%;object-fit:contain}
+.mbLDTxt{flex:1;min-width:0}.mbLDTxt b{display:block;font-size:14.5px;line-height:1.25;margin-bottom:4px}
+.mbLDTags{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mbLDPct{background:#d64545;color:#fff;font-weight:800;font-size:11px;border-radius:7px;padding:2px 6px}
+.mbLDPromo{font-size:11.5px;font-weight:700;color:#b85c00}
+.mbLDPrice{font-weight:800;font-size:15.5px;color:#d64545;margin-top:4px}.mbLDPrice s{color:#9aa79f;font-weight:500;font-size:12.5px;margin-left:5px}
+.mbLDAlso{font-size:12px;color:#66776d;margin-top:7px}
+.mbLDUse{display:block;width:100%;border:0;background:#3f5b45;color:#fff;font:inherit;font-weight:800;font-size:14px;border-radius:12px;padding:10px;margin-top:10px;cursor:pointer}
+.mbLDUse[disabled]{background:#cfe0d4;color:#3f5b45}
+body.dark-theme #mbDealBar{background:#3a2c1a;border-color:#7a5520;color:#f3e6d3}
+body.dark-theme #mbDealBar b,body.dark-theme #mbDealBar .ar{color:#f0a64a}
+body.dark-theme .mbLDOffer{border-color:#2f3a33}
+body.dark-theme .mbLDImg{background:#29352d}
+body.dark-theme .mbLDMine,body.dark-theme .mbLDAlso{color:#a9b9ae}
+body.dark-theme .mbLDPromo{color:#f0a64a}
+body.dark-theme .mbLDUse[disabled]{background:#29352d;color:#9fd3ac}
+</style>
+<script id="mbStrictDealsScript">
+/* Strenge koppeling: hoort deze aanbieding echt bij wat je op je lijst hebt gezet?
+   Liever niets tonen dan iets verkeerds. */
+window.__mbStrictDeals=(function(){
+  function norm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[|]/g," ").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();}
+  var STOP=/^(de|het|een|van|met|en|voor|of|stuk|stuks|st|pak|zak|fles|blik|pot|los|ah|jumbo|lidl|aldi|dirk|plus|g|kg|ml|l|cl|liter|gram|x|ca)$/;
+  var SHOPS=/\b(ah|albert heijn|jumbo|lidl|aldi|dirk|plus|colruyt|delhaize|hoogvliet|vomar|dekamarkt|coop|spar|ekoplaza|poiesz|huismerk)\b/g;
+  // Woorden die van het product iets anders maken (smaak, bijproduct). Telt alleen als jij dat woord zelf niet typte.
+  var SIDE=["smaak","maak","soep","saus","sap","chips","salade","taart","cake","ketchup","snoep","choco","chocola","chocolade","reep","smoothie","toetje","drink","drank","shake","spread","koek","wafel","cracker","biscuit","stengel","nugget","kroket","pizza","burger","maaltijd","pilav","tandoori","dip","pesto","worst","ijs","yoghurt","vla","pudding","bonbon","vlokken","hagelslag","pasta","rijstwafel","siroop","limonade","thee","koffie","bier","wijn","likeur","olie","azijn","mayonaise","kruiden","bouillon","korst","broodje","brood","croissant","gebak","muffin","salami","beleg","vega","vegetarisch","vegan","plantaardig","kattenvoer","hondenvoer","voer","shampoo","douchegel","zeep","lotion","body","creme","tandpasta","deo"];
+  // Samengestelde woorden die op het gezochte woord eindigen maar iets anders zijn (koffiemelk is geen melk).
+  var BADPRE=["koffie","karne","choco","chocolade","kokos","soja","haver","amandel","rijst","peuter","dreumes","baby","body","geit","pinda","boter","zuur","slag","kook","bloem","poeder","kip","vis","vlees","aard","sinaas","granaat","appel","sinaasappel","tomaten","paprika","kaas","ei"];
+  // Delen van vlees: "kip" mag kipfilet zijn, maar geen kipsalade.
+  var CUTS=/^(filet|dijfilet|bout|bouten|poten|pootjes|vleugels|lapjes|blokjes|reepjes|stukjes|haas|plakjes|schijven|gehakt|burgers?)$/;
+  var CUT_HEADS=/^(kip|spek|rund|runder|varkens|varken|kalkoen|zalm|tonijn|kabeljauw)$/;
+  // Vorm of verpakking achter het woord: koffiebonen, koffiepads, theezakjes.
+  var VORM=/^(bonen|pads|capsules|cups|snelfilter|filtermaling|zakjes|rollen|tabletten)$/;
+  // Andere woorden voor hetzelfde product.
+  var SYN={"wc papier":"toiletpapier","wcpapier":"toiletpapier","wc rol":"toiletpapier","wc rollen":"toiletpapier","aardappels":"aardappelen","piepers":"aardappelen","eitjes":"eieren","ei":"eieren","patat":"friet","frietjes":"friet","pieper":"aardappelen","kipfilets":"kipfilet","pinda kaas":"pindakaas"};
+  var SNACK=/chips|koek|snoep|chocola|drop|snack|noten|pinda/;
+  var NONFOOD_CAT=/drogist|verzorg|huid|haar|cosmetic|gezondheid|huishoud|schoonmaak|was|baby|dier/;
+  function forms(w){var s=w.replace(/'s$/,"").replace(/(en|s)$/,"");var f=[w,s,s+"en",s+"s",s+"e"];if(/en$/.test(w))f.push(w.slice(0,-2));return f.filter(function(x,i,a){return x.length>=2&&a.indexOf(x)===i;});}
+  function aisle(name,cat){try{return window.__mbAisleSmart?window.__mbAisleSmart(name,cat||""):-1;}catch(e){return -1;}}
+  function score(p,term){
+    var name=norm(String(p.name||"").replace(SHOPS," ")),cat=String(p.unified_category||"").toLowerCase();
+    var t=norm(String(term||"").replace(SHOPS," "));if(SYN[t])t=SYN[t];
+    var tw=t.split(" ").filter(function(w){return w.length>1&&!STOP.test(w)&&!/^\d/.test(w);});if(!tw.length)return -1;
+    var head=tw[tw.length-1],hf=forms(head),words=name.split(" "),joined=name.replace(/ /g,"");
+    var exact=false,ok=false;
+    words.forEach(function(w){
+      if(hf.indexOf(w)>=0){ok=true;exact=true;return;}
+      hf.forEach(function(f){
+        if(f.length<3)return;
+        // samengesteld, eindigt op het woord: scharreleieren, roomboter, toverrijst, ijsbergsla
+        if(w.length>f.length+2&&w.slice(-f.length)===f){var pre=w.slice(0,-f.length);if(!BADPRE.some(function(b){return pre===b||pre.slice(-b.length)===b;})&&!SIDE.some(function(s){return pre===s||(s.length>=4&&pre.slice(-s.length)===s);}))ok=true;}
+        // begint met het woord: alleen vleesdelen (kipfilet, speklapjes)
+        if(w.length>f.length+2&&w.indexOf(f)===0&&((CUT_HEADS.test(f)&&CUTS.test(w.slice(f.length)))||VORM.test(w.slice(f.length))))ok=true;
+      });
+    });
+    if(!ok)return -1;
+    // andere woorden die je typte (halfvolle, jonge, volkoren) moeten er ook in staan
+    for(var i=0;i<tw.length-1;i++){var m=tw[i].replace(/(e|en)$/,"");if(joined.indexOf(m)<0)return -1;}
+    // bijzaak-woorden die jij niet typte
+    for(var j=0;j<SIDE.length;j++){var s=SIDE[j];if(t.indexOf(s)>=0)continue;
+      if(words.some(function(w){if(hf.indexOf(w)>=0)return false;return w===s||(w.length>s.length&&w.slice(-s.length)===s)||(s.length>=4&&w.length>s.length&&w.indexOf(s)===0);}))return -1;}
+    // categorie: geen snoep bij "melk", geen drogisterij bij eten
+    if(/snoep|koek|chips/.test(cat)&&!SNACK.test(t)&&!/chips|koek|snoep|chocola|drop|noten|pinda|wafel/.test(head))return -1;
+    var ta=aisle(t,""),pa=aisle(String(p.name||""),cat);
+    if(ta>=0&&ta!==99&&pa>=0&&pa!==99&&ta!==pa)return -1;
+    if(NONFOOD_CAT.test(cat)&&(ta<9||ta===99)&&ta>=0&&!/papier|wasmiddel|luier|afwas|tandpasta|shampoo|zeep|douche|deo|voer/.test(t))return -1;
+    var sc=(exact?10:6)-words.length*0.1;
+    var o=Number(p.original_price),n=Number(p.price);if(o>n&&n>0)sc+=Math.min(2,(1-n/o)*2);
+    return sc;
+  }
+  return function(rows,term){
+    return (rows||[]).map(function(p){return {p:p,s:score(p,term)};}).filter(function(x){return x.s>0;})
+      .sort(function(a,b){return b.s-a.s;}).map(function(x){return x.p;});
+  };
+})();
+
+</script>
+<script id="mbListDeals">
+/* Aanbiedingen op je lijst: welke producten die je zelf typte, zijn deze week in de aanbieding bij jouw winkels?
+   Gebruikt de folders (die toch al geladen worden) en de strenge koppeling hierboven. Gratis voor iedereen. */
+(function(){
+  var HIDE_KEY="mbDealBarHide";
+  function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function money(n){return "€ "+Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function slugs(){return window.__budgetRetailerSlugs||{};}
+  function nameOf(k){try{if(window.__shopName)return window.__shopName(k);}catch(e){}return k;}
+  function logo(k){try{if(window.__mbShopLogo)return window.__mbShopLogo(k);}catch(e){}return '<b>'+esc(nameOf(k))+'</b>';}
+  function shops(){
+    var f=[];try{f=(window.__favShops?window.__favShops():[]).filter(function(k){return slugs()[k];});}catch(e){}
+    if(!f.length){var v=(document.getElementById("budgetSupermarket")||{}).value;if(v&&slugs()[v])f=[v];}
+    return f.slice(0,3);
+  }
+  function items(){try{return Array.isArray(boodschappen)?boodschappen:[];}catch(e){return [];}}
+  function activeDeal(it){var d=it&&it.deal;if(!d||!Number.isFinite(Number(d.price)))return false;var t=new Date().toISOString().slice(0,10);return !d.until||d.until>=t;}
+  function pctOf(p){var o=Number(p.original_price),n=Number(p.price);return o>n&&n>0?Math.round((1-n/o)*100):0;}
+  function promoOf(p){return String(p.promotion||(p.promotional_keywords||[])[0]||"").trim();}
+  function key(it){return String(it.text||"").trim().toLowerCase();}
+
+  /* De berekening: per product de beste aanbieding (eerst bij de winkel van dat product). */
+  var found={},sig="",busy=false;
+  async function compute(){
+    var ks=shops(),L=items().filter(function(it){return it&&!it.completed&&String(it.text||"").trim()&&!activeDeal(it);});
+    var s=ks.join(",")+"#"+L.map(key).join(";");
+    if(s===sig||busy)return false;busy=true;
+    try{
+      var rows={};
+      await Promise.all(ks.map(async function(k){try{rows[k]=window.__mbFolderNow?(await window.__mbFolderNow(slugs()[k]))||[]:[];}catch(e){rows[k]=[];}}));
+      var out={};
+      L.forEach(function(it){
+        var per=[];
+        ks.forEach(function(k){var m=window.__mbStrictDeals(rows[k],it.text)[0];if(m)per.push({k:k,p:m});});
+        if(!per.length)return;
+        per.sort(function(a,b){
+          var sa=it.shop&&a.k===it.shop?1:0,sb=it.shop&&b.k===it.shop?1:0;if(sa!==sb)return sb-sa;
+          return pctOf(b.p)-pctOf(a.p)||Number(a.p.price)-Number(b.p.price);
+        });
+        out[key(it)]={best:per[0],also:per.slice(1)};
+      });
+      var changed=JSON.stringify(Object.keys(out).map(function(k){return k+out[k].best.k+out[k].best.p.name;}))!==JSON.stringify(Object.keys(found).map(function(k){return k+found[k].best.k+found[k].best.p.name;}));
+      found=out;sig=s;
+      if(changed){try{showList();}catch(e){}}
+      bar();
+      return changed;
+    }finally{busy=false;}
+  }
+
+  /* Regeltje onder het product (gebruikt dezelfde plek als een aanbieding uit de Folder) */
+  var orig=window.__dealLineFor;
+  window.__dealLineFor=function(item){
+    var el=orig?orig(item):null;if(el)return el;
+    if(!item||item.completed||activeDeal(item))return null;
+    var f=found[key(item)];if(!f)return null;
+    var p=f.best.p,pct=pctOf(p),pr=promoOf(p);
+    el=document.createElement("span");el.className="productDeal mbLDHint";el.setAttribute("role","button");
+    el.innerHTML=(pct>0?'<span class="productDealBadge">-'+pct+'%</span>':'<i class="fa-solid fa-tag" aria-hidden="true"></i>')+
+      esc((pct>0?"":(pr?pr+" ":""))+"bij "+nameOf(f.best.k)+" · "+money(p.price));
+    el.addEventListener("click",function(e){e.stopPropagation();e.preventDefault();openDeals(key(item));});
+    return el;
+  };
+
+  /* De oranje balk boven je lijst */
+  function weekId(){var d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+"-"+Math.ceil(((d-j)/864e5+j.getDay()+1)/7);}
+  function hidden(){try{return localStorage.getItem(HIDE_KEY)===weekId();}catch(e){return false;}}
+  function current(){var L=items();return Object.keys(found).filter(function(k){return L.some(function(it){return it&&!it.completed&&!activeDeal(it)&&key(it)===k;});});}
+  function saving(){var L=items(),sum=0;current().forEach(function(k){var it=L.filter(function(x){return key(x)===k;})[0],p=found[k].best.p,o=Number(p.original_price),n=Number(p.price);if(o>n)sum+=(o-n)*(Number(it&&it.quantity)||1);});return Math.round(sum*100)/100;}
+  function barEl(){
+    var b=document.getElementById("mbDealBar"),l=document.getElementById("list");
+    if(b){if(l&&b.nextSibling!==l)l.parentNode.insertBefore(b,l);return b;}
+    if(!l)return null;
+    b=document.createElement("div");b.id="mbDealBar";b.hidden=true;b.setAttribute("role","button");l.parentNode.insertBefore(b,l);
+    b.addEventListener("click",function(e){
+      if(e.target.closest(".x")){e.stopPropagation();try{localStorage.setItem(HIDE_KEY,weekId());}catch(_){}b.hidden=true;return;}
+      openDeals();
+    });
+    return b;
+  }
+  function bar(){
+    var b=barEl();if(!b)return;var n=current().length;
+    if(!n||hidden()){b.hidden=true;return;}
+    var sv=saving();
+    b.innerHTML='<span aria-hidden="true">🏷️</span><span class="t"><b>'+n+(n===1?' product':' producten')+'</b> in de aanbieding'+(sv>=0.5?' · bespaar <b>'+money(sv)+'</b>':'')+'</span><span class="ar"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span><button type="button" class="x" aria-label="Verbergen voor deze week"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
+    b.hidden=false;
+  }
+
+  /* Het overzicht met alle aanbiedingen (zelfde pop-up-stijl als de rest van de app) */
+  var ov=null;
+  function close(){if(!ov)return;var o=ov;ov=null;o.classList.remove("on");setTimeout(function(){o.remove();},300);}
+  function openDeals(focus){
+    var ks=current(),L=items();if(!ks.length)return;
+    if(ov&&!ov.isConnected)ov=null;
+    if(!ov){
+      ov=document.createElement("div");ov.className="mbCmpOv";ov.innerHTML='<div class="mbCmpSheet" role="dialog" aria-modal="true" aria-label="Aanbiedingen op je lijst"></div>';
+      document.body.appendChild(ov);var o2=ov;requestAnimationFrame(function(){requestAnimationFrame(function(){if(o2.isConnected)o2.classList.add("on");});});
+      ov.addEventListener("click",function(e){if(e.target===ov)close();});
+    }
+    var sv=saving();
+    if(focus&&ks.indexOf(focus)>0){ks.splice(ks.indexOf(focus),1);ks.unshift(focus);}
+    var html='<div class="mbCmpGrab"></div><div class="mbCmpHead"><h3>Aanbiedingen op je lijst</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
+      '<div class="mbCmpSub">'+ks.length+(ks.length===1?' product':' producten')+(sv>=0.5?' · samen <b style="color:#b85c00">'+money(sv)+'</b> voordeel':'')+'</div>';
+    ks.forEach(function(k,i){
+      var it=L.filter(function(x){return key(x)===k;})[0],f=found[k],p=f.best.p,pct=pctOf(p),pr=promoOf(p),o=Number(p.original_price);
+      var img=typeof p.image_url==="string"&&/^https:\/\//.test(p.image_url)?'<img src="'+esc(p.image_url)+'" alt="" loading="lazy" onerror="this.remove()">':'<i class="fa-solid fa-tag" style="color:#b85c00;font-size:20px"></i>';
+      html+='<div class="mbLDOffer"><div class="mbLDMine">Op je lijst: '+esc(it?it.text:k)+'</div><div class="mbLDRow"><div class="mbLDImg">'+img+'</div><div class="mbLDTxt"><b>'+esc(p.name)+'</b>'+
+        '<div class="mbLDTags">'+logo(f.best.k)+(pct>0?'<span class="mbLDPct">-'+pct+'%</span>':'')+(pr&&!pct?'<span class="mbLDPromo">'+esc(pr)+'</span>':'')+'</div>'+
+        '<div class="mbLDPrice">'+money(p.price)+(o>Number(p.price)?'<s>'+money(o)+'</s>':'')+'</div></div></div>'+
+        (f.also.length?'<div class="mbLDAlso">Ook bij '+f.also.map(function(a){var q=pctOf(a.p);return esc(nameOf(a.k))+(q?' (-'+q+'%)':'');}).join(", ")+'</div>':'')+
+        '<button type="button" class="mbLDUse" data-i="'+i+'">Gebruik deze aanbieding</button></div>';
+    });
+    html+='<div class="mbCmpSub" style="margin-top:4px">Aanbiedingen uit de folders van jouw winkels. Kijk even of het product klopt; de prijs in de winkel is leidend.</div>';
+    var s=ov.querySelector(".mbCmpSheet");s.innerHTML=html;s.scrollTop=0;
+    s.querySelector(".mbCmpClose").onclick=close;
+    s.querySelectorAll(".mbLDUse").forEach(function(b){b.onclick=function(e){e.stopPropagation();use(ks[+b.dataset.i],b);};});
+  }
+  async function use(k,btn){
+    var L=items(),it=L.filter(function(x){return x&&!x.completed&&key(x)===k;})[0],f=found[k];if(!it||!f||!window.__addDealToList)return;
+    btn.disabled=true;
+    var p=f.best.p,before={deal:it.deal,shop:it.shop,quantity:it.quantity};
+    var on=false;try{on=!!(window.__shopsOn&&window.__shopsOn());}catch(e){}
+    var ok=await window.__addDealToList({name:String(p.name||it.text),term:it.text,price:Number(p.price),was:Number(p.original_price)||0,promo:promoOf(p),until:p.valid_until||"",
+      store:nameOf(f.best.k),img:p.image_url||"",cat:p.unified_category||"",shop:on?f.best.k:""});
+    if(!ok){btn.disabled=false;return;}
+    btn.innerHTML='<i class="fa-solid fa-check" aria-hidden="true"></i> Gebruikt';
+    sig="";
+    try{if(window.__pantryApi&&window.__pantryApi.toast)window.__pantryApi.toast(esc(it.text)+" is nu de aanbieding van "+esc(nameOf(f.best.k))+".","Ongedaan maken",async function(){
+      // De lijst kan intussen opnieuw geladen zijn: het product opnieuw opzoeken.
+      var cur=items().filter(function(x){return x&&key(x)===k;})[0]||items().filter(function(x){return x&&x.deal&&String(x.deal.price)===String(p.price)&&key(x)===String(p.name||"").trim().toLowerCase();})[0];
+      if(!cur)return;
+      if(before.deal===undefined)delete cur.deal;else cur.deal=before.deal;
+      if(before.shop===undefined)delete cur.shop;else cur.shop=before.shop;
+      cur.quantity=before.quantity;
+      try{showList();}catch(e){}try{await saveList();}catch(e){}sig="";schedule();
+    });}catch(e){}
+    setTimeout(function(){if(!current().length)close();},700);
+    schedule();
+  }
+
+  /* Bijwerken na elke wijziging van de lijst */
+  var tmr=null;
+  function schedule(){clearTimeout(tmr);tmr=setTimeout(function(){compute().catch(function(){});},900);}
+  function watch(){
+    var l=document.getElementById("list");if(!l){setTimeout(watch,800);return;}
+    barEl();
+    try{new MutationObserver(function(){schedule();bar();}).observe(l,{childList:true});}catch(e){}
+    schedule();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
+  window.__mbListDealsRefresh=function(){sig="";schedule();};
 })();
 </script>
 
