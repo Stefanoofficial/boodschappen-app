@@ -18741,6 +18741,14 @@ body.dark-theme .mbFolderShops button.edit{border-color:#38453b;color:#a9bfb0}
 .mbFolderSec .mbIc{margin-right:6px}
 .mbFolderSec{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 10px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b7d71}
 .mbFolderSec button{border:0;background:none;color:#3F5B45;font:inherit;font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;cursor:pointer;padding:4px}
+/* Categoriekop als rustig lichtgroen balkje met donkergroene streep. Felgroen alleen waar je op kunt tikken. */
+.mbFolderSec{margin:10px 0 10px;padding:8px 9px 8px 12px;min-height:44px;border-radius:12px;background:#dcebe1;border-left:5px solid #3F5B45;color:#22382a;font-size:15px;letter-spacing:0;text-transform:none;gap:10px}
+.mbFolderSec .nm{display:flex;align-items:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mbFolderSec .cnt{flex:none;min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:#f3f9f4;color:#2f4a38;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #c6dccd}
+.mbFolderSec button{flex:none;background:var(--mb-accent,#14BE4B);color:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:800;min-height:28px}
+body.dark-theme .mbFolderSec{background:#24342a;border-left-color:#57956c;color:#e4eee7}
+body.dark-theme .mbFolderSec .cnt{background:#1b241e;color:#cfe0d4;box-shadow:inset 0 0 0 1px #3a4a3f}
+body.dark-theme .mbFolderSec button{background:var(--mb-accent,#22c45a);color:#fff}
 .mbFolderGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .mbFCard{position:relative;display:flex;flex-direction:column;background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 8px rgba(40,70,50,.06);min-width:0}
 .mbFImg{width:100%;aspect-ratio:1/1;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
@@ -19069,7 +19077,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
       if(state.cat!=="all"&&state.cat!==g[0])return;
       var items=by[g[0]],all=state.cat!=="all"||state.open[g[0]]||!!state.q,list2=all?items:items.slice(0,PER_GROUP);
       var sec=document.createElement("div");sec.className="mbFolderSec";
-      sec.innerHTML='<span>'+g[2]+' '+esc(g[1])+'</span>'+(state.cat==="all"&&items.length>PER_GROUP?'<button type="button">'+(all?"Minder":"Alle "+items.length+" ›")+'</button>':'<span>'+items.length+'</span>');
+      sec.innerHTML='<span class="nm">'+g[2]+' '+esc(g[1])+'</span>'+(state.cat==="all"&&items.length>PER_GROUP?'<button type="button">'+(all?"Minder":"Alle "+items.length+" ›")+'</button>':'<span class="cnt" aria-label="'+items.length+' aanbiedingen">'+items.length+'</span>');
       var sb=sec.querySelector("button");if(sb)sb.onclick=function(){state.open[g[0]]=!state.open[g[0]];draw();};
       var grid=document.createElement("div");grid.className="mbFolderGrid";
       list2.forEach(function(bd){grid.appendChild(cardEl(bd));});
