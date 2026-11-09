@@ -5696,6 +5696,30 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
 /* Meer bevat geen destructieve lijstactie. */
 
 </style>
+<style id="menu-platform-style">
+/* ⋮-menu: zelfde menu op elk toestel, in de stijl van de app.
+   Achtergrond alleen iets donkerder (niet wazig), op iPhone en Android: je ziet je lijst gewoon. */
+.listOptionsPanel::before{display:none !important}
+.listOptionsPanel{background:rgba(22,30,25,.30) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+
+/* Het menu zelf: wit vlak met schaduw, groeit uit de hoek bij de ⋮-knop. */
+.listOptionsPanelInner{
+  width:212px !important;border-radius:14px !important;padding:6px !important;background:#fff !important;
+  box-shadow:0 8px 28px rgba(20,40,28,.20),0 2px 6px rgba(20,40,28,.12) !important;
+  transform-origin:top right !important;transform:scale(.86) !important;opacity:0;
+  transition:transform .18s cubic-bezier(.2,0,0,1),opacity .14s ease !important}
+.listOptionsPanel.open .listOptionsPanelInner{transform:scale(1) !important;opacity:1}
+.sortOptionsPanel .listOptionsPanelInner{transform:scale(.86) !important}
+.sortOptionsPanel.open .listOptionsPanelInner{transform:scale(1) !important}
+.listOptionItem{font-size:14.5px !important;font-weight:600 !important;min-height:42px !important;color:#1f3326 !important}
+.listOptionItem i:first-child{color:#3f5b45}
+.listOptionDanger,.listOptionDanger i:first-child{color:#c2453b !important}
+.listOptionTitle{font-size:11.5px !important;padding:8px 9px 3px !important}
+body.dark-theme .listOptionsPanelInner{background:#2a312c !important;box-shadow:0 10px 30px rgba(0,0,0,.45) !important}
+body.dark-theme .listOptionItem{color:#e3ece6 !important}
+body.dark-theme .listOptionItem i:first-child{color:#9fd3ac}
+
+</style>
 <style id="barcode-scanner-system">
 .barcode-search-btn{background:none!important;border:0!important;color:#607069!important;font-size:20px!important;padding:0 8px!important;width:38px!important;height:38px!important;display:inline-flex!important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 38px!important}
 .barcode-search-btn:active{transform:scale(.94)} .barcode-search-btn.scanning-disabled{display:none!important}
@@ -21782,7 +21806,7 @@ window.__mbStrictDeals=(function(){
       var m=document.querySelector('meta[name="theme-color"]'); if(!m) return;
       if(THEME_LIGHT===null) THEME_LIGHT=m.getAttribute('content')||'#eef8f1';
       var dark=document.body.classList.contains('dark-theme');
-      m.setAttribute('content', on ? (dark ? '#141a16' : '#b1bbb4') : THEME_LIGHT);
+      m.setAttribute('content', on ? (dark ? '#141a16' : '#adb7b0') : THEME_LIGHT);
     }catch(e){}
   }
   // Het menu stond binnen .app (die een transform heeft). Daardoor bleef de wazige laag onder de knoppenbalk
