@@ -5667,9 +5667,9 @@ body.dark-theme .listOptionItem:hover {background:#2b362f}
   position:fixed !important;
   top:0 !important; left:0 !important; right:0 !important; bottom:0 !important;
   width:auto !important; height:auto !important; min-height:0 !important;
-  background:rgba(38,52,43,.16) !important; backdrop-filter:blur(1.5px); -webkit-backdrop-filter:blur(1.5px);
-  z-index:12000 !important; pointer-events:none !important; opacity:0 !important;
-  transition:opacity .18s ease !important;
+  background:rgba(22,30,25,.28) !important; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  z-index:2147470000 !important; pointer-events:none !important; opacity:0 !important;
+  transition:opacity .2s ease !important;
 }
 .listOptionsPanel.open{pointer-events:auto !important; opacity:1 !important;}
 .listOptionsPanelInner{
@@ -21761,7 +21761,7 @@ window.__mbStrictDeals=(function(){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
   window.__mbListDealsRefresh=function(){sig="";schedule();};
   /* Terugknop van Android: sluit eerst een open venster van Vergelijk winkels of Aanbiedingen op je lijst. */
-  function hookBack(){var ob=window.__appBack;window.__appBack=function(){var o=document.querySelector(".mbCmpOv.on");if(o){var c=o.querySelector(".mbCmpClose");if(c)c.click();else o.remove();return true;}return ob?ob():false;};}
+  function hookBack(){var ob=window.__appBack;window.__appBack=function(){var o=document.querySelector(".mbCmpOv.on");if(o){var c=o.querySelector(".mbCmpClose");if(c)c.click();else o.remove();return true;}var lo=document.querySelector(".listOptionsPanel.open");if(lo){try{closeSortOptions();closeListOptions();}catch(e){}return true;}return ob?ob():false;};}
   if(document.readyState==="complete")setTimeout(hookBack,0);else window.addEventListener("load",function(){setTimeout(hookBack,0);});
 })();
 </script>
@@ -21774,6 +21774,20 @@ window.__mbStrictDeals=(function(){
 <script id="list-options-and-language-logic">
 (function(){
   function panel(id){ return document.getElementById(id); }
+  // Statusbalk mee laten donkeren met de wazige laag: op Android via de app, op iPhone via theme-color.
+  var THEME_LIGHT=null;
+  function setDim(on){
+    try{ if (window.AndroidApp && window.AndroidApp.setMenuDimmed) window.AndroidApp.setMenuDimmed(!!on); }catch(e){}
+    try{
+      var m=document.querySelector('meta[name="theme-color"]'); if(!m) return;
+      if(THEME_LIGHT===null) THEME_LIGHT=m.getAttribute('content')||'#eef8f1';
+      var dark=document.body.classList.contains('dark-theme');
+      m.setAttribute('content', on ? (dark ? '#141a16' : '#b1bbb4') : THEME_LIGHT);
+    }catch(e){}
+  }
+  // Het menu stond binnen .app (die een transform heeft). Daardoor bleef de wazige laag onder de knoppenbalk
+  // en zag hij er anders uit dan de andere pop-ups. Direct onder <body> bedekt hij het hele scherm.
+  ['listOptionsPanel','sortOptionsPanel'].forEach(function(id){var p=panel(id);if(p&&p.parentNode!==document.body)document.body.appendChild(p);});
 
   function setPanel(id, open){
     var p=panel(id);
@@ -21789,18 +21803,14 @@ window.__mbStrictDeals=(function(){
     var open=p ? !p.classList.contains('open') : false;
     setPanel('listOptionsPanel', false);
     setPanel('sortOptionsPanel', open);
-    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
-      window.AndroidApp.setMenuDimmed(open);
-    }
+    setDim(open);
     var b=panel('listOptionsButton');
     if(b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
   };
 
   window.closeListOptions=function(){
     setPanel('listOptionsPanel', false);
-    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
-      window.AndroidApp.setMenuDimmed(false);
-    }
+    setDim(false);
     var b=panel('listOptionsButton');
     if(b) b.setAttribute('aria-expanded','false');
   };
@@ -21814,27 +21824,21 @@ window.__mbStrictDeals=(function(){
   };
 
   window.addEventListener('pagehide', function(){
-    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
-      window.AndroidApp.setMenuDimmed(false);
-    }
+    setDim(false);
   });
 
   window.openSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('listOptionsPanel', false);
     setPanel('sortOptionsPanel', true);
-    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
-      window.AndroidApp.setMenuDimmed(true);
-    }
+    setDim(true);
   };
 
   window.closeSortOptions=function(e){
     if(e){ e.preventDefault(); e.stopPropagation(); }
     setPanel('sortOptionsPanel', false);
     var lb=panel('listOptionsButton'); if(lb) lb.setAttribute('aria-expanded','false');
-    if (window.AndroidApp && window.AndroidApp.setMenuDimmed) {
-      window.AndroidApp.setMenuDimmed(false);
-    }
+    setDim(false);
   };
 
   window.sortCurrentList=function(mode,e){
