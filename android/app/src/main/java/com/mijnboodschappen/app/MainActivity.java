@@ -43,6 +43,8 @@ public class MainActivity extends Activity {
     private View topScrim;
     private View bottomScrim;
     private int statusBarScrimColor = Color.rgb(238, 248, 241);
+    private ValueAnimator scrimAnimator;
+    private int scrimShownColor = Color.rgb(238, 248, 241);
     // Kleur voor de strook achter de knoppen van Android; wordt pas na het opstartscherm toegepast.
     private int navBarColor = Color.rgb(238, 248, 241);
     private boolean navBarLight = true;
@@ -737,9 +739,21 @@ public class MainActivity extends Activity {
         public void setMenuDimmed(final boolean dimmed) {
             runOnUiThread(() -> {
                 Window window = getWindow();
-                statusBarScrimColor = dimmed ? Color.rgb(200, 211, 204) : BACKGROUND_COLOR;
-                if (Build.VERSION.SDK_INT < 35) window.setStatusBarColor(statusBarScrimColor);
-                if (topScrim != null) topScrim.setBackgroundColor(statusBarScrimColor);
+                // Zelfde snelheid als de wazige laag in de app (0,2 s), anders verspringt de bovenkant.
+                if (scrimAnimator != null) scrimAnimator.cancel();
+                int from = scrimShownColor;
+                int to = dimmed ? Color.rgb(177, 186, 180) : BACKGROUND_COLOR;
+                statusBarScrimColor = to;
+                if (from == to) return;
+                scrimAnimator = ValueAnimator.ofArgb(from, to);
+                scrimAnimator.setDuration(200);
+                scrimAnimator.addUpdateListener(a -> {
+                    int c = (Integer) a.getAnimatedValue();
+                    scrimShownColor = c;
+                    if (Build.VERSION.SDK_INT < 35) window.setStatusBarColor(c);
+                    if (topScrim != null) topScrim.setBackgroundColor(c);
+                });
+                scrimAnimator.start();
             });
         }
     }
