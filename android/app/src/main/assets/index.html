@@ -18920,7 +18920,25 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     var ctrl=typeof AbortController!=="undefined"?new AbortController():null,t=ctrl?setTimeout(function(){ctrl.abort();},15000):null;
     try{var r=await fetch(url,{headers:{Accept:"application/json"},signal:ctrl?ctrl.signal:undefined});if(t)clearTimeout(t);return r;}catch(e){if(t)clearTimeout(t);throw e;}
   }
+  // Weekend- en vrijdagacties (bijv. Boon's "Weekenddeals vanaf vr") staan bij PrijsProfeet onder "binnenkort",
+  // maar horen bij de folder van deze week. Grens: de einddatum van de huidige folder.
+  function folderEnd(rows){var n={},best="",bc=0;(rows||[]).forEach(function(p){var u=p.valid_until||"";if(!u)return;n[u]=(n[u]||0)+1;if(n[u]>bc){bc=n[u];best=u;}});return best;}
   async function load(slug){
+    var nx=state.week==="next";
+    function weekRows(w){var o=state.week;state.week=w;try{return loadRaw(slug);}finally{state.week=o;}}
+    var nowP=weekRows("now"),nextP=weekRows("next");
+    if(!nx){
+      nextP=nextP.catch(function(){return [];});
+      var a=await nowP,b=await nextP,end=folderEnd(a);if(!end||!b.length)return a;
+      var seen={};a.forEach(function(p){seen[norm(p.name)+"|"+Number(p.price)]=1;});
+      var extra=b.filter(function(p){return p.valid_from&&p.valid_from<=end&&!seen[norm(p.name)+"|"+Number(p.price)];});
+      return extra.length?a.concat(extra).sort(function(x,y){return pct(y)-pct(x);}):a;
+    }
+    nowP=nowP.catch(function(){return [];});
+    var nb=await nextP,na=await nowP,ne=folderEnd(na);
+    return ne?nb.filter(function(p){return !(p.valid_from&&p.valid_from<=ne);}):nb;
+  }
+  async function loadRaw(slug){
     var next=state.week==="next",key0=ck(slug);
     var hit=readCache(key0);if(hit)return hit;
     var rows=null,r;
