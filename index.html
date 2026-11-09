@@ -18837,15 +18837,18 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   function catLook(slug){slug=String(slug||"").toLowerCase();for(var i=0;i<CAT_LOOK.length;i++)if(CAT_LOOK[i][0].test(slug))return {i:i,e:CAT_LOOK[i][1]};return {i:90,e:"🧺"};}
   function niceSlug(slug){var w=String(slug||"").split("-").filter(Boolean);if(!w.length)return "Overig";var t=w.length>1?w.slice(0,-1).join(", ")+" & "+w[w.length-1]:w[0];return t.charAt(0).toUpperCase()+t.slice(1);}
   // Groepen = dezelfde afdelingen als op je lijst (zelfde naam, icoon en volgorde).
+  window.__mbFolderAisleOf=function(p){return aisleKey(Object.assign({},p));};
   function aisleKey(p){
     var A=window.__mbAisles,c=groupOf(p);
-    if(window.__mbAisleSmart){var i=window.__mbAisleSmart(p.name||"",c==="overig"?"":c);return (i>=0&&i!==99)?"a"+i:"overig";}
+    // Bij huisdier staat het merk (Sheba, Whiskas) soms alleen in "brand", niet in de naam.
+    var nm=String(p.name||"");if(c==="huisdier"&&p.brand&&nm.toLowerCase().indexOf(String(p.brand).toLowerCase())<0)nm+=" "+p.brand;
+    if(window.__mbAisleSmart){var i=window.__mbAisleSmart(nm,c==="overig"?"":c);return (i>=0&&i!==99)?"a"+i:"overig";}
     if(!A||c==="overig")return "overig";var j=A.fromCat(c);return j>=0?"a"+j:"overig";}
   function groupList(by){
     var A=window.__mbAisles;
     return Object.keys(by).map(function(k){
       if(k==="overig"||!A)return [k,"Overig","",null,999];
-      var i=Number(k.slice(1));return [k,A.label(i),'<em class="mbIc" aria-hidden="true">'+A.icon(i)+'</em>',null,i];
+      var i=Number(k.slice(1));return [k,A.label(i),'<em class="mbIc" aria-hidden="true">'+A.icon(i)+'</em>',null,(A.rank?A.rank(i):i),(A.short?A.short(i):A.label(i))];
     }).sort(function(a,b){return a[4]-b[4];});
   }
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -18862,7 +18865,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   // Correctie: PrijsProfeet deelt sommige ketens (Aldi, Hoogvliet, Vomar, Lidl) in op naam, en dan belandt
   // appelsap of een smoothie soms bij groente & fruit. Drinken zetten we terug bij de dranken.
   var DRINK=/(^| )([a-z]*sap|juice|smoothies?|limonade|siroop|ranja|frisdrank|ice ?tea|cola|water|spa|fruitdrank|vruchtendrank|energy ?drink|red bull|monster|appelsientje|roosvicee|capri ?sun|dubbelfris|taksi|tonic|cassis|sinas)( |$)/;
-  var NOT_DRINK=/(^| )op (sap|siroop|lichte siroop|water)( |$)|compote|moes|in blik|watermeloen|waterkers|siroopwafel/;
+  var NOT_DRINK=/(^| )op (sap|siroop|lichte siroop|water)( |$)|compote|moes|in blik|watermeloen|waterkers|siroopwafel|soep|saus|creme|crème|dessert|yoghurt|kwark|kaas|dressing|pudding|olie|azijn|(^| )vla( |$)|balletjes/;
   var VOLUME=/\d\s*(ml|cl|l|liter)( |$)/;
   function drinkSlug(){var k=Object.keys(CATS).filter(function(x){return /frisdrank|sap|drank/.test(x)&&!/bier|wijn|sterke/.test(x);})[0];if(k)return k;CATS["frisdrank-sappen"]=CATS["frisdrank-sappen"]||{name:"Frisdrank & sappen"};return "frisdrank-sappen";}
   function groupOf(p){
@@ -19067,7 +19070,7 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
     else ov.querySelector(".mbFolderHead span").textContent=until.length?untilTxt(until[Math.floor(until.length/2)]):"";
     if(!rows.length){b.innerHTML='<div class="mbFolderMsg">'+(state.q?'Geen aanbiedingen gevonden voor “'+esc(state.q)+'”.':state.week==="next"?'De aanbiedingen van volgende week van '+esc(nameOf(state.shop))+' zijn nog niet bekend.<br>Winkels zetten ze meestal een paar dagen van tevoren online, Albert Heijn bijvoorbeeld op vrijdagmiddag.':'Er staan op dit moment geen aanbiedingen van '+esc(nameOf(state.shop))+' bij ons.')+'</div>';return;}
     if(state.cat!=="all"&&!by[state.cat])state.cat="all";
-    cats.innerHTML='<button type="button" data-c="all" class="'+(state.cat==="all"?"on":"")+'">Alles<span>'+bundles.length+'</span></button>'+shown.map(function(g){return '<button type="button" data-c="'+g[0]+'" class="'+(state.cat===g[0]?"on":"")+'">'+g[2]+' '+esc(g[1])+'<span>'+by[g[0]].length+'</span></button>';}).join("");
+    cats.innerHTML='<button type="button" data-c="all" class="'+(state.cat==="all"?"on":"")+'">Alles<span>'+bundles.length+'</span></button>'+shown.map(function(g){return '<button type="button" data-c="'+g[0]+'" class="'+(state.cat===g[0]?"on":"")+'">'+g[2]+' '+esc(g[5]||g[1])+'<span>'+by[g[0]].length+'</span></button>';}).join("");
     // Groepen-balk: na het kiezen niet terugspringen; de gekozen groep blijft in beeld.
     try{cats.scrollLeft=state.catScroll||0;var on=cats.querySelector("button.on");if(on&&state.cat!=="all"){var l=on.offsetLeft-cats.offsetLeft,r=l+on.offsetWidth;if(l<cats.scrollLeft+8||r>cats.scrollLeft+cats.clientWidth-8)cats.scrollLeft=Math.max(0,l-(cats.clientWidth-on.offsetWidth)/2);}}catch(e){}
     cats.onscroll=function(){state.catScroll=cats.scrollLeft;};
@@ -20734,13 +20737,17 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
 (function(){
   /* Afdelingen in de volgorde van de winkel (zelfde volgorde als "Per categorie" sorteren). */
   // Het icoontje bij een kopje komt uit de eigen iconen van de app (via een voorbeeldproduct).
-  var AISLES=[["appel","Groente & fruit"],["brood","Brood & bakkerij"],["kipfilet","Vlees & vis"],["kaas","Zuivel, eieren & kaas"],["pindakaas","Broodbeleg"],["pasta","Pasta, rijst & sauzen"],["chips","Snoep & koek"],["cola","Drinken"],["pizza","Diepvries"],["shampoo","Verzorging"],["wasmiddel","Huishouden"],["luiers","Baby & kind"],["kattenvoer","Huisdier"]];
+  var AISLES=[["appel","Groente & fruit"],["brood","Brood & bakkerij"],["kipfilet","Vlees & vis"],["kaas","Zuivel, eieren & kaas"],["pindakaas","Broodbeleg"],["pasta","Pasta, rijst & sauzen"],["chips","Snoep & koek"],["cola","Drinken"],["pizza","Diepvries"],["shampoo","Verzorging"],["wasmiddel","Huishouden"],["luiers","Baby & kind"],["kattenvoer","Huisdier"],["soep","Maaltijden"],["wijn","Bier, wijn & sterke drank"]];
+  // Volgorde in de winkel. Maaltijden (13) komt na vlees & vis; de nummers zelf blijven gelijk, zodat eerdere keuzes blijven kloppen.
+  function aisleRank(i){return i===99?999:(i===13?2.5:(i===14?7.5:i));}
+  // Korte naam voor de knoppen in de Folder.
+  function aisleShort(i){return i===14?"Bier & wijn":(i===99?OTHER[1]:AISLES[i][1]);}
   var OTHER=["","Overig"],KEY="boodschappenDoneOpen",busy=false,obs=null;
   var iconCache={};
   function headIcon(word){if(!word)return "";if(iconCache[word]!=null)return iconCache[word];var h="";try{h=productIconMarkup(getProductIcon(word))||"";}catch(e){}iconCache[word]=h;return h;}
   function aisleOf(text){try{var a=typeof productAisle==="function"?productAisle(String(text||"")):99;return (a>=0&&a<AISLES.length)?a:99;}catch(e){return 99;}}
   // Categorie van PrijsProfeet (bij een aanbieding uit de Folder) → afdeling op je lijst.
-  var CAT2AISLE=[[/^groente|^aardappel/,0],[/brood|bakker/,1],[/vlees|vis|vega|kip/,2],[/zuivel|eier|^kaas/,3],[/beleg|ontbijt|granen/,4],[/pasta|rijst|wereld|soep|conserv|saus|kruid|bak|olie|maaltijd/,5],[/snoep|koek|chips|chocola|snack|noten/,6],[/drank|sap|frisdrank|koffie|thee|water|bier|wijn|sterke/,7],[/diepvries/,8],[/drogist|verzorg|haar|huid|deo|mond|gezond/,9],[/huishoud|schoonmaak/,10],[/huisdier|dier/,12],[/baby|kind/,11]];
+  var CAT2AISLE=[[/^groente|^aardappel/,0],[/brood|bakker/,1],[/vlees|vis|vega|kip/,2],[/zuivel|eier|^kaas/,3],[/beleg|ontbijt|granen/,4],[/maaltijd/,13],[/pasta|rijst|wereld|soep|conserv|saus|kruid|bak|olie/,5],[/snoep|koek|chips|chocola|snack|noten/,6],[/bier|wijn|sterke/,14],[/drank|sap|frisdrank|koffie|thee|water/,7],[/diepvries/,8],[/drogist|verzorg|haar|huid|deo|mond|gezond/,9],[/huishoud|schoonmaak/,10],[/huisdier|dier/,12],[/baby|kind/,11]];
   function aisleOfCat(c){c=String(c||"");if(!c)return -1;for(var i=0;i<CAT2AISLE.length;i++)if(CAT2AISLE[i][0].test(c))return CAT2AISLE[i][1];return -1;}
   // Extra woorden voor productnamen uit de folder die de app niet herkent ("AH Tijger volkoren heel").
   var NAME_EXTRA=[[/(^| )(tijger|volkoren|meergranen|waldkorn|bolletjes?|broodjes?|croissants?|stokbrood|pistolets?|beschuit|krentenbol|bruin heel|wit heel|casino|wraps?)( |$)/i,1]];
@@ -20755,26 +20762,98 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
   var B="(^|[^a-z])",E="([^a-z]|$)";
   function W(words){return new RegExp(B+"("+words+")"+E);}
   var RULES=[
-    [12,W("katten ?voer|honden ?voer|kattenbak|kattengrit|kattenbakvulling|dierenvoer|vogelzaad|whiskas|felix|sheba|gourmet kat|pedigree|hondensnack|kattensnack|hondenbrokken|kattenbrokken|brokken"),1],
+    // Baby: merken en leeftijden ("8+ maanden", "12m/36m") winnen van groente, vlees of zuivel.
+    [11,{test:function(n){if(/wasverzachter|wasmiddel|wasparfum|robijn|dry wash/.test(n))return false;return /(olvarit|ella'?s kitchen|de kleine keuken|bambix|covelt|dixap|nutrilon|zwitsal|na[iï]f baby|water ?wipes|pyjamapapje|yogolino|little steps|nestl[eé] (baby|junior)|babyvoeding|baby ?(brekkie|biscuit|cereals|koekjes)|drinkpapje|peutermelk|dreumesmelk|kindermelk|opvolgmelk)/.test(n)||!/(kaas|comt[eé]|gouda|belegen|gerijpt|rijping|jaar oud)/.test(n)&&/\d+ ?\+? ?(maanden|months|mnd)|\d+m\d+|\d+ ?\+? ?mnd|\d+ ?m ?\+|\d+m ?[-\/] ?\d+m|vanaf \d+ maanden/.test(n);}},1],
+    // Spullen die geen eten zijn: pannen, bewaarblikken, lampjes, spellen.
+    [10,W("koekenpan|hapjespan|braadpan|steelpan|wokpan|pan|ontbijtblik|bewaarblik|broodtrommel|lunchbox|drinkfles|waxinelichtjes|waxine|lantaarn|lampjes|handlampje|mandje|radiatorfolie|haardhout|tochtstrip|servetten|bekers|borden|bestek"),1],
+    [99,W("playmobil|lego|rummikub|keezenspel|spel|spellen|999 ?games|kaartspel|bordspel|puzzel|halli galli|saboteur|beverbende|el dorado|keer op keer|sounds fishy|uno|jenga|monopoly|ganzenbord"),1],
+    // Vlekken en kleur in de was: huishouden, ook als er "deo" in de naam staat.
+    [10,W("hg|wasparfum|calgon|sanytol|strijkplank|schalen voor airfryer|kookset|soup maker|biotex|glassex|ecover|vlekkenspray|vlekverwijderaar|ontvlekker|eau ecarlate|kleurvanger|decolor[a-z.]*|aanmaakblokjes|houtwol|sodastream (cylinder|quickconnect|terra|art|duo)|vapona|anti ?mug|le chat|fireball|muggenstekker|stekkerdoos|stofzuiger|handstofzuiger|canon|inktpatroon|cartridge"),1],
+    [9,W("elnett|palmolive|sanex|shower cream|gezichtsverzorging|voetverzorging[a-z]*|eau de toilette|aftershave|interdentale|nivea|always|glycerona|therme|jordan|vogue|garnier|aquafresh|libresse|tena|wella|tandpaste|signal|schwarzkopf|palette|soft[- ]?picks|sp comfort|flossers|flossdraad|rager|ragers|tandenstokers|wasgel|handzeep|douche|sanicur|l'?or[eé]al|true match|wenkbrauw[a-z.]*|oogpotl[a-z.]*|mascara|foundation|bb ?cr[eè]me|cc ?cr[eè]me|dagcr[eè]me|nachtcr[eè]me|lippenstift|propolis|keelspray|wondspray|jungle beat"),1],
+    [9,{test:function(n){return W("vitamines?|multivitamines?|vitamine [a-z0-9]").test(n)&&!/(smoothie|sap\b|drink|drank|water|shot|yoghurt|gummies|snoep)/.test(n);}},1],
+    // Pakjes en mixen voor de maaltijd (Knorr, Maggi, Conimex, verspakketten) horen bij pasta, rijst & sauzen.
+    // Verse maaltijden en verspakketten: eigen afdeling.
+    [13,W("uit eigen keuken|bereide gerechten|meal to go|quiches|verspakket|verspakketten|uit de keuken van|puur gemak|mealmasters|maaltijdsalade|ovenschotel kant-en-klaar|[a-z]* stijl kant-en-klaar"),2],
+    [5,W("knorr|maggi|conimex|cup-a-soup|dagschotel|good potatoes|good pasta|mix voor|stoofmix|airfryer crispy|so thai|curry ?paste|pad thai paste|mirin|miso soup|saitaku|zilvervlies|bbq rubs?|rubs gift set|vanillestokjes"),2],
+    // Bakmixen van Dr. Oetker horen bij het bakschap (bij pasta, rijst & sauzen), niet bij de diepvries. Pizza's wel.
+    [5,{test:function(n){return /(bakmix|cakemix|mix voor|brownie|cookie|muffin|cupcake|brookies|pannenkoekenmix|bakpoeder|vanillesuiker)/.test(n)&&/(dr\.? ?oetker|koopmans|home ?made|bakmix|cakemix|mix voor|muffinmix|browniemix)/.test(n)&&!/pizza|ristorante|ijs|roerbak|groente|wok|bollenmix|yamato|rice/.test(n);}},2],
+    [12,W("bonzo|iams|royal canin|perfect fit|friskies|kitekat|cesar|frolic|brekkies|gimcat|vetbollen|beneful|top dog|voederfiguur|vogelvoer|katten ?voer|honden ?voer|kattenbak|kattengrit|kattenbakvulling|dierenvoer|vogelzaad|whiskas|felix|sheba|gourmet kat|pedigree|hondensnack|kattensnack|hondenbrokken|kattenbrokken|brokken"),1],
     [11,W("luiers?|pampers|babydoekjes|billendoekjes|flesvoeding|opvolgmelk|nutrilon|olvarit|babyvoeding|fruithapje|zuigfles|speen"),1],
-    [9,W("shampoo|conditioner|douchegel|douchecreme|deodorant|deo|tandpasta|tandenborstels?|mondwater|scheermes(jes)?|scheergel|scheerschuim|bodylotion|dagcreme|nachtcreme|handcreme|zonnebrand|aftersun|maandverband|tampons?|inlegkruisjes|haarlak|haargel|wattenschijfjes|lippenbalsem|vitamines?|paracetamol|ibuprofen|pleisters|zeep|handzeep|zakdoekjes|scheerapparaat|make-?up|mascara|nagellak"),1],
+    [9,W("shampoo|conditioner|douchegel|duchegel|douchecreme|deodorant|deo|tandpasta|tandenborstels?|mondwater|scheermes(jes)?|scheergel|scheerschuim|bodylotion|dagcreme|nachtcreme|handcreme|zonnebrand|aftersun|maandverband|tampons?|inlegkruisjes|haarlak|haargel|wattenschijfjes|lippenbalsem|paracetamol|ibuprofen|pleisters|zeep|handzeep|zakdoekjes|scheerapparaat|make-?up|mascara|nagellak"),1],
     [10,W("wasmiddel|wasverzachter|waspoeder|wascapsules|afwasmiddel|vaatwas(tabletten|middel)?|allesreiniger|wc-?reiniger|wc-?blok|toiletpapier|wc-?papier|keukenrol|keukenpapier|vuilniszakken|afvalzakken|pedaalemmerzakken|schoonmaakazijn|ontkalker|chloor|bleekmiddel|sponzen|schuursponsjes|vaatdoekjes|aluminiumfolie|vershoudfolie|bakpapier|diepvrieszakjes|batterijen|kaarsen|lucifers|luchtverfrisser|glasreiniger|vloerreiniger"),1],
     [3,W("oatly|alpro|haverdrank|havermelk|haverdrink|sojadrank|sojamelk|sojadrink|amandeldrank|amandelmelk|amandeldrink|rijstdrank|kokosdrank|oat ?drink|plantaardige (drank|drink|melk)"),2],
-    [7,W("chocolademelk|bier|pils|radler|wijn|rose|prosecco|cava|champagne|whisky|vodka|rum|jenever|likeur|gin|koffiebonen|koffiepads|koffiecups|nespresso|senseo|oploskoffie|koffie|thee|theezakjes|frisdrank|cola|sinas|ice ?tea|energy ?drink|limonade|siroop|ranja|spa|mineraalwater|bronwater|vruchtensap|sinaasappelsap|appelsap|jus d'orange|smoothie"),2],
-    [4,W("pindakaas|hagelslag|vlokken|chocoladepasta|chocopasta|nutella|jam|honing|appelstroop|smeerkaas|leverworst|filet americain|sandwichspread|zoet beleg"),2],
+    // Beleg-salades (kip kerrie salade, tonijnsalade) horen bij het beleg, niet bij vlees of groente.
+    [4,{test:function(n){return !/(maaltijdsalade|pasta ?salade|salade ?mix|slamix|ijsberg|rucola)/.test(n)&&/((kip|ei|eier|tonijn|zalm|krab|surimi|vlees|beenham|selderij|sellerie|garnalen|komkommer)[ -]?(kerrie |sat[eé] |walnoot |pesto |mambo )?salade|salade (van )?(kip|pittige kip|ei|vrije uitloop|surinaamse|tonijn|zalm|gerookte zalm|krab|surimi|vlees|ambachtelijke|beenham|sellerie|selderij|garnalen|komkommer|farmer)|(uitloopei|eier?)( [a-z]+)? salade|toastsalade)/.test(n);}},2],
+    // Vla, yoghurt en kwark blijven zuivel, ook met "rum smaak" of "honing" in de naam.
+    [3,{test:function(n){return /(yoghurt|kwark|skyr|pudding|(^|[^a-z])vla([^a-z]|$)|roomvla|griesmeel|danio|yoplait|almhof|danette|o[iî]kos|dessertglaasje|optimel|boursin|xxl nutrition perfect milk|zuivelspecialiteit|halvarine|li[eé]geois)/.test(n)&&!/(caps|pads|gemalen|bonen|iglo|roerbak)/.test(n)&&!/(yoghurt ?rozijn|gums|noten|chips|koek|reep|repen|biscuit|broodje|ijs|crunch|cruesli|granola|muesli|dressing|saus|dip|vlaai)/.test(n);}},2],
+    [6,W("lay['’]?s|doritos|pringles|cheetos|bugles|wokkels|pomtips|ringlings|lu bastogne|bastogne|jules destrooper|destrooper"),2],
+    [7,{test:function(n){return /(haribo|katja|venco|red band|trolli|venz|de ruijter|gums|snoep|drop|lolly|winegum|chips|spekjes|brood|desem|gesneden|pesto|kruidnoten|koek|saus|op siroop|op lichte siroop|op sap|comt[eé]|kaas|fromage|tickets|grottes|cruesli|muesli|granola|cereal|vlokken)/.test(n)?false:W("sparkling|alcoholvrij|0\\.0%?|ipa|quadrupel|tripel|dubbelbock|bock|spiced rum|old captain|beer|loire|touraine|saint-mont|rioja|aop|aoc|docg?|igt|bodegas|ch[aâ]teau|pomerol|beaujolais|morgon|gavi|nero d'avola|barbera|vernaccia|piccini|utiel|19 crimes|gallo|mucho m[aá]s|sangre de toro|vin de|forte alto|terra pura|bourgogne|bordeaux|lalande|alsace|elzas|gl[uü]hwein|zero sugar|zero cherry|zero vanille|zero lemon|ricor[eé]|collageendrink|infusion|clipper|dubbelfris+|zappie|tintelfruit|sisi|seven up|7-?up|jopen|brugse zot|straffe hendrik|benediktiner|ijwit|hertog jan|parisienne|k[oö]nig ludwig|dommelsch|la trappe|yfood|gew[uü]rztraminer|negroamaro|i heart|njoy|grix|swartland|licor|bacardi|moscato|taksi|schweppes|healthy people|appelsientje|roosvicee|kriek|kwak|martini|bons voeux|rombouts|starbucks|twinings|lavazza|douwe egberts|pickwick|tea|caps|herfstbock|winterbier|weizen|witbier|cider|blond|beerenburg|kruidenbitter|zachtbitter|ginger ale|ginger beer|dr\\.? ?pepper|canada dry|royal club|gini|isostar|chimay|duvel|leffe|grimbergen|affligem|ros[eé]|blanco|tinto|rosso|chianti|super-?tuscan|merlot|chardonnay|sauvignon|rioja|primitivo|malbec|shiraz|cabernet|pinot|graindor|charles li[eé]geois|chicor[eé]e|cichorei|shot|shots|mate|perrier|chocolademelk|bier|pils|radler|wijn|rose|prosecco|cava|champagne|whisky|vodka|rum|jenever|likeur|gin|koffiebonen|koffiepads|koffiecups|nespresso|senseo|oploskoffie|koffie|thee|theezakjes|frisdrank|cola|sinas|ice ?tea|energy ?drink|limonade|siroop|ranja|spa|mineraalwater|bronwater|vruchtensap|sinaasappelsap|appelsap|jus d'orange|smoothie").test(n);}},2],
+    // Kant-en-klare havermout (to go, knijpzakje, overnight oats, pap) staat bij de zuivel.
+    [3,{test:function(n){return /(havermout|haver|oats).*(to ?go|knijp|pouch)|overnight oats|havermoutpap|\bpap\b|griesmeelpap|rijstepap|brinta to go/.test(n);}},2],
+    // Ontbijtgranen horen bij het ontbijt-/broodbelegschap, niet bij brood. Maar een mueslireep is snoep en een mueslibol is brood.
+    [4,{test:function(n){return /(havermout|havervlokken|muesli|cruesli|granola|cornflakes|brinta|ontbijtgranen|kellogg|weetabix|chocapic|cini minis)/.test(n)&&!/(reep|repen|\bbar\b|bars|koek|stick|bollen|bolletjes|broodje|brood\b|cake|melk|drink|drank|yoghurt|yogurt)/.test(n);}},2],
+    [4,{test:function(n){return W("pindakaas|hagelslag|vlokken|chocoladepasta|chocopasta|nutella|jam|appelstroop|smeerkaas|leverworst|filet americain|sandwichspread|zoet beleg").test(n)&&!/(reep|repen|\bbar\b|koek|chips|ijs|saus|smaak|kruidnoten|pepernoten)/.test(n);}},2],
+    // Honing alleen als het echt honing is, niet "tonijn met honing" of "honingdrop".
+    [4,{test:function(n){return W("honing|bloemenhoning|acaciahoning").test(n)&&!/(tonijn|kip|ham|mosterd|saus|dressing|marinade|topping|thee|drop|pastille|keel|koek|reep|noten|cashew|pinda|cruesli|granola|muesli|yoghurt|kwark)/.test(n);}},2],
     [8,W("diepvries|ijs|ijsjes|roomijs|magnum|cornetto|friet|frites|patat|kroketten|bitterballen|frikandellen?|snacks? diepvries|pizza diepvries|diepvriespizza|vissticks"),2],
+    [1,W("harry'?s|american sandwich|b[oö]rek|kaasstengels?|kruier|afbak[a-z]*|saucijzenbroodje|worstenbroodje|swirl"),0],
+    [8,W("aperitiefhapjes|apero ?hapjes"),2],
+    [5,W("old el paso|mutti|carapelli|extra vierge|tagliatte|ravioli|tortellini|tortelloni|gnocchi|cappelletti|nissin|noodles|tahin|tahini|honig|hela|vermicelli|hellmann'?s|calv[eé]"),0],
+    [8,W("kwekkeboom|mora|lamb weston"),0],
+    [13,{test:function(n){return !/aardappel(en|s)? voor|fijn|grof|gesneden/.test(n)&&W("chili con carne|chili sin carne|goulash|tikka masala|foe yong hai|mihoen|rendang|bapao|stamppot|loempia|roti|maaltijd|maaltijden|kant-en-klaar|kant-en-klare maaltijd|magnetronmaaltijd|ovenmaaltijd|quiche|pok[eé] bowl|nachokit").test(n);}},0],
+    [4,W("aioli|tzatziki|[a-z]*dip"),0],
+    [0,W("snack ?tomaten|snacktomaten|kaki|kaki fruit|witloof"),0],
+    [11,W("pyamapapje"),1],
     [6,W("chips|chocolade|chocola|reep|koek|koekjes|stroopwafels?|ontbijtkoek|snoep|drop|winegums|zuurtjes|kauwgom|popcorn|borrelnoten|nootjes|cashewnoten|pinda'?s|toffees|pepernoten|kruidnoten|speculaas|wafels"),0],
     [3,W("melk|halfvolle|volle melk|karnemelk|yoghurt|kwark|skyr|vla|slagroom|kookroom|room|roomboter|boter|margarine|eieren|scharreleieren|kaas|geraspte kaas|mozzarella|feta|brie|camembert|zuivel"),0],
     [2,W("kipfilet|kip|kipdijen|kippenpoten|gehakt|rundergehakt|worst|rookworst|braadworst|spek|spekjes|ontbijtspek|biefstuk|varkens\\w*|runder\\w*|schnitzel|hamburgers?|ham|zalm|kabeljauw|tonijn|garnalen|vis|vlees|vegaburger|vegetarische"),0],
     [1,W("brood|bolletjes|broodjes|croissants?|stokbrood|baguette|pistolets?|beschuit|crackers|knackebrod|wraps?|tortilla|krentenbollen|tijger|casino"),0],
-    [5,W("pasta|spaghetti|macaroni|penne|fusilli|lasagne|lasagnebladen|rijst|noedels|mie|[a-z]*saus|ketchup|mayonaise|mosterd|soep|bouillon|olie|olijfolie|azijn|kruiden|bloem|suiker|tomatenpuree|passata|tomatenblokjes|bonen in blik|kikkererwten|couscous|wereldkeuken|curry|taco"),0]
+    [5,W("pasta|spaghetti|macaroni|penne|fusilli|lasagne|lasagnebladen|rijst|noedels|mie|[a-z]*saus|ketchup|mayonaise|mosterd|soep|bouillon|olie|olijfolie|azijn|kruiden|bloem|suiker|tomatenpuree|passata|tomatenblokjes|bonen in blik|kikkererwten|couscous|wereldkeuken|curry|taco"),0],
+    // Extra namen uit de folders van Plus, Aldi, Delhaize en Colruyt (vaak zonder goede categorie).
+    [6,W("chupa chups|lolly|lolly's|merci|gums|zure matten|zure staven|haverrepen|krakelingen|musketflikken|galettes|madeleines|mini mix|nacho'?s|scrocchi|sfoglie|katjang|katjang pedis|elitehaver|studentenhaver|zoutjes|herfstmix|epixs|kinder|mon ch[eé]ri|raffaello|fritt|zuurstok[a-z]*|staf van sinterklaas|sinterklaasstaf|mijter|libeert|halloween mixx?|candy|deense knopen|delacre|c[oô]te d.or|mignonnettes?|pick up!?|milkmouse[a-z-]*|panettone|minipanettone|spritsen|weespermoppen|peperkoek|bros|milky ?way|smarties|smint|time out|digestive|mcvitie'?s|schnitt|scholiertje|pim'?s|toffifee|tony'?s|chocolonely|st[eë]lz|pindarotsjes|redband|red band|skittles|snack a jacks|yamato mix|cocktailmix|melange|mexicaantjes|dipstokjes|picos|torinesi"),0],
+    [4,W("charcuterie|gevulde eitjes|gevulde eieren|sirop de li[eè]ge|tapas|quaker oats|oats express|ontbijtmix|ontbijtverrijker|chiazaad|lijnzaad|flakes|loops|cacaokussen|spread"),0],
+    [3,W("vitelma|smeren"),0],
+    [2,W("blinde vinken|parelhoen|kwartels|reeragout|hazenrug|eendenborst[a-z]*|eendenfilet|tartaar|tartaartjes|sukadelappen|gelderse|eend|rollade|hertenrollade|kabanos|wienerschnitzels?|wienerschitzels?|saucission|saucisson|baton"),0],
+    [3,W("emmental[a-z]*|manchego|cambozola|pecorino|ricotta|robiola|stracchino|squaquerello|scamorza|scarmorze|tomme|passendale|postel|brugge blomme|brillat-?savarin|saint paulin|maredsous|comt[eé]|formaggio|fryske|klaverland|beemster|gouda|cheddar|parmezaan|parmigiano|mascarpone|burrata|halloumi|gorgonzola|leerdammer|old amsterdam|arla|alpro|lactosevrij[a-z]*|zero lactose|brugge|wapenaer|eru|chavroux|koggelandse|[0-9]{2}\\+|bavaria blu|ch[eè]vre|munster|saint flour|viking blue"),0],
+    [2,W("knacki|knakworst|frankfurters?|jerky|lomo|sprot|kalkoengebraad"),0],
+    [4,W("bonne maman|confituur|confiture|confi[a-z.]*|fruitbeleg|penotti"),0],
+    [5,W("[a-z]*soep|liebig|spaghettoni|capellini|linguine|orecchiette|rigatoni|tagliatelle|farfalle|paella|risotto|fettuccine|horentjes|spirelli|tagliatelli|gochujang|kruiden|maanzaad|sesamzaad|suikerklontjes"),0],
+    [3,W("bakken en braden"),0]
   ];
-  var FOOD_A={0:1,1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1};
+  var FOOD_A={0:1,1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1,13:1};
   function ruleFor(name){var n=normName(name);for(var i=0;i<RULES.length;i++)if(RULES[i][1].test(n))return RULES[i];return null;}
   // Slimme afdeling uit naam + winkelcategorie. Geeft 99 voor Overig.
+  // Alcohol (bier, wijn, sterke drank) heeft een eigen afdeling (14), direct na drinken.
+  var ALC=W("bier|bieren|pils|pilsener|radler|wijn|wijnen|ros[eé]|prosecco|cava|champagne|whiske?y|vodka|rum|jenever|likeur|liqueur|gin|cider|ipa|tripel|quadrupel|bock|herfstbock|weizen|witbier|blond|beerenburg|kruidenbitter|zachtbitter|bacardi|moscato|martini|aperol|campari|licor|sherry|cognac|brandy|baileys|amaretto|tequila|heineken|amstel|grolsch|hertog jan|bavaria|jupiler|leffe|affligem|la trappe|duvel|chimay|corona|desperados|hoegaarden|warsteiner|stella artois|westmalle|karmeliet|kwak|kriek|jopen|brugse zot|straffe hendrik|dommelsch|ijwit|parisienne|k[oö]nig ludwig|gl[uü]hwein|merlot|chardonnay|sauvignon|rioja|primitivo|malbec|shiraz|cabernet|pinot|chianti|nebbiolo|barbera|gavi|beaujolais|bordeaux|bourgogne|aop|aoc|docg?|bodegas|ch[aâ]teau|19 crimes|gallo|i heart|njoy|grix|swartland|forte alto|terra pura|mucho m[aá]s|sangre de toro|vernaccia|nero d'avola|negroamaro|gew[uü]rztraminer|loire|touraine|saint-mont|label 5|jack daniel'?s|johnnie walker|captain morgan|old captain|spiced rum|sterke drank|apple bandit|brand bier|wodka|ouzo|sangria|gran palas|viverty|sparkling (wit|ros[eé]|rood)|alcoholvrij[a-z]* (wijn|bier)|frizzante");
+  var NOT_ALC=/chocolademelk|koffie|thee|(^|[^a-z])sap|cola|frisdrank|limonade|siroop|ranja|azijn|ginger ale|ginger beer|tonic|bitter lemon/;
   function smartAisle(name,cat){
+    var a=smartAisle0(name,cat);
+    if(a===7||a===99){var n=normName(name);if(ALC.test(n)&&!NOT_ALC.test(n))return 14;}
+    return a;
+  }
+  function smartAisle0(name,cat){
     var r=ruleFor(name),c=aisleOfCat(cat);
     if(r&&r[2]===1)return r[0];                               // non-food: altijd
+    // Bij "verse maaltijden" zetten winkels ook dips, beleg-salades, worst en verse pasta.
+    if(c===13){var nm=normName(name);
+      if(!/pizza/.test(nm)&&/(aioli|tzatziki|hummus|(^|[^a-z])dip|(^|[^a-z])salade |salam[ei]|salade (tonijn|ei|vrije uitloopei|kip|zalm|vlees|kaas|krab|garna)|(tonijn|ei|kip|zalm|vlees|krab|garnalen)salade|metworst|worst)/.test(nm)&&!/(maaltijdsalade|soep|stamppot|stampot| met )/.test(nm))return 4;
+      if(/(gnocchi|tagliatelle|spaghetti|penne|ravioli|tortel+ini|fusilli|lasagnebladen)/.test(nm)&&!/(bolognese|carbonara|maaltijd| met |salsa|saus|pesto)/.test(nm))return 5;}
+    // Groente of vlees die de winkel bij brood zet ("Hollandse bloemkool", "Rundertartaartjes").
+    if(c===1&&!(r&&r[2]===2)){var nb2=normName(name);
+      if(!/(brood|(^|[^a-z])bol(len)?([^a-z]|$)|broodje|croissant|stol|taart|cake|krentenbol|pistolet|donut|koek|wafel|kn[aä]ckebr[oö]d|cracker|pizza|tijger|casino|baguette|wrap|beschuit|bagel|muffin|brownie|tortilla|pita|naan|pinsa|desem|brioche|punten|flap|(^|[^a-z])gebak(je|jes)?([^a-z]|$)|vlaai|kruimel)/.test(nb2)){
+        if(r&&(r[0]===2||r[0]===0||r[0]===5))return r[0];var a2=aisleOf(name);if(a2===0||a2===2)return a2;}}
+    // Croissant, broodje of cake die de winkel bij zuivel of snoep zet ("Roombotercroissant").
+    if(c===3||c===6||c<0){var nb=normName(name);
+      if(/(croissant|cruffin|broodje|broodjes|krentenbrood|krentenbol|pistolet|stokbrood|baguette|(^|[^a-z])naan([^a-z]|$)|pinsa|(^|[^a-z])(tarwe|wit|witte|bruin|bruine|volkoren|zachte|krenten|meergranen)[ -]?bollen([^a-z]|$))/.test(nb)&&!/(salade|beleg|spread|knakworst)/.test(nb))return 1;
+      if(c===3&&/(cake|cakejes|koek|wafel|taart)/.test(nb)&&!/(yoghurt|kwark|vla|pudding|smaak|blue band|margarine|boter (voor|om)|bakken)/.test(nb))return 6;}
+    if(c===12&&!/(hond|kat|kitten|puppy|vogel|knaag|konijn|dier|snack|brok|voer|pedigree|whiskas|sheba|felix|purina|gourmet|rodeo|beneful|dreamies|catisfactions|kattenbak|vetbol|bonzo|iams|royal canin|perfect fit|friskies|kitekat|cesar|frolic|brekkies|gimcat)/.test(normName(name)))c=-1;
+    else if(c>=9&&c!==99)return c;                                 // winkel zegt verzorging, huishouden, baby of huisdier: dat klopt bijna altijd
+    if(/^kaas$|kaas.*vleeswaren/.test(String(cat||"").toLowerCase())&&!(r&&r[2]===2&&r[0]!==4)){
+      // "Kaas & vleeswaren": echte kaas bij de zuivel, ham, worst, salades en tapas bij het beleg.
+      var n=normName(name);
+      if(/(kaas|cheese|mozzarella|feta|brie|camembert|parmezaan|parmigiano|grana padano|gouda|cheddar|emmentaler|apetina|castello|boursin|philadelphia|old amsterdam|leerdammer|beemster|milner|zaanlander|president|président|mascarpone|ricotta|burrata|halloumi|manchego|gorgonzola|roquefort|babybel|kiri|raclette|fondue|geitenkaas)/.test(n)&&!/(salade|dip|rolletje|worst|ham|salami|spread|pesto|gevuld|olijf|olijven|tapenade|hummus|chorizo|pat[eé]|filet|kip|zalm|wrap|rookvlees|spiesje|snack|bal|ballen)/.test(n))return 3;
+      return 4;
+    }
     if(r&&r[2]===2&&c>=0&&r[0]!==c)return r[0];               // heel duidelijke woorden (pindakaas, bier, ijs): ook boven een andere eetcategorie
     if(c>=0){
       if(r&&r[0]!==c&&(c===0||!FOOD_A[c]))return r[0];        // groente & fruit en non-food zijn de bekende foutplekken
@@ -20802,12 +20881,12 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
   function aisleLabel(i){return i===99?OTHER[1]:AISLES[i][1];}
   function aisleIcon(i){return i===99?"":headIcon(AISLES[i][0]);}
   // Voor de Folder: zelfde afdelingen, namen, iconen en volgorde als je lijst.
-  window.__mbAisles={count:AISLES.length,label:aisleLabel,icon:aisleIcon,fromCat:aisleOfCat};
+  window.__mbAisles={count:AISLES.length,label:aisleLabel,icon:aisleIcon,fromCat:aisleOfCat,rank:aisleRank,short:aisleShort};
   window.__mbAisleFor=function(it){return aisleForItem(it);};
   function escH(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   window.__mbPickAisle=function(idx){
     var it=Array.isArray(boodschappen)?boodschappen[idx]:null;if(!it)return;
-    var cur=aisleForItem(it),opts=AISLES.map(function(a,i){return i;}).concat([99]);
+    var cur=aisleForItem(it),opts=AISLES.map(function(a,i){return i;}).sort(function(a,b){return aisleRank(a)-aisleRank(b);}).concat([99]);
     var html='<div class="familyDialogText">Waar ligt <strong>'+escH(it.text)+'</strong> in de winkel? De app onthoudt je keuze voor de volgende keer.</div><div class="mbAislePick">'+
       opts.map(function(i){return '<button type="button" data-a="'+i+'" class="'+(i===cur?"on":"")+'"><span class="ic" aria-hidden="true">'+aisleIcon(i)+'</span><span class="nm">'+escH(aisleLabel(i))+'</span>'+(i===cur?'<i class="fa-solid fa-check" aria-hidden="true"></i>':'')+'</button>';}).join("")+'</div>';
     var ov=familyDialogBase("fa-layer-group","Afdeling",html,'<button type="button" class="familyDialogBtn familyDialogCancel">Annuleren</button>');
@@ -20868,7 +20947,7 @@ body.dark-theme .mbDoneHead{background:#202923;color:#cfe3d4}
       var act=items.filter(function(el){return !el.classList.contains("completed");}),done=items.filter(function(el){return el.classList.contains("completed");});
       // Afdelingen
       var groups={};act.forEach(function(el){var a=aisleOfEl(el);(groups[a]=groups[a]||[]).push(el);});
-      var order=Object.keys(groups).map(Number).sort(function(a,b){return a-b;});
+      var order=Object.keys(groups).map(Number).sort(function(a,b){return aisleRank(a)-aisleRank(b);});
       var showHeads=act.length>=1;
       order.forEach(function(a){
         var g=groups[a],vis=g.filter(visible).length,lab=a===99?OTHER:AISLES[a];
