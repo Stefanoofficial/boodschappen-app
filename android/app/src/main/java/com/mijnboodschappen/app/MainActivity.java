@@ -742,7 +742,7 @@ public class MainActivity extends Activity {
                 // Zelfde snelheid als de wazige laag in de app (0,2 s), anders verspringt de bovenkant.
                 if (scrimAnimator != null) scrimAnimator.cancel();
                 int from = scrimShownColor;
-                int to = dimmed ? Color.rgb(177, 186, 180) : BACKGROUND_COLOR;
+                int to = dimmed ? Color.rgb(173, 183, 176) : BACKGROUND_COLOR;
                 statusBarScrimColor = to;
                 if (from == to) return;
                 scrimAnimator = ValueAnimator.ofArgb(from, to);
