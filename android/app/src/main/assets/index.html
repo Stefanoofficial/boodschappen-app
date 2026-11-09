@@ -5701,6 +5701,9 @@ body.dark-theme .listOptionsPanelInner{background:#202923 !important;box-shadow:
    Achtergrond alleen iets donkerder (niet wazig), op iPhone en Android: je ziet je lijst gewoon. */
 .listOptionsPanel::before{display:none !important}
 .listOptionsPanel{background:rgba(22,30,25,.30) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+/* iPhone: de statusbalk (klok, batterij) kan niet soepel mee van kleur veranderen en loopt achter.
+   Daarom laten we het donker bovenaan zacht uitlopen naar de lichte statusbalk: geen rand, geen sprong. */
+html.platform-ios .listOptionsPanel{background:linear-gradient(to bottom,rgba(22,30,25,0) 0,rgba(22,30,25,.30) 96px) !important}
 
 /* Het menu zelf: wit vlak met schaduw, groeit uit de hoek bij de ⋮-knop. */
 .listOptionsPanelInner{
@@ -21803,6 +21806,8 @@ window.__mbStrictDeals=(function(){
   function setDim(on){
     try{ if (window.AndroidApp && window.AndroidApp.setMenuDimmed) window.AndroidApp.setMenuDimmed(!!on); }catch(e){}
     try{
+      // theme-color niet meer wisselen: op iPhone loopt die achter en verspringt hij.
+      if(true) return;
       var m=document.querySelector('meta[name="theme-color"]'); if(!m) return;
       if(THEME_LIGHT===null) THEME_LIGHT=m.getAttribute('content')||'#eef8f1';
       var dark=document.body.classList.contains('dark-theme');
