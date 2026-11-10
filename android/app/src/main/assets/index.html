@@ -16330,6 +16330,8 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
     catch(e){return {items:[],log:[],share:false};}
   }
   function write(d){
+    // Veiligheid: nooit iets anders dan een echte voorraad opslaan (anders raak je al je producten kwijt).
+    if(!d||typeof d!=="object"||!Array.isArray(d.items)){console.warn("Voorraad niet opgeslagen: ongeldige gegevens",d);return;}
     if(d.log&&d.log.length>300)d.log=d.log.slice(-300);
     // Elke wijziging maakt de vorige bevestiging ("… staat nu …") ongeldig
     try{var st=document.getElementById("pantryStatus");if(st){st.textContent="";clearTimeout(st.__t);}}catch(e){}
@@ -16573,7 +16575,7 @@ window.addPlannerIngredientsToShoppingList=async function(event){ if(event) even
       var dd=read(),x=dd.items.find(function(i){return i.id===id;});if(!x){close();return;}
       x.name=niceName(name);x.loc=ov.querySelector("#pantryEditLoc").value;x.qty=int(ov.querySelector("#pantryEditQty").value,0);
       var newExp=ov.querySelector("#pantryEditExp").value||"";
-      if(newExp!==(it.exp||"")){x.estExp=false;if(newExp){var dd=daysUntil(newExp);if(dd!=null)learn(name,ov.querySelector("#pantryEditLoc").value,dd);}}
+      if(newExp!==(it.exp||"")){x.estExp=false;if(newExp){var expDays=daysUntil(newExp);if(expDays!=null)learn(name,ov.querySelector("#pantryEditLoc").value,expDays);}}
       x.exp=newExp;x.min=int(ov.querySelector("#pantryEditMin").value,0);x.updatedAt=Date.now();
       write(dd);close();render();
     };
