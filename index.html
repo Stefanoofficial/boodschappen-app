@@ -5712,6 +5712,9 @@ html.platform-ios .listOptionsPanel{background:linear-gradient(to bottom,rgba(22
   transform-origin:top right !important;transform:scale(.86) !important;opacity:0;
   transition:transform .18s cubic-bezier(.2,0,0,1),opacity .14s ease !important}
 .listOptionsPanel.open .listOptionsPanelInner{transform:scale(1) !important;opacity:1}
+/* Eigen laag voor de grafische kaart: openen en sluiten blijft elke keer even soepel, ook als je lijst lang is. */
+.listOptionsPanel{will-change:opacity;contain:layout paint}
+.listOptionsPanelInner{will-change:transform,opacity;backface-visibility:hidden}
 .sortOptionsPanel .listOptionsPanelInner{transform:scale(.86) !important}
 .sortOptionsPanel.open .listOptionsPanelInner{transform:scale(1) !important}
 .listOptionItem{font-size:14.5px !important;font-weight:600 !important;min-height:42px !important;color:#1f3326 !important}
@@ -18970,6 +18973,15 @@ body.dark-theme .dealFolderBtn{background:#202923;border-color:#38453b;color:#9f
   }
   // Voor "Vergelijk winkels": de aanbiedingen van deze week, los van wat de Folder nu toont.
   window.__mbFolderNow=function(slug){var w=state.week;state.week="now";try{return load(slug);}finally{state.week=w;}};
+  // Voorverwarmen: na het opstarten, als de telefoon niets te doen heeft, de folder van je eerste winkel alvast ophalen
+  // en de eerste foto's klaarzetten. Dan opent de Folder de eerste keer net zo snel als daarna.
+  window.__mbFolderPrewarm=async function(){
+    try{
+      if(ov)return;var s=shops()[0];if(!s)return;
+      var rows=await window.__mbFolderNow(s);if(!Array.isArray(rows))return;
+      rows.slice(0,24).forEach(function(p){var u=imgOf(p);if(!u)return;var im=new Image();im.decoding="async";im.src=u;if(im.decode)im.decode().catch(function(){});});
+    }catch(e){}
+  };
   function norm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();}
   function brandOf(p){var b=String(p.brand||"").trim();if(b)return b;return String(p.name||"").split(/\s+/)[0]||"";}
   /* Varianten samenvoegen: zelfde merk + zelfde actie + zelfde prijs = één kaart (zoals in de apps van de supermarkten). */
@@ -21811,6 +21823,25 @@ window.__mbStrictDeals=(function(){
 })();
 </script>
 
+<script id="startup-prewarm">
+/* De eerste keer naar Overzicht, Folder of Meer voelde traag: die schermen werden pas op dat moment opgebouwd.
+   Nu bouwen we ze stilletjes alvast op als de app net open is en de telefoon even niets doet. */
+(function(){
+  var done=false;
+  function idle(fn,t){ if(window.requestIdleCallback) requestIdleCallback(fn,{timeout:t||3000}); else setTimeout(fn,300); }
+  function prewarm(){
+    if(done) return;
+    var app=document.querySelector('.app');
+    if(!document.body.classList.contains('logged-in')) { setTimeout(prewarm,2500); return; }
+    done=true;
+    idle(function(){
+      try{ if(app && !app.classList.contains('overview-active') && typeof updateOverviewView==='function') updateOverviewView().catch(function(){}); }catch(e){}
+      idle(function(){ try{ if(window.__mbFolderPrewarm) window.__mbFolderPrewarm(); window.__mbPrewarmed=Date.now(); }catch(e){} },4000);
+    },3000);
+  }
+  if(document.readyState==='complete') setTimeout(prewarm,1800); else window.addEventListener('load',function(){ setTimeout(prewarm,1800); });
+})();
+</script>
 </body>
 
 
