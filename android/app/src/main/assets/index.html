@@ -14392,8 +14392,11 @@ function openWeekCompleted(){
 
 <div id="clearListBackdrop" class="clearListBackdrop" aria-hidden="true"></div>
 <aside id="clearListSheet" class="clearListSheet" role="dialog" aria-modal="true" aria-labelledby="clearListTitle" aria-describedby="clearListDescription" aria-hidden="true">
-  <div class="clearListIcon"><i class="fa-solid fa-trash-can"></i></div>
-  <h2 id="clearListTitle">Boodschappenlijst wissen?</h2>
+  <div class="familyDialogHeader clearListHead">
+    <div class="familyDialogIcon clearListIc"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></div>
+    <div class="familyDialogTitle" id="clearListTitle">Lijst wissen?</div>
+    <button type="button" class="mbDialogClose" aria-label="Sluiten" onclick="closeClearListConfirm(event)"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+  </div>
   <p id="clearListDescription">Weet je zeker dat je je huidige boodschappenlijst wilt wissen?</p>
   <div class="clearListHistoryNote"><i class="fa-solid fa-circle-check"></i><span>Je huidige lijst wordt eerst bewaard in je geschiedenis.</span></div>
   <div class="clearListActions">
@@ -18471,7 +18474,7 @@ body.proPaidMode .onlyFree{display:none!important}
       var view=new Date((sel||t).getFullYear(),(sel||t).getMonth(),1);
       var ov=document.createElement("div");ov.className="appCalOverlay";
       ov.innerHTML='<div class="appCal" role="dialog" aria-modal="true" aria-label="Datum kiezen">'+
-        '<div class="appCalHead"><span class="appCalIcon" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span><div class="appCalTitles"><div class="appCalTitle"></div><div class="appCalSel" aria-live="polite"></div></div></div>'+
+        '<div class="appCalHead"><span class="appCalIcon" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span><div class="appCalTitles"><div class="appCalTitle"></div><div class="appCalSel" aria-live="polite"></div></div><button type="button" class="mbDialogClose" data-b="cancel" aria-label="Sluiten"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>'+
         '<div class="appCalNav"><div class="appCalMonth"></div><div class="appCalArrows"><button type="button" class="appCalArrow" data-m="-1" aria-label="Vorige maand"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="appCalArrow" data-m="1" aria-label="Volgende maand"><i class="fa-solid fa-chevron-right"></i></button></div></div>'+
         '<div class="appCalWeek">'+WD.map(function(w){return "<span>"+w+"</span>";}).join("")+'</div>'+
         '<div class="appCalGrid" role="grid"></div>'+
@@ -21316,18 +21319,18 @@ body.dark-theme .mbCmpNote{background:#3a3320;color:#f0dc9c}
   }
   window.openCompare=async function(){
     var items=list(),ks=shops();
-    if(!items.length){sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">Zet eerst een paar producten op je lijst. Dan rekent de app uit bij welke winkel je het minst betaalt.</div>');return;}
-    var s=sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpLoad">Prijzen ophalen bij '+ks.map(function(k){return esc(nameOf(k));}).join(", ")+'…<div class="bar"><i></i></div></div>');
+    if(!items.length){sheet('<div class="mbCmpHead"><div class="familyDialogIcon" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">Zet eerst een paar producten op je lijst. Dan rekent de app uit bij welke winkel je het minst betaalt.</div>');return;}
+    var s=sheet('<div class="mbCmpHead"><div class="familyDialogIcon" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpLoad">Prijzen ophalen bij '+ks.map(function(k){return esc(nameOf(k));}).join(", ")+'…<div class="bar"><i></i></div></div>');
     var res;
     try{res=await compute(function(d,n){if(!ov)return;var i=ov.querySelector(".mbCmpLoad .bar i");if(i)i.style.width=Math.round(d/n*100)+"%";});}
-    catch(e){if(ov)sheet('<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">De prijzen konden niet worden opgehaald. Controleer je internetverbinding en probeer het opnieuw.</div>');return;}
+    catch(e){if(ov)sheet('<div class="mbCmpHead"><div class="familyDialogIcon" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div><div class="mbCmpEmpty">De prijzen konden niet worden opgehaald. Controleer je internetverbinding en probeer het opnieuw.</div>');return;}
     if(!ov)return;
     drawOverview(res);
     updateBar();
   };
   function drawOverview(res){
     var best=res.shops[0],n=res.items;
-    var html='<div class="mbCmpHead"><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
+    var html='<div class="mbCmpHead"><div class="familyDialogIcon" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div><h3>Waar is je lijst het goedkoopst?</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
       '<div class="mbCmpSub">'+n+' product'+(n===1?'':'en')+' · prijzen en aanbiedingen van deze week</div>';
     if(res.blocked){
       html+='<div class="mbCmpEmpty">Niet alle prijzen konden nu worden opgehaald. Misschien is je verbinding even weg, of wordt er op dit moment veel gezocht.<br><br>De prijzen die al binnen zijn, worden bewaard. Probeer het over een minuutje opnieuw.</div><button type="button" class="mbCmpBtn" data-retry="1">Opnieuw proberen</button>';
@@ -21769,7 +21772,7 @@ window.__mbStrictDeals=(function(){
     }
     var sv=saving();
     if(focus&&ks.indexOf(focus)>0){ks.splice(ks.indexOf(focus),1);ks.unshift(focus);}
-    var html='<div class="mbCmpGrab"></div><div class="mbCmpHead"><h3>Aanbiedingen op je lijst</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
+    var html='<div class="mbCmpGrab"></div><div class="mbCmpHead"><div class="familyDialogIcon" aria-hidden="true"><i class="fa-solid fa-tag"></i></div><h3>Aanbiedingen op je lijst</h3><button class="mbDialogClose mbCmpClose" aria-label="Sluiten"><i class="fa-solid fa-xmark"></i></button></div>'+
       '<div class="mbCmpSub">'+ks.length+(ks.length===1?' product':' producten')+(sv>=0.5?' · samen <b style="color:#b85c00">'+money(sv)+'</b> voordeel':'')+'</div>';
     ks.forEach(function(k,i){
       var it=L.filter(function(x){return key(x)===k;})[0],f=found[k],p=f.best.p,pct=pctOf(p),pr=promoOf(p),o=Number(p.original_price);
@@ -21842,6 +21845,71 @@ window.__mbStrictDeals=(function(){
     },3000);
   }
   if(document.readyState==='complete') setTimeout(prewarm,1800); else window.addEventListener('load',function(){ setTimeout(prewarm,1800); });
+})();
+</script>
+<style id="popup-consistent">
+/* Alle pop-ups in dezelfde stijl: rondje met icoon, titel, kruisje; dezelfde knoppen en dezelfde manier van openen. */
+/* Lijst wissen */
+.clearListBackdrop{bottom:0!important;background:rgba(22,30,25,.38)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:110000!important}
+body.dark-theme .clearListBackdrop{background:rgba(0,0,0,.48)!important}
+html body .clearListSheet{left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;width:min(360px,calc(100vw - 36px))!important;max-width:none!important;padding:18px!important;border-radius:20px!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.24)!important;color:#29322c;opacity:0;visibility:hidden;pointer-events:none;
+  transform:translate(-50%,-50%) translateX(70px) scale(.985)!important;transition:opacity .22s ease,transform .30s cubic-bezier(.22,.8,.3,1),visibility 0s linear .30s!important}
+html body .clearListSheet.show{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,-50%)!important;transition-delay:0s!important}
+.clearListHead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.clearListHead .mbDialogClose{margin-left:auto}
+.clearListIc{background:#fde4e4!important;color:#c93434!important}
+body.dark-theme .clearListIc{background:#3a2a28!important;color:#f0b8b0!important}
+html body .clearListSheet #clearListDescription{font-size:15px;line-height:1.45;color:#59615b;margin:0}
+body.dark-theme .clearListSheet #clearListDescription{color:#b9c1bb}
+html body .clearListSheet .clearListHistoryNote{margin:12px 0 0;padding:10px 12px;border-radius:12px;font-size:13.5px;line-height:1.4;gap:9px}
+html body .clearListSheet #clearListOnlyShop{min-height:40px;margin:14px 0 0!important;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:700;background:#fdecec;color:#c53b3b}
+body.dark-theme .clearListSheet #clearListOnlyShop{background:#3a2a28;color:#f0b8b0}
+html body .clearListSheet .clearListActions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+html body .clearListSheet #clearListOnlyShop + .clearListActions{margin-top:8px}
+html body .clearListSheet .clearListActions button{min-height:40px;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:700;flex:0 0 auto}
+html body .clearListSheet .clearListCancel{background:#eaf2ec;color:#31543b}
+body.dark-theme .clearListSheet .clearListCancel{background:rgba(255,255,255,.08);color:#dff1e2}
+html body .clearListSheet .clearListConfirm{background:#c93434;color:#fff;border-radius:12px}
+body.dark-theme .clearListSheet{background:#252b26!important;color:#f1f4f1}
+/* Aanbiedingen: geen wazige achtergrond, kop met icoon */
+.mbCmpOv,.mbCmpOv.on{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.mbCmpOv.on{background:rgba(22,30,25,.38)!important}
+body.dark-theme .mbCmpOv.on{background:rgba(0,0,0,.48)!important}
+.mbCmpHead{align-items:center!important;gap:12px!important}
+.mbCmpHead h3{font-size:19px!important;font-weight:750!important;line-height:1.15!important}
+.mbCmpHead .familyDialogIcon{flex:0 0 42px}
+body.dark-theme .mbCmpHead .familyDialogIcon{background:#2d3a30;color:#cfe8d5}
+/* Kalender: rond icoon, titel zoals de rest */
+.appCalHead{gap:12px!important}
+.appCalIcon{flex:0 0 42px!important;width:42px!important;height:42px!important;border-radius:50%!important;background:#dff5df!important;color:#3F5B45!important;font-size:18px!important}
+body.dark-theme .appCalIcon{background:#2d3a30!important;color:#cfe8d5!important}
+.appCalTitle{font-size:19px!important;font-weight:750!important}
+.appCalHead .mbDialogClose{margin-left:auto}
+/* Kruisje in de standaard pop-ups */
+.familyDialogHeader .mbDialogClose.mbAutoX{margin-left:auto}
+</style>
+<script id="popup-consistent-logic">
+(function(){
+  // Lijst wissen: altijd direct in <body>, zodat de donkere laag ook de navigatie bedekt
+  function moveClear(){["clearListBackdrop","clearListSheet"].forEach(function(id){var e=document.getElementById(id);if(e&&e.parentNode!==document.body)document.body.appendChild(e);});}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",moveClear);else moveClear();
+  // Terugknop (Android) sluit Lijst wissen
+  var ob=window.__appBack;
+  window.__appBack=function(){var sh=document.querySelector(".clearListSheet.show");if(sh){try{closeClearListConfirm();}catch(e){}return true;}return ob?ob.apply(this,arguments):false;};
+  // Kruisje rechtsboven bij elke pop-up met een Annuleren/Niet nu/Sluiten-knop
+  function cancelBtn(d){return [].slice.call(d.querySelectorAll(".familyDialogActions button,.proPayFoot button,button.familyDialogCancel")).filter(function(b){return b.classList.contains("familyDialogCancel")||/^(Annuleren|Niet nu|Sluiten)$/.test((b.textContent||"").trim());})[0];}
+  function addX(ov){
+    var d=ov.querySelector(".familyDialog");if(!d)return;
+    var h=d.querySelector(".familyDialogHeader");if(!h||d.querySelector(".mbDialogClose"))return;
+    if(!cancelBtn(d))return;
+    var x=document.createElement("button");x.type="button";x.className="mbDialogClose mbAutoX";x.setAttribute("aria-label","Sluiten");
+    x.innerHTML='<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+    x.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();var c=cancelBtn(d);if(c)c.click();});
+    h.appendChild(x);
+  }
+  function scan(ov){[0,80,400].forEach(function(t){setTimeout(function(){if(ov.isConnected)addX(ov);},t);});}
+  new MutationObserver(function(ms){ms.forEach(function(m){[].forEach.call(m.addedNodes,function(n){if(n.nodeType===1&&n.classList&&n.classList.contains("familyDialogOverlay"))scan(n);});});}).observe(document.body,{childList:true});
 })();
 </script>
 </body>
